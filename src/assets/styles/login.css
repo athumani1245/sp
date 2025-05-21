@@ -1,0 +1,42 @@
+
+
+.brand-logo {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 1rem;
+}
+.login-card {
+    border: 1px solid #e3e6e8;
+    border-radius: 0; /* Removed border radius for sharp corners */
+    background: #fff;
+}
+.form-control,
+.btn,
+.btn-google {
+    border-radius: 0 !important; /* Remove border radius for inputs and buttons */
+}
+.btn-google, .btn-danger {
+    background: #fff;
+    border: 1px solid #000;
+    color: #000;
+    font-weight: 500;
+}
+.btn-google:hover, .btn-danger:hover{
+    background: #000;
+    color: #fff;
+}
+.text-brand {
+    color: #4b5e6b;
+    font-weight: 700;
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+}
+.footer {
+    color: #888;
+    font-size: 0.95rem;
+    margin-top: 2rem;
+    text-align: center;
+}
+.text-danger {
+    color: #000 !important;
+}
