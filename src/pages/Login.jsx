@@ -15,7 +15,7 @@ function Login() {
         setError("");
         setLoading(true);
 
-        await login(username, password, navigate);
+        await login(username, password, navigate, setError);
         setLoading(false);
     };
 

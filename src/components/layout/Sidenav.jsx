@@ -13,7 +13,7 @@ function Sidenav(){
                 <li className="nav-item">
                     <NavLink className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
                              to="/properties">
-                        <i className="bi bi-building"></i> Properties Management <span className="badge">24</span>
+                        <i className="bi bi-building"></i> Properties Management
                     </NavLink>
                 </li>
                 <li className="nav-item">

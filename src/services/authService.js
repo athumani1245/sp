@@ -4,7 +4,7 @@ import axios from "axios";
 const API_BASE = process.env.REACT_APP_API_BASE;
 
 
-export const login = async (username, password, navigate) => {
+export const login = async (username, password, navigate, setError) => {
     try {
         const response = await axios.post(
             `${API_BASE}/auth/login/`,
@@ -26,9 +26,10 @@ export const login = async (username, password, navigate) => {
         return { success: true };
     }
     catch (err) {
-        let error_msg = "Invalid Login Credentials. Please try again.";
+        let error_msg = "Something went wrong. Please try again.";
         if (err.response?.data?.description) {
             error_msg = err.response.data.description;
+            setError(error_msg);
         }
         return { success: false, error: error_msg}
     }

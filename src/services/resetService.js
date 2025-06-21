@@ -6,6 +6,8 @@ const API_BASE = process.env.REACT_APP_API_BASE;
 
 
 
+
+//done
 export const sendOtp = async (username, navigate, setError, setLoading) => {
     try {
         const response = await axios.post(
@@ -29,5 +31,33 @@ export const sendOtp = async (username, navigate, setError, setLoading) => {
     }
     finally {
         setLoading(false);
+    }
+}
+
+
+
+// done
+export const verifyOtp = async (username, otp, setOtpError) => {
+    try {
+        console.log(username, otp);
+        const otp_code = otp
+        const response = await axios.post(
+            `${API_BASE}/otp/verify-otp/`,
+            {
+                username,
+                otp_code
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }
+        )
+    }
+    catch (err) {
+        console.log(err);
+        if (err.response?.data?.description) {
+            setOtpError(err.response.data.description);
+        }
     }
 }
