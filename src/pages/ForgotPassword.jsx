@@ -32,8 +32,8 @@ function ForgotPassword() {
                     <a href="/" className="nav-link d-inline text-danger">Log In</a>
                 </div>
             </div>
-            <div className="container min-vh-100 d-flex flex-column justify-content-center align-items-center">
-                <div className="card p-4 shadow" style={{ maxWidth: 400, width: "100%" }}>
+            <div className="container d-flex flex-column justify-content-center align-items-center" style={{ minHeight: "30vh" }}>
+                <div className="card p-4 shadow mt-4" style={{ maxWidth: 400, width: "100%" }}>
                     <p className="mb-4 text-center">Forgot Password</p>
                     {error && <div className="alert alert-danger">{error}</div>}
                     {success && <div className="alert alert-success">{success}</div>}
