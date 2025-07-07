@@ -13,21 +13,23 @@ function Sidenav(){
                 <li className="nav-item">
                     <NavLink className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
                              to="/properties">
-                        <i className="bi bi-building"></i> Properties Management
+                        <i className="bi bi-building"></i> Properties
                     </NavLink>
                 </li>
+                 <li className="nav-item">
+                    <NavLink className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
+                             to="/dashboard/leases">
+                        <i className="bi bi-file-earmark-text"></i> Lease Management
+                    </NavLink>
+                </li>
+                
                 <li className="nav-item">
                     <NavLink className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
-                             to="#">
-                        <i className="bi bi-people"></i> Tenants Management
+                             to="/dashboard/tenants">
+                        <i className="bi bi-person"></i> Tenants
                     </NavLink>
                 </li>
-                <li className="nav-item">
-                    <NavLink className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
-                             to="#">
-                        <i className="bi bi-cash"></i> Rent Collection & Payments
-                    </NavLink>
-                </li>
+                {/*
                 <li className="nav-item">
                     <NavLink className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
                              to="#">
@@ -45,7 +47,7 @@ function Sidenav(){
                              to="#">
                         <i className="bi bi-gear"></i> Settings
                     </NavLink>
-                </li>
+                </li> */}
             </ul>
         </nav>
     );

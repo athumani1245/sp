@@ -1,0 +1,206 @@
+/* AddLease Modal Styles */
+
+/* Remove border radius for sharp angles */
+.modal-content {
+    border-radius: 0 !important;
+}
+
+.modal-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    border-radius: 0 !important;
+}
+
+.modal-title {
+    color: #495057;
+    font-weight: 600;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+    padding: 1rem 1.5rem;
+    border-radius: 0 !important;
+}
+
+/* Form styling */
+.form-label {
+    font-weight: 500;
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+.form-control,
+.form-select {
+    border: 1px solid #ced4da;
+    border-radius: 0 !important;
+    padding: 0.625rem 0.75rem;
+    font-size: 0.9rem;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    border-radius: 0 !important;
+}
+
+.form-control:disabled,
+.form-select:disabled {
+    background-color: #f8f9fa;
+    opacity: 0.7;
+}
+
+/* Section headers */
+.modal-body h6 {
+    color: #495057;
+    font-weight: 600;
+    border-bottom: 1px solid #e9ecef;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Alert styling */
+.alert {
+    border-radius: 0 !important;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+/* Button styling */
+.btn {
+    border-radius: 0 !important;
+    font-weight: 500;
+    padding: 0.625rem 1.25rem;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #004085;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+.btn-secondary:hover {
+    background-color: #545b62;
+    border-color: #4e555b;
+}
+
+/* Loading spinner */
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Form text styling */
+.form-text {
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-top: 0.25rem;
+}
+
+/* Required field indicator */
+.form-label:after {
+    content: "";
+}
+
+/* Textarea styling */
+textarea.form-control {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Modal size adjustments */
+.modal-lg {
+    max-width: 800px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .modal-body {
+        padding: 1rem;
+    }
+    
+    .modal-footer {
+        padding: 1rem;
+    }
+    
+    .btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+    }
+}
+
+/* Form validation styling */
+.was-validated .form-control:invalid,
+.form-control.is-invalid {
+    border-color: #dc3545;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23dc3545' viewBox='0 0 12 12'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath d='m5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+.was-validated .form-control:valid,
+.form-control.is-valid {
+    border-color: #28a745;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3e%3cpath fill='%2328a745' d='m2.3 6.73.94-.94a.5.5 0 0 1 .71 0l1.06 1.06a.5.5 0 0 1 0 .71l-.94.94a.5.5 0 0 1-.71 0l-1.06-1.06a.5.5 0 0 1 0-.71z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+/* Custom styling for specific elements */
+.property-unit-info {
+    background-color: #f8f9fa;
+    padding: 0.75rem;
+    border-radius: 0 !important;
+    border: 1px solid #e9ecef;
+    margin-bottom: 1rem;
+}
+
+.property-unit-info h6 {
+    margin-bottom: 0.5rem;
+    color: #495057;
+}
+
+.property-unit-info p {
+    margin-bottom: 0;
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+/* Section dividers */
+hr {
+    margin: 1.5rem 0;
+    opacity: 0.5;
+}
+
+/* Form group spacing */
+.mb-3 {
+    margin-bottom: 1rem !important;
+}

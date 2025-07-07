@@ -48,14 +48,14 @@ function Register() {
                 </div>
                 <div>
                     <span className="me-2">Already have an account?</span>
-                    <a href="/login" className="nav-link d-inline text-danger">Log In</a>
+                    <a href="/" className="nav-link d-inline text-danger">Log In</a>
                 </div>
             </div>
             <div className="container d-flex flex-column align-items-center justify-content-center" style={{ minHeight: "80vh" }}>
                 <div className="register-card w-100">
                     <h2 className="mb-2 text-center fw-bold" style={{ color: "#222" }}>Tell us a bit about yourself</h2>
                     <p className="text-center text-muted mb-4">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. <br /> Suspendisse varius enim in eros.
+                        Please fill in necessary information
                     </p>
                     {error && <div className="alert alert-danger">{error}</div>}
                     {success && <div className="alert alert-success">{success}</div>}

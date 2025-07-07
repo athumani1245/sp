@@ -1,0 +1,239 @@
+/* Add Property Modal Styles */
+
+/* Modal Overlay */
+.add-property-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 0px !important;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1050;
+    backdrop-filter: blur(2px);
+    animation: modalFadeIn 0.3s ease;
+}
+
+/* Modal Dialog */
+.add-property-modal .modal-dialog {
+    max-width: 500px;
+    width: 90%;
+    margin: 1rem;
+}
+
+/* Modal Content */
+.add-property-modal .modal-content {
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    background: #fff;
+    overflow: hidden;
+    animation: modalSlideIn 0.3s ease;
+}
+
+/* Modal Header */
+.add-property-modal .modal-header {
+    background: #f8f9fa;
+    border-bottom: 1px solid #e3e6e8;
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.add-property-modal .modal-title {
+    color: #222;
+    font-weight: 600;
+    font-size: 1.25rem;
+    margin: 0;
+}
+
+.add-property-modal .btn-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #6c757d;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.add-property-modal .btn-close:hover {
+    background: #e9ecef;
+    color: #000;
+}
+
+.add-property-modal .btn-close::before {
+    content: "×";
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+/* Modal Body */
+.add-property-modal .modal-body {
+    padding: 2rem;
+}
+
+/* Form Styles */
+.add-property-modal .form-label {
+    font-weight: 500;
+    color: #222;
+    margin-bottom: 0.5rem;
+    text-align: left;
+    display: block;
+    font-size: 0.95rem;
+}
+
+.add-property-modal .form-control,
+.add-property-modal .form-select {
+    border-radius: 6px;
+    border: 1px solid #e3e6e8;
+    background: #f7fafc;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    width: 100%;
+}
+
+.add-property-modal .form-control:focus,
+.add-property-modal .form-select:focus {
+    border-color: #4b5e6b;
+    box-shadow: 0 0 0 0.2rem rgba(75, 94, 107, 0.1);
+    background: #fff;
+    outline: none;
+}
+
+.add-property-modal .form-control::placeholder {
+    color: #6c757d;
+    opacity: 0.8;
+}
+
+/* Form Group Spacing */
+.add-property-modal .mb-3 {
+    margin-bottom: 1.5rem;
+}
+
+.add-property-modal .mb-3:last-child {
+    margin-bottom: 0;
+}
+
+/* Modal Footer */
+.add-property-modal .modal-footer {
+    background: #f8f9fa;
+    border-top: 1px solid #e3e6e8;
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+/* Button Styles */
+.add-property-modal .btn {
+    border-radius: 6px;
+    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+    min-width: 100px;
+}
+
+.add-property-modal .btn-secondary {
+    background: #6c757d;
+    color: #fff;
+}
+
+.add-property-modal .btn-secondary:hover {
+    background: #5a6268;
+    transform: translateY(-1px);
+}
+
+.add-property-modal .btn-primary {
+    background: #4b5e6b;
+    color: #fff;
+}
+
+.add-property-modal .btn-primary:hover {
+    background: #3a4a54;
+    transform: translateY(-1px);
+}
+
+.add-property-modal .btn:active {
+    transform: translateY(0);
+}
+
+/* Form Validation Styles */
+.add-property-modal .form-control:invalid {
+    border-color: #dc3545;
+}
+
+.add-property-modal .form-control:valid {
+    border-color: #28a745;
+}
+
+/* Loading State */
+.add-property-modal .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.add-property-modal .btn:disabled:hover {
+    transform: none;
+}
+
+/* Responsive Design */
+@media (max-width: 576px) {
+    .add-property-modal .modal-dialog {
+        width: 95%;
+        margin: 0.5rem;
+    }
+    
+    .add-property-modal .modal-header,
+    .add-property-modal .modal-body,
+    .add-property-modal .modal-footer {
+        padding: 1rem 1.5rem;
+    }
+    
+    .add-property-modal .modal-footer {
+        flex-direction: column-reverse;
+        gap: 0.5rem;
+    }
+    
+    .add-property-modal .btn {
+        width: 100%;
+        min-width: unset;
+    }
+}
+
+/* Animation */
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes modalSlideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}

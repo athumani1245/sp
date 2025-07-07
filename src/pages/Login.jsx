@@ -15,7 +15,7 @@ function Login() {
         setError("");
         setLoading(true);
 
-        await login(username, password, navigate, setError);
+        await login(username, password, navigate);
         setLoading(false);
     };
 
@@ -31,7 +31,9 @@ function Login() {
                 {error && <div className="alert alert-danger">{error}</div>}
                 <form onSubmit={handleSubmit}>
                     <div className="mb-3">
-                        <label htmlFor="username" className="form-label">Username<span className="text-danger">*</span></label>
+                        <div className="mb-3 d-flex justify-content-between align-items-center">
+                            <label htmlFor="username" className="form-label">Username<span className="text-danger">*</span></label>
+                        </div>
                         <input
                             type="text"
                             className="form-control"

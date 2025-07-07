@@ -41,6 +41,9 @@
 .form-label {
     font-weight: 500;
     color: #222;
+    text-align: left;
+    display: block;
+    margin-bottom: 0.5rem;
 }
 .input-group-text {
     background: #f7fafc;
