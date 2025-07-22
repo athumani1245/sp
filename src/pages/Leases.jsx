@@ -134,7 +134,7 @@ function Leases() {
   };
 
   const handleRowClick = (leaseId) => {
-    navigate(`/dashboard/leases/${leaseId}`);
+    navigate(`/leases/${leaseId}`);
   };
 
   const handleLeaseAdded = (newLease) => {
@@ -149,13 +149,10 @@ function Leases() {
       <div className="main-content">
         {/* Profile-style Header */}
         <div className="profile-container">
-          <div className="profile-header text-center">
-            <h1 className="page-title">Lease Management</h1>
-            <p className="page-subtitle">Manage and track all property lease agreements</p>
-          </div>
+          
 
           {/* Action Button Section */}
-          <div className="d-flex justify-content-end mb-4">
+          <div className="d-flex justify-content-start mb-4">
             <button 
               className="btn btn-primary"
               onClick={() => setShowAddModal(true)}

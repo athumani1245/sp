@@ -23,7 +23,7 @@ function Login() {
     return (
         <div className="container min-vh-100 d-flex flex-column justify-content-center align-items-center">
             <div className="mb-4 text-center">
-                <div className="text-brand">Smart Pangisha</div>
+                <div className="text-brand">Tanaka</div>
             </div>
             <div className="login-card p-5 shadow-sm w-100" style={{ maxWidth: "420px" }}>
                 <h2 className="mb-3 text-center fw-bold">Log In</h2>
@@ -71,7 +71,7 @@ function Login() {
                     Don't have an account? <a href="/register" className="text-danger">Sign Up</a>
                 </div>
             </div>
-            <div className="footer mt-4">© 2025 Smart Pangisha</div>
+            <div className="footer mt-4">© 2025 Tanaka</div>
         </div>
     );
 }

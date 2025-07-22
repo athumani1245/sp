@@ -72,7 +72,7 @@ function Property() {
                 setProperty(result.data);
                 console.log('Property data:', result.data); // Debug log
                 console.log('Address data:', result.data.address); // Debug log
-                // Populate edit data
+                // Populate edit data and location IDs
                 setEditData({
                     propertyName: result.data.property_name || "",
                     propertyType: result.data.property_type || "",
@@ -81,6 +81,13 @@ function Property() {
                     ward: result.data.address?.ward || "",
                     street: result.data.address?.street || "",
                 });
+                
+                // Set the selected location values
+                if (result.data.address) {
+                    setSelectedRegionId(result.data.address.region_code || "");
+                    setSelectedDistrictId(result.data.address.district_code || "");
+                    setSelectedWardId(result.data.address.ward_code || "");
+                }
             } else {
                 setError(result.error || "Failed to fetch property details");
             }
@@ -158,17 +165,42 @@ function Property() {
         }
     }, [propertyId]);
 
-    // Load regions when editing starts
+    // Load location data when the component mounts or property changes
     useEffect(() => {
-        if (isEditing) {
-            loadRegions();
-            // If we have existing location data, we need to populate the selected IDs
-            if (property?.address) {
-                // Here we would need to find the region/district/ward IDs based on names
-                // For now, we'll handle this in the region loading
+        const loadLocationData = async () => {
+            try {
+                setLocationLoading(true);
+                
+                // Load regions
+                const regionsResponse = await getRegions();
+                if (regionsResponse.success) {
+                    setRegions(regionsResponse.data || []);
+                }
+                
+                // If we have a selected region, load districts
+                if (selectedRegionId) {
+                    const districtsResponse = await getDistricts(selectedRegionId);
+                    if (districtsResponse.success) {
+                        setDistricts(districtsResponse.data || []);
+                    }
+                }
+                
+                // If we have a selected district, load wards
+                if (selectedDistrictId) {
+                    const wardsResponse = await getWards(selectedDistrictId);
+                    if (wardsResponse.success) {
+                        setWards(wardsResponse.data || []);
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading location data:', error);
+            } finally {
+                setLocationLoading(false);
             }
-        }
-    }, [isEditing, property]);
+        };
+
+        loadLocationData();
+    }, [property]);
 
     const loadRegions = async () => {
         try {
@@ -195,16 +227,8 @@ function Property() {
         setSelectedRegionId(regionId);
         setEditData(prev => ({
             ...prev,
-            region: regionName,
-            district: '',
-            ward: ''
+            region: regionName
         }));
-        
-        // Reset dependent dropdowns
-        setDistricts([]);
-        setWards([]);
-        setSelectedDistrictId('');
-        setSelectedWardId('');
         
         if (regionId) {
             try {
@@ -232,13 +256,8 @@ function Property() {
         setSelectedDistrictId(districtId);
         setEditData(prev => ({
             ...prev,
-            district: districtName,
-            ward: ''
+            district: districtName
         }));
-        
-        // Reset wards
-        setWards([]);
-        setSelectedWardId('');
         
         if (districtId) {
             try {
@@ -323,10 +342,16 @@ function Property() {
         setSuccess("");
         
         try {
+            const selectedRegion = regions.find(r => r.region_code === selectedRegionId);
+            const selectedDistrict = districts.find(d => d.district_code === selectedDistrictId);
+            const selectedWard = wards.find(w => w.ward_code === selectedWardId);
+            
             const propertyData = {
                 propertyName: editData.propertyName,
                 propertyType: editData.propertyType,
-                ward: editData.ward,
+                ward: selectedWard ? selectedWard.ward_name : editData.ward,
+                district: selectedDistrict ? selectedDistrict.district_name : editData.district,
+                region: selectedRegion ? selectedRegion.region_name : editData.region,
                 street: editData.street,
             };
             
@@ -580,7 +605,7 @@ function Property() {
                                     <Link to="/dashboard">Dashboard</Link>
                                 </li>
                                 <li className="breadcrumb-item">
-                                    <Link to="/dashboard/properties">Properties</Link>
+                                    <Link to="/properties">Properties</Link>
                                 </li>
                                 <li className="breadcrumb-item active" aria-current="page">
                                     {property.property_name}
@@ -590,7 +615,7 @@ function Property() {
                     </div>
                     <div>
                         
-                        <Link to="/dashboard/properties" className="btn btn-secondary">
+                        <Link to="/properties" className="btn btn-secondary">
                             <i className="bi bi-arrow-left me-2"></i>
                             Back
                         </Link>
@@ -675,10 +700,8 @@ function Property() {
                                                         disabled={!isEditing}
                                                     >
                                                         <option value="">Select Type</option>
-                                                        <option value="Residential">Residential</option>
-                                                        <option value="Commercial">Commercial</option>
-                                                        <option value="Mixed">Mixed</option>
-                                                        <option value="Industrial">Industrial</option>
+                                                        <option value="Standalone">Standalone</option>
+                                                        <option value="Apartment">Apartment</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -803,72 +826,6 @@ function Property() {
                                                 </div>
                                             </div>
                                         </div>
-
-                                        
-
-                                        <div className="row">
-                                            <div className="col-md-6">
-                                                <div className="mb-3">
-                                                    <label htmlFor="status" className="form-label">Status</label>
-                                                    <div className="form-control-static">
-                                                        <span className={getStatusBadge(property.status)}>
-                                                            {property.status || 'Active'}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div className="col-md-6">
-                                                <div className="mb-3">
-                                                    <label htmlFor="totalUnits" className="form-label">Total Units</label>
-                                                    <input
-                                                        type="text"
-                                                        className="form-control fw-bold text-primary"
-                                                        id="totalUnits"
-                                                        value={property.id || 'N/A'}
-                                                        disabled
-                                                        readOnly
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="row">
-                                            <div className="col-md-6">
-                                                <div className="mb-3">
-                                                    <label htmlFor="createdAt" className="form-label">Created Date</label>
-                                                    <input
-                                                        type="text"
-                                                        className="form-control"
-                                                        id="createdAt"
-                                                        value={property.created_at 
-                                                            ? new Date(property.created_at).toLocaleDateString()
-                                                            : 'N/A'
-                                                        }
-                                                        disabled
-                                                        readOnly
-                                                    />
-                                                </div>
-                                            </div>                                            
-                                            <div className="col-md-6">
-                                                <div className="mb-3">
-                                                    <label className="form-label">Property Managers</label>
-                                                    <div className="form-control-static" role="region" aria-label="Property managers list">
-                                                        {property.managers && property.managers.length > 0 ? (
-                                                            <div className="d-flex flex-wrap gap-2">
-                                                                {property.managers.map((manager) => (
-                                                                    <span key={manager.id || manager.email || manager.name} className="badge bg-info text-dark">
-                                                                        <i className="bi bi-person me-1"></i>
-                                                                        {manager.name || manager.email || 'Manager'}
-                                                                    </span>
-                                                                ))}
-                                                            </div>
-                                                        ) : (
-                                                            <span className="text-muted">No managers assigned</span>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
                                     </form>
                                 </div>
                             </div>
@@ -886,20 +843,10 @@ function Property() {
                             <div className="card-header">
                                 <h5 className="card-title">
                                     <i className="bi bi-door-open me-2"></i>
-                                    Property Units
-                                    {units.length > 0 && (
-                                        <span className="badge bg-primary ms-2">{units.length}</span>
-                                    )}
+                                    Units
                                 </h5>
                             </div>
                             <div className="card-body">
-                                {unitsError && (
-                                    <div className="alert alert-danger" role="alert">
-                                        <i className="bi bi-exclamation-triangle me-2"></i>
-                                        {unitsError}
-                                    </div>
-                                )}
-
                                 {unitsLoading && (
                                     <div className="text-center py-4">
                                         <div className="spinner-border text-primary" role="status">

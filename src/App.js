@@ -27,12 +27,12 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/otp-verify" element={<OtpVerify />} />
         <Route path="/properties" element={<Properties />} />
-        <Route path="/dashboard/properties" element={<Properties />} />
-        <Route path="/dashboard/properties/:propertyId" element={<Property />} />
-        <Route path="/dashboard/leases" element={<Leases />} />
-        <Route path="/dashboard/leases/:leaseId" element={<Lease />} />
-        <Route path="/dashboard/tenants" element={<Tenants />} />
-        <Route path="/dashboard/tenants/:tenantId" element={<Tenant />} />
+        <Route path="/properties" element={<Properties />} />
+        <Route path="/properties/:propertyId" element={<Property />} />
+        <Route path="/leases" element={<Leases />} />
+        <Route path="/leases/:leaseId" element={<Lease />} />
+        <Route path="/tenants" element={<Tenants />} />
+        <Route path="/tenants/:tenantId" element={<Tenant />} />
         <Route path="/profile" element={<Profile />} />
 
       </Routes>

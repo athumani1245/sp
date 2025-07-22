@@ -225,13 +225,13 @@ export const deleteLease = async (leaseId) => {
 // Terminate a lease
 export const terminateLease = async (leaseId, terminationData = {}) => {
     try {
-        const response = await axios.patch(
+        const response = await axios.post(
             `${API_BASE}/leases/${leaseId}/terminate/`,
-            {
-                termination_date: terminationData.termination_date || new Date().toISOString().split('T')[0],
-                termination_reason: terminationData.termination_reason || "",
-                refund_amount: parseFloat(terminationData.refund_amount) || 0
-            },
+            // {
+            //     termination_date: terminationData.termination_date || new Date().toISOString().split('T')[0],
+            //     termination_reason: terminationData.termination_reason || "",
+            //     refund_amount: parseFloat(terminationData.refund_amount) || 0
+            // },
             { headers: getAuthHeaders() }
         );
 

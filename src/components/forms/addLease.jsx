@@ -10,21 +10,21 @@ import '../../assets/styles/add-lease.css';
 
 const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
     const [formData, setFormData] = useState({
-        property_id: '',
-        unit_id: '',
-        tenant_first_name: '',
-        tenant_last_name: '',
+        unit: '',
+        first_name: '',
+        last_name: '',
         tenant_phone: '',
-        tenant_id_number: '',
+        number_of_month: '',
         start_date: '',
-        lease_months: '',
         end_date: '',
-        monthly_rent: '',
-        total_amount: '',
-        security_deposit: '',
+        rent_amount_per_unit: '',
+        discount: '',
         amount_paid: '',
-        paid_amount: '',
-        discount: ''
+        total_amount: '',
+        // Additional fields for UI purposes only (not sent to API)
+        property_id: '',
+        tenant_id_number: '',
+        security_deposit: ''
     });
 
     const [properties, setProperties] = useState([]);
@@ -44,21 +44,21 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
 
     const resetForm = () => {
         setFormData({
-            property_id: '',
-            unit_id: '',
-            tenant_first_name: '',
-            tenant_last_name: '',
+            unit: '',
+            first_name: '',
+            last_name: '',
             tenant_phone: '',
-            tenant_id_number: '',
+            number_of_month: '',
             start_date: '',
-            lease_months: '',
-            end_date: '',   
-            monthly_rent: '',
-            total_amount: '',
-            security_deposit: '',
+            end_date: '',
+            rent_amount_per_unit: '',
+            discount: '',
             amount_paid: '',
-            paid_amount: '',
-            discount: ''
+            total_amount: '',
+            // Additional fields for UI purposes only
+            property_id: '',
+            tenant_id_number: '',
+            security_deposit: ''
         });
         setAvailableUnits([]);
         setError('');
@@ -141,50 +141,51 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
         // Load units when property is selected
         if (name === 'property_id' && value) {
             loadAvailableUnits(value);
-            setFormData(prev => ({ ...prev, unit_id: '', monthly_rent: '' }));
+            setFormData(prev => ({ ...prev, unit: '', rent_amount_per_unit: '' }));
         }
 
         // Auto-fill rent amount when unit is selected
-        if (name === 'unit_id' && value) {
+        if (name === 'unit' && value) {
             const selectedUnit = availableUnits.find(unit => unit.id.toString() === value);
             if (selectedUnit) {
                 const rentAmount = selectedUnit.rent_per_month || selectedUnit.rent_amount || 0;
                 setFormData(prev => ({ 
                     ...prev, 
-                    monthly_rent: rentAmount,
-                    total_amount: formData.lease_months ? calculateTotalAmount(rentAmount, formData.lease_months) : ''
+                    rent_amount_per_unit: rentAmount,
+                    total_amount: formData.number_of_month ? calculateTotalAmount(rentAmount, formData.number_of_month) : ''
                 }));
             }
         }
 
-        // Calculate end date when start date or lease months change
-        if (name === 'start_date' || name === 'lease_months') {
+        // Calculate end date when start date or number of months change
+        if (name === 'start_date' || name === 'number_of_month') {
             const startDate = name === 'start_date' ? value : formData.start_date;
-            const months = name === 'lease_months' ? value : formData.lease_months;
+            const months = name === 'number_of_month' ? value : formData.number_of_month;
             
             if (startDate && months) {
                 const endDate = calculateEndDate(startDate, months);
                 setFormData(prev => ({ 
                     ...prev, 
                     end_date: endDate,
-                    total_amount: formData.monthly_rent ? calculateTotalAmount(formData.monthly_rent, months) : ''
+                    total_amount: formData.rent_amount_per_unit ? calculateTotalAmount(formData.rent_amount_per_unit, months) : ''
                 }));
             }
         }
 
         // Calculate total amount when monthly rent changes
-        if (name === 'monthly_rent') {
-            if (value && formData.lease_months) {
-                const totalAmount = calculateTotalAmount(value, formData.lease_months);
+        if (name === 'rent_amount_per_unit') {
+            if (value && formData.number_of_month) {
+                const totalAmount = calculateTotalAmount(value, formData.number_of_month);
                 setFormData(prev => ({ ...prev, total_amount: totalAmount }));
             }
         }
     };
 
     const validateForm = () => {
+        
         const requiredFields = [
-            'property_id', 'unit_id', 'tenant_first_name', 'tenant_last_name', 
-            'start_date', 'lease_months', 'monthly_rent'
+            'property_id', 'unit', 'first_name', 'last_name', 
+            'start_date', 'number_of_month', 'rent_amount_per_unit'
         ];
 
         for (let field of requiredFields) {
@@ -194,9 +195,9 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
             }
         }
 
-        // Validate lease months
-        if (formData.lease_months <= 0) {
-            setError('Lease months must be greater than 0');
+        // Validate number of months
+        if (formData.number_of_month <= 0) {
+            setError('Number of months must be greater than 0');
             return false;
         }
 
@@ -222,43 +223,30 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
         setError('');
         
         try {
+            // Prepare data for API call - only send required fields in exact format
+            const leaseData = {
+                unit: formData.unit,
+                first_name: formData.first_name,
+                last_name: formData.last_name,
+                tenant_phone: formData.tenant_phone || "",
+                number_of_month: formData.number_of_month,
+                start_date: formData.start_date,
+                end_date: formData.end_date,
+                rent_amount_per_unit: formData.rent_amount_per_unit,
+                discount: formData.discount || "0",
+                amount_paid: formData.amount_paid || "0",
+                total_amount: formData.total_amount
+            };
+
             // Call the actual lease service
-            const result = await createLease(formData);
-            
+            const result = await createLease(leaseData);
+
             if (result.success) {
                 setSuccess(result.message || 'Lease created successfully!');
-                
-                // Create enriched lease object for callback
-                const newLease = {
-                    id: result.data?.id || Date.now(),
-                    tenant_first_name: formData.tenant_first_name,
-                    tenant_last_name: formData.tenant_last_name,
-                    tenant_name: `${formData.tenant_first_name} ${formData.tenant_last_name}`.trim(),
-                    tenant_phone: formData.tenant_phone,
-                    tenant_id_number: formData.tenant_id_number,
-                    property_id: formData.property_id,
-                    unit_id: formData.unit_id,
-                    start_date: formData.start_date,
-                    end_date: formData.end_date,
-                    lease_months: formData.lease_months,
-                    monthly_rent: formData.monthly_rent,
-                    total_amount: formData.total_amount,
-                    amount_paid: formData.paid_amount || 0,
-                    discount: formData.discount || 0,
-                    security_deposit: formData.security_deposit,
-                    status: 'active',
-                    created_at: new Date().toISOString(),
-                    // Get property and unit names for display
-                    property_name: properties.find(p => p.id.toString() === formData.property_id)?.property_name || 'Unknown Property',
-                    unit_number: availableUnits.find(u => u.id.toString() === formData.unit_id)?.unit_name || 
-                               availableUnits.find(u => u.id.toString() === formData.unit_id)?.unit_number || 'Unknown Unit'
-                };
-
-                // Call the callback with the new lease data
+                // Notify parent to refresh lease list
                 if (onLeaseAdded) {
-                    onLeaseAdded(newLease);
+                    onLeaseAdded();
                 }
-
                 // Close modal after short delay to show success message
                 setTimeout(() => {
                     onClose();
@@ -335,8 +323,8 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                             <Form.Group className="mb-3">
                                 <Form.Label>Available Unit *</Form.Label>
                                 <Form.Select
-                                    name="unit_id"
-                                    value={formData.unit_id}
+                                    name="unit"
+                                    value={formData.unit}
                                     onChange={handleInputChange}
                                     disabled={!formData.property_id || loading}
                                     required
@@ -369,8 +357,8 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                                 <Form.Label>First Name *</Form.Label>
                                 <Form.Control
                                     type="text"
-                                    name="tenant_first_name"
-                                    value={formData.tenant_first_name}
+                                    name="first_name"
+                                    value={formData.first_name}
                                     onChange={handleInputChange}
                                     placeholder="Enter first name"
                                     required
@@ -383,8 +371,8 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                                 <Form.Label>Last Name *</Form.Label>
                                 <Form.Control
                                     type="text"
-                                    name="tenant_last_name"
-                                    value={formData.tenant_last_name}
+                                    name="last_name"
+                                    value={formData.last_name}
                                     onChange={handleInputChange}
                                     placeholder="Enter last name"
                                     required
@@ -417,6 +405,9 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                                     onChange={handleInputChange}
                                     placeholder="Enter ID/Passport number"
                                 />
+                                <Form.Text className="text-muted">
+                                    Optional - for reference only
+                                </Form.Text>
                             </Form.Group>
                         </Col>
                     </Row>
@@ -446,8 +437,8 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                                 <Form.Label>Lease Duration (Months) *</Form.Label>
                                 <Form.Control
                                     type="number"
-                                    name="lease_months"
-                                    value={formData.lease_months}
+                                    name="number_of_month"
+                                    value={formData.number_of_month}
                                     onChange={handleInputChange}
                                     placeholder="Enter number of months"
                                     min="1"
@@ -479,8 +470,8 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                                 <Form.Label>Monthly Rent (TSh) *</Form.Label>
                                 <Form.Control
                                     type="number"
-                                    name="monthly_rent"
-                                    value={formData.monthly_rent}
+                                    name="rent_amount_per_unit"
+                                    value={formData.rent_amount_per_unit}
                                     onChange={handleInputChange}
                                     placeholder="Enter monthly rent amount"
                                     required
@@ -509,8 +500,8 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                                 <Form.Label>Paid Amount (TSh)</Form.Label>
                                 <Form.Control
                                     type="number"
-                                    name="paid_amount"
-                                    value={formData.paid_amount}
+                                    name="amount_paid"
+                                    value={formData.amount_paid}
                                     onChange={handleInputChange}
                                     placeholder="Enter paid amount"
                                 />

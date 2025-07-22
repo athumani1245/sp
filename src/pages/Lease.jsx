@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { Container, Row, Col, Card, Button, Badge, Tab, Tabs, Alert, Spinner } from "react-bootstrap";
+import { Container, Row, Col, Card, Button, Badge, Tab, Tabs, Alert, Spinner, Modal } from "react-bootstrap";
 import Layout from "../components/Layout";
 import { getLeaseById, getLeasePayments, getLeaseDocuments, terminateLease, renewLease } from "../services/leaseService";
 import "../assets/styles/profile.css";
@@ -19,12 +19,48 @@ function Lease() {
   const [documentsLoading, setDocumentsLoading] = useState(false);
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState("details");
+  const [isCancelling, setIsCancelling] = useState(false);
+  const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
 
   useEffect(() => {
     if (leaseId) {
       fetchLeaseDetails();
     }
   }, [leaseId]);
+
+  const handleCancelClick = () => {
+    setShowCancelConfirmation(true);
+  };
+
+  const handleCancelConfirm = async () => {
+    setIsCancelling(true);
+    try {
+      const terminationData = {
+        termination_date: new Date().toISOString().split('T')[0],
+        termination_reason: "Lease cancelled by management",
+        refund_amount: 0
+      };
+      
+      const result = await terminateLease(leaseId, terminationData);
+      if (result.success) {
+        // Optionally show a success message before navigating
+        setError(""); // Clear any existing errors
+        navigate('/leases');
+      } else {
+        setError(result.error || 'Failed to cancel lease');
+      }
+    } catch (error) {
+      console.error('Error cancelling lease:', error);
+      setError('Failed to cancel lease');
+    } finally {
+      setIsCancelling(false);
+      setShowCancelConfirmation(false);
+    }
+  };
+
+  const handleCancelModalClose = () => {
+    setShowCancelConfirmation(false);
+  };
 
   const fetchLeaseDetails = async () => {
     try {
@@ -236,7 +272,7 @@ function Lease() {
           <Alert variant="danger">
             <Alert.Heading>Error</Alert.Heading>
             <p>{error}</p>
-            <Button variant="outline-danger" onClick={() => navigate("/dashboard/leases")}>
+            <Button variant="outline-danger" onClick={() => navigate("/leases")}>
               Back to Leases
             </Button>
           </Alert>
@@ -252,7 +288,7 @@ function Lease() {
           <Alert variant="warning">
             <Alert.Heading>Lease Not Found</Alert.Heading>
             <p>The requested lease could not be found.</p>
-            <Button variant="outline-warning" onClick={() => navigate("/dashboard/leases")}>
+            <Button variant="outline-warning" onClick={() => navigate("/leases")}>
               Back to Leases
             </Button>
           </Alert>
@@ -263,23 +299,24 @@ function Lease() {
 
   return (
     <Layout>
-      <Container fluid className="py-4">
+      <div className="main-content">
+        <Container fluid className="py-4">
         {/* Header */}
         <div className="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <nav aria-label="breadcrumb">
                     <ol className="breadcrumb">
                         <li className="breadcrumb-item">
-                            <Link to="/dashboard/leases">Leases Management</Link>
+                            <Link to="/leases">Leases Management</Link>
                         </li>
                         <li className="breadcrumb-item active" aria-current="page">
-                            Lease Details
+                            Details
                         </li>
                     </ol>
                 </nav>
                 <h2>
                     <i className="bi bi-file-earmark-text me-2"></i>
-                    Lease Agreement
+                    {lease.lease_number}
                 </h2>
                 <small className="text-muted mb-0">
                     Reference: {lease.lease_number} | Status: {lease.status}
@@ -289,18 +326,58 @@ function Lease() {
             <div>
                 <Button 
                     variant="outline-secondary" 
-                    onClick={() => navigate("/dashboard/leases")}
+                    onClick={() => navigate("/leases")}
                     className="me-2"
                 >
                     <i className="bi bi-arrow-left me-1"></i>
                     Back to Leases
                 </Button>
-                <Button variant="primary">
+                <Button variant="primary" className="me-2">
                     <i className="bi bi-pencil me-1"></i>
                     Edit Lease
                 </Button>
+                <Button 
+                    variant="warning" 
+                    onClick={handleCancelClick}
+                    disabled={isCancelling}
+                >
+                    <i className="bi bi-x-circle me-1"></i>
+                    {isCancelling ? 'Cancelling...' : 'Cancel Lease'}
+                </Button>
           </div>
         </div>
+
+        {/* Cancel Confirmation Modal */}
+        <Modal show={showCancelConfirmation} onHide={handleCancelModalClose} backdrop="static">
+          <Modal.Header closeButton>
+            <Modal.Title>
+              <i className="bi bi-exclamation-triangle-fill text-warning me-2"></i>
+              Cancel Lease
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <p>Are you sure you want to cancel this lease? The lease will be marked as terminated.</p>
+            <div className="mt-3 p-3 bg-light rounded">
+              <strong>Lease Details:</strong>
+              <ul className="mt-2 mb-0">
+                <li>Tenant: {lease.tenant.first_name} {lease.tenant.last_name}</li>
+                <li>Property: {lease.property.property_name}</li>
+                <li>Unit: {getUnitInfo(lease)}</li>
+                <li>Duration: {lease.lease_months} months</li>
+              </ul>
+            </div>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={handleCancelModalClose}>
+              <i className="bi bi-x-circle me-2"></i>
+              Close
+            </Button>
+            <Button variant="warning" onClick={handleCancelConfirm} disabled={isCancelling}>
+              <i className="bi bi-x-circle me-2"></i>
+              {isCancelling ? 'Cancelling...' : 'Confirm Cancel'}
+            </Button>
+          </Modal.Footer>
+        </Modal>
 
        
 
@@ -334,7 +411,7 @@ function Lease() {
                 <Row className="g-3 mb-5">
                   <Col md={6}>
                     <div className="mb-3">
-                      <label className="form-label">Full Name</label>
+                      <label className="form-label">Tenant</label>
                       <input 
                         type="text" 
                         className="form-control" 
@@ -627,6 +704,7 @@ function Lease() {
             )}
         </div>
       </Container>
+      </div>
     </Layout>
   );
 }
