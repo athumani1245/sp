@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Modal, Button } from 'react-bootstrap';
 import Layout from "../components/Layout";
+import AddTenantModal from "../components/forms/AddTenant";
 import { getTenants, deleteTenant } from "../services/tenantService";
 import "../assets/styles/profile.css";
 import "../assets/styles/leases.css";
@@ -98,6 +99,7 @@ function Tenants() {
     try {
       return new Date(dateString).toLocaleDateString();
     } catch (error) {
+      console.warn('Error formatting date:', error);
       return 'Invalid Date';
     }
   };
@@ -184,26 +186,16 @@ function Tenants() {
     fetchTenants();
   };
 
-  const handleTenantUpdated = (updatedTenant) => {
-    console.log('Tenant updated:', updatedTenant);
-    setShowEditModal(false);
-    setEditingTenant(null);
-    // Refresh the tenant list to get the latest data from the server
-    fetchTenants();
-  };
 
   return (
     <Layout>
       <div className="main-content">
         {/* Profile-style Header */}
         <div className="profile-container">
-          <div className="profile-header text-center">
-            <h1 className="page-title">Tenant Management</h1>
-            <p className="page-subtitle">Manage and track all tenant information</p>
-          </div>
+         
 
           {/* Action Button Section */}
-          <div className="d-flex justify-content-end mb-4">
+          <div className="d-flex justify-content-start mb-4">
             <button 
               className="btn btn-primary"
               onClick={() => setShowAddModal(true)}
@@ -237,13 +229,14 @@ function Tenants() {
             <div className="card-body">
               <div className="row g-3">
                 <div className="col-md-6">
-                  <label className="form-label">Search Tenants</label>
+                  <label className="form-label" htmlFor="tenant-search">Search Tenants</label>
                   <div className="input-group">
                     <span className="input-group-text">
                       <i className="bi bi-search"></i>
                     </span>
                     <input
                       type="text"
+                      id="tenant-search"
                       className="form-control"
                       placeholder="Search by name, email, phone, or ID number..."
                       value={search}
@@ -252,7 +245,7 @@ function Tenants() {
                   </div>
                 </div>
                 <div className="col-md-3">
-                  <label className="form-label">Status Filter</label>
+                  <label className="form-label" htmlFor="status-filter">Status Filter</label>
                   <select
                     className="form-select"
                     value={status}
@@ -348,7 +341,7 @@ function Tenants() {
                     <thead className="table-light">
                       <tr>
                         <th style={{ width: '25%' }}>Tenant Name</th>
-                        <th style={{ width: '20%' }}>Contact Info</th>
+                        <th style={{ width: '20%' }}>Contact</th>
                         <th style={{ width: '15%' }}>Join Date</th>
                         <th style={{ width: '12%' }}>Status</th>
                         <th style={{ width: '13%' }}>Actions</th>
@@ -371,10 +364,7 @@ function Tenants() {
                           </td>
                           <td>
                             <div className="contact-info">
-                              <span className="email d-block">
-                                <i className="bi bi-envelope me-1"></i>
-                                {tenant.email || 'No email'}
-                              </span>
+                             
                               <span className="phone text-muted">
                                 <i className="bi bi-telephone me-1"></i>
                                 {formatPhone(tenant.username) || 'No phone'}
@@ -477,7 +467,7 @@ function Tenants() {
           {tenantToDelete && (
             <div className="alert alert-warning">
               <strong>Tenant:</strong> {getTenantName(tenantToDelete)}<br />
-              <strong>Email:</strong> {tenantToDelete.email || 'N/A'}<br />
+              <strong>Phone:</strong> {tenantToDelete.username || 'N/A'}<br />
               <small className="text-muted">This action cannot be undone and may affect existing leases.</small>
             </div>
           )}
@@ -496,36 +486,12 @@ function Tenants() {
         </Modal.Footer>
       </Modal>
 
-      {/* TODO: Add Tenant Modal */}
-      {showAddModal && (
-        <div className="modal fade show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-          <div className="modal-dialog modal-lg">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">Add New Tenant</h5>
-                <button 
-                  type="button" 
-                  className="btn-close" 
-                  onClick={() => setShowAddModal(false)}
-                ></button>
-              </div>
-              <div className="modal-body">
-                <p className="text-muted">Add Tenant form will be implemented here.</p>
-                {/* TODO: Create AddTenantModal component */}
-              </div>
-              <div className="modal-footer">
-                <button 
-                  type="button" 
-                  className="btn btn-secondary" 
-                  onClick={() => setShowAddModal(false)}
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Add Tenant Modal */}
+      <AddTenantModal
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        onTenantAdded={handleTenantAdded}
+      />
 
       {/* TODO: Edit Tenant Modal */}
       {showEditModal && editingTenant && (

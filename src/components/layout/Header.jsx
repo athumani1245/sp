@@ -24,7 +24,7 @@ function Header() {
             <div>
                 {/* <img src="https://svgshare.com/i/14hA.svg" alt="Magnolia Logo" className="brand-logo" /> */}
                 <a href="/dashboard" className="text-brand text-decoration-none">
-                    Smart Pangisha
+                    Tanaka
                 </a>
             </div>
             <input type="text" className="search-box" placeholder="Search" />
@@ -32,7 +32,7 @@ function Header() {
                 <button className="icon-btn"><i className="bi bi-bell"></i></button>
                 {/* Added link to profile page */}
                 <a href="/profile" className="profile-circle dropdown-toggle" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false" type="button" style={{ textDecoration: 'none', color: 'inherit' }}>
-                    B
+                    O
                 </a>
                 <ul className="dropdown-menu dropdown-menu-end mt-2" aria-labelledby="profileDropdown">
                     <li>
@@ -41,7 +41,6 @@ function Header() {
                         </button>
                     </li>
                     <li><button className="dropdown-item" type="button">Settings</button></li>
-                    <li><button className="dropdown-item" type="button">Profile</button></li>
                     <li><hr className="dropdown-divider" /></li>
                     <li><button className="dropdown-item text-danger" onClick={handleLogout}>Logout</button></li>
                 </ul>

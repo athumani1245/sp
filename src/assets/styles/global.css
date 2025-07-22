@@ -5,3 +5,15 @@ body {
     background-color: #f7fafc !important;
     font-family: 'Host Grotesk', sans-serif !important;
 }
+
+/* Fixed layout styles */
+body.fixed-layout {
+    padding-top: 0;
+    overflow-x: hidden;
+}
+
+/* Ensure content doesn't go under fixed header */
+body.fixed-layout .container-fluid {
+    padding-left: 0;
+    padding-right: 0;
+}

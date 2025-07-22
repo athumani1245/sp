@@ -90,7 +90,7 @@ export const getTenantById = async (tenantId) => {
 export const createTenant = async (tenantData) => {
     try {
         const response = await axios.post(
-            `${API_BASE}/tenants/`,
+            `${API_BASE}/auth/register-other-users/`,
             tenantData,
             { headers: getAuthHeaders() }
         );

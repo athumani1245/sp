@@ -6,7 +6,7 @@ import { addProperty, getRegions, getDistricts, getWards } from '../../services/
 const AddPropertyModal = ({isOpen, onClose, onPropertyAdded})=>{
     const [formData, setFormData] = useState({
         propertyName: '',
-        propertyType: 'Residential',
+        propertyType: 'Apartment',
         region: '',
         district: '',
         ward: '',
@@ -262,10 +262,8 @@ const AddPropertyModal = ({isOpen, onClose, onPropertyAdded})=>{
                                     value={formData.propertyType}
                                     onChange={handleInputChange}
                                 >
-                                    <option value="Residential">Residential</option>
-                                    <option value="Commercial">Commercial</option>
-                                    <option value="Industrial">Industrial</option>
-                                    <option value="Mixed-use">Mixed-use</option>
+                                    <option value="Standalone">Standalone</option>
+                                    <option value="Apartment">Apartment</option>
                                 </select>
                             </div>
 
