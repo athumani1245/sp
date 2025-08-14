@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form, Row, Col, Alert } from 'react-bootstrap';
 import { getProperties, getPropertyUnits } from '../../services/propertyService';
 import { createLease } from '../../services/leaseService';
+import { getTenants } from '../../services/tenantService';
 import '../../assets/styles/add-lease.css';
 
 
@@ -11,6 +12,8 @@ import '../../assets/styles/add-lease.css';
 const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
     const [formData, setFormData] = useState({
         unit: '',
+        property_id: '',
+        tenant_id: '',
         first_name: '',
         last_name: '',
         tenant_phone: '',
@@ -21,13 +24,10 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
         discount: '',
         amount_paid: '',
         total_amount: '',
-        // Additional fields for UI purposes only (not sent to API)
-        property_id: '',
-        tenant_id_number: '',
-        security_deposit: ''
     });
 
     const [properties, setProperties] = useState([]);
+    const [tenants, setTenants] = useState([]);
     const [availableUnits, setAvailableUnits] = useState([]);
     const [loading, setLoading] = useState(false);
     const [submitLoading, setSubmitLoading] = useState(false);
@@ -39,12 +39,32 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
         if (isOpen) {
             resetForm();
             loadProperties();
+            loadTenants();
         }
     }, [isOpen]);
+
+    const loadTenants = async () => {
+        try {
+            setLoading(true);
+            const result = await getTenants();
+            if (result.success) {
+                setTenants(result.data || []);
+            } else {
+                setError('Failed to load tenants');
+            }
+        } catch (error) {
+            console.error('Failed to load tenants:', error);
+            setError('Failed to load tenants');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const resetForm = () => {
         setFormData({
             unit: '',
+            property_id: '',
+            tenant_id: '',
             first_name: '',
             last_name: '',
             tenant_phone: '',
@@ -55,10 +75,6 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
             discount: '',
             amount_paid: '',
             total_amount: '',
-            // Additional fields for UI purposes only
-            property_id: '',
-            tenant_id_number: '',
-            security_deposit: ''
         });
         setAvailableUnits([]);
         setError('');
@@ -144,6 +160,29 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
             setFormData(prev => ({ ...prev, unit: '', rent_amount_per_unit: '' }));
         }
 
+        // Auto-fill tenant details when tenant is selected
+        if (name === 'tenant_id' && value) {
+            console.log('Selected tenant ID:', value);
+            console.log('Available tenants:', tenants);
+            const selectedTenant = tenants.find(tenant => tenant.id === parseInt(value) || tenant.id === value);
+            console.log('Selected tenant:', selectedTenant);
+            if (selectedTenant) {
+                setFormData(prev => {
+                    console.log('Setting tenant data:', {
+                        first_name: selectedTenant.first_name,
+                        last_name: selectedTenant.last_name,
+                        tenant_phone: selectedTenant.phone || selectedTenant.username || ''
+                    });
+                    return {
+                        ...prev,
+                        first_name: selectedTenant.first_name,
+                        last_name: selectedTenant.last_name,
+                        tenant_phone: selectedTenant.phone || selectedTenant.username || ''
+                    };
+                });
+            }
+        }
+
         // Auto-fill rent amount when unit is selected
         if (name === 'unit' && value) {
             const selectedUnit = availableUnits.find(unit => unit.id.toString() === value);
@@ -184,7 +223,7 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
     const validateForm = () => {
         
         const requiredFields = [
-            'property_id', 'unit', 'first_name', 'last_name', 
+            'property_id', 'unit', 'tenant_id', 
             'start_date', 'number_of_month', 'rent_amount_per_unit'
         ];
 
@@ -223,12 +262,20 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
         setError('');
         
         try {
-            // Prepare data for API call - only send required fields in exact format
+            // Find selected tenant again to ensure we have the latest data
+            const selectedTenant = tenants.find(tenant => tenant.id === parseInt(formData.tenant_id) || tenant.id === formData.tenant_id);
+            
+            if (!selectedTenant) {
+                setError('Selected tenant information not found');
+                return;
+            }
+
+            // Prepare data for API call - use tenant information from selected tenant
             const leaseData = {
                 unit: formData.unit,
-                first_name: formData.first_name,
-                last_name: formData.last_name,
-                tenant_phone: formData.tenant_phone || "",
+                first_name: selectedTenant.first_name,
+                last_name: selectedTenant.last_name,
+                tenant_phone: selectedTenant.phone || selectedTenant.username || '',
                 number_of_month: formData.number_of_month,
                 start_date: formData.start_date,
                 end_date: formData.end_date,
@@ -237,6 +284,8 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                 amount_paid: formData.amount_paid || "0",
                 total_amount: formData.total_amount
             };
+
+            console.log('Submitting lease data:', leaseData);
 
             // Call the actual lease service
             const result = await createLease(leaseData);
@@ -352,62 +401,28 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                     </h6>
 
                     <Row>
-                        <Col md={6}>
+                        <Col md={12}>
                             <Form.Group className="mb-3">
-                                <Form.Label>First Name *</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    name="first_name"
-                                    value={formData.first_name}
+                                <Form.Label>Select Tenant *</Form.Label>
+                                <Form.Select
+                                    name="tenant_id"
+                                    value={formData.tenant_id}
                                     onChange={handleInputChange}
-                                    placeholder="Enter first name"
+                                    disabled={loading}
                                     required
-                                />
-                            </Form.Group>
-                        </Col>
-                        
-                        <Col md={6}>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Last Name *</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    name="last_name"
-                                    value={formData.last_name}
-                                    onChange={handleInputChange}
-                                    placeholder="Enter last name"
-                                    required
-                                />
-                            </Form.Group>
-                        </Col>
-                    </Row>
-
-                    <Row>
-                        <Col md={6}>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Phone Number</Form.Label>
-                                <Form.Control
-                                    type="tel"
-                                    name="tenant_phone"
-                                    value={formData.tenant_phone}
-                                    onChange={handleInputChange}
-                                    placeholder="Enter phone number"
-                                />
-                            </Form.Group>
-                        </Col>
-                        
-                        <Col md={6}>
-                            <Form.Group className="mb-3">
-                                <Form.Label>ID Number</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    name="tenant_id_number"
-                                    value={formData.tenant_id_number}
-                                    onChange={handleInputChange}
-                                    placeholder="Enter ID/Passport number"
-                                />
-                                <Form.Text className="text-muted">
-                                    Optional - for reference only
-                                </Form.Text>
+                                >
+                                    <option value="">Select Tenant</option>
+                                    {tenants.map(tenant => (
+                                        <option key={tenant.id} value={tenant.id}>
+                                            {tenant.first_name} {tenant.last_name} - {tenant.username || tenant.phone}
+                                        </option>
+                                    ))}
+                                </Form.Select>
+                                {tenants.length === 0 && (
+                                    <Form.Text className="text-muted">
+                                        No tenants available. Please add a tenant first.
+                                    </Form.Text>
+                                )}
                             </Form.Group>
                         </Col>
                     </Row>

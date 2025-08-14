@@ -286,8 +286,8 @@ function Leases() {
                         <th style={{ width: '20%' }}>Reference</th>
                         <th style={{ width: '20%' }}>Property & Unit</th>
                         <th style={{ width: '20%' }}>Lease Period</th>
-                        <th style={{ width: '15%' }}>Amount</th>
-                        <th style={{ width: '13%' }}>Paid</th>
+                        <th style={{ width: '15%' }}>Total Amount</th>
+                        <th style={{ width: '13%' }}>Paid Amount</th>
                         <th style={{ width: '12%' }}>Status</th>
                       </tr>
                     </thead>

@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Container, Row, Col, Card, Button, Badge, Tab, Tabs, Alert, Spinner, Modal } from "react-bootstrap";
 import Layout from "../components/Layout";
-import { getLeaseById, getLeasePayments, getLeaseDocuments, terminateLease, renewLease } from "../services/leaseService";
+import Payments from "../components/snippets/Payments";
+import { getLeaseById, getLeaseDocuments, terminateLease, renewLease } from "../services/leaseService";
 import "../assets/styles/profile.css";
 import "../assets/styles/leases.css";
 import "../assets/styles/lease-details.css";
@@ -12,15 +13,14 @@ function Lease() {
   const navigate = useNavigate();
   
   const [lease, setLease] = useState(null);
-  const [payments, setPayments] = useState([]);
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [paymentsLoading, setPaymentsLoading] = useState(false);
   const [documentsLoading, setDocumentsLoading] = useState(false);
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState("details");
   const [isCancelling, setIsCancelling] = useState(false);
   const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
+
 
   useEffect(() => {
     if (leaseId) {
@@ -88,28 +88,7 @@ function Lease() {
     }
   };
 
-  const fetchPayments = async () => {
-    try {
-      setPaymentsLoading(true);
-      
-      console.log('Fetching payments for lease ID:', leaseId);
-      
-      // Call the actual payments service
-      const result = await getLeasePayments(leaseId);
-      
-      if (result.success) {
-        setPayments(result.data || []);
-      } else {
-        console.error("Failed to fetch payments:", result.error);
-        setPayments([]);
-      }
-    } catch (error) {
-      console.error("Error fetching payments:", error);
-      setPayments([]);
-    } finally {
-      setPaymentsLoading(false);
-    }
-  };
+  // Payments are now loaded as part of lease data
 
   const fetchDocuments = async () => {
     try {
@@ -137,9 +116,7 @@ function Lease() {
   const handleTabSelect = (tab) => {
     setActiveTab(tab);
     
-    if (tab === "payments" && payments.length === 0) {
-      fetchPayments();
-    } else if (tab === "documents" && documents.length === 0) {
+    if (tab === "documents" && documents.length === 0) {
       fetchDocuments();
     }
   };
@@ -432,17 +409,7 @@ function Lease() {
                     </div>
                   </Col>
                  
-                  <Col md={6}>
-                    <div className="mb-3">
-                      <label className="form-label">ID Number</label>
-                      <input 
-                        type="text" 
-                        className="form-control" 
-                        value={getTenantIdNumber(lease)} 
-                        readOnly 
-                      />
-                    </div>
-                  </Col>
+                  
                   <Col md={6}>
                     <div className="mb-3">
                       <label className="form-label">Property Name</label>
@@ -476,17 +443,7 @@ function Lease() {
                       />
                     </div>
                   </Col>
-                  <Col md={6}>
-                    <div className="mb-3">
-                      <label className="form-label">Unit Type</label>
-                      <input 
-                        type="text" 
-                        className="form-control" 
-                        value={getUnitType(lease)} 
-                        readOnly 
-                      />
-                    </div>
-                  </Col>
+                  
                   <Col md={6}>
                     <div className="mb-3">
                       <label className="form-label">Start Date</label>
@@ -515,7 +472,7 @@ function Lease() {
                       <input 
                         type="text" 
                         className="form-control" 
-                        value={`${lease.lease_months || 'N/A'} months`} 
+                        value={`${lease.number_of_month || 'N/A'} months`} 
                         readOnly 
                       />
                     </div>
@@ -532,8 +489,8 @@ function Lease() {
                     <Col md={4}>
                       <div className="bg-light p-4 rounded">
                         <div className="d-flex justify-content-between mb-2">
-                          <span>Amount:</span>
-                          <span className="fw-bold">{formatCurrency(getRentAmount(lease))}</span>
+                          <span>Subtotal:</span>
+                          <span className="fw-bold">{formatCurrency((lease.total_amount))}</span>
                         </div>
                         <div className="d-flex justify-content-between mb-2">
                           <span>Discount:</span>
@@ -542,16 +499,16 @@ function Lease() {
                         <hr className="my-2" />
                         <div className="d-flex justify-content-between mb-3">
                           <span className="fw-bold">Total:</span>
-                          <span className="fw-bold">{formatCurrency(getRentAmount(lease))}</span>
+                          <span className="fw-bold">{formatCurrency(lease.total_amount || 0)}</span>
                         </div>
                         <div className="d-flex justify-content-between mb-3">
                           <span className="fw-bold">Paid Amount:</span>
-                          <span className="fw-bold">{formatCurrency(getRentAmount(lease))}</span>
+                          <span className="fw-bold">{formatCurrency(lease.amount_paid || 0)}</span>
                         </div>
                         <hr className="my-3" />
                         <div className="d-flex justify-content-between">
                           <span className="fw-bold">Amount Due:</span>
-                          <span className="fw-bold text-danger">{formatCurrency(lease.outstanding_amount || 0)}</span>
+                          <span className="fw-bold text-danger">{formatCurrency(lease.remaining_amount || 0)}</span>
                         </div>
                       </div>
                     </Col>
@@ -561,78 +518,13 @@ function Lease() {
             )}
 
             {/* Payments Tab */}
-            {activeTab === "payments" && (() => {
-              let paymentsContent;
-              if (paymentsLoading) {
-                paymentsContent = (
-                  <div className="text-center py-4">
-                    <Spinner animation="border" size="sm" />
-                    <p className="mt-2 text-muted">Loading payments...</p>
-                  </div>
-                );
-              } else if (payments.length > 0) {
-                paymentsContent = (
-                  <div className="table-responsive">
-                    <table className="table table-hover">
-                      <thead>
-                        <tr>
-                          <th>Date</th>
-                          <th>Amount</th>
-                          <th>Method</th>
-                          <th>Reference</th>
-                          <th>Status</th>
-                          <th>Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {payments.map((payment, index) => (
-                          <tr key={payment.id || index}>
-                            <td>{formatDate(payment.payment_date)}</td>
-                            <td className="fw-bold text-success">
-                              {formatCurrency(payment.amount)}
-                            </td>
-                            <td>
-                              <span className="badge bg-secondary">
-                                {payment.payment_method || 'Cash'}
-                              </span>
-                            </td>
-                            <td>{payment.reference_number || 'N/A'}</td>
-                            <td>
-                              <span className="badge bg-success">Confirmed</span>
-                            </td>
-                            <td>
-                              <Button variant="outline-primary" size="sm">
-                                <i className="bi bi-receipt"></i>
-                              </Button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                );
-              } else {
-                paymentsContent = (
-                  <div className="text-center py-5">
-                    <i className="bi bi-credit-card display-1 text-muted"></i>
-                    <h5 className="mt-3">No payments recorded</h5>
-                    <p className="text-muted">Payment history will appear here once payments are recorded.</p>
-                  </div>
-                );
-              }
-              return (
-                <div>
-                  <div className="d-flex justify-content-between align-items-center mb-4">
-                    <h5><i className="bi bi-credit-card me-2"></i>Payment History</h5>
-                    <Button variant="primary" size="sm">
-                      <i className="bi bi-plus me-1"></i>
-                      Record Payment
-                    </Button>
-                  </div>
-                  {paymentsContent}
-                </div>
-              );
-            })()}
+            {activeTab === "payments" && (
+              <Payments 
+                payments={lease.payments || []}
+                leaseId={leaseId}
+                refreshData={fetchLeaseDetails}
+              />
+            )}
 
             {/* Documents Tab */}
             {activeTab === "documents" && (

@@ -72,13 +72,13 @@ const formatLeaseData = (leaseData) => {
     return {
         start_date: formatDateForApi(leaseData.start_date),
         end_date: formatDateForApi(leaseData.end_date),
-        first_name: `${leaseData.tenant_first_name}`.trim(),
-        last_name: `${leaseData.tenant_last_name}`.trim(),
+        first_name: `${leaseData.first_name}`.trim(),
+        last_name: `${leaseData.last_name}`.trim(),
         tenant_phone: leaseData.tenant_phone || "",
-        rent_amount_per_unit: parseFloat(leaseData.monthly_rent).toString(),
+        rent_amount_per_unit: parseFloat(leaseData.rent_amount_per_unit).toString(),
         discount: parseFloat(leaseData.discount || 0).toString(),
-        unit: leaseData.unit_id,
-        number_of_month: parseInt(leaseData.number_of_months || 0).toString(),
+        unit: leaseData.unit || "",
+        number_of_month: parseInt(leaseData.number_of_month || 0).toString(),
         total_amount: parseFloat(leaseData.total_amount || 0).toString(),
         amount_paid: parseFloat(leaseData.amount_paid || 0).toString()
     };
