@@ -115,10 +115,10 @@ function Properties() {
           </div>
         )}
 
-        {/* Main Properties Card */}
-        <div className="profile-card">
-          <div className="card-header">
-            <h5 className="card-title">
+        {/* Main Properties Section */}
+        <div className="properties-full-width">
+          <div className="properties-header-section">
+            <h5 className="properties-title">
               <i className="bi bi-building me-2"></i>
               Properties
               {properties.length > 0 && (
@@ -126,39 +126,41 @@ function Properties() {
               )}
             </h5>
           </div>
-          <div className="card-body p-0">
-            {loading && (
-              <div className="text-center py-5">
-                <div className="spinner-border text-primary" role="status">
-                  <span className="visually-hidden">Loading...</span>
-                </div>
-                <p className="text-muted mt-2">Loading properties...</p>
+          
+          {loading && (
+            <div className="text-center py-5">
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Loading...</span>
               </div>
-            )}
+              <p className="text-muted mt-2">Loading properties...</p>
+            </div>
+          )}
 
-            {!loading && properties.length === 0 && !error && (
-              <div className="text-center py-5">
-                <i className="bi bi-building text-muted" style={{ fontSize: "4rem" }}></i>
-                <h4 className="text-muted mt-3 mb-3">No Properties Found</h4>
-                <p className="text-muted mb-4">
-                  {search
-                    ? "No properties match your current search. Try adjusting your search criteria."
-                    : "No properties have been added yet. Start by creating your first property."}
-                </p>
-                {!search && (
-                  <button 
-                    className="btn btn-primary btn-lg"
-                    onClick={() => setShowModal(true)}
-                  >
-                    <i className="bi bi-plus me-2"></i>
-                    Create First Property
-                  </button>
-                )}
-              </div>
-            )}
+          {!loading && properties.length === 0 && !error && (
+            <div className="text-center py-5">
+              <i className="bi bi-building text-muted" style={{ fontSize: "4rem" }}></i>
+              <h4 className="text-muted mt-3 mb-3">No Properties Found</h4>
+              <p className="text-muted mb-4">
+                {search
+                  ? "No properties match your current search. Try adjusting your search criteria."
+                  : "No properties have been added yet. Start by creating your first property."}
+              </p>
+              {!search && (
+                <button 
+                  className="btn btn-primary btn-lg"
+                  onClick={() => setShowModal(true)}
+                >
+                  <i className="bi bi-plus me-2"></i>
+                  Create First Property
+                </button>
+              )}
+            </div>
+          )}
 
-            {!loading && properties.length > 0 && (
-              <div className="table-responsive">
+          {!loading && properties.length > 0 && (
+            <>
+              {/* Desktop Table View */}
+              <div className="table-responsive d-none d-md-block">
                 <table className="table table-hover align-middle mb-0">
                   <thead className="table-light">
                     <tr>
@@ -205,8 +207,52 @@ function Properties() {
                   </tbody>
                 </table>
               </div>
-            )}
-          </div>
+
+              {/* Mobile Full-Width List View */}
+              <div className="d-md-none">
+                <div className="property-list-container">
+                  {properties.map((property) => (
+                    <div
+                      key={property.id || property.property_name}
+                      className="property-list-item"
+                      onClick={() => navigate(`/properties/${property.id}`)}
+                    >
+                      <div className="property-list-header">
+                        <div className="property-name-mobile">
+                          {property.property_name || property.name}
+                        </div>
+                        <span className="badge bg-secondary">
+                          {property.property_type || "Residential"}
+                        </span>
+                      </div>
+                      
+                      <div className="property-list-body">
+                        <div className="property-list-row">
+                          <div className="property-list-label">
+                            <i className="bi bi-geo-alt me-1"></i>Address
+                          </div>
+                          <div className="property-list-value">
+                            {property.address?.street || 'No street address'}
+                          </div>
+                        </div>
+                        
+                        {property.address?.region_name && (
+                          <div className="property-list-row">
+                            <div className="property-list-label">
+                              <i className="bi bi-map me-1"></i>Region
+                            </div>
+                            <div className="property-list-value">
+                              {property.address.region_name}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
 
           {/* Pagination */}
           {pagination && pagination.total_pages > 1 && (

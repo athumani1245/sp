@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { Modal, Button } from 'react-bootstrap';
 import Layout from "../components/Layout";
 import AddTenantModal from "../components/forms/AddTenant";
@@ -8,7 +7,6 @@ import "../assets/styles/profile.css";
 import "../assets/styles/leases.css";
 
 function Tenants() {
-  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
   const [page, setPage] = useState(1);
@@ -97,16 +95,6 @@ function Tenants() {
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
-  };
-
-  const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
-    try {
-      return new Date(dateString).toLocaleDateString();
-    } catch (error) {
-      console.warn('Error formatting date:', error);
-      return 'Invalid Date';
-    }
   };
 
   const formatPhone = (phone) => {
@@ -265,328 +253,395 @@ function Tenants() {
   return (
     <Layout>
       <div className="main-content">
-        {/* Profile-style Header */}
-        <div className="profile-container">
-         
-
-          {/* Action Button Section */}
-          <div className="d-flex justify-content-start mb-4">
-            <button 
-              className="btn btn-primary"
-              onClick={() => setShowAddModal(true)}
-            >
-              <i className="bi bi-person-plus me-2"></i>
-              Add New Tenant
-            </button>
-          </div>
-
-          {/* Success Alert */}
-          {success && (
-            <div className="alert alert-success alert-dismissible fade show" role="alert">
-              <i className="bi bi-check-circle me-2"></i>
-              <strong>Success:</strong> {success}
+        {/* Filters Section */}
+        <div className="tenants-filters-section">
+          <div className="row g-3 align-items-end">
+            <div className="col-md-4">
+              <label className="form-label" htmlFor="tenant-search">Search Tenants</label>
+              <div className="input-group">
+                <span className="input-group-text">
+                  <i className="bi bi-search"></i>
+                </span>
+                <input
+                  type="text"
+                  id="tenant-search"
+                  className="form-control"
+                  placeholder="Search by name, email, phone..."
+                  value={search}
+                  onChange={handleSearch}
+                />
+              </div>
+            </div>
+            <div className="col-md-3">
+              <label className="form-label" htmlFor="status-filter">Status Filter</label>
+              <select
+                className="form-select"
+                value={status}
+                onChange={handleStatusFilter}
+              >
+                <option value="">All Statuses</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+                <option value="pending">Pending</option>
+                <option value="blacklisted">Blacklisted</option>
+              </select>
+            </div>
+            <div className="col-md-5">
               <button 
-                type="button" 
-                className="btn-close" 
-                onClick={() => setSuccess('')}
-              ></button>
+                className="btn btn-primary w-100"
+                onClick={() => setShowAddModal(true)}
+              >
+                <i className="bi bi-person-plus me-2"></i>
+                Add New Tenant
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Success Alert */}
+        {success && (
+          <div className="alert alert-success alert-dismissible fade show" role="alert">
+            <i className="bi bi-check-circle me-2"></i>
+            <strong>Success:</strong> {success}
+            <button 
+              type="button" 
+              className="btn-close" 
+              onClick={() => setSuccess('')}
+            ></button>
+          </div>
+        )}
+
+        {/* Error Alert */}
+        {error && (
+          <div className="alert alert-danger" role="alert">
+            <i className="bi bi-exclamation-triangle me-2"></i>
+            <strong>Error:</strong> {error}
+            <details className="mt-2">
+              <summary>Debug Info</summary>
+              <small>
+                <div>API Base: {process.env.REACT_APP_API_BASE || 'Not configured'}</div>
+                <div>Current Page: {page}</div>
+                <div>Search: {search || 'None'}</div>
+                <div>Status Filter: {status || 'None'}</div>
+              </small>
+            </details>
+          </div>
+        )}
+
+        {/* Main Tenants Section */}
+        <div className="tenants-full-width">
+          <div className="tenants-header-section">
+            <h5 className="tenants-title">
+              <i className="bi bi-people me-2"></i>
+              Tenants
+              {tenants.length > 0 && (
+                <span className="badge bg-primary ms-2">{tenants.length}</span>
+              )}
+            </h5>
+          </div>
+          
+          {loading && (
+            <div className="text-center py-5">
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Loading...</span>
+              </div>
+              <p className="text-muted mt-2">Loading tenants...</p>
             </div>
           )}
 
-          {/* Filters Card */}
-          <div className="profile-card mb-4">
-            <div className="card-header">
-              <h5 className="card-title">
-                <i className="bi bi-funnel me-2"></i>
-                Search & Filter
-              </h5>
+          {!loading && tenants.length === 0 && !error && (
+            <div className="text-center py-5">
+              <i className="bi bi-people text-muted" style={{ fontSize: "4rem" }}></i>
+              <h4 className="text-muted mt-3 mb-3">No Tenants Found</h4>
+              <p className="text-muted mb-4">
+                {search || status
+                  ? "No tenants match your current filters. Try adjusting your search criteria."
+                  : "No tenants have been added yet. Start by adding your first tenant."}
+              </p>
+              {!search && !status && (
+                <button 
+                  className="btn btn-primary btn-lg"
+                  onClick={() => setShowAddModal(true)}
+                >
+                  <i className="bi bi-person-plus me-2"></i>
+                  Add First Tenant
+                </button>
+              )}
             </div>
-            <div className="card-body">
-              <div className="row g-3">
-                <div className="col-md-6">
-                  <label className="form-label" htmlFor="tenant-search">Search Tenants</label>
-                  <div className="input-group">
-                    <span className="input-group-text">
-                      <i className="bi bi-search"></i>
-                    </span>
-                    <input
-                      type="text"
-                      id="tenant-search"
-                      className="form-control"
-                      placeholder="Search by name, email, phone, or ID number..."
-                      value={search}
-                      onChange={handleSearch}
-                    />
-                  </div>
+          )}
+
+          {!loading && tenants.length > 0 && (
+            <>
+              {/* Desktop Table View */}
+              <div className="table-responsive d-none d-md-block">
+                <table className="table table-hover align-middle mb-0">
+                  <thead className="table-light">
+                    <tr>
+                      <th style={{ width: '35%' }}>Tenant Name</th>
+                      <th style={{ width: '25%' }}>Contact</th>
+                      <th style={{ width: '25%' }}>Status</th>
+                      <th style={{ width: '15%' }}>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {Array.isArray(tenants) && tenants.map((tenant) => (
+                      <tr
+                        key={tenant.id || Math.random()}
+                        className={`${editingTenantId === tenant.id ? "table-warning" : ""}`}
+                      >
+                        <td>
+                          <div className="tenant-info">
+                            {editingTenantId === tenant.id ? (
+                              <div className="row g-2">
+                                <div className="col-6">
+                                  <input
+                                    type="text"
+                                    className="form-control form-control-sm"
+                                    name="first_name"
+                                    value={editTenantData.first_name}
+                                    onChange={handleEditTenantChange}
+                                    onKeyDown={handleEditTenantKeyPress}
+                                    placeholder="First name"
+                                    disabled={updatingTenant}
+                                    autoFocus
+                                  />
+                                </div>
+                                <div className="col-6">
+                                  <input
+                                    type="text"
+                                    className="form-control form-control-sm"
+                                    name="last_name"
+                                    value={editTenantData.last_name}
+                                    onChange={handleEditTenantChange}
+                                    onKeyDown={handleEditTenantKeyPress}
+                                    placeholder="Last name"
+                                    disabled={updatingTenant}
+                                  />
+                                </div>
+                              </div>
+                            ) : (
+                              <span className="tenant-name fw-medium">
+                                {getTenantName(tenant)}
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td>
+                          <div className="contact-info">
+                            {editingTenantId === tenant.id ? (
+                              <div>
+                                <input
+                                  type="text"
+                                  className="form-control form-control-sm mb-2"
+                                  name="username"
+                                  value={editTenantData.username}
+                                  onChange={handleEditTenantChange}
+                                  onKeyDown={handleEditTenantKeyPress}
+                                  placeholder="Phone number"
+                                  disabled={updatingTenant}
+                                />
+                              </div>
+                            ) : (
+                              <span className="phone text-muted">
+                                <i className="bi bi-telephone me-1"></i>
+                                {formatPhone(tenant.username) || 'No phone'}
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td>
+                          <span className={getStatusBadge(tenant.status || 'active')}>
+                            {((tenant.status || 'active').charAt(0).toUpperCase() + (tenant.status || 'active').slice(1))}
+                          </span>
+                        </td>
+                        <td>
+                          <div className="action-buttons">
+                            {editingTenantId === tenant.id ? (
+                              <>
+                                <button
+                                  className="btn btn-sm btn-success me-1"
+                                  onClick={handleSaveEditTenant}
+                                  disabled={updatingTenant}
+                                  title="Press Enter to confirm"
+                                >
+                                  <i className="bi bi-check2"></i>
+                                </button>
+                                <button
+                                  className="btn btn-sm btn-secondary"
+                                  onClick={handleCancelEditTenant}
+                                  disabled={updatingTenant}
+                                  title="Press Esc to cancel"
+                                >
+                                  <i className="bi bi-x"></i>
+                                </button>
+                              </>
+                            ) : (
+                              <>
+                                <button
+                                  className="btn btn-sm btn-outline-primary me-1"
+                                  onClick={(e) => handleEditTenant(e, tenant)}
+                                  title="Edit Tenant"
+                                >
+                                  <i className="bi bi-pencil"></i>
+                                </button>
+                                <button
+                                  className="btn btn-sm btn-outline-danger"
+                                  onClick={(e) => handleDeleteTenant(e, tenant)}
+                                  title="Delete Tenant"
+                                >
+                                  <i className="bi bi-trash"></i>
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile Full-Width List View */}
+              <div className="d-md-none">
+                <div className="tenant-list-container">
+                  {Array.isArray(tenants) && tenants.map((tenant) => (
+                    <div
+                      key={tenant.id || Math.random()}
+                      className={`tenant-list-item ${editingTenantId === tenant.id ? "editing" : ""}`}
+                    >
+                      <div className="tenant-list-header">
+                        <div className="tenant-name-mobile">
+                          {editingTenantId === tenant.id ? (
+                            <div className="row g-2">
+                              <div className="col-6">
+                                <input
+                                  type="text"
+                                  className="form-control form-control-sm"
+                                  name="first_name"
+                                  value={editTenantData.first_name}
+                                  onChange={handleEditTenantChange}
+                                  placeholder="First name"
+                                  disabled={updatingTenant}
+                                />
+                              </div>
+                              <div className="col-6">
+                                <input
+                                  type="text"
+                                  className="form-control form-control-sm"
+                                  name="last_name"
+                                  value={editTenantData.last_name}
+                                  onChange={handleEditTenantChange}
+                                  placeholder="Last name"
+                                  disabled={updatingTenant}
+                                />
+                              </div>
+                            </div>
+                          ) : (
+                            getTenantName(tenant)
+                          )}
+                        </div>
+                        <span className={getStatusBadge(tenant.status || 'active')}>
+                          {((tenant.status || 'active').charAt(0).toUpperCase() + (tenant.status || 'active').slice(1))}
+                        </span>
+                      </div>
+                      
+                      <div className="tenant-list-body">
+                        <div className="tenant-list-row">
+                          <div className="tenant-list-label">
+                            <i className="bi bi-telephone me-1"></i>Phone
+                          </div>
+                          <div className="tenant-list-value">
+                            {editingTenantId === tenant.id ? (
+                              <input
+                                type="text"
+                                className="form-control form-control-sm"
+                                name="username"
+                                value={editTenantData.username}
+                                onChange={handleEditTenantChange}
+                                placeholder="Phone number"
+                                disabled={updatingTenant}
+                              />
+                            ) : (
+                              formatPhone(tenant.username) || 'No phone'
+                            )}
+                          </div>
+                        </div>
+                        
+                        <div className="tenant-list-actions">
+                          {editingTenantId === tenant.id ? (
+                            <div className="d-flex gap-2 justify-content-end">
+                              <button
+                                className="btn btn-sm btn-success"
+                                onClick={handleSaveEditTenant}
+                                disabled={updatingTenant}
+                              >
+                                <i className="bi bi-check2 me-1"></i>Save
+                              </button>
+                              <button
+                                className="btn btn-sm btn-secondary"
+                                onClick={handleCancelEditTenant}
+                                disabled={updatingTenant}
+                              >
+                                <i className="bi bi-x me-1"></i>Cancel
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="d-flex gap-2 justify-content-end">
+                              <button
+                                className="btn btn-sm btn-outline-primary"
+                                onClick={(e) => handleEditTenant(e, tenant)}
+                              >
+                                <i className="bi bi-pencil me-1"></i>Edit
+                              </button>
+                              <button
+                                className="btn btn-sm btn-outline-danger"
+                                onClick={(e) => handleDeleteTenant(e, tenant)}
+                              >
+                                <i className="bi bi-trash me-1"></i>Delete
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <div className="col-md-3">
-                  <label className="form-label" htmlFor="status-filter">Status Filter</label>
-                  <select
-                    className="form-select"
-                    value={status}
-                    onChange={handleStatusFilter}
-                  >
-                    <option value="">All Statuses</option>
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                    <option value="pending">Pending</option>
-                    <option value="blacklisted">Blacklisted</option>
-                  </select>
-                </div>
-                <div className="col-md-3">
-                  <label className="form-label">&nbsp;</label>
+              </div>
+            </>
+          )}
+
+          {/* Pagination */}
+          {pagination && pagination.total_pages > 1 && (
+            <div className="tenants-pagination-section">
+              <nav aria-label="Tenants pagination">
+                <div className="d-flex justify-content-between align-items-center">
                   <button
-                    className="btn btn-outline-secondary w-100 d-block"
-                    onClick={() => {
-                      setSearch("");
-                      setStatus("");
-                      setPage(1);
-                    }}
+                    className="btn btn-outline-secondary"
+                    disabled={pagination.current_page <= 1}
+                    onClick={() => handlePageChange(pagination.current_page - 1)}
                   >
-                    <i className="bi bi-arrow-clockwise me-2"></i>
-                    Reset Filters
+                    <i className="bi bi-chevron-left me-1"></i>
+                    Previous
+                  </button>
+
+                  <div className="pagination-info">
+                    <span className="text-muted">
+                      Page {pagination.current_page} of {pagination.total_pages || 1}
+                    </span>
+                  </div>
+
+                  <button
+                    className="btn btn-outline-secondary"
+                    disabled={pagination.current_page >= pagination.total_pages}
+                    onClick={() => handlePageChange(pagination.current_page + 1)}
+                  >
+                    Next
+                    <i className="bi bi-chevron-right ms-1"></i>
                   </button>
                 </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Error Alert */}
-          {error && (
-            <div className="alert alert-danger" role="alert">
-              <i className="bi bi-exclamation-triangle me-2"></i>
-              <strong>Error:</strong> {error}
-              <details className="mt-2">
-                <summary>Debug Info</summary>
-                <small>
-                  <div>API Base: {process.env.REACT_APP_API_BASE || 'Not configured'}</div>
-                  <div>Current Page: {page}</div>
-                  <div>Search: {search || 'None'}</div>
-                  <div>Status Filter: {status || 'None'}</div>
-                </small>
-              </details>
+              </nav>
             </div>
           )}
-
-          {/* Main Tenants Card */}
-          <div className="profile-card">
-            <div className="card-header">
-              <h5 className="card-title">
-                <i className="bi bi-people me-2"></i>
-                Tenants
-                {tenants.length > 0 && (
-                  <span className="badge bg-primary ms-2">{tenants.length}</span>
-                )}
-              </h5>
-            </div>
-            <div className="card-body p-0">
-              {loading && (
-                <div className="text-center py-5">
-                  <div className="spinner-border text-primary" role="status">
-                    <span className="visually-hidden">Loading...</span>
-                  </div>
-                  <p className="text-muted mt-2">Loading tenants...</p>
-                </div>
-              )}
-
-              {!loading && tenants.length === 0 && !error && (
-                <div className="text-center py-5">
-                  <i className="bi bi-people text-muted" style={{ fontSize: "4rem" }}></i>
-                  <h4 className="text-muted mt-3 mb-3">No Tenants Found</h4>
-                  <p className="text-muted mb-4">
-                    {search || status
-                      ? "No tenants match your current filters. Try adjusting your search criteria."
-                      : "No tenants have been added yet. Start by adding your first tenant."}
-                  </p>
-                  {!search && !status && (
-                    <button 
-                      className="btn btn-primary btn-lg"
-                      onClick={() => setShowAddModal(true)}
-                    >
-                      <i className="bi bi-person-plus me-2"></i>{' '}
-                      Add First Tenant
-                    </button>
-                  )}
-                </div>
-              )}
-
-              {!loading && tenants.length > 0 && (
-                <div className="table-responsive">
-                  <table className="table table-hover align-middle mb-0">
-                    <thead className="table-light">
-                      <tr>
-                        <th style={{ width: '35%' }}>Tenant Name</th>
-                        <th style={{ width: '25%' }}>Contact</th>
-                        <th style={{ width: '25%' }}>Status</th>
-                        <th style={{ width: '15%' }}>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {Array.isArray(tenants) && tenants.map((tenant) => (
-                        <tr
-                          key={tenant.id || Math.random()}
-                          className={`${editingTenantId === tenant.id ? "table-warning" : ""}`}
-                        >
-                          <td>
-                            <div className="tenant-info">
-                                            {editingTenantId === tenant.id ? (
-                                                <div className="row g-2">
-                                                    <div className="col-6">
-                                                        <input
-                                                            type="text"
-                                                            className="form-control form-control-sm"
-                                                            name="first_name"
-                                                            value={editTenantData.first_name}
-                                                            onChange={handleEditTenantChange}
-                                                            onKeyDown={handleEditTenantKeyPress}
-                                                            placeholder="First name"
-                                                            disabled={updatingTenant}
-                                                            autoFocus
-                                                        />
-                                                    </div>
-                                                    <div className="col-6">
-                                                        <input
-                                                            type="text"
-                                                            className="form-control form-control-sm"
-                                                            name="last_name"
-                                                            value={editTenantData.last_name}
-                                                            onChange={handleEditTenantChange}
-                                                            onKeyDown={handleEditTenantKeyPress}
-                                                            placeholder="Last name"
-                                                            disabled={updatingTenant}
-                                                        />
-                                                    </div>
-                                                </div>
-                                            ) : (
-                                                <span className="tenant-name fw-medium">
-                                                    {getTenantName(tenant)}
-                                                </span>
-                                            )}
-                                        </div>
-                                      </td>
-                                      <td>
-                                        <div className="contact-info">
-                                            {editingTenantId === tenant.id ? (
-                                                <div>
-                                                    <input
-                                                        type="text"
-                                                        className="form-control form-control-sm mb-2"
-                                                        name="username"
-                                                        value={editTenantData.username}
-                                                        onChange={handleEditTenantChange}
-                                                        onKeyDown={handleEditTenantKeyPress}
-                                                        placeholder="Phone number"
-                                                        disabled={updatingTenant}
-                                                    />
-                                                </div>
-                                            ) : (
-                                                <span className="phone text-muted">
-                                                    <i className="bi bi-telephone me-1"></i>
-                                                    {formatPhone(tenant.username) || 'No phone'}
-                                                </span>
-                                            )}
-                                        </div>
-                                      </td>
-                          <td>
-                            <span className={getStatusBadge(tenant.status || 'active')}>
-                              {((tenant.status || 'active').charAt(0).toUpperCase() + (tenant.status || 'active').slice(1))}
-                            </span>
-                          </td>
-                          <td>
-                            <div className="action-buttons">
-                              {editingTenantId === tenant.id ? (
-                                <>
-                                  <button
-                                    className="btn btn-sm btn-success me-1"
-                                    onClick={handleSaveEditTenant}
-                                    disabled={updatingTenant}
-                                    title="Press Enter to confirm"
-                                  >
-                                    <i className="bi bi-check2"></i>
-                                  </button>
-                                  <button
-                                    className="btn btn-sm btn-secondary"
-                                    onClick={handleCancelEditTenant}
-                                    disabled={updatingTenant}
-                                    title="Press Esc to cancel"
-                                  >
-                                    <i className="bi bi-x"></i>
-                                  </button>
-                                </>
-                              ) : (
-                                <>
-                                  <button
-                                    className="btn btn-sm btn-outline-primary me-1"
-                                    onClick={(e) => handleEditTenant(e, tenant)}
-                                    title="Edit Tenant"
-                                  >
-                                    <i className="bi bi-pencil"></i>
-                                  </button>
-                                  <button
-                                    className="btn btn-sm btn-outline-danger"
-                                    onClick={(e) => handleDeleteTenant(e, tenant)}
-                                    title="Delete Tenant"
-                                  >
-                                    <i className="bi bi-trash"></i>
-                                  </button>
-                                </>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-
-            {/* Pagination */}
-            {pagination && pagination.total_pages > 1 && (
-              <div className="card-footer">
-                <nav aria-label="Tenants pagination">
-                  <ul className="pagination justify-content-center mb-0">
-                    <li className={`page-item ${pagination.current_page <= 1 ? 'disabled' : ''}`}>
-                      <button
-                        className="page-link"
-                        onClick={() => handlePageChange(pagination.current_page - 1)}
-                        disabled={pagination.current_page <= 1}
-                      >
-                        Previous
-                      </button>
-                    </li>
-
-                    {[...Array(pagination.total_pages)].map((_, index) => {
-                      const pageNum = index + 1;
-                      return (
-                        <li
-                          key={pageNum}
-                          className={`page-item ${pagination.current_page === pageNum ? 'active' : ''}`}
-                        >
-                          <button
-                            className="page-link"
-                            onClick={() => handlePageChange(pageNum)}
-                          >
-                            {pageNum}
-                          </button>
-                        </li>
-                      );
-                    })}
-
-                    <li className={`page-item ${pagination.current_page >= pagination.total_pages ? 'disabled' : ''}`}>
-                      <button
-                        className="page-link"
-                        onClick={() => handlePageChange(pagination.current_page + 1)}
-                        disabled={pagination.current_page >= pagination.total_pages}
-                      >
-                        Next
-                      </button>
-                    </li>
-                  </ul>
-                </nav>
-              </div>
-            )}
-          </div>
         </div>
       </div>
 

@@ -1,3 +1,269 @@
+/* Full Width Leases Layout */
+.leases-full-width {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.leases-filters-section {
+    background: #f8f9fa;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e9ecef;
+    margin-bottom: 1rem;
+}
+
+.leases-actions-section {
+    padding: 0 1.5rem 1rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.leases-header-section {
+    background: #f8f9fa;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.leases-title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #333;
+    display: flex;
+    align-items: center;
+}
+
+.leases-pagination-section {
+    background: #f8f9fa;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #e9ecef;
+}
+
+/* Mobile Full-Width List Styles for Leases */
+.lease-list-container {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.lease-list-item {
+    background: #fff;
+    border-bottom: 1px solid #e9ecef;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    padding: 1rem 1.5rem;
+}
+
+.lease-list-item:hover {
+    background-color: #f8f9fa;
+}
+
+.lease-list-item:last-child {
+    border-bottom: none;
+}
+
+.lease-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.lease-reference-mobile {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.lease-list-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.lease-list-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.lease-list-label {
+    font-size: 0.875rem;
+    color: #6c757d;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.lease-list-value {
+    font-size: 0.875rem;
+    color: #333;
+    font-weight: 500;
+    text-align: right;
+    margin-left: 1rem;
+    flex: 1;
+}
+
+.lease-list-amounts {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid #f1f3f4;
+    gap: 1rem;
+}
+
+.amount-item-list {
+    flex: 1;
+    text-align: center;
+}
+
+.amount-label-list {
+    font-size: 0.65rem;
+    color: #6c757d;
+    font-weight: 500;
+    margin-bottom: 0.15rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.amount-value-list {
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.amount-value-list.total-amount {
+    color: #007bff;
+}
+
+.amount-value-list.paid-amount {
+    color: #28a745;
+}
+
+/* Badge styling for mobile */
+.lease-list-item .badge {
+    font-size: 0.65rem;
+    padding: 0.25rem 0.5rem;
+}
+
+/* Full Width Tenants Layout */
+.tenants-full-width {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.tenants-filters-section {
+    background: #f8f9fa;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e9ecef;
+    margin-bottom: 1rem;
+}
+
+.tenants-header-section {
+    background: #f8f9fa;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.tenants-title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #333;
+    display: flex;
+    align-items: center;
+}
+
+.tenants-pagination-section {
+    background: #f8f9fa;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #e9ecef;
+}
+
+/* Mobile Full-Width List Styles for Tenants */
+.tenant-list-container {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.tenant-list-item {
+    background: #fff;
+    border-bottom: 1px solid #e9ecef;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    padding: 1rem 1.5rem;
+}
+
+.tenant-list-item:hover {
+    background-color: #f8f9fa;
+}
+
+.tenant-list-item.editing {
+    background-color: #fff3cd;
+    border-left: 4px solid #ffc107;
+}
+
+.tenant-list-item:last-child {
+    border-bottom: none;
+}
+
+.tenant-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.tenant-name-mobile {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.tenant-list-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.tenant-list-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tenant-list-label {
+    font-size: 0.875rem;
+    color: #6c757d;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.tenant-list-value {
+    font-size: 0.875rem;
+    color: #333;
+    font-weight: 500;
+    text-align: right;
+    margin-left: 1rem;
+    flex: 1;
+}
+
+.tenant-list-actions {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid #f1f3f4;
+}
+
+/* Badge styling for mobile tenants */
+.tenant-list-item .badge {
+    font-size: 0.65rem;
+    padding: 0.25rem 0.5rem;
+}
+
 /* Leases Page Styles */
 
 .table-row-hover:hover {
@@ -148,6 +414,207 @@
     color: #6c757d;
 }
 
+/* Mobile Kanban Card Styles */
+.lease-cards-container {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.lease-card-mobile {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 2px solid #dee2e6;
+    min-height: auto;
+    margin: 0;
+}
+
+.lease-card-mobile:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    border-color: #007bff;
+}
+
+.lease-card {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 2px solid #dee2e6;
+    min-height: auto;
+    margin: 0;
+    padding: 1rem;
+}
+
+.lease-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    border-color: #007bff;
+}
+
+.lease-card.editing {
+    border-color: #ffc107;
+    background-color: #fff3cd;
+}
+
+.lease-card.adding {
+    border-color: #007bff;
+    background-color: #e7f3ff;
+}
+
+.lease-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0 0.5rem;
+    border-bottom: 1px solid #f1f3f4;
+    margin-bottom: 0.5rem;
+}
+
+.lease-card-body {
+    padding: 0 1rem 0.75rem;
+}
+
+.lease-card-actions {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid #f1f3f4;
+}
+
+.lease-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.detail-label {
+    font-size: 0.8rem;
+    color: #6c757d;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.detail-value {
+    font-size: 0.8rem;
+    color: #333;
+    font-weight: 500;
+    text-align: right;
+    margin-left: 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 60%;
+    flex: 1;
+}
+
+.lease-detail {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.4rem;
+    min-height: auto;
+}
+
+.lease-detail:last-child {
+    margin-bottom: 0;
+}
+
+.lease-reference {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.lease-card-body {
+    padding: 0 1rem 0.75rem;
+}
+
+.lease-card-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.4rem;
+    min-height: auto;
+}
+
+.lease-card-row:last-child {
+    margin-bottom: 0;
+}
+
+.lease-card-label {
+    font-size: 0.8rem;
+    color: #6c757d;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    min-width: auto;
+    flex-shrink: 0;
+}
+
+.lease-card-value {
+    font-size: 0.8rem;
+    color: #333;
+    font-weight: 500;
+    text-align: right;
+    margin-left: 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 60%;
+    flex: 1;
+}
+
+.lease-card-amounts {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid #f1f3f4;
+    gap: 1rem;
+}
+
+.amount-item {
+    flex: 1;
+    text-align: center;
+}
+
+.amount-label {
+    font-size: 0.65rem;
+    color: #6c757d;
+    font-weight: 500;
+    margin-bottom: 0.15rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.amount-value {
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.amount-value.total-amount {
+    color: #007bff;
+}
+
+.amount-value.paid-amount {
+    color: #28a745;
+}
+
+/* Status badges in mobile cards */
+.lease-card-mobile .badge {
+    font-size: 0.65rem;
+    padding: 0.25rem 0.5rem;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .leases-header {
@@ -171,6 +638,105 @@
     .property-info,
     .lease-period {
         min-width: 120px;
+    }
+    
+    /* Full width mobile layout */
+    .leases-filters-section {
+        padding: 0.75rem 1rem;
+    }
+    
+    .leases-actions-section {
+        padding: 0 1rem 0.75rem;
+    }
+    
+    .leases-header-section {
+        padding: 0.75rem 1rem;
+    }
+    
+    .leases-title {
+        font-size: 1.125rem;
+    }
+    
+    .leases-pagination-section {
+        padding: 0.75rem 1rem;
+    }
+    
+    .lease-list-item {
+        padding: 0.875rem 1rem;
+    }
+    
+    .lease-reference-mobile {
+        font-size: 0.95rem;
+    }
+    
+    .lease-list-label,
+    .lease-list-value {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .lease-card-header {
+        flex-direction: row;
+        align-items: center;
+        gap: 0.5rem;
+        justify-content: space-between;
+    }
+    
+    .lease-reference {
+        font-size: 1rem;
+    }
+    
+    /* Ensure rows stay inline on very small screens too */
+    .lease-card-row {
+        flex-direction: row !important;
+        align-items: center !important;
+    }
+    
+    /* Full width cards on very small screens */
+    .lease-card-mobile {
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        margin: 0;
+    }
+    
+    .lease-cards-container {
+        padding: 0;
+        gap: 1px;
+    }
+    
+    /* Very small screen adjustments for new layout */
+    .leases-filters-section {
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .leases-actions-section {
+        padding: 0 0.75rem 0.5rem;
+    }
+    
+    .leases-header-section {
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .leases-pagination-section {
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .leases-title {
+        font-size: 1rem;
+    }
+    
+    .lease-list-item {
+        padding: 0.75rem;
+    }
+    
+    .lease-reference-mobile {
+        font-size: 0.875rem;
+        max-width: 70%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 }
 

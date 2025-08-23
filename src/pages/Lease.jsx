@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { Container, Row, Col, Card, Button, Badge, Tab, Tabs, Alert, Spinner, Modal } from "react-bootstrap";
+import { Container, Row, Col, Button, Tab, Tabs, Alert, Spinner, Modal } from "react-bootstrap";
 import Layout from "../components/Layout";
 import Payments from "../components/snippets/Payments";
 import { getLeaseById, getLeaseDocuments, terminateLease, renewLease } from "../services/leaseService";
-import "../assets/styles/profile.css";
 import "../assets/styles/leases.css";
-import "../assets/styles/lease-details.css";
 
 function Lease() {
   const { leaseId } = useParams();
@@ -242,14 +240,16 @@ function Lease() {
   if (loading) {
     return (
       <Layout>
-        <Container className="py-4">
-          <div className="text-center">
-            <Spinner animation="border" role="status" variant="primary">
-              <span className="visually-hidden">Loading...</span>
-            </Spinner>
-            <p className="mt-2">Loading lease details...</p>
+        <div className="main-content">
+          <div className="leases-filters-section">
+            <div className="text-center">
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Loading...</span>
+              </div>
+              <p className="mt-2">Loading lease details...</p>
+            </div>
           </div>
-        </Container>
+        </div>
       </Layout>
     );
   }
@@ -257,15 +257,22 @@ function Lease() {
   if (error) {
     return (
       <Layout>
-        <Container className="py-4">
-          <Alert variant="danger">
-            <Alert.Heading>Error</Alert.Heading>
-            <p>{error}</p>
-            <Button variant="outline-danger" onClick={() => navigate("/leases")}>
-              Back to Leases
-            </Button>
-          </Alert>
-        </Container>
+        <div className="main-content">
+          <div className="leases-filters-section">
+            <div className="alert alert-danger" role="alert">
+              <h4 className="alert-heading">Error</h4>
+              <p>{error}</p>
+              <hr />
+              <button 
+                className="btn btn-outline-danger"
+                onClick={() => navigate("/leases")}
+              >
+                <i className="bi bi-arrow-left me-2"></i>
+                Back to Leases
+              </button>
+            </div>
+          </div>
+        </div>
       </Layout>
     );
   }
@@ -273,15 +280,22 @@ function Lease() {
   if (!lease) {
     return (
       <Layout>
-        <Container className="py-4">
-          <Alert variant="warning">
-            <Alert.Heading>Lease Not Found</Alert.Heading>
-            <p>The requested lease could not be found.</p>
-            <Button variant="outline-warning" onClick={() => navigate("/leases")}>
-              Back to Leases
-            </Button>
-          </Alert>
-        </Container>
+        <div className="main-content">
+          <div className="leases-filters-section">
+            <div className="alert alert-warning" role="alert">
+              <h4 className="alert-heading">Lease Not Found</h4>
+              <p>The requested lease could not be found.</p>
+              <hr />
+              <button 
+                className="btn btn-outline-warning"
+                onClick={() => navigate("/leases")}
+              >
+                <i className="bi bi-arrow-left me-2"></i>
+                Back to Leases
+              </button>
+            </div>
+          </div>
+        </div>
       </Layout>
     );
   }
@@ -289,50 +303,47 @@ function Lease() {
   return (
     <Layout>
       <div className="main-content">
-        <Container fluid className="py-4">
         {/* Header */}
-        <div className="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <nav aria-label="breadcrumb">
-                    <ol className="breadcrumb">
-                        <li className="breadcrumb-item">
-                            <Link to="/leases">Leases Management</Link>
-                        </li>
-                        <li className="breadcrumb-item active" aria-current="page">
-                            Details
-                        </li>
-                    </ol>
-                </nav>
-                <h2>
-                    <i className="bi bi-file-earmark-text me-2"></i>
-                    {lease.lease_number}
-                </h2>
-                <small className="text-muted mb-0">
-                    Reference: {lease.lease_number} | Status: {lease.status}
-                </small>
-                
+        <div className="leases-filters-section">
+          <div className="row g-3 align-items-center">
+            <div className="col-md-8">
+              <nav aria-label="breadcrumb">
+                <ol className="breadcrumb mb-2">
+                  <li className="breadcrumb-item">
+                    <Link to="/leases">Leases Management</Link>
+                  </li>
+                  <li className="breadcrumb-item active" aria-current="page">
+                    Details
+                  </li>
+                </ol>
+              </nav>
+              <h4 className="mb-1">
+                <i className="bi bi-file-earmark-text me-2"></i>
+                {lease.lease_number}
+              </h4>
+              <small className="text-muted">
+                Reference: {lease.lease_number} | Status: {lease.status}
+              </small>
             </div>
-            <div>
-                <Button 
-                    variant="outline-secondary" 
-                    onClick={() => navigate("/leases")}
-                    className="me-2"
+            <div className="col-md-4">
+              <div className="d-flex flex-column flex-md-row gap-2">
+                <button
+                  className="btn btn-outline-secondary flex-fill"
+                  onClick={() => navigate("/leases")}
                 >
-                    <i className="bi bi-arrow-left me-1"></i>
-                    Back to Leases
-                </Button>
-                <Button variant="primary" className="me-2">
-                    <i className="bi bi-pencil me-1"></i>
-                    Edit Lease
-                </Button>
-                <Button 
-                    variant="warning" 
-                    onClick={handleCancelClick}
-                    disabled={isCancelling}
+                  <i className="bi bi-arrow-left me-1"></i>
+                  <span className="d-none d-md-inline">Back to </span>Leases
+                </button>
+                <button
+                  className="btn btn-warning flex-fill"
+                  onClick={handleCancelClick}
+                  disabled={isCancelling}
                 >
-                    <i className="bi bi-x-circle me-1"></i>
-                    {isCancelling ? 'Cancelling...' : 'Cancel Lease'}
-                </Button>
+                  <i className="bi bi-x-circle me-1"></i>
+                  {isCancelling ? 'Cancelling...' : 'Cancel'}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -411,34 +422,34 @@ function Lease() {
        
 
         {/* Main Content Tabs */}
-        <div className="border-bottom mb-4">
-          <Tabs
-            activeKey={activeTab}
-            onSelect={handleTabSelect}
-            className="border-0"
-          >
-            <Tab eventKey="details" title={
-              <span><i className="bi bi-info-circle me-1"></i>Details</span>
-            } />
-            <Tab eventKey="payments" title={
-              <span><i className="bi bi-credit-card me-1"></i>Payments</span>
-            } />
-            <Tab eventKey="documents" title={
-              <span><i className="bi bi-file-earmark me-1"></i>Documents</span>
-            } />
-            <Tab eventKey="history" title={
-              <span><i className="bi bi-clock-history me-1"></i>History</span>
-            } />
-          </Tabs>
+        <div className="leases-filters-section">
+          <div className="nav nav-pills nav-fill" role="tablist">
+            <button
+              className={`nav-link ${activeTab === 'details' ? 'active' : ''}`}
+              onClick={() => handleTabSelect('details')}
+            >
+              <i className="bi bi-info-circle me-1"></i>
+              <span className="d-none d-md-inline">Details</span>
+              <span className="d-md-none">Info</span>
+            </button>
+            <button
+              className={`nav-link ${activeTab === 'payments' ? 'active' : ''}`}
+              onClick={() => handleTabSelect('payments')}
+            >
+              <i className="bi bi-credit-card me-1"></i>
+              <span className="d-none d-md-inline">Payments</span>
+              <span className="d-md-none">Pay</span>
+            </button>
+          </div>
         </div>
 
-        <div className="py-4">
+        <div className="leases-filters-section">
             {/* Details Tab */}
             {activeTab === "details" && (
-              <div className="container-fluid">
+              <div>
                 {/* General Information Fields */}
-                <Row className="g-3 mb-5">
-                  <Col md={6}>
+                <div className="row g-3 mb-4">
+                  <div className="col-md-6 col-6">
                     <div className="mb-3">
                       <label className="form-label">Tenant</label>
                       <input 
@@ -448,8 +459,8 @@ function Lease() {
                         readOnly 
                       />
                     </div>
-                  </Col>
-                  <Col md={6}>
+                  </div>
+                  <div className="col-md-6 col-6">
                     <div className="mb-3">
                       <label className="form-label">Phone Number</label>
                       <input 
@@ -459,10 +470,9 @@ function Lease() {
                         readOnly 
                       />
                     </div>
-                  </Col>
-                 
+                  </div>
                   
-                  <Col md={6}>
+                  <div className="col-md-6 col-6">
                     <div className="mb-3">
                       <label className="form-label">Property Name</label>
                       <input 
@@ -472,8 +482,8 @@ function Lease() {
                         readOnly 
                       />
                     </div>
-                  </Col>
-                  <Col md={6}>
+                  </div>
+                  <div className="col-md-6 col-6">
                     <div className="mb-3">
                       <label className="form-label">Property Location</label>
                       <input 
@@ -483,8 +493,8 @@ function Lease() {
                         readOnly 
                       />
                     </div>
-                  </Col>
-                  <Col md={6}>
+                  </div>
+                  <div className="col-md-6 col-6">
                     <div className="mb-3">
                       <label className="form-label">Unit Number/Name</label>
                       <input 
@@ -494,9 +504,9 @@ function Lease() {
                         readOnly 
                       />
                     </div>
-                  </Col>
+                  </div>
                   
-                  <Col md={6}>
+                  <div className="col-md-6 col-6">
                     <div className="mb-3">
                       <label className="form-label">Start Date</label>
                       <input 
@@ -506,8 +516,8 @@ function Lease() {
                         readOnly 
                       />
                     </div>
-                  </Col>
-                  <Col md={6}>
+                  </div>
+                  <div className="col-md-6 col-6">
                     <div className="mb-3">
                       <label className="form-label">End Date</label>
                       <input 
@@ -517,8 +527,8 @@ function Lease() {
                         readOnly 
                       />
                     </div>
-                  </Col>
-                  <Col md={6}>
+                  </div>
+                  <div className="col-md-6 col-6">
                     <div className="mb-3">
                       <label className="form-label">Lease Duration</label>
                       <input 
@@ -528,126 +538,54 @@ function Lease() {
                         readOnly 
                       />
                     </div>
-                  </Col>
-                  
-                </Row>
+                  </div>
+                </div>
 
-                {/* Terms and Conditions Section */}
-                <div className="border-top pt-4">
-                  <Row>
-                    <Col md={8}>
-                      <h5 className="text-muted mb-4"></h5>
-                    </Col>
-                    <Col md={4}>
-                      <div className="bg-light p-4 rounded">
-                        <div className="d-flex justify-content-between mb-2">
-                          <span>Subtotal:</span>
-                          <span className="fw-bold">{formatCurrency((lease.total_amount))}</span>
-                        </div>
-                        <div className="d-flex justify-content-between mb-2">
-                          <span>Discount:</span>
-                          <span className="fw-bold text-success">{formatCurrency(lease.discount || 0)}</span>
-                        </div>
-                        <hr className="my-2" />
-                        <div className="d-flex justify-content-between mb-3">
-                          <span className="fw-bold">Total:</span>
-                          <span className="fw-bold">{formatCurrency(lease.total_amount || 0)}</span>
-                        </div>
-                        <div className="d-flex justify-content-between mb-3">
-                          <span className="fw-bold">Paid Amount:</span>
-                          <span className="fw-bold">{formatCurrency(lease.amount_paid || 0)}</span>
-                        </div>
-                        <hr className="my-3" />
-                        <div className="d-flex justify-content-between">
-                          <span className="fw-bold">Amount Due:</span>
-                          <span className="fw-bold text-danger">{formatCurrency(lease.remaining_amount || 0)}</span>
-                        </div>
+                {/* Financial Summary - Bottom Left */}
+                <div className="row mt-4">
+                  <div className="col-md-8">
+                    {/* Empty space for other content if needed */}
+                  </div>
+                  <div className="col-md-4">
+                    <div className="bg-light p-3 rounded">
+                      <h6 className="mb-3">
+                        <i className="bi bi-calculator me-2"></i>
+                        Financial Summary
+                      </h6>
+                      <div className="d-flex justify-content-between mb-2">
+                        <span>Total Amount:</span>
+                        <span className="fw-bold">{formatCurrency(lease.total_amount)}</span>
                       </div>
-                    </Col>
-                  </Row>
+                      <div className="d-flex justify-content-between mb-2">
+                        <span>Paid Amount:</span>
+                        <span className="fw-bold text-success">{formatCurrency(lease.amount_paid || 0)}</span>
+                      </div>
+                      <div className="d-flex justify-content-between mb-2">
+                        <span>Discount:</span>
+                        <span className="fw-bold text-info">{formatCurrency(lease.discount || 0)}</span>
+                      </div>
+                      <hr className="my-2" />
+                      <div className="d-flex justify-content-between">
+                        <span className="fw-bold">Amount Due:</span>
+                        <span className="fw-bold text-danger">{formatCurrency(lease.remaining_amount || 0)}</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
 
             {/* Payments Tab */}
             {activeTab === "payments" && (
-              <Payments 
-                payments={lease.payments || []}
-                leaseId={leaseId}
-                refreshData={fetchLeaseDetails}
-              />
-            )}
-
-            {/* Documents Tab */}
-            {activeTab === "documents" && (
               <div>
-                <div className="d-flex justify-content-between align-items-center mb-4">
-                  <h5><i className="bi bi-file-earmark me-2"></i>Documents</h5>
-                  <Button variant="primary" size="sm">
-                    <i className="bi bi-upload me-1"></i>
-                    Upload Document
-                  </Button>
-                </div>
-                
-                {documentsLoading ? (
-                  <div className="text-center py-4">
-                    <Spinner animation="border" size="sm" />
-                    <p className="mt-2 text-muted">Loading documents...</p>
-                  </div>
-                ) : documents.length > 0 ? (
-                  <Row>
-                    {documents.map((document, index) => (
-                      <Col md={4} key={document.id || index} className="mb-3">
-                        <div className="border p-4 h-100">
-                          <div className="text-center">
-                            <i className="bi bi-file-earmark-text display-4 text-primary"></i>
-                            <h6 className="mt-2">{document.document_type || 'Document'}</h6>
-                            <p className="text-muted small">{document.description || 'No description'}</p>
-                            <Button variant="outline-primary" size="sm">
-                              <i className="bi bi-download me-1"></i>
-                              Download
-                            </Button>
-                          </div>
-                        </div>
-                      </Col>
-                    ))}
-                  </Row>
-                ) : (
-                  <div className="text-center py-5">
-                    <i className="bi bi-file-earmark display-1 text-muted"></i>
-                    <h5 className="mt-3">No documents uploaded</h5>
-                    <p className="text-muted">Lease documents will appear here once uploaded.</p>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* History Tab */}
-            {activeTab === "history" && (
-              <div>
-                <h5><i className="bi bi-clock-history me-2"></i>Lease History</h5>
-                <div className="timeline mt-4">
-                  <div className="timeline-item">
-                    <div className="timeline-marker bg-success"></div>
-                    <div className="timeline-content">
-                      <h6>Lease Created</h6>
-                      <p className="text-muted">{formatDate(lease.created_at)}</p>
-                      <small className="text-muted">Lease agreement was created and activated</small>
-                    </div>
-                  </div>
-                  <div className="timeline-item">
-                    <div className="timeline-marker bg-primary"></div>
-                    <div className="timeline-content">
-                      <h6>Last Updated</h6>
-                      <p className="text-muted">{formatDate(lease.updated_at || lease.created_at)}</p>
-                      <small className="text-muted">Most recent modification to lease terms</small>
-                    </div>
-                  </div>
-                </div>
+                <Payments 
+                  payments={lease.payments || []}
+                  leaseId={leaseId}
+                  refreshData={fetchLeaseDetails}
+                />
               </div>
             )}
         </div>
-      </Container>
       </div>
     </Layout>
   );
