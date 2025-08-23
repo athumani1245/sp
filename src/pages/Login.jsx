@@ -58,16 +58,16 @@ function Login() {
             <div className="flex-grow-1 d-flex align-items-center justify-content-center">
                 <div className="container my-4">
                     <div className="card mx-auto shadow-sm" style={{ maxWidth: "420px" }}>
-                        <div className="card-body p-2">
+                        <div className="card-body p-4">
                             <div className="text-center mb-4">
                                 <img 
-                                    src="/logo192.png" 
+                                    src="/Logo.png" 
                                     alt="Tanaka Logo" 
                                     className="mb-3"
                                     style={{ width: "64px", height: "64px" }}
                                 />
-                                <p className="card-title mb-1 text-center w-100">Rent & Manage with Ease</p>
-                                <small className="text-muted d-block text-center w-100">Please log in to your account</small>
+                                <h4 className="mb-1 text-center fw-normal" style={{ textAlign: "center !important" }}>Rent & Manage with Ease</h4>
+                                <small className="text-muted d-block text-center">Please log in to your account</small>
                             </div>
                             {error && (
                                 <div className="alert alert-danger py-2 mb-4">

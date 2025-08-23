@@ -20,43 +20,107 @@ function ForgotPassword() {
         await sendOtp(username, navigate, setError, setLoading);
     }
 
-
     return (
-        <>
-            <div className="forgot-password-header d-flex justify-content-between align-items-center px-4 mb-0">
-                <div>
-                    <span className="text-brand">Tanaka</span>
-                </div>
-                <div>
-                    <span className="me-2">Already have an account?</span>
-                    <a href="/" className="nav-link d-inline text-danger">Log In</a>
-                </div>
-            </div>
-            <div className="container d-flex flex-column justify-content-center align-items-center" style={{ minHeight: "30vh" }}>
-                <div className="card p-4 shadow mt-4" style={{ maxWidth: 400, width: "100%" }}>
-                    <p className="mb-4 text-center">Forgot Password</p>
-                    {error && <div className="alert alert-danger">{error}</div>}
-                    {success && <div className="alert alert-success">{success}</div>}
-                    <form onSubmit={handleSubmit}>
-                        <div className="mb-3">
-                            <label htmlFor="phone" className="form-label">Phone Number</label>
-                            <input
-                                type="tel"
-                                className="form-control"
-                                id="username"
-                                value={username}
-                                onChange={e => setUsername(e.target.value)}
-                                required
-                                placeholder="Enter your phone number"
-                            />
+        <div className="min-vh-100 d-flex flex-column">
+            {/* Header */}
+            <header className="forgot-password-header">
+                <div className="container">
+                    <div className="row align-items-center justify-content-between">
+                        <div className="col-auto">
+                            <span className="text-brand">Tanaka</span>
                         </div>
-                        <button type="submit" className="btn btn-submit w-100" disabled={loading}>
-                            {loading ? "Sending..." : "Send OTP"}
-                        </button>
-                    </form>
+                        <div className="col-auto">
+                            <div className="d-flex align-items-center">
+                                <span className="me-2 d-none d-md-inline">Remember your password?</span>
+                                <a href="/" className="nav-link text-danger fw-medium">
+                                    Log In
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            {/* Main Content */}
+            <div className="flex-grow-1 d-flex align-items-center justify-content-center py-4">
+                <div className="container">
+                    <div className="row justify-content-center">
+                        <div className="col-12 col-sm-10 col-md-6 col-lg-5 col-xl-4">
+                            <div className="forgot-password-card">
+                                <div className="text-center mb-4">
+                                    <img 
+                                        src="/Logo.png" 
+                                        alt="Tanaka Logo" 
+                                        className="mb-3"
+                                        style={{ width: "64px", height: "64px" }}
+                                    />
+                                    <h2 className="mb-2 fw-normal text-center">
+                                        Forgot Password?
+                                    </h2>
+                                    <p className="text-muted mb-0">
+                                        Don't worry, we'll send you a verification code to reset it
+                                    </p>
+                                </div>
+
+                                {error && (
+                                    <div className="alert alert-danger py-2 mb-3">
+                                        <small>{error}</small>
+                                    </div>
+                                )}
+                                {success && (
+                                    <div className="alert alert-success py-2 mb-3">
+                                        <small>{success}</small>
+                                    </div>
+                                )}
+                                
+                                <form onSubmit={handleSubmit}>
+                                    <div className="mb-4">
+                                        <label htmlFor="username" className="form-label">Phone Number</label>
+                                        <div className="input-group">
+                                            <span className="input-group-text bg-white border-end-0">
+                                                <span className="me-2">🇹🇿</span>
+                                                <span className="text-muted">+255</span>
+                                            </span>
+                                            <input
+                                                type="tel"
+                                                className="form-control border-start-0"
+                                                id="username"
+                                                value={username}
+                                                onChange={e => setUsername(e.target.value)}
+                                                required
+                                                placeholder="622 330 329"
+                                            />
+                                        </div>
+                                        <small className="text-muted">We'll send a verification code to this number</small>
+                                    </div>
+                                    
+                                    <button 
+                                        type="submit" 
+                                        className="btn btn-submit w-100 mb-3" 
+                                        disabled={loading}
+                                    >
+                                        {loading ? "Sending OTP..." : "Send Verification Code"}
+                                    </button>
+                                    
+                                    <div className="text-center">
+                                        <a href="/" className="text-muted text-decoration-none small">
+                                            ← Back to Login
+                                        </a>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </>
+
+            {/* Footer */}
+            <footer className="py-4 text-center">
+                <div className="text-muted small">
+                    &copy; {new Date().getFullYear()} Tanaka. All rights reserved.
+                </div>
+            </footer>
+        </div>
     );
 }
 

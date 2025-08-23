@@ -4,6 +4,7 @@ import { getProperties, getPropertyUnits } from '../../services/propertyService'
 import { createLease } from '../../services/leaseService';
 import { getTenants } from '../../services/tenantService';
 import '../../assets/styles/add-lease.css';
+import '../../assets/styles/forms-responsive.css';
 
 
 
@@ -323,10 +324,12 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
             size="lg" 
             backdrop="static"
             keyboard={false}
+            centered
+            className="responsive-modal"
         >
-            <Modal.Header closeButton>
-                <Modal.Title>
-                    <i className="bi bi-file-earmark-plus me-2"></i>
+            <Modal.Header closeButton className="border-0">
+                <Modal.Title className="text-center w-100 h5 fw-bold text-dark">
+                    <i className="bi bi-file-earmark-plus me-2 text-danger"></i>
                     Add New Lease Agreement
                 </Modal.Title>
             </Modal.Header>
@@ -334,24 +337,29 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
             <Form onSubmit={handleSubmit}>
                 <Modal.Body>
                     {error && (
-                        <Alert variant="danger">
+                        <Alert variant="danger" className="alert alert-danger">
                             <i className="bi bi-exclamation-triangle me-2"></i>
                             {error}
                         </Alert>
                     )}
                     
                     {success && (
-                        <Alert variant="success">
+                        <Alert variant="success" className="alert alert-success">
                             <i className="bi bi-check-circle me-2"></i>
                             {success}
                         </Alert>
                     )}
 
-                    <Row>
-                        <Col md={6}>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Property *</Form.Label>
+                    <div className="form-section-header mb-form-section">
+                        <i className="fas fa-building text-danger"></i>
+                        Property & Unit Selection
+                    </div>
+                    <Row className="mb-3">
+                        <Col xs={12} md={6} className="mb-3">
+                            <Form.Group>
+                                <Form.Label className="form-label">Property *</Form.Label>
                                 <Form.Select
+                                    className="form-select"
                                     name="property_id"
                                     value={formData.property_id}
                                     onChange={handleInputChange}
@@ -368,10 +376,11 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                             </Form.Group>
                         </Col>
                         
-                        <Col md={6}>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Available Unit *</Form.Label>
+                        <Col xs={12} md={6} className="mb-3">
+                            <Form.Group>
+                                <Form.Label className="form-label">Available Unit *</Form.Label>
                                 <Form.Select
+                                    className="form-select"
                                     name="unit"
                                     value={formData.unit}
                                     onChange={handleInputChange}
@@ -386,7 +395,8 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                                     ))}
                                 </Form.Select>
                                 {loading && formData.property_id && (
-                                    <Form.Text className="text-muted">
+                                    <Form.Text className="form-text">
+                                        <i className="spinner-border spinner-border-sm me-1"></i>
                                         Loading available units...
                                     </Form.Text>
                                 )}
@@ -394,17 +404,17 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                         </Col>
                     </Row>
 
-                    <hr />
-                    <h6 className="mb-3">
-                        <i className="bi bi-person me-2"></i>
+                    <div className="form-section-header mb-form-section">
+                        <i className="fas fa-user text-danger"></i>
                         Tenant Information
-                    </h6>
+                    </div>
 
-                    <Row>
-                        <Col md={12}>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Select Tenant *</Form.Label>
+                    <Row className="mb-3">
+                        <Col xs={12} className="mb-3">
+                            <Form.Group>
+                                <Form.Label className="form-label">Select Tenant *</Form.Label>
                                 <Form.Select
+                                    className="form-select"
                                     name="tenant_id"
                                     value={formData.tenant_id}
                                     onChange={handleInputChange}
@@ -419,7 +429,8 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                                     ))}
                                 </Form.Select>
                                 {tenants.length === 0 && (
-                                    <Form.Text className="text-muted">
+                                    <Form.Text className="form-text text-warning">
+                                        <i className="bi bi-info-circle me-1"></i>
                                         No tenants available. Please add a tenant first.
                                     </Form.Text>
                                 )}
@@ -427,17 +438,17 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                         </Col>
                     </Row>
 
-                    <hr />
-                    <h6 className="mb-3">
-                        <i className="bi bi-calendar me-2"></i>
+                    <div className="form-section-header mb-form-section">
+                        <i className="fas fa-calendar-alt text-danger"></i>
                         Lease Terms
-                    </h6>
+                    </div>
 
-                    <Row>
-                        <Col md={4}>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Start Date *</Form.Label>
+                    <Row className="mb-3">
+                        <Col xs={12} sm={6} md={4} className="mb-3">
+                            <Form.Group>
+                                <Form.Label className="form-label">Start Date *</Form.Label>
                                 <Form.Control
+                                    className="form-control"
                                     type="date"
                                     name="start_date"
                                     value={formData.start_date}
@@ -447,10 +458,11 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                             </Form.Group>
                         </Col>
                         
-                        <Col md={4}>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Lease Duration (Months) *</Form.Label>
+                        <Col xs={12} sm={6} md={4} className="mb-3">
+                            <Form.Group>
+                                <Form.Label className="form-label">Lease Duration (Months) *</Form.Label>
                                 <Form.Control
+                                    className="form-control"
                                     type="number"
                                     name="number_of_month"
                                     value={formData.number_of_month}
@@ -462,93 +474,115 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                             </Form.Group>
                         </Col>
 
-                        <Col md={4}>
-                            <Form.Group className="mb-3">
-                                <Form.Label>End Date</Form.Label>
+                        <Col xs={12} sm={6} md={4} className="mb-3">
+                            <Form.Group>
+                                <Form.Label className="form-label">End Date</Form.Label>
                                 <Form.Control
+                                    className="form-control"
                                     type="date"
                                     name="end_date"
                                     value={formData.end_date}
                                     readOnly
-                                    className="bg-light"
+                                    style={{backgroundColor: '#f8f9fa', cursor: 'not-allowed'}}
                                 />
-                                <Form.Text className="text-muted">
+                                <Form.Text className="form-text">
+                                    <i className="bi bi-info-circle me-1"></i>
                                     Auto-calculated
                                 </Form.Text>
                             </Form.Group>
                         </Col>
                     </Row>
 
-                    <Row>
-                        <Col md={4}>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Monthly Rent (TSh) *</Form.Label>
+                    <div className="form-section-header mb-form-section">
+                        <i className="fas fa-dollar-sign text-danger"></i>
+                        Financial Information
+                    </div>
+                    <Row className="mb-3">
+                        <Col xs={12} sm={6} md={4} className="mb-3">
+                            <Form.Group>
+                                <Form.Label className="form-label">Monthly Rent (TSh) *</Form.Label>
                                 <Form.Control
+                                    className="form-control"
                                     type="number"
                                     name="rent_amount_per_unit"
                                     value={formData.rent_amount_per_unit}
                                     onChange={handleInputChange}
-                                    placeholder="Enter monthly rent amount"
+                                    placeholder="0"
+                                    step="0.01"
                                     required
                                 />
                             </Form.Group>
                         </Col>
                         
-                        <Col md={4}>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Total Amount (TSh)</Form.Label>
+                        <Col xs={12} sm={6} md={4} className="mb-3">
+                            <Form.Group>
+                                <Form.Label className="form-label">Total Amount (TSh)</Form.Label>
                                 <Form.Control
+                                    className="form-control"
                                     type="number"
                                     name="total_amount"
                                     value={formData.total_amount}
                                     readOnly
-                                    className="bg-light"
+                                    style={{backgroundColor: '#f8f9fa', cursor: 'not-allowed'}}
                                 />
-                                <Form.Text className="text-muted">
+                                <Form.Text className="form-text">
+                                    <i className="bi bi-calculator me-1"></i>
                                     Monthly rent × Duration
                                 </Form.Text>
                             </Form.Group>
                         </Col>
                         
-                        <Col md={4}>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Paid Amount (TSh)</Form.Label>
+                        <Col xs={12} sm={6} md={4} className="mb-3">
+                            <Form.Group>
+                                <Form.Label className="form-label">Paid Amount (TSh)</Form.Label>
                                 <Form.Control
+                                    className="form-control"
                                     type="number"
                                     name="amount_paid"
                                     value={formData.amount_paid}
                                     onChange={handleInputChange}
-                                    placeholder="Enter paid amount"
+                                    placeholder="0"
+                                    step="0.01"
                                 />
                             </Form.Group>
                         </Col>
-                        <Col md={4}>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Discount (TSh)</Form.Label>
+                    </Row>
+                    <Row className="mb-3">
+                        <Col xs={12} sm={6} md={4} className="mb-3">
+                            <Form.Group>
+                                <Form.Label className="form-label">Discount (TSh)</Form.Label>
                                 <Form.Control
+                                    className="form-control"
                                     type="number"
                                     name="discount"
                                     value={formData.discount}
                                     onChange={handleInputChange}
-                                    placeholder="Enter discount amount"
+                                    placeholder="0"
+                                    step="0.01"
                                 />
+                                <Form.Text className="form-text">
+                                    Optional discount amount
+                                </Form.Text>
                             </Form.Group>
                         </Col>
                     </Row>
                 </Modal.Body>
                 
-                <Modal.Footer>
+                <Modal.Footer className="border-0 pt-0">
                     <Button 
                         variant="secondary" 
                         onClick={onClose}
                         disabled={submitLoading}
+                        className="btn btn-secondary"
                     >
+                        <i className="bi bi-x-circle me-2"></i>
                         Cancel
                     </Button>
                     <Button 
                         variant="primary" 
                         type="submit"
                         disabled={submitLoading}
+                        className="btn btn-primary"
                     >
                         {submitLoading ? (
                             <>

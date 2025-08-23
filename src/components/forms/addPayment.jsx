@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form, Row, Col, Alert } from 'react-bootstrap';
+import '../../assets/styles/forms-responsive.css';
 import PropTypes from 'prop-types';
 import { createPayment } from '../../services/paymentService';
 
@@ -109,10 +110,12 @@ const AddPayment = ({ isOpen, onClose, leaseId, onPaymentAdded }) => {
             onHide={onClose} 
             backdrop="static"
             keyboard={false}
+            centered
+            className="responsive-modal"
         >
-            <Modal.Header closeButton>
-                <Modal.Title>
-                    <i className="bi bi-credit-card me-2"></i>
+            <Modal.Header closeButton className="border-0">
+                <Modal.Title className="text-center w-100 h5 fw-bold text-dark">
+                    <i className="bi bi-credit-card me-2 text-danger"></i>
                     Record Payment
                 </Modal.Title>
             </Modal.Header>
@@ -120,36 +123,37 @@ const AddPayment = ({ isOpen, onClose, leaseId, onPaymentAdded }) => {
             <Form onSubmit={handleSubmit}>
                 <Modal.Body>
                     {error && (
-                        <Alert variant="danger">
+                        <Alert variant="danger" className="alert alert-danger">
                             <i className="bi bi-exclamation-triangle me-2" />
                             {error}
                         </Alert>
                     )}
                     
                     {success && (
-                        <Alert variant="success">
+                        <Alert variant="success" className="alert alert-success">
                             <i className="bi bi-check-circle me-2" />
                             {success}
                         </Alert>
                     )}
 
-                    <h6 className="mb-3">
-                        <i className="bi bi-cash me-2"></i>
-                        Payment Details
-                    </h6>
+                    <div className="form-section-header mb-form-section">
+                        <i className="fas fa-money-bill-wave text-danger"></i>
+                        Payment Information
+                    </div>
 
-                    <Row>
-                        <Col md={6}>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Amount *</Form.Label>
+                    <Row className="mb-3">
+                        <Col xs={12} md={6} className="mb-3">
+                            <Form.Group>
+                                <Form.Label className="form-label">Amount (TSh) *</Form.Label>
                                 <div className="input-group">
                                     <span className="input-group-text">TSh</span>
                                     <Form.Control
+                                        className="form-control"
                                         type="number"
                                         name="amount_paid"
                                         value={formData.amount_paid}
                                         onChange={handleInputChange}
-                                        placeholder="Enter amount"
+                                        placeholder="0.00"
                                         required
                                         min="0"
                                         step="0.01"
@@ -157,10 +161,11 @@ const AddPayment = ({ isOpen, onClose, leaseId, onPaymentAdded }) => {
                                 </div>
                             </Form.Group>
                         </Col>
-                        <Col md={6}>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Payment Date & Time *</Form.Label>
+                        <Col xs={12} md={6} className="mb-3">
+                            <Form.Group>
+                                <Form.Label className="form-label">Payment Date & Time *</Form.Label>
                                 <Form.Control
+                                    className="form-control"
                                     type="datetime-local"
                                     name="date_paid"
                                     value={formData.date_paid}
@@ -171,11 +176,12 @@ const AddPayment = ({ isOpen, onClose, leaseId, onPaymentAdded }) => {
                         </Col>
                     </Row>
 
-                    <Row>
-                        <Col md={6}>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Category</Form.Label>
+                    <Row className="mb-3">
+                        <Col xs={12} md={6} className="mb-3">
+                            <Form.Group>
+                                <Form.Label className="form-label">Category *</Form.Label>
                                 <Form.Select
+                                    className="form-select"
                                     name="category"
                                     value={formData.category}
                                     onChange={handleInputChange}
@@ -189,21 +195,42 @@ const AddPayment = ({ isOpen, onClose, leaseId, onPaymentAdded }) => {
                                 </Form.Select>
                             </Form.Group>
                         </Col>
+                        <Col xs={12} md={6} className="mb-3">
+                            <Form.Group>
+                                <Form.Label className="form-label">Status</Form.Label>
+                                <Form.Select
+                                    className="form-select"
+                                    name="status"
+                                    value={formData.status}
+                                    onChange={handleInputChange}
+                                >
+                                    <option value="success">Successful</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="failed">Failed</option>
+                                </Form.Select>
+                                <Form.Text className="form-text">
+                                    Payment processing status
+                                </Form.Text>
+                            </Form.Group>
+                        </Col>
                     </Row>
                 </Modal.Body>
                 
-                <Modal.Footer>
+                <Modal.Footer className="border-0 pt-0">
                     <Button 
                         variant="secondary" 
                         onClick={onClose}
                         disabled={submitLoading}
+                        className="btn btn-secondary"
                     >
+                        <i className="bi bi-x-circle me-2"></i>
                         Cancel
                     </Button>
                     <Button 
                         variant="primary" 
                         type="submit"
                         disabled={submitLoading}
+                        className="btn btn-primary"
                     >
                         {submitLoading ? (
                             <>

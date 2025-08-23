@@ -1,29 +1,29 @@
-/* Forgot Password Page Styles */
-.forgot-password-header {
+/* Verify OTP Page Styles */
+.verify-otp-header {
     background: #fff;
     border-bottom: 1px solid #dee2e6;
     padding: 1rem 0;
 }
 
-.forgot-password-header .text-brand {
+.verify-otp-header .text-brand {
     color: #dc3545;
     font-weight: 600;
     font-size: 1.25rem;
 }
 
-.forgot-password-header .nav-link {
+.verify-otp-header .nav-link {
     color: #dc3545;
     font-weight: 500;
     text-decoration: none;
     transition: all 0.2s ease;
 }
 
-.forgot-password-header .nav-link:hover {
+.verify-otp-header .nav-link:hover {
     color: #c82333;
     text-decoration: underline;
 }
 
-.forgot-password-card {
+.verify-otp-card {
     background: #fff;
     border: none;
     border-radius: 8px;
@@ -33,60 +33,42 @@
     margin: 0 auto;
 }
 
-.form-control {
-    height: calc(2.5rem + 2px);
-    border-radius: 4px;
-    border: 1px solid #ced4da;
-    background: #fff;
-    font-size: 0.95rem;
-    transition: all 0.2s ease;
+.form-label {
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
 }
 
-.form-control:focus {
+.otp-input-container {
+    gap: 0.75rem;
+}
+
+.otp-input {
+    width: 60px;
+    height: 60px;
+    font-size: 1.5rem;
+    font-weight: 600;
+    border: 2px solid #ced4da;
+    border-radius: 8px;
+    background: #fff;
+    transition: all 0.2s ease;
+    box-shadow: none;
+}
+
+.otp-input:focus {
     border-color: #dc3545 !important;
     box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25) !important;
     outline: none !important;
     background: #fff !important;
 }
 
-.form-label {
-    font-weight: 500;
-    color: #333;
-    margin-bottom: 0.5rem;
-    font-size: 0.9rem;
-    text-align: left;
+.otp-input:disabled {
+    background: #f8f9fa;
+    opacity: 0.6;
 }
 
-.input-group-text {
-    background: #fff;
-    border: 1px solid #ced4da;
-    font-size: 0.95rem;
-    color: #495057;
-    height: calc(2.5rem + 2px);
-    border-radius: 4px 0 0 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 70px;
-    padding: 0.375rem 0.75rem;
-}
-
-.input-group .form-control.border-start-0 {
-    border-left: none;
-    border-radius: 0 4px 4px 0;
-}
-
-.input-group:focus-within .input-group-text {
-    border-color: #dc3545;
-    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
-}
-
-.input-group:focus-within .form-control {
-    border-color: #dc3545 !important;
-    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25) !important;
-}
-
-.btn-submit {
+.btn-verify {
     background-color: #fff !important;
     border: 2px solid #dc3545 !important;
     color: #000 !important;
@@ -97,20 +79,45 @@
     box-shadow: none !important;
 }
 
-.btn-submit:hover,
-.btn-submit:focus {
+.btn-verify:hover,
+.btn-verify:focus {
     background-color: #dc3545 !important;
     border-color: #dc3545 !important;
     color: #fff !important;
     box-shadow: none !important;
 }
 
-.btn-submit:disabled {
+.btn-verify:disabled {
     background-color: #fff !important;
     border-color: #dc3545 !important;
     color: #000 !important;
     opacity: 0.65;
     box-shadow: none !important;
+}
+
+.btn-link {
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.btn-link:focus {
+    box-shadow: none;
+}
+
+/* Countdown Text Styling */
+.countdown-text {
+    font-size: 0.95rem;
+    color: #6c757d;
+    margin-bottom: 0.75rem;
+}
+
+.countdown-number {
+    font-weight: 700;
+    color: #dc3545;
+    font-size: 1.1em;
+    display: inline-block;
+    min-width: 20px;
+    text-align: center;
 }
 
 .alert {
@@ -121,16 +128,16 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .forgot-password-header {
+    .verify-otp-header {
         padding: 0.75rem 0;
     }
     
-    .forgot-password-header .container {
+    .verify-otp-header .container {
         padding-left: 1rem;
         padding-right: 1rem;
     }
     
-    .forgot-password-card {
+    .verify-otp-card {
         padding: 2rem 1.5rem;
         margin: 1rem 0.75rem;
         border-radius: 12px;
@@ -138,18 +145,13 @@
         border: none;
     }
     
-    .form-control {
-        font-size: 1rem;
-        height: calc(2.75rem + 2px);
-        padding: 0.75rem 1rem;
+    .otp-input {
+        width: 65px;
+        height: 65px;
+        font-size: 1.6rem;
     }
     
-    .input-group-text {
-        height: calc(2.75rem + 2px);
-        padding: 0.75rem 1rem;
-    }
-    
-    .btn-submit {
+    .btn-verify {
         font-size: 1rem;
         height: calc(2.75rem + 2px);
         padding: 0.75rem 1rem;
@@ -170,7 +172,7 @@
 
 @media (max-width: 576px) {
     /* Header improvements for mobile */
-    .forgot-password-header {
+    .verify-otp-header {
         padding: 1rem 0;
         border-bottom: 2px solid #f8f9fa;
     }
@@ -181,7 +183,7 @@
     }
     
     /* Card improvements for mobile */
-    .forgot-password-card {
+    .verify-otp-card {
         padding: 1.75rem 1.25rem;
         margin: 0.75rem 0.5rem;
         border-radius: 16px;
@@ -190,7 +192,7 @@
     }
     
     /* Logo and heading improvements */
-    .forgot-password-card img {
+    .verify-otp-card img {
         width: 56px !important;
         height: 56px !important;
         margin-bottom: 1rem !important;
@@ -213,61 +215,44 @@
         line-height: 1.4;
     }
     
-    /* Form improvements for mobile */
-    .form-label {
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: #495057;
-        margin-bottom: 0.4rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        text-align: left;
+    /* OTP input improvements for mobile */
+    .otp-input-container {
+        gap: 0.5rem;
+        justify-content: space-between;
     }
     
-    /* Input group mobile improvements */
-    .input-group-text {
-        display: none !important; /* Hide flag and +255 on mobile */
-    }
-    
-    .input-group .form-control.border-start-0 {
-        border-radius: 8px; /* Full border radius when no prefix */
-        border: 1.5px solid #e9ecef;
-        background: #fafbfc;
-    }
-    
-    .input-group:focus-within .input-group-text {
-        border-color: #dc3545;
-        box-shadow: 0 0 0 0.3rem rgba(220, 53, 69, 0.15);
-        background: #fff;
-        transform: translateY(-1px);
-    }
-    
-    .form-control {
-        font-size: 1rem;
-        height: 3rem;
-        padding: 0.875rem 1rem;
-        border-radius: 8px;
-        border: 1.5px solid #e9ecef;
+    .otp-input {
+        width: 70px;
+        height: 70px;
+        font-size: 1.8rem;
+        font-weight: 700;
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
         background: #fafbfc;
         transition: all 0.3s ease;
         box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
     }
     
-    .form-control:focus {
+    .otp-input:focus {
         border-color: #dc3545 !important;
         box-shadow: 0 0 0 0.3rem rgba(220, 53, 69, 0.15) !important;
         background: #fff !important;
-        transform: translateY(-1px);
+        transform: translateY(-2px);
         outline: none !important;
     }
     
-    .form-control::placeholder {
-        color: #adb5bd;
-        font-size: 0.9rem;
+    /* Form label improvements */
+    .form-label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
     
     /* Button improvements for mobile */
-    .btn-submit {
+    .btn-verify {
         height: 3.25rem;
         font-size: 1.05rem;
         font-weight: 600;
@@ -283,11 +268,29 @@
         transition: all 0.3s ease;
     }
     
-    .btn-submit:hover {
+    .btn-verify:hover {
         background: #dc3545 !important;
         border-color: #dc3545 !important;
         color: #fff !important;
         box-shadow: none !important;
+    }
+    
+    /* Resend button styling */
+    .btn-link {
+        font-size: 1rem;
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+    }
+    
+    .btn-link.text-danger {
+        background: rgba(220, 53, 69, 0.08);
+    }
+    
+    .btn-link.text-danger:hover {
+        background: rgba(220, 53, 69, 0.15);
+        text-decoration: underline !important;
     }
     
     /* Alert improvements */
@@ -305,11 +308,6 @@
         color: #721c24;
     }
     
-    .alert-success {
-        background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
-        color: #155724;
-    }
-    
     /* Footer improvements */
     footer {
         padding: 1.5rem 1rem;
@@ -324,7 +322,7 @@
     }
     
     /* Navigation link improvements for mobile */
-    .forgot-password-header .nav-link {
+    .verify-otp-header .nav-link {
         font-size: 0.9rem;
         font-weight: 600;
         color: #dc3545 !important;
@@ -335,26 +333,72 @@
         transition: all 0.2s ease;
     }
     
-    .forgot-password-header .nav-link:hover {
+    .verify-otp-header .nav-link:hover {
         background: rgba(220, 53, 69, 0.15);
         color: #c82333 !important;
     }
     
-    /* Hide "Remember your password?" text on very small screens */
-    .forgot-password-header .d-none.d-md-inline {
+    /* Hide text on very small screens */
+    .verify-otp-header .d-none.d-md-inline {
         display: none !important;
     }
     
-    /* Back to Login link styling */
-    .text-center a {
+    /* Countdown styling */
+    .countdown-text {
+        font-size: 1rem;
+        color: #495057;
+        margin-bottom: 1rem;
+        font-weight: 500;
+    }
+    
+    .countdown-number {
+        font-weight: 700;
+        color: #dc3545;
+        font-size: 1.3em;
+        display: inline-block;
+        min-width: 25px;
+        text-align: center;
+        background: rgba(220, 53, 69, 0.1);
+        padding: 0.2em 0.4em;
+        border-radius: 6px;
+        border: 1px solid rgba(220, 53, 69, 0.2);
+    }
+    
+    /* Change phone number link styling */
+    .text-center a.small {
         color: #6c757d !important;
-        font-size: 0.9rem;
+        font-size: 0.85rem;
         font-weight: 500;
         transition: all 0.2s ease;
     }
     
-    .text-center a:hover {
+    .text-center a.small:hover {
         color: #dc3545 !important;
         text-decoration: underline !important;
+    }
+    
+    /* Countdown styling */
+    .text-danger.fw-bold {
+        color: #dc3545 !important;
+        font-size: 1.1em;
+        font-weight: 700 !important;
+    }
+}
+
+/* Extra small screens */
+@media (max-width: 400px) {
+    .otp-input-container {
+        gap: 0.375rem;
+    }
+    
+    .otp-input {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+    }
+    
+    .verify-otp-card {
+        margin: 0.5rem 0.25rem;
+        padding: 1.5rem 1rem;
     }
 }

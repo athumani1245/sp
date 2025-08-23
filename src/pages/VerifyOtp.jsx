@@ -1,7 +1,8 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { verifyOtp } from "../services/resetService";
+import { verifyOtp, sendOtp } from "../services/resetService";
 import { useNavigate } from "react-router-dom";
+import "../assets/styles/verify-otp.css";
 
 function OtpVerify() {
     // Get phone number (or username) from previous page via location.state
@@ -9,7 +10,27 @@ function OtpVerify() {
     const { username } = location.state || {};
 
     const [otp, setOtp] = useState(["", "", "", ""]);
+    const [otpError, setOtpError] = useState("");
+    const [otpLoading, setOtpLoading] = useState(false);
+    const [resendLoading, setResendLoading] = useState(false);
+    const [countdown, setCountdown] = useState(60);
+    const [canResend, setCanResend] = useState(false);
+    
     const inputRefs = [useRef(null), useRef(null), useRef(null), useRef(null)];
+    const navigate = useNavigate();
+
+    // Countdown timer effect
+    useEffect(() => {
+        let interval = null;
+        if (countdown > 0 && !canResend) {
+            interval = setInterval(() => {
+                setCountdown(countdown => countdown - 1);
+            }, 1000);
+        } else if (countdown === 0) {
+            setCanResend(true);
+        }
+        return () => clearInterval(interval);
+    }, [countdown, canResend]);
 
     const handleChange = (e, idx) => {
         const value = e.target.value.replace(/\D/g, "");
@@ -25,11 +46,6 @@ function OtpVerify() {
         }
     };
 
-    // phone is now available as a variable in this page
-    const [otpError, setOtpError] = useState("");
-    const [otpLoading, setOtpLoading] = useState(false);
-
-    const navigate = useNavigate();
     const handleSubmit = async (e) => {
         e.preventDefault();
         setOtpError("");
@@ -37,84 +53,155 @@ function OtpVerify() {
 
         await verifyOtp(username, otp.join(""), setOtpError, navigate);
         setOtpLoading(false);
+    };
 
-
+    const handleResendOtp = async () => {
+        if (!canResend) return;
+        
+        setResendLoading(true);
+        setOtpError("");
+        
+        try {
+            await sendOtp(username, navigate, setOtpError, setResendLoading);
+            // Reset timer
+            setCountdown(60);
+            setCanResend(false);
+            // Clear OTP inputs
+            setOtp(["", "", "", ""]);
+            inputRefs[0].current.focus();
+        } catch (error) {
+            console.error('Resend OTP error:', error);
+        }
+        
+        setResendLoading(false);
     };
 
     return (
-        <>
-            <div className="forgot-password-header d-flex justify-content-between align-items-center px-4">
-                <div>
-                    <span className="text-brand">Smart Pangisha</span>
-                </div>
-                <div>
-                    <span className="me-2">Already have an account?</span>
-                    <a href="/login" className="nav-link d-inline text-danger">Log In</a>
-                </div>
-            </div>
-            <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "100vh", background: "#f6f9fc" }}>
-                <div className="p-4" style={{ background: "#fff", border: "1px solid #e3e8ee", borderRadius: 0, maxWidth: 370, width: "100%", boxShadow: "0 2px 8px rgba(0,0,0,0.03)" }}>
-                    <h3 className="fw-bold text-center mb-2" style={{ fontSize: 24 }}>Verify your Phone Number</h3>
-                    <div className="text-center text-muted mb-4" style={{ fontSize: 15 }}>
-                        Please check your phone for a message containing&nbsp;
-                        <span className="fw-semibold">OTP Code</span>. And Enter the code &nbsp; below.
-                    </div>
-                    <form autoComplete="off" onSubmit={handleSubmit}>
-                        <div className="d-flex justify-content-center gap-2 mb-3">
-                            {[0, 1, 2, 3].map((idx) => (
-                                <input
-                                    key={idx}
-                                    ref={inputRefs[idx]}
-                                    type="text"
-                                    className="form-control text-center"
-                                    style={{
-                                        width: 56,
-                                        height: 56,
-                                        fontSize: 24,
-                                        borderRadius: 6,
-                                        outline: "none",
-                                        boxShadow: "none",
-                                        transition: "border-color 0.2s"
-                                    }}
-                                    maxLength={1}
-                                    value={otp[idx]}
-                                    onChange={e => handleChange(e, idx)}
-                                    inputMode="numeric"
-                                    disabled={otpLoading}
-                                />
-                            ))}
+        <div className="min-vh-100 d-flex flex-column">
+            {/* Header */}
+            <header className="verify-otp-header">
+                <div className="container">
+                    <div className="row align-items-center justify-content-between">
+                        <div className="col-auto">
+                            <span className="text-brand">Tanaka</span>
                         </div>
-                        {otpError && (
-                            <div className="alert alert-danger py-2 text-center" style={{ fontSize: 15 }} role="alert">
-                                {otpError}
+                        <div className="col-auto">
+                            <div className="d-flex align-items-center">
+                                <span className="me-2 d-none d-md-inline">Remember your password?</span>
+                                <a href="/" className="nav-link text-danger fw-medium">
+                                    Log In
+                                </a>
                             </div>
-                        )}
+                        </div>
+                    </div>
+                </div>
+            </header>
 
-                        <div className="text-center mb-2" style={{ fontSize: 15 }}>
-                            You can resend the code in <span style={{ color: '#000', fontWeight: 500 }}>60</span> seconds.
-                        </div>
-                        <div className="text-center mb-3">
-                        <span className="fw-semibold" style={{ color: '#000', textDecoration: 'underline', fontSize: 16, cursor: 'pointer' }}>
-                            Resend code
-                        </span>
-                        </div>
-                        <div className="text-center">
-                            <button
-                                type="submit"
-                                className="btn btn-primary w-100 d-flex align-items-center justify-content-center"
-                                style={{ fontSize: 18, padding: '10px 0', background: '#000' }}
-                                disabled={otpLoading || otp.some(digit => digit === "")}
-                            >
-                                {otpLoading && (
-                                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            {/* Main Content */}
+            <div className="flex-grow-1 d-flex align-items-center justify-content-center py-4">
+                <div className="container">
+                    <div className="row justify-content-center">
+                        <div className="col-12 col-sm-10 col-md-6 col-lg-5 col-xl-4">
+                            <div className="verify-otp-card">
+                                <div className="text-center mb-4">
+                                    <img 
+                                        src="/Logo.png" 
+                                        alt="Tanaka Logo" 
+                                        className="mb-3"
+                                        style={{ width: "64px", height: "64px" }}
+                                    />
+                                    <h2 className="mb-2 fw-normal text-center">
+                                        Verify your Phone Number
+                                    </h2>
+                                    <p className="text-muted mb-0">
+                                        We've sent a verification code to your phone number ending in ***{username?.slice(-3) || '***'}
+                                    </p>
+                                </div>
+
+                                {otpError && (
+                                    <div className="alert alert-danger py-2 mb-3">
+                                        <small>{otpError}</small>
+                                    </div>
                                 )}
-                                {otpLoading ? "Verifying..." : "Submit OTP"}
-                            </button>
+                                
+                                <form onSubmit={handleSubmit} autoComplete="off">
+                                    <div className="mb-4">
+                                        <label className="form-label text-center d-block mb-3">Enter Verification Code</label>
+                                        <div className="otp-input-container d-flex justify-content-center gap-2 mb-3">
+                                            {[0, 1, 2, 3].map((idx) => (
+                                                <input
+                                                    key={idx}
+                                                    ref={inputRefs[idx]}
+                                                    type="text"
+                                                    className="otp-input form-control text-center"
+                                                    maxLength={1}
+                                                    value={otp[idx]}
+                                                    onChange={e => handleChange(e, idx)}
+                                                    inputMode="numeric"
+                                                    disabled={otpLoading}
+                                                />
+                                            ))}
+                                        </div>
+                                    </div>
+                                    
+                                    <button 
+                                        type="submit" 
+                                        className="btn btn-verify w-100 mb-3" 
+                                        disabled={otpLoading || otp.some(digit => digit === "")}
+                                    >
+                                        {otpLoading && (
+                                            <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                        )}
+                                        {otpLoading ? "Verifying..." : "Verify Code"}
+                                    </button>
+                                    
+                                    <div className="text-center">
+                                        {!canResend ? (
+                                            <p className="countdown-text">
+                                                You can resend the code in <span className="countdown-number">{countdown}</span> seconds
+                                            </p>
+                                        ) : (
+                                            <p className="text-muted mb-2">
+                                                Didn't receive the code?
+                                            </p>
+                                        )}
+                                        
+                                        <button
+                                            type="button"
+                                            className={`btn btn-link p-0 text-decoration-none ${canResend ? 'text-danger' : 'text-muted'}`}
+                                            onClick={handleResendOtp}
+                                            disabled={!canResend || resendLoading}
+                                        >
+                                            {resendLoading ? (
+                                                <>
+                                                    <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                                                    Sending...
+                                                </>
+                                            ) : (
+                                                'Resend Code'
+                                            )}
+                                        </button>
+                                        
+                                        <div className="mt-3">
+                                            <a href="/forgot-password" className="text-muted text-decoration-none small">
+                                                ← Change Phone Number
+                                            </a>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
-                    </form>
+                    </div>
                 </div>
             </div>
-        </>
+
+            {/* Footer */}
+            <footer className="py-4 text-center">
+                <div className="text-muted small">
+                    &copy; {new Date().getFullYear()} Tanaka. All rights reserved.
+                </div>
+            </footer>
+        </div>
     );
 }
 

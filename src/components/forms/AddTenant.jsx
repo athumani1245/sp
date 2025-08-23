@@ -3,6 +3,7 @@ import { Modal, Button, Form, Row, Col, Alert } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import { createTenant } from '../../services/tenantService';
 import '../../assets/styles/add-tenant.css';
+import '../../assets/styles/forms-responsive.css';
 
 const AddTenantModal = ({ isOpen, onClose, onTenantAdded }) => {
     const [formData, setFormData] = useState({
@@ -115,10 +116,12 @@ const AddTenantModal = ({ isOpen, onClose, onTenantAdded }) => {
             size="lg" 
             backdrop="static"
             keyboard={false}
+            centered
+            className="responsive-modal"
         >
-            <Modal.Header closeButton>
-                <Modal.Title>
-                    <i className="bi bi-person-plus me-2"></i>
+            <Modal.Header closeButton className="border-0">
+                <Modal.Title className="text-center w-100 h5 fw-bold text-dark">
+                    <i className="bi bi-person-plus me-2 text-danger"></i>
                     Add New Tenant
                 </Modal.Title>
             </Modal.Header>
@@ -126,29 +129,29 @@ const AddTenantModal = ({ isOpen, onClose, onTenantAdded }) => {
             <Form onSubmit={handleSubmit}>
                 <Modal.Body>
                     {error && (
-                        <Alert variant="danger">
+                        <Alert variant="danger" className="alert alert-danger">
                             <i className="bi bi-exclamation-triangle me-2" />
                             {error}
                         </Alert>
                     )}
                     
                     {success && (
-                        <Alert variant="success">
+                        <Alert variant="success" className="alert alert-success">
                             <i className="bi bi-check-circle me-2" />
                             {success}
                         </Alert>
                     )}
 
-                    {/* Only required fields */}
-                    <h6 className="mb-3">
-                        <i className="bi bi-person me-2"></i>
+                    <div className="form-section-header mb-form-section">
+                        <i className="fas fa-user text-danger"></i>
                         Tenant Information
-                    </h6>
-                    <Row>
-                        <Col md={6}>
-                            <Form.Group className="mb-3">
-                                <Form.Label>First Name *</Form.Label>
+                    </div>
+                    <Row className="mb-3">
+                        <Col xs={12} md={6} className="mb-3">
+                            <Form.Group>
+                                <Form.Label className="form-label">First Name *</Form.Label>
                                 <Form.Control
+                                    className="form-control"
                                     type="text"
                                     name="first_name"
                                     value={formData.first_name}
@@ -158,10 +161,11 @@ const AddTenantModal = ({ isOpen, onClose, onTenantAdded }) => {
                                 />
                             </Form.Group>
                         </Col>
-                        <Col md={6}>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Last Name *</Form.Label>
+                        <Col xs={12} md={6} className="mb-3">
+                            <Form.Group>
+                                <Form.Label className="form-label">Last Name *</Form.Label>
                                 <Form.Control
+                                    className="form-control"
                                     type="text"
                                     name="last_name"
                                     value={formData.last_name}
@@ -172,38 +176,53 @@ const AddTenantModal = ({ isOpen, onClose, onTenantAdded }) => {
                             </Form.Group>
                         </Col>
                     </Row>
-                    <Row>
-                        <Col md={6}>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Phone Number *</Form.Label>
+                    <Row className="mb-3">
+                        <Col xs={12} md={6} className="mb-3">
+                            <Form.Group>
+                                <Form.Label className="form-label">Phone Number *</Form.Label>
                                 <Form.Control
+                                    className="form-control"
                                     type="tel"
                                     name="phone"
                                     value={formData.username}
                                     onChange={handleInputChange}
-                                    placeholder="Enter phone number (e.g. 0712345678)"
+                                    placeholder="0712345678"
                                     required
                                 />
-                                <Form.Text className="text-muted">
-                                    This will be used as the username
+                                <Form.Text className="form-text">
+                                    This will be used as the username. Format: 0XXXXXXXXX
                                 </Form.Text>
                             </Form.Group>
+                        </Col>
+                        <Col xs={12} md={6} className="mb-3">
+                            <div className="info-card p-3 bg-light rounded">
+                                <h6 className="text-muted mb-2">
+                                    <i className="bi bi-info-circle me-2"></i>
+                                    Default Login Credentials
+                                </h6>
+                                <p className="small mb-1"><strong>Username:</strong> Phone number</p>
+                                <p className="small mb-0"><strong>Password:</strong> StrongPass123</p>
+                                <small className="text-muted">Tenant can change password after first login</small>
+                            </div>
                         </Col>
                     </Row>
                 </Modal.Body>
                 
-                <Modal.Footer>
+                <Modal.Footer className="border-0 pt-0">
                     <Button 
                         variant="secondary" 
                         onClick={onClose}
                         disabled={submitLoading}
+                        className="btn btn-secondary"
                     >
+                        <i className="bi bi-x-circle me-2"></i>
                         Cancel
                     </Button>
                     <Button 
                         variant="primary" 
                         type="submit"
                         disabled={submitLoading}
+                        className="btn btn-primary"
                     >
                         {submitLoading ? (
                             <>

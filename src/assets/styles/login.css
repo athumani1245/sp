@@ -7,15 +7,17 @@
 }
 
 .auth-link {
-    color: #020202;
+    color: #dc3545;
+    text-decoration: none;
 }
 
-/* .auth-link:hover {
+.auth-link:hover {
+    color: #c82333;
     text-decoration: underline;
-} */
+}
 
 .text-brand {
-    color: #222;
+    color: #dc3545;
     font-weight: 600;
     font-size: 1.25rem;
 }
@@ -23,6 +25,11 @@
 .card {
     border: none;
     border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.card-body {
+    padding: 2rem;
 }
 
 .card-title {
@@ -35,31 +42,42 @@
     height: calc(2.5rem + 2px);
     border-radius: 4px;
     font-size: 0.95rem;
+    padding: 0.75rem 1rem;
+}
+
+.input-group {
+    margin-bottom: 1rem;
 }
 
 .form-control:focus {
-    border-color: #000000;
-    box-shadow: 0 0 0 0.25rem rgba(0, 0, 0, 0.25);
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
     outline: none;
 }
 
 .btn-submit {
-    background-color: #dc3545;
-    border: none;
-    color: #fff;
-    padding: 0.6rem 1.5rem;
-    height: calc(2.5rem + 2px);
+    background-color: #fff !important;
+    border: 0.5px solid #dc3545 !important;
+    color: #f00101 !important;
     font-weight: 500;
+    height: calc(2.5rem + 2px);
+    transition: all 0.2s ease;
+    border-radius: 4px;
+    box-shadow: none !important;
 }
 
 .btn-submit:hover,
 .btn-submit:focus {
     background-color: #c82333;
+    border-color: #c82333;
     color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
 }
 
 .btn-submit:disabled {
     background-color: #dc3545;
+    border-color: #dc3545;
     opacity: 0.65;
 }
 
@@ -69,18 +87,26 @@
     padding-left: 1rem;
     padding-right: 1rem;
     background-color: #f8f9fa;
+    transition: all 0.2s ease;
+}
+
+.form-control:focus + .input-group-text,
+.input-group .form-control:focus ~ .input-group-text {
+    border-color: #dc3545;
+    color: #dc3545;
 }
 
 .btn-outline-secondary {
-    border-color: #ced4da;
-    color: #6c757d;
+    border-color: #dc3545;
+    color: #dc3545;
+    transition: all 0.2s ease;
 }
 
 .btn-outline-secondary:hover,
 .btn-outline-secondary:focus {
-    background-color: #f8f9fa;
-    color: #070707;
-    border-color: #ced4da;
+    background-color: #dc3545;
+    color: #fff;
+    border-color: #dc3545;
 }
 
 .text-danger {
@@ -99,9 +125,9 @@
 
 @media (max-width: 576px) {
     .card {
-        border-radius: 0;
-        box-shadow: none !important;
-        margin: 0;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        margin: 0.75rem;
     }
     
     .container {
@@ -110,7 +136,7 @@
     }
     
     .card-body {
-        padding: 1.25rem;
+        padding: 1.75rem 1.5rem;
     }
 
     .card-title {
@@ -120,6 +146,15 @@
     .form-control,
     .input-group-text,
     .btn {
-        font-size: 0.9rem;
+        font-size: 1rem;
+        height: calc(2.75rem + 2px);
+    }
+    
+    .form-control {
+        padding: 0.875rem 1rem;
+    }
+    
+    .input-group-text {
+        padding: 0.875rem 1rem;
     }
 }

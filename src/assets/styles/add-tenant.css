@@ -200,3 +200,50 @@
 .add-tenant-modal .alert li:last-child {
     margin-bottom: 0;
 }
+
+/* Phone input styling */
+.add-tenant-modal .phone-input-group .phone-flag {
+    background: #f8f9fa;
+    border: 1px solid #d1d5db;
+    color: #6b7280;
+    font-size: 0.9rem;
+    padding: 0.625rem 0.75rem;
+    border-radius: 6px 0 0 6px;
+    height: calc(2.5rem + 2px);
+    display: flex;
+    align-items: center;
+}
+
+.add-tenant-modal .phone-input {
+    border-left: none;
+    border-radius: 0 6px 6px 0;
+}
+
+.add-tenant-modal .info-card {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+}
+
+/* Mobile responsive styles for phone input */
+@media (max-width: 768px) {
+    .add-tenant-modal .phone-flag {
+        display: none !important;
+    }
+    
+    .add-tenant-modal .phone-input {
+        border-left: 1.5px solid #e5e7eb;
+        border-radius: 8px;
+    }
+    
+    .add-tenant-modal .info-card {
+        margin-top: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .add-tenant-modal .info-card {
+        padding: 1rem;
+        border-radius: 10px;
+    }
+}

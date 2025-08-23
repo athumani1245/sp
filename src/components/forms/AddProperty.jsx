@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../../assets/styles/add-property.css';
+import '../../assets/styles/forms-responsive.css';
 import { addProperty, getRegions, getDistricts, getWards } from '../../services/propertyService';
 
 
@@ -213,7 +214,7 @@ const AddPropertyModal = ({isOpen, onClose, onPropertyAdded})=>{
     
     return (
         <div 
-            className="add-property-modal" 
+            className="add-property-modal responsive-modal" 
             tabIndex="-1"
             onClick={(e) => e.target === e.currentTarget && handleClose()}
             onKeyDown={(e) => e.key === 'Escape' && handleClose()}
@@ -221,11 +222,14 @@ const AddPropertyModal = ({isOpen, onClose, onPropertyAdded})=>{
             aria-modal="true"
             aria-labelledby="modal-title"
         >
-            <div className="modal-dialog">
+            <div className="modal-dialog modal-lg">
                 <div className="modal-content">
                     <form onSubmit={handleSubmit}>
-                        <div className="modal-header">
-                            <h5 id="modal-title" className="modal-title">Add Property</h5>
+                        <div className="modal-header border-0">
+                            <h5 id="modal-title" className="modal-title text-center w-100 h5 fw-bold text-dark">
+                                <i className="fas fa-building me-2 text-danger"></i>
+                                Add Property
+                            </h5>
                             <button 
                                 type="button" 
                                 className="btn-close" 
@@ -237,171 +241,162 @@ const AddPropertyModal = ({isOpen, onClose, onPropertyAdded})=>{
                             {error && <div className="alert alert-danger">{error}</div>}
                             {success && <div className="alert alert-success">{success}</div>}
                             
-                            {/* Property Name */}
-                            <div className="mb-3">
-                                <label htmlFor="propertyName" className="form-label">Property Name *</label>
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    id="propertyName"
-                                    name="propertyName"
-                                    value={formData.propertyName}
-                                    onChange={handleInputChange}
-                                    placeholder="Enter property name"
-                                    required
-                                />
+                            <div className="form-section-header mb-form-section">
+                                <i className="fas fa-info-circle text-danger"></i>
+                                Basic Information
                             </div>
-
-                            {/* Property Type */}
-                            <div className="mb-3">
-                                <label htmlFor="propertyType" className="form-label">Property Type</label>
-                                <select
-                                    className="form-select"
-                                    id="propertyType"
-                                    name="propertyType"
-                                    value={formData.propertyType}
-                                    onChange={handleInputChange}
-                                >
-                                    <option value="Standalone">Standalone</option>
-                                    <option value="Apartment">Apartment</option>
-                                </select>
-                            </div>
-
-                            {/* Address Section */}
-                            <div className="row">
-                                <div className="col-md-6">
-                                    <div className="mb-3">
-                                        <label htmlFor="region" className="form-label">Region *</label>
-                                        <select
-                                            className="form-control"
-                                            id="region"
-                                            name="region"
-                                            value={selectedRegionId}
-                                            onChange={handleRegionChange}
-                                            required
-                                            disabled={locationLoading}
-                                        >
-                                            <option value="">Select Region</option>
-                                            {regions.map(region => (
-                                                <option key={region.region_code} value={region.region_code}>
-                                                    {region.region_name}
-                                                </option>
-                                            ))}
-                                        </select>
-                                        {locationLoading && <small className="text-muted">Loading regions...</small>}
-                                    </div>
-                                </div>
-                                <div className="col-md-6">
-                                    <div className="mb-3">
-                                        <label htmlFor="district" className="form-label">District *</label>
-                                        <select
-                                            className="form-control"
-                                            id="district"
-                                            name="district"
-                                            value={selectedDistrictId}
-                                            onChange={handleDistrictChange}
-                                            required
-                                            disabled={!selectedRegionId || locationLoading}
-                                        >
-                                            <option value="">Select District</option>
-                                            {districts.map(district => (
-                                                <option key={district.district_code} value={district.district_code}>
-                                                    {district.district_name}
-                                                </option>
-                                            ))}
-                                        </select>
-                                        {locationLoading && <small className="text-muted">Loading districts...</small>}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="row">
-                                <div className="col-md-6">
-                                    <div className="mb-3">
-                                        <label htmlFor="ward" className="form-label">Ward</label>
-                                        <select
-                                            className="form-control"
-                                            id="ward"
-                                            name="ward"
-                                            value={selectedWardId}
-                                            onChange={handleWardChange}
-                                            disabled={!selectedDistrictId || locationLoading}
-                                        >
-                                            <option value="">Select Ward</option>
-                                            {wards.map(ward => (
-                                                <option key={ward.ward_code} value={ward.ward_code}>
-                                                    {ward.ward_name}
-                                                </option>
-                                            ))}
-                                        </select>
-                                        {locationLoading && <small className="text-muted">Loading wards...</small>}
-                                    </div>
-                                </div>
-                                <div className="col-md-6">
-                                    <div className="mb-3">
-                                        <label htmlFor="street" className="form-label">Street Address</label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            id="street"
-                                            name="street"
-                                            value={formData.street}
-                                            onChange={handleInputChange}
-                                            placeholder="e.g., 123 Beach Road"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
                             
-
-                            {/* Auto Generate Units */}
-                            <div className="mb-3">
-                                <div className="form-check">
+                            {/* Property Name and Type Row */}
+                            <div className="row mb-3">
+                                <div className="col-12 col-md-6 mb-3">
+                                    <label htmlFor="propertyName" className="form-label">Property Name *</label>
                                     <input
-                                        className="form-check-input"
-                                        type="checkbox"
-                                        id="autoGenerate"
-                                        name="autoGenerate"
-                                        checked={formData.autoGenerate}
+                                        type="text"
+                                        className="form-control"
+                                        id="propertyName"
+                                        name="propertyName"
+                                        value={formData.propertyName}
                                         onChange={handleInputChange}
+                                        placeholder="Enter property name"
+                                        required
                                     />
-                                    <label className="form-check-label" htmlFor="autoGenerate">
-                                        Auto-generate units based on floors and units per floor
-                                    </label>
+                                </div>
+                                <div className="col-12 col-md-6 mb-3">
+                                    <label htmlFor="propertyType" className="form-label">Property Type</label>
+                                    <select
+                                        className="form-select"
+                                        id="propertyType"
+                                        name="propertyType"
+                                        value={formData.propertyType}
+                                        onChange={handleInputChange}
+                                    >
+                                        <option value="Standalone">Standalone</option>
+                                        <option value="Apartment">Apartment</option>
+                                    </select>
                                 </div>
                             </div>
 
-                            {/* Managers Selection
-                                <div className="mb-3">
-                                    <label className="form-label">Assign Managers (Optional)</label>
-                                    <div className="managers-list" style={{ maxHeight: '120px', overflowY: 'auto' }}>
-                                        {availableManagers.map(manager => (
-                                            <div key={manager.id} className="form-check">
-                                                <input
-                                                    className="form-check-input"
-                                                    type="checkbox"
-                                                    id={`manager-${manager.id}`}
-                                                    value={manager.id}
-                                                    checked={formData.managers.includes(manager.id)}
-                                                    onChange={handleManagerChange}
-                                                />
-                                                <label className="form-check-label" htmlFor={`manager-${manager.id}`}>
-                                                    {manager.first_name} {manager.last_name} ({manager.email})
-                                                </label>
-                                            </div>
+                            <div className="form-section-header mb-form-section">
+                                <i className="fas fa-map-marker-alt text-danger"></i>
+                                Location Information
+                            </div>
+                            
+                            {/* Region and District Row */}
+                            <div className="row mb-3">
+                                <div className="col-12 col-md-6 mb-3">
+                                    <label htmlFor="region" className="form-label">Region *</label>
+                                    <select
+                                        className="form-select"
+                                        id="region"
+                                        name="region"
+                                        value={selectedRegionId}
+                                        onChange={handleRegionChange}
+                                        required
+                                        disabled={locationLoading}
+                                    >
+                                        <option value="">Select Region</option>
+                                        {regions.map(region => (
+                                            <option key={region.region_code} value={region.region_code}>
+                                                {region.region_name}
+                                            </option>
                                         ))}
+                                    </select>
+                                    {locationLoading && <small className="form-text text-muted">Loading regions...</small>}
+                                </div>
+                                <div className="col-12 col-md-6 mb-3">
+                                    <label htmlFor="district" className="form-label">District *</label>
+                                    <select
+                                        className="form-select"
+                                        id="district"
+                                        name="district"
+                                        value={selectedDistrictId}
+                                        onChange={handleDistrictChange}
+                                        required
+                                        disabled={!selectedRegionId || locationLoading}
+                                    >
+                                        <option value="">Select District</option>
+                                        {districts.map(district => (
+                                            <option key={district.district_code} value={district.district_code}>
+                                                {district.district_name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    {locationLoading && <small className="form-text text-muted">Loading districts...</small>}
+                                </div>
+                            </div>
+
+                            {/* Ward and Street Row */}
+                            <div className="row mb-3">
+                                <div className="col-12 col-md-6 mb-3">
+                                    <label htmlFor="ward" className="form-label">Ward</label>
+                                    <select
+                                        className="form-select"
+                                        id="ward"
+                                        name="ward"
+                                        value={selectedWardId}
+                                        onChange={handleWardChange}
+                                        disabled={!selectedDistrictId || locationLoading}
+                                    >
+                                        <option value="">Select Ward</option>
+                                        {wards.map(ward => (
+                                            <option key={ward.ward_code} value={ward.ward_code}>
+                                                {ward.ward_name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    {locationLoading && <small className="form-text text-muted">Loading wards...</small>}
+                                </div>
+                                <div className="col-12 col-md-6 mb-3">
+                                    <label htmlFor="street" className="form-label">Street Address</label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        id="street"
+                                        name="street"
+                                        value={formData.street}
+                                        onChange={handleInputChange}
+                                        placeholder="e.g., 123 Beach Road"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="form-section-header mb-form-section">
+                                <i className="fas fa-cogs text-danger"></i>
+                                Additional Settings
+                            </div>
+                            
+                            {/* Auto Generate Units */}
+                            <div className="row mb-3">
+                                <div className="col-12 mb-3">
+                                    <div className="form-check">
+                                        <input
+                                            className="form-check-input"
+                                            type="checkbox"
+                                            id="autoGenerate"
+                                            name="autoGenerate"
+                                            checked={formData.autoGenerate}
+                                            onChange={handleInputChange}
+                                        />
+                                        <label className="form-check-label" htmlFor="autoGenerate">
+                                            <i className="fas fa-magic me-2 text-primary"></i>
+                                            Auto-generate units based on floors and units per floor
+                                        </label>
+                                        <div className="form-text">
+                                            Enable this option to automatically create units when the property is saved
+                                        </div>
                                     </div>
-                                </div> */}
+                                </div>
+                            </div>
                         </div>
                         
-                        <div className="modal-footer">
+                        <div className="modal-footer border-0 pt-0">
                             <button 
                                 type="button" 
                                 className="btn btn-secondary"
                                 onClick={handleClose}
                                 disabled={loading}
                             >
+                                <i className="bi bi-x-circle me-2"></i>
                                 Cancel
                             </button>
                             <button 
@@ -409,7 +404,17 @@ const AddPropertyModal = ({isOpen, onClose, onPropertyAdded})=>{
                                 className="btn btn-primary"
                                 disabled={loading}
                             >
-                                {loading ? 'Adding Property...' : 'Add Property'}
+                                {loading ? (
+                                    <>
+                                        <span className="spinner-border spinner-border-sm me-2" role="status"></span>
+                                        Adding Property...
+                                    </>
+                                ) : (
+                                    <>
+                                        <i className="bi bi-plus-circle me-2"></i>
+                                        Add Property
+                                    </>
+                                )}
                             </button>
                         </div>
                     </form>
