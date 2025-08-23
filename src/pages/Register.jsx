@@ -44,7 +44,7 @@ function Register() {
         <>
             <div className="register-header d-flex justify-content-between align-items-center px-4">
                 <div>
-                    <span className="text-brand">Smart Pangisha</span>
+                    <span className="text-brand">Tanaka</span>
                 </div>
                 <div>
                     <span className="me-2">Already have an account?</span>

@@ -1,0 +1,99 @@
+/* Mobile Navigation Styles */
+.mobile-nav-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1040;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.mobile-nav-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.mobile-nav {
+    position: fixed;
+    top: 0;
+    left: -280px;
+    bottom: 0;
+    width: 280px;
+    background-color: #fff;
+    z-index: 1050;
+    transition: transform 0.3s ease;
+    overflow-y: auto;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+}
+
+.mobile-nav.show {
+    transform: translateX(280px);
+}
+
+/* Mobile Navigation Links */
+.mobile-nav .list-group-item {
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    padding: 1rem 1.25rem;
+    font-size: 1rem;
+}
+
+.mobile-nav .list-group-item.active {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    color: white;
+}
+
+.mobile-nav .list-group-item:not(.active):hover {
+    background-color: #f8f9fa;
+    color: var(--bs-primary);
+}
+
+/* Header Layout */
+.navbar {
+    min-height: 64px;
+}
+
+.navbar-brand {
+    font-size: 1.25rem;
+    transition: transform 0.3s ease;
+}
+
+@media (min-width: 992px) {
+    .navbar-brand {
+        position: static !important;
+        transform: none !important;
+    }
+    
+    .d-lg-relative {
+        position: relative !important;
+    }
+}
+
+/* Profile and Actions */
+.dropdown-menu {
+    min-width: 200px;
+}
+
+.dropdown-item {
+    padding: 0.75rem 1rem;
+}
+
+.dropdown-item i {
+    width: 1.25rem;
+    text-align: center;
+}
+
+.dropdown-item:active {
+    background-color: var(--bs-primary);
+}
+
+/* Modal Blur Effect */
+.modal-blur {
+    backdrop-filter: blur(4px);
+}

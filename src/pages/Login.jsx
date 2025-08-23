@@ -1,77 +1,148 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import "../assets/styles/login.css";
-import {login} from "../services/authService";
+import { login as loginService } from "../services/authService";
+import { useAuth } from "../context/AuthContext";
 
 function Login() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
+    const location = useLocation();
+    const { login } = useAuth();
+
+    // Redirect if user is already logged in
+    const { isAuthenticated } = useAuth();
+    useEffect(() => {
+        if (isAuthenticated) {
+            const from = location.state?.from?.pathname || "/dashboard";
+            navigate(from);
+        }
+    }, [isAuthenticated, navigate, location]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError("");
         setLoading(true);
 
-        await login(username, password, navigate);
-        setLoading(false);
+        try {
+            const result = await loginService(username, password);
+            if (result.success) {
+                // Update auth context
+                login(result.token, result.user);
+                
+                // Navigate to the page user tried to access or dashboard
+                const from = location.state?.from?.pathname || "/dashboard";
+                navigate(from, { replace: true });
+            } else {
+                setError(result.error || "Login failed");
+            }
+        } catch (error) {
+            setError(error.message || "An error occurred during login");
+        } finally {
+            setLoading(false);
+        }
     };
 
 
     return (
-        <div className="container min-vh-100 d-flex flex-column justify-content-center align-items-center">
-            <div className="mb-4 text-center">
-                <div className="text-brand">Tanaka</div>
-            </div>
-            <div className="login-card p-5 shadow-sm w-100" style={{ maxWidth: "420px" }}>
-                <h2 className="mb-3 text-center fw-bold">Log In</h2>
-                <p className="text-center text-muted mb-4">Manage your properties anytime, anywhere.</p>
-                {error && <div className="alert alert-danger">{error}</div>}
-                <form onSubmit={handleSubmit}>
-                    <div className="mb-3">
-                        <div className="mb-3 d-flex justify-content-between align-items-center">
-                            <label htmlFor="username" className="form-label">Username<span className="text-danger">*</span></label>
+        <div className="min-vh-100 d-flex flex-column">
+            <header className="login-header">
+                <div className="container">
+                    <div className="text-brand">Tanaka</div>
+                </div>
+            </header>
+            <div className="flex-grow-1 d-flex align-items-center justify-content-center">
+                <div className="container my-4">
+                    <div className="card mx-auto shadow-sm" style={{ maxWidth: "420px" }}>
+                        <div className="card-body p-2">
+                            <div className="text-center mb-4">
+                                <img 
+                                    src="/logo192.png" 
+                                    alt="Tanaka Logo" 
+                                    className="mb-3"
+                                    style={{ width: "64px", height: "64px" }}
+                                />
+                                <p className="card-title mb-1 text-center w-100">Rent & Manage with Ease</p>
+                                <small className="text-muted d-block text-center w-100">Please log in to your account</small>
+                            </div>
+                            {error && (
+                                <div className="alert alert-danger py-2 mb-4">
+                                    <small>{error}</small>
+                                </div>
+                            )}
+                            <form onSubmit={handleSubmit}>
+                                <div className="mb-3">
+                                    <div className="input-group">
+                                        <span className="input-group-text">
+                                            <i className="bi bi-person"></i>
+                                        </span>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            placeholder="Username"
+                                            value={username}
+                                            onChange={e => setUsername(e.target.value)}
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                                <div className="mb-4">
+                                    <div className="input-group">
+                                        <span className="input-group-text">
+                                            <i className="bi bi-key"></i>
+                                        </span>
+                                        <input
+                                            type={showPassword ? "text" : "password"}
+                                            className="form-control"
+                                            placeholder="Password"
+                                            value={password}
+                                            onChange={e => setPassword(e.target.value)}
+                                            required
+                                        />
+                                        <button
+                                            className="btn btn-outline-secondary"
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            tabIndex="-1"
+                                        >
+                                            <i className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"}`}></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <button 
+                                    type="submit" 
+                                    className="btn btn-submit w-100" 
+                                    disabled={loading}
+                                >
+                                    {loading ? "Logging in..." : "Log in"}
+                                </button>
+                            </form>
                         </div>
-                        <input
-                            type="text"
-                            className="form-control"
-                            id="username"
-                            value={username}
-                            onChange={e => setUsername(e.target.value)}
-                            required
-                        />
+                        <div className="card-footer text-center py-3 bg-white">
+                            <div className="mb-2">
+                                Don't have an account? 
+                                <a href="/register" className="auth-link ms-1">
+                                    Sign up
+                                </a>
+                            </div>
+                            <div>
+                                <a href="/forgot-password" className="auth-link">
+                                    Forgot password?
+                                </a>
+                            </div>
+                        </div>
                     </div>
-                    <div className="mb-3 d-flex justify-content-between align-items-center">
-                        <label htmlFor="password" className="form-label mb-0">Password<span className="text-danger">*</span></label>
-                        <a href="/forgot-password" className="small text-danger btn btn-link p-0" tabIndex={0}>Forgot your password?</a>
-                    </div>
-                    <div className="mb-3">
-                        <input
-                            type="password"
-                            className="form-control"
-                            id="password"
-                            value={password}
-                            onChange={e => setPassword(e.target.value)}
-                            required
-                        />
-                    </div>
-                    <button type="submit" className="btn btn-danger w-100 mb-3" disabled={loading}>
-                        {loading ? "Logging in..." : "Log in"}
-                    </button>
-                    {/* <button type="button" className="btn btn-google w-100 mb-3" disabled={loading}>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" className="bi bi-google" viewBox="4 4 16 16">
-                            <path d="M15.545 6.558a9.4 9.4 0 0 1 .139 1.626c0 2.434-.87 4.492-2.384 5.885h.002C11.978 15.292 10.158 16 8 16A8 8 0 1 1 8 0a7.7 7.7 0 0 1 5.352 2.082l-2.284 2.284A4.35 4.35 0 0 0 8 3.166c-2.087 0-3.86 1.408-4.492 3.304a4.8 4.8 0 0 0 0 3.063h.003c.635 1.893 2.405 3.301 4.492 3.301 1.078 0 2.004-.276 2.722-.764h-.003a3.7 3.7 0 0 0 1.599-2.431H8v-3.08z"/>
-                        </svg>
-                        Log in with Google
-                    </button> */}
-                </form>
-                <div className="text-center mt-2">
-                    Don't have an account? <a href="/register" className="text-danger">Sign Up</a>
                 </div>
             </div>
-            <div className="footer mt-4">© 2025 Tanaka</div>
+            <footer className="py-4 text-center">
+                <div className="text-muted small">
+                    &copy; {new Date().getFullYear()} Tanaka. All rights reserved.
+                </div>
+            </footer>
         </div>
     );
 }

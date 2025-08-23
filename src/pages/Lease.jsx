@@ -20,6 +20,10 @@ function Lease() {
   const [activeTab, setActiveTab] = useState("details");
   const [isCancelling, setIsCancelling] = useState(false);
   const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
+  const [terminationData, setTerminationData] = useState({
+    termination_date: new Date().toISOString().split('T')[0],
+    reason: ""
+  });
 
 
   useEffect(() => {
@@ -33,17 +37,17 @@ function Lease() {
   };
 
   const handleCancelConfirm = async () => {
+    if (!terminationData.reason.trim()) {
+      setError("Please provide a reason for termination");
+      return;
+    }
+
     setIsCancelling(true);
     try {
-      const terminationData = {
-        termination_date: new Date().toISOString().split('T')[0],
-        termination_reason: "Lease cancelled by management",
-        refund_amount: 0
-      };
-      
+      console.log('Sending termination data:', terminationData);
       const result = await terminateLease(leaseId, terminationData);
+      
       if (result.success) {
-        // Optionally show a success message before navigating
         setError(""); // Clear any existing errors
         navigate('/leases');
       } else {
@@ -56,6 +60,14 @@ function Lease() {
       setIsCancelling(false);
       setShowCancelConfirmation(false);
     }
+  };
+
+  const handleTerminationDataChange = (e) => {
+    const { name, value } = e.target;
+    setTerminationData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   const handleCancelModalClose = () => {
@@ -333,8 +345,9 @@ function Lease() {
             </Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <p>Are you sure you want to cancel this lease? The lease will be marked as terminated.</p>
-            <div className="mt-3 p-3 bg-light rounded">
+            <p>Please provide the following information to terminate the lease.</p>
+            
+            <div className="mt-3 p-3 bg-light rounded mb-4">
               <strong>Lease Details:</strong>
               <ul className="mt-2 mb-0">
                 <li>Tenant: {lease.tenant.first_name} {lease.tenant.last_name}</li>
@@ -343,15 +356,54 @@ function Lease() {
                 <li>Duration: {lease.lease_months} months</li>
               </ul>
             </div>
+
+            <form>
+              <div className="mb-3">
+                <label className="form-label">Termination Date *</label>
+                <input
+                  type="date"
+                  className="form-control"
+                  name="termination_date"
+                  value={terminationData.termination_date}
+                  onChange={handleTerminationDataChange}
+                  min={new Date().toISOString().split('T')[0]}
+                  required
+                />
+              </div>
+              
+              <div className="mb-3">
+                <label className="form-label">Reason for Termination *</label>
+                <textarea
+                  className="form-control"
+                  name="reason"
+                  value={terminationData.reason}
+                  onChange={handleTerminationDataChange}
+                  rows="3"
+                  placeholder="Please provide a reason for terminating the lease..."
+                  required
+                />
+              </div>
+            </form>
+
+            {error && (
+              <Alert variant="danger" className="mt-3">
+                <i className="bi bi-exclamation-triangle me-2"></i>
+                {error}
+              </Alert>
+            )}
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={handleCancelModalClose}>
               <i className="bi bi-x-circle me-2"></i>
               Close
             </Button>
-            <Button variant="warning" onClick={handleCancelConfirm} disabled={isCancelling}>
+            <Button 
+              variant="warning" 
+              onClick={handleCancelConfirm} 
+              disabled={isCancelling || !terminationData.reason.trim()}
+            >
               <i className="bi bi-x-circle me-2"></i>
-              {isCancelling ? 'Cancelling...' : 'Confirm Cancel'}
+              {isCancelling ? 'Cancelling...' : 'Confirm Termination'}
             </Button>
           </Modal.Footer>
         </Modal>

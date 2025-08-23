@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Modal, Button } from 'react-bootstrap';
 import Layout from "../components/Layout";
 import AddTenantModal from "../components/forms/AddTenant";
-import { getTenants, deleteTenant } from "../services/tenantService";
+import { getTenants, deleteTenant, updateTenant } from "../services/tenantService";
 import "../assets/styles/profile.css";
 import "../assets/styles/leases.css";
 
@@ -21,9 +21,14 @@ function Tenants() {
   // Modal states for adding tenant
   const [showAddModal, setShowAddModal] = useState(false);
   
-  // Modal states for editing tenant
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [editingTenant, setEditingTenant] = useState(null);
+  // Inline editing states
+  const [editingTenantId, setEditingTenantId] = useState(null);
+  const [editTenantData, setEditTenantData] = useState({
+    first_name: '',
+    last_name: '',
+    username: ''
+  });
+  const [updatingTenant, setUpdatingTenant] = useState(false);
   
   // Modal states for delete confirmation
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -133,14 +138,84 @@ function Tenants() {
     return 'Unknown Tenant';
   };
 
-  const handleRowClick = (tenantId) => {
-    navigate(`/dashboard/tenants/${tenantId}`);
-  };
+  // Removed handleRowClick as we're doing inline editing only
 
   const handleEditTenant = (e, tenant) => {
     e.stopPropagation(); // Prevent row click
-    setEditingTenant(tenant);
-    setShowEditModal(true);
+    setEditingTenantId(tenant.id);
+    setEditTenantData({
+      first_name: tenant.first_name || '',
+      last_name: tenant.last_name || '',
+      username: tenant.username || ''
+    });
+    setError('');
+  };
+
+  const handleEditTenantChange = (e) => {
+    const { name, value } = e.target;
+    setEditTenantData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSaveEditTenant = async () => {
+    if (!editTenantData.first_name.trim() || !editTenantData.last_name.trim() || !editTenantData.username.trim()) {
+      setError('All fields are required');
+      return;
+    }
+
+    setUpdatingTenant(true);
+    setError('');
+
+    try {
+      const result = await updateTenant(editingTenantId, editTenantData);
+      
+      if (result.success) {
+        setTenants(prev => prev.map(tenant => 
+          tenant.id === editingTenantId 
+            ? { ...tenant, ...result.data }
+            : tenant
+        ));
+        
+        setEditingTenantId(null);
+        setEditTenantData({
+          first_name: '',
+          last_name: '',
+          username: ''
+        });
+        setSuccess('Tenant updated successfully!');
+        
+        setTimeout(() => setSuccess(''), 3000);
+      } else {
+        setError(result.error || 'Failed to update tenant');
+      }
+    } catch (err) {
+      console.error('Error updating tenant:', err);
+      setError('Failed to update tenant');
+    } finally {
+      setUpdatingTenant(false);
+    }
+  };
+
+  const handleCancelEditTenant = () => {
+    setEditingTenantId(null);
+    setEditTenantData({
+      first_name: '',
+      last_name: '',
+      username: ''
+    });
+    setError('');
+  };
+
+  const handleEditTenantKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSaveEditTenant();
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      handleCancelEditTenant();
+    }
   };
 
   const handleDeleteTenant = (e, tenant) => {
@@ -340,43 +415,78 @@ function Tenants() {
                   <table className="table table-hover align-middle mb-0">
                     <thead className="table-light">
                       <tr>
-                        <th style={{ width: '25%' }}>Tenant Name</th>
-                        <th style={{ width: '20%' }}>Contact</th>
-                        <th style={{ width: '15%' }}>Join Date</th>
-                        <th style={{ width: '12%' }}>Status</th>
-                        <th style={{ width: '13%' }}>Actions</th>
+                        <th style={{ width: '35%' }}>Tenant Name</th>
+                        <th style={{ width: '25%' }}>Contact</th>
+                        <th style={{ width: '25%' }}>Status</th>
+                        <th style={{ width: '15%' }}>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
                       {Array.isArray(tenants) && tenants.map((tenant) => (
                         <tr
                           key={tenant.id || Math.random()}
-                          onClick={() => handleRowClick(tenant.id)}
-                          style={{ cursor: "pointer" }}
-                          className="table-row-hover"
+                          className={`${editingTenantId === tenant.id ? "table-warning" : ""}`}
                         >
                           <td>
                             <div className="tenant-info">
-                              <span className="tenant-name fw-medium">
-                                {getTenantName(tenant)}
-                              </span>
-                            </div>
-                          </td>
-                          <td>
-                            <div className="contact-info">
-                             
-                              <span className="phone text-muted">
-                                <i className="bi bi-telephone me-1"></i>
-                                {formatPhone(tenant.username) || 'No phone'}
-                              </span>
-                            </div>
-                          </td>
-                          
-                          <td>
-                            <span className="join-date">
-                              {formatDate(tenant.date_joined || tenant.created_at)}
-                            </span>
-                          </td>
+                                            {editingTenantId === tenant.id ? (
+                                                <div className="row g-2">
+                                                    <div className="col-6">
+                                                        <input
+                                                            type="text"
+                                                            className="form-control form-control-sm"
+                                                            name="first_name"
+                                                            value={editTenantData.first_name}
+                                                            onChange={handleEditTenantChange}
+                                                            onKeyDown={handleEditTenantKeyPress}
+                                                            placeholder="First name"
+                                                            disabled={updatingTenant}
+                                                            autoFocus
+                                                        />
+                                                    </div>
+                                                    <div className="col-6">
+                                                        <input
+                                                            type="text"
+                                                            className="form-control form-control-sm"
+                                                            name="last_name"
+                                                            value={editTenantData.last_name}
+                                                            onChange={handleEditTenantChange}
+                                                            onKeyDown={handleEditTenantKeyPress}
+                                                            placeholder="Last name"
+                                                            disabled={updatingTenant}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <span className="tenant-name fw-medium">
+                                                    {getTenantName(tenant)}
+                                                </span>
+                                            )}
+                                        </div>
+                                      </td>
+                                      <td>
+                                        <div className="contact-info">
+                                            {editingTenantId === tenant.id ? (
+                                                <div>
+                                                    <input
+                                                        type="text"
+                                                        className="form-control form-control-sm mb-2"
+                                                        name="username"
+                                                        value={editTenantData.username}
+                                                        onChange={handleEditTenantChange}
+                                                        onKeyDown={handleEditTenantKeyPress}
+                                                        placeholder="Phone number"
+                                                        disabled={updatingTenant}
+                                                    />
+                                                </div>
+                                            ) : (
+                                                <span className="phone text-muted">
+                                                    <i className="bi bi-telephone me-1"></i>
+                                                    {formatPhone(tenant.username) || 'No phone'}
+                                                </span>
+                                            )}
+                                        </div>
+                                      </td>
                           <td>
                             <span className={getStatusBadge(tenant.status || 'active')}>
                               {((tenant.status || 'active').charAt(0).toUpperCase() + (tenant.status || 'active').slice(1))}
@@ -384,20 +494,43 @@ function Tenants() {
                           </td>
                           <td>
                             <div className="action-buttons">
-                              <button
-                                className="btn btn-sm btn-outline-primary me-1"
-                                onClick={(e) => handleEditTenant(e, tenant)}
-                                title="Edit Tenant"
-                              >
-                                <i className="bi bi-pencil"></i>
-                              </button>
-                              <button
-                                className="btn btn-sm btn-outline-danger"
-                                onClick={(e) => handleDeleteTenant(e, tenant)}
-                                title="Delete Tenant"
-                              >
-                                <i className="bi bi-trash"></i>
-                              </button>
+                              {editingTenantId === tenant.id ? (
+                                <>
+                                  <button
+                                    className="btn btn-sm btn-success me-1"
+                                    onClick={handleSaveEditTenant}
+                                    disabled={updatingTenant}
+                                    title="Press Enter to confirm"
+                                  >
+                                    <i className="bi bi-check2"></i>
+                                  </button>
+                                  <button
+                                    className="btn btn-sm btn-secondary"
+                                    onClick={handleCancelEditTenant}
+                                    disabled={updatingTenant}
+                                    title="Press Esc to cancel"
+                                  >
+                                    <i className="bi bi-x"></i>
+                                  </button>
+                                </>
+                              ) : (
+                                <>
+                                  <button
+                                    className="btn btn-sm btn-outline-primary me-1"
+                                    onClick={(e) => handleEditTenant(e, tenant)}
+                                    title="Edit Tenant"
+                                  >
+                                    <i className="bi bi-pencil"></i>
+                                  </button>
+                                  <button
+                                    className="btn btn-sm btn-outline-danger"
+                                    onClick={(e) => handleDeleteTenant(e, tenant)}
+                                    title="Delete Tenant"
+                                  >
+                                    <i className="bi bi-trash"></i>
+                                  </button>
+                                </>
+                              )}
                             </div>
                           </td>
                         </tr>
@@ -493,43 +626,7 @@ function Tenants() {
         onTenantAdded={handleTenantAdded}
       />
 
-      {/* TODO: Edit Tenant Modal */}
-      {showEditModal && editingTenant && (
-        <div className="modal fade show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-          <div className="modal-dialog modal-lg">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">Edit Tenant</h5>
-                <button 
-                  type="button" 
-                  className="btn-close" 
-                  onClick={() => {
-                    setShowEditModal(false);
-                    setEditingTenant(null);
-                  }}
-                ></button>
-              </div>
-              <div className="modal-body">
-                <p className="text-muted">Edit Tenant form will be implemented here.</p>
-                <p><strong>Editing:</strong> {getTenantName(editingTenant)}</p>
-                {/* TODO: Create EditTenantModal component */}
-              </div>
-              <div className="modal-footer">
-                <button 
-                  type="button" 
-                  className="btn btn-secondary" 
-                  onClick={() => {
-                    setShowEditModal(false);
-                    setEditingTenant(null);
-                  }}
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Inline editing has replaced the modal */}
     </Layout>
   );
 }

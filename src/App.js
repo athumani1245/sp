@@ -1,3 +1,4 @@
+import { Routes, Route } from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from "./pages/Dashboard";
@@ -10,33 +11,73 @@ import Leases from "./pages/Leases";
 import Lease from "./pages/Lease";
 import Tenants from "./pages/Tenants";
 import Tenant from "./pages/Tenant";
-import './App.css';
-import { Routes, Route } from 'react-router-dom';
 import Profile from './pages/Profile';
+import PrivateRoute from './components/PrivateRoute';
+import { AuthProvider } from './context/AuthContext';
+import './App.css';
 
 
 
 function App() {
   return (
-    <div className="App">
-      <Routes>
-        <Route path={"/home"} element={<Home />} />
-        <Route path="/" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/otp-verify" element={<OtpVerify />} />
-        <Route path="/properties" element={<Properties />} />
-        <Route path="/properties" element={<Properties />} />
-        <Route path="/properties/:propertyId" element={<Property />} />
-        <Route path="/leases" element={<Leases />} />
-        <Route path="/leases/:leaseId" element={<Lease />} />
-        <Route path="/tenants" element={<Tenants />} />
-        <Route path="/tenants/:tenantId" element={<Tenant />} />
-        <Route path="/profile" element={<Profile />} />
+    <AuthProvider>
+      <div className="App">
+        <Routes>
+          {/* Public routes */}
+          <Route path="/" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/otp-verify" element={<OtpVerify />} />
 
-      </Routes>
-    </div>
+          {/* Protected routes */}
+          <Route path="/home" element={
+            <PrivateRoute>
+              <Home />
+            </PrivateRoute>
+          } />
+          <Route path="/dashboard" element={
+            <PrivateRoute>
+              <Dashboard />
+            </PrivateRoute>
+          } />
+          <Route path="/properties" element={
+            <PrivateRoute>
+              <Properties />
+            </PrivateRoute>
+          } />
+          <Route path="/properties/:propertyId" element={
+            <PrivateRoute>
+              <Property />
+            </PrivateRoute>
+          } />
+          <Route path="/leases" element={
+            <PrivateRoute>
+              <Leases />
+            </PrivateRoute>
+          } />
+          <Route path="/leases/:leaseId" element={
+            <PrivateRoute>
+              <Lease />
+            </PrivateRoute>
+          } />
+          <Route path="/tenants" element={
+            <PrivateRoute>
+              <Tenants />
+            </PrivateRoute>
+          } />
+          <Route path="/tenants/:tenantId" element={
+            <PrivateRoute>
+              <Tenant />
+            </PrivateRoute>
+          } />
+          <Route path="/profile" element={
+            <PrivateRoute>
+              <Profile />
+            </PrivateRoute>
+          } />
+        </Routes>
+      </div>
+    </AuthProvider>
   );
 }
 

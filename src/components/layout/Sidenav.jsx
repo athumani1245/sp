@@ -1,8 +1,9 @@
 import { NavLink } from "react-router-dom";
+import "../../assets/styles/sidenav.css";
 
 function Sidenav(){
     return (
-        <nav className="col-md-2 sidebar d-none d-md-block">
+        <nav className="col-lg-2 sidebar">
             <ul className="nav flex-column">
                 <li className="nav-item">
                     <NavLink className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}

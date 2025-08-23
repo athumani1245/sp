@@ -42,11 +42,9 @@ const handleApiError = (err, defaultMessage) => {
 // Helper function to format subscription data for API
 const formatSubscriptionData = (subscriptionData) => {
     return {
-        plan: subscriptionData.plan,
-        payment_method: subscriptionData.payment_method || 'card',
-        billing_cycle: subscriptionData.billing_cycle || 'monthly',
-        auto_renew: subscriptionData.auto_renew || false,
-        coupon_code: subscriptionData.coupon_code || null
+        plan_id: subscriptionData.plan,
+        phone_number: subscriptionData.phone_number || '',
+        
     };
 };
 
@@ -55,37 +53,46 @@ const formatSubscriptionData = (subscriptionData) => {
 
 // Get license status
 export const getLicenseStatus = async () => {
-    // try {
-    //     const response = await axios.get(
-    //         `${API_BASE}/license/status/`,
-    //         { headers: getAuthHeaders() }
-    //     );
-
-    //     return {
-    //         success: true,
-    //         data: response.data.data
-    //     };
-    // } catch (err) {
-    //     return handleApiError(err, "Failed to fetch license status.");
-    // }
-};
-
-// Get available subscription plans
-export const getSubscriptionPlans = async () => {
     try {
-        
-
         const response = await axios.get(
-            `${API_BASE}/plans/`,
+            `${API_BASE}/subscriptions/active/`,
             { headers: getAuthHeaders() }
         );
+        console.log("License Status Response:", response.data);
 
-        console.log("Subscription Plans Response:", response.data);
         return {
             success: true,
             data: response.data.data
         };
     } catch (err) {
+        return handleApiError(err, "Failed to fetch license status.");
+    }
+};
+
+// Get available subscription plans
+export const getSubscriptionPlans = async () => {
+    try {
+        const response = await axios.get(
+            `${API_BASE}/plans/`,
+            { headers: getAuthHeaders() }
+        );
+
+        // Transform the data to ensure consistent structure
+        const plans = response.data.data.map(plan => ({
+            id: plan.id,
+            name: plan.name,
+            description: plan.description,
+            price: parseFloat(plan.price),
+            duration_days: plan.duration_days || 30,
+        }));
+
+        console.log("Processed Subscription Plans:", plans);
+        return {
+            success: true,
+            data: plans
+        };
+    } catch (err) {
+        console.error("Error fetching subscription plans:", err);
         return handleApiError(err, "Failed to fetch subscription plans.");
     }
 };

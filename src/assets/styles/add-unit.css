@@ -156,25 +156,26 @@
 }
 
 .add-unit-modal .btn-secondary {
-    background-color: #6c757d;
-    border-color: #6c757d;
-    color: #fff;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    color: #6c757d;
 }
 
 .add-unit-modal .btn-secondary:hover:not(:disabled) {
-    background-color: #5c636a;
-    border-color: #565e64;
+    background-color: #f8f9fa;
+    border-color: #dc3545;
+    color: #dc3545;
 }
 
 .add-unit-modal .btn-primary {
-    background-color: #0d6efd;
-    border-color: #0d6efd;
+    background-color: #dc3545;
+    border-color: #dc3545;
     color: #fff;
 }
 
 .add-unit-modal .btn-primary:hover:not(:disabled) {
-    background-color: #0b5ed7;
-    border-color: #0a58ca;
+    background-color: #c82333;
+    border-color: #c82333;
 }
 
 .add-unit-modal .btn:disabled {

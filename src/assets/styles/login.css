@@ -1,42 +1,125 @@
 
 
-.brand-logo {
-    width: 48px;
-    height: 48px;
-    margin-bottom: 1rem;
-}
-.login-card {
-    border: 1px solid #e3e6e8;
-    border-radius: 0; /* Removed border radius for sharp corners */
+.login-header {
+    padding: 1rem 0;
     background: #fff;
+    border-bottom: 1px solid #dee2e6;
 }
-.form-control,
-.btn,
-.btn-google {
-    border-radius: 0 !important; /* Remove border radius for inputs and buttons */
+
+.auth-link {
+    color: #020202;
 }
-.btn-google, .btn-danger {
-    background: #fff;
-    border: 1px solid #000;
-    color: #000;
+
+/* .auth-link:hover {
+    text-decoration: underline;
+} */
+
+.text-brand {
+    color: #222;
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+.card {
+    border: none;
+    border-radius: 8px;
+}
+
+.card-title {
+    color: #212529;
+    font-weight: 500;
+    font-size: 1.5rem;
+}
+
+.form-control {
+    height: calc(2.5rem + 2px);
+    border-radius: 4px;
+    font-size: 0.95rem;
+}
+
+.form-control:focus {
+    border-color: #000000;
+    box-shadow: 0 0 0 0.25rem rgba(0, 0, 0, 0.25);
+    outline: none;
+}
+
+.btn-submit {
+    background-color: #dc3545;
+    border: none;
+    color: #fff;
+    padding: 0.6rem 1.5rem;
+    height: calc(2.5rem + 2px);
     font-weight: 500;
 }
-.btn-google:hover, .btn-danger:hover{
-    background: #000;
+
+.btn-submit:hover,
+.btn-submit:focus {
+    background-color: #c82333;
     color: #fff;
 }
-.text-brand {
-    color: #4b5e6b;
-    font-weight: 700;
-    font-size: 1.5rem;
-    letter-spacing: 1px;
+
+.btn-submit:disabled {
+    background-color: #dc3545;
+    opacity: 0.65;
 }
-.footer {
-    color: #888;
-    font-size: 0.95rem;
-    margin-top: 2rem;
-    text-align: center;
+
+.input-group-text {
+    border-color: #ced4da;
+    color: #6c757d;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    background-color: #f8f9fa;
 }
+
+.btn-outline-secondary {
+    border-color: #ced4da;
+    color: #6c757d;
+}
+
+.btn-outline-secondary:hover,
+.btn-outline-secondary:focus {
+    background-color: #f8f9fa;
+    color: #070707;
+    border-color: #ced4da;
+}
+
 .text-danger {
-    color: #000 !important;
+    color: #dc3545 !important;
+    text-decoration: none;
+}
+
+.alert {
+    font-size: 0.875rem;
+    border: none;
+}
+
+.card-footer {
+    border-top: 1px solid #dee2e6;
+}
+
+@media (max-width: 576px) {
+    .card {
+        border-radius: 0;
+        box-shadow: none !important;
+        margin: 0;
+    }
+    
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    .card-body {
+        padding: 1.25rem;
+    }
+
+    .card-title {
+        font-size: 1.25rem;
+    }
+    
+    .form-control,
+    .input-group-text,
+    .btn {
+        font-size: 0.9rem;
+    }
 }
