@@ -953,164 +953,164 @@ function Property() {
 
                     {!unitsLoading && units.length > 0 && (
                         <>
-                            {/* Mobile View - Kanban Cards */}
+                            {/* Mobile View - Unit Cards */}
                             <div className="d-md-none">
-                                <div className="row g-3">
+                                <div className="unit-cards-container">
                                     {units.map((unit) => (
-                                        <div key={unit.id} className="col-12 col-sm-6">
-                                            <div className={`lease-card border ${editingUnitId === unit.id ? 'editing border-warning' : 'border-light'}`}>
-                                                <div className="lease-card-header">
-                                                    <div className="lease-title">
-                                                        {editingUnitId === unit.id ? (
-                                                            <input
-                                                                type="text"
-                                                                className="form-control form-control-sm"
-                                                                name="unit_name"
-                                                                value={editUnitData.unit_name}
-                                                                onChange={handleEditUnitChange}
-                                                                onKeyPress={handleEditUnitKeyPress}
-                                                                disabled={updatingUnit}
-                                                                autoFocus
-                                                            />
-                                                        ) : (
-                                                            <span className="fw-semibold">
-                                                                {unit.unit_name || 'N/A'}
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                    <div>
-                                                        <span className={`badge ${
-                                                            unit.is_occupied ? 'bg-danger' : 'bg-success'
-                                                        }`}>
-                                                            {unit.is_occupied ? 'Occupied' : 'Available'}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                                <div className="lease-card-body">
-                                                    <div className="lease-detail">
-                                                        <span className="detail-label">Rent:</span>
-                                                        {editingUnitId === unit.id ? (
-                                                            <input
-                                                                type="number"
-                                                                className="form-control form-control-sm"
-                                                                name="rent_per_month"
-                                                                value={editUnitData.rent_per_month}
-                                                                onChange={handleEditUnitChange}
-                                                                onKeyPress={handleEditUnitKeyPress}
-                                                                disabled={updatingUnit}
-                                                                placeholder="Rent amount"
-                                                            />
-                                                        ) : (
-                                                            <span className="detail-value text-success fw-bold">
-                                                                {unit.rent_per_month 
-                                                                    ? `TSh ${unit.rent_per_month.toLocaleString()}` 
-                                                                    : 'N/A'
-                                                                }
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                                <div className="lease-card-actions">
+                                        <div key={unit.id} className={`unit-card-mobile ${editingUnitId === unit.id ? 'editing' : ''}`}>
+                                            <div className="unit-card-header">
+                                                <div className="unit-name">
                                                     {editingUnitId === unit.id ? (
-                                                        <div className="d-flex gap-2">
-                                                            <button 
-                                                                className="btn btn-success btn-sm flex-fill"
-                                                                onClick={handleSaveEditUnit}
-                                                                disabled={updatingUnit || !editUnitData.unit_name.trim()}
-                                                            >
-                                                                <i className="bi bi-check me-1"></i>
-                                                                {updatingUnit ? 'Saving...' : 'Save'}
-                                                            </button>
-                                                            <button 
-                                                                className="btn btn-secondary btn-sm flex-fill"
-                                                                onClick={handleCancelEditUnit}
-                                                                disabled={updatingUnit}
-                                                            >
-                                                                <i className="bi bi-x me-1"></i>
-                                                                Cancel
-                                                            </button>
-                                                        </div>
+                                                        <input
+                                                            type="text"
+                                                            className="form-control form-control-sm"
+                                                            name="unit_name"
+                                                            value={editUnitData.unit_name}
+                                                            onChange={handleEditUnitChange}
+                                                            onKeyPress={handleEditUnitKeyPress}
+                                                            disabled={updatingUnit}
+                                                            autoFocus
+                                                        />
                                                     ) : (
-                                                        <div className="d-flex gap-2">
-                                                            <button 
-                                                                className="btn btn-outline-primary btn-sm flex-fill"
-                                                                onClick={() => handleEditUnit(unit)}
-                                                                disabled={isAddingUnit || editingUnitId !== null}
-                                                            >
-                                                                <i className="bi bi-pencil me-1"></i>
-                                                                Edit
-                                                            </button>
-                                                            <button 
-                                                                className="btn btn-outline-danger btn-sm flex-fill"
-                                                                disabled={isAddingUnit || editingUnitId !== null}
-                                                                onClick={() => handleDeleteUnit(unit.id)}
-                                                            >
-                                                                <i className="bi bi-trash me-1"></i>
-                                                                Delete
-                                                            </button>
-                                                        </div>
+                                                        <span className="fw-semibold">
+                                                            <i className="bi bi-door-open me-1"></i>
+                                                            {unit.unit_name || 'N/A'}
+                                                        </span>
                                                     )}
                                                 </div>
+                                                <div className="unit-status">
+                                                    <span className={`badge ${
+                                                        unit.is_occupied ? 'bg-danger' : 'bg-success'
+                                                    }`}>
+                                                        {unit.is_occupied ? 'Occupied' : 'Available'}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div className="unit-card-body">
+                                                <div className="unit-card-row">
+                                                    <span className="unit-card-label">
+                                                        <i className="bi bi-currency-dollar me-1"></i>
+                                                        Monthly Rent:
+                                                    </span>
+                                                    {editingUnitId === unit.id ? (
+                                                        <input
+                                                            type="number"
+                                                            className="form-control form-control-sm"
+                                                            name="rent_per_month"
+                                                            value={editUnitData.rent_per_month}
+                                                            onChange={handleEditUnitChange}
+                                                            onKeyPress={handleEditUnitKeyPress}
+                                                            disabled={updatingUnit}
+                                                            placeholder="Rent amount"
+                                                        />
+                                                    ) : (
+                                                        <span className="unit-rent-amount">
+                                                            {unit.rent_per_month 
+                                                                ? `TSh ${unit.rent_per_month.toLocaleString()}` 
+                                                                : 'N/A'
+                                                            }
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <div className="unit-card-actions">
+                                                {editingUnitId === unit.id ? (
+                                                    <div className="d-flex gap-2">
+                                                        <button 
+                                                            className="btn btn-success btn-sm flex-fill"
+                                                            onClick={handleSaveEditUnit}
+                                                            disabled={updatingUnit || !editUnitData.unit_name.trim()}
+                                                        >
+                                                            <i className="bi bi-check me-1"></i>
+                                                            {updatingUnit ? 'Saving...' : 'Save'}
+                                                        </button>
+                                                        <button 
+                                                            className="btn btn-secondary btn-sm flex-fill"
+                                                            onClick={handleCancelEditUnit}
+                                                            disabled={updatingUnit}
+                                                        >
+                                                            <i className="bi bi-x me-1"></i>
+                                                            Cancel
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <div className="d-flex gap-2">
+                                                        <button 
+                                                            className="btn btn-outline-primary btn-sm flex-fill"
+                                                            onClick={() => handleEditUnit(unit)}
+                                                            disabled={isAddingUnit || editingUnitId !== null}
+                                                        >
+                                                            <i className="bi bi-pencil me-1"></i>
+                                                            Edit
+                                                        </button>
+                                                        <button 
+                                                            className="btn btn-outline-danger btn-sm flex-fill"
+                                                            disabled={isAddingUnit || editingUnitId !== null}
+                                                            onClick={() => handleDeleteUnit(unit.id)}
+                                                        >
+                                                            <i className="bi bi-trash me-1"></i>
+                                                            Delete
+                                                        </button>
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     ))}
                                     
                                     {/* Add Unit Card for Mobile */}
                                     {isAddingUnit && (
-                                        <div className="col-12 col-sm-6">
-                                            <div className="lease-card adding border border-primary">
-                                                <div className="lease-card-header">
-                                                    <div className="lease-title">
-                                                        <i className="bi bi-plus-circle me-2"></i>
-                                                        Add New Unit
-                                                    </div>
+                                        <div className="unit-card-mobile adding">
+                                            <div className="unit-card-header">
+                                                <div className="unit-name">
+                                                    <i className="bi bi-plus-circle me-2"></i>
+                                                    Add New Unit
                                                 </div>
-                                                <div className="lease-card-body">
-                                                    <div className="mb-3">
-                                                        <input
-                                                            type="text"
-                                                            className="form-control form-control-sm"
-                                                            name="unit_name"
-                                                            value={newUnitData.unit_name}
-                                                            onChange={handleNewUnitChange}
-                                                            onKeyPress={handleUnitKeyPress}
-                                                            placeholder="Unit name *"
-                                                            disabled={addingUnitLoading}
-                                                            autoFocus
-                                                        />
-                                                    </div>
-                                                    <div className="mb-3">
-                                                        <input
-                                                            type="number"
-                                                            className="form-control form-control-sm"
-                                                            name="rent_per_month"
-                                                            value={newUnitData.rent_per_month}
-                                                            onChange={handleNewUnitChange}
-                                                            onKeyPress={handleUnitKeyPress}
-                                                            placeholder="Rent amount *"
-                                                            disabled={addingUnitLoading}
-                                                        />
-                                                    </div>
+                                            </div>
+                                            <div className="unit-card-body">
+                                                <div className="mb-3">
+                                                    <input
+                                                        type="text"
+                                                        className="form-control form-control-sm"
+                                                        name="unit_name"
+                                                        value={newUnitData.unit_name}
+                                                        onChange={handleNewUnitChange}
+                                                        onKeyPress={handleUnitKeyPress}
+                                                        placeholder="Unit name *"
+                                                        disabled={addingUnitLoading}
+                                                        autoFocus
+                                                    />
                                                 </div>
-                                                <div className="lease-card-actions">
-                                                    <div className="d-flex gap-2">
-                                                        <button 
-                                                            className="btn btn-success btn-sm flex-fill"
-                                                            onClick={handleSaveNewUnit}
-                                                            disabled={addingUnitLoading || !newUnitData.unit_name.trim() || !newUnitData.rent_per_month}
-                                                        >
-                                                            <i className="bi bi-check me-1"></i>
-                                                            {addingUnitLoading ? 'Adding...' : 'Add'}
-                                                        </button>
-                                                        <button 
-                                                            className="btn btn-secondary btn-sm flex-fill"
-                                                            onClick={handleCancelNewUnit}
-                                                            disabled={addingUnitLoading}
-                                                        >
-                                                            <i className="bi bi-x me-1"></i>
-                                                            Cancel
-                                                        </button>
-                                                    </div>
+                                                <div className="mb-3">
+                                                    <input
+                                                        type="number"
+                                                        className="form-control form-control-sm"
+                                                        name="rent_per_month"
+                                                        value={newUnitData.rent_per_month}
+                                                        onChange={handleNewUnitChange}
+                                                        onKeyPress={handleUnitKeyPress}
+                                                        placeholder="Rent amount *"
+                                                        disabled={addingUnitLoading}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="unit-card-actions">
+                                                <div className="d-flex gap-2">
+                                                    <button 
+                                                        className="btn btn-success btn-sm flex-fill"
+                                                        onClick={handleSaveNewUnit}
+                                                        disabled={addingUnitLoading || !newUnitData.unit_name.trim() || !newUnitData.rent_per_month}
+                                                    >
+                                                        <i className="bi bi-check me-1"></i>
+                                                        {addingUnitLoading ? 'Adding...' : 'Add'}
+                                                    </button>
+                                                    <button 
+                                                        className="btn btn-secondary btn-sm flex-fill"
+                                                        onClick={handleCancelNewUnit}
+                                                        disabled={addingUnitLoading}
+                                                    >
+                                                        <i className="bi bi-x me-1"></i>
+                                                        Cancel
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>

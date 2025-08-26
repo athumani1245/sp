@@ -28,52 +28,112 @@ const Payments = ({ payments = [], onPaymentAdded, leaseId, refreshData }) => {
     const renderPaymentsList = () => {
         if (payments.length > 0) {
             return (
-                <div className="table-responsive">
-                    <table className="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Amount</th>
-                                <th>Category</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                <div>
+                    {/* Desktop Table View */}
+                    <div className="d-none d-md-block">
+                        <div className="table-responsive">
+                            <table className="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Amount</th>
+                                        <th>Category</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {payments.map((payment, index) => (
+                                        <tr key={payment.id || index}>
+                                            <td>{payment.date_paid || 'N/A'}</td>
+                                            <td className="fw-bold text-success">
+                                                {formatCurrency(payment.amount_paid)}
+                                            </td>
+                                            <td>
+                                                <span className="badge bg-secondary">
+                                                    {payment.category || 'RENT'}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span className={`badge ${payment.status === 'success' ? 'bg-success' : 'bg-warning'}`}>
+                                                    {payment.status || 'pending'}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <Button 
+                                                    variant="outline-danger" 
+                                                    size="sm"
+                                                    onClick={() => {
+                                                        setSelectedPayment(payment);
+                                                        setShowCancelModal(true);
+                                                    }}
+                                                    disabled={payment.status !== 'success'}
+                                                >
+                                                    <i className="bi bi-x-circle me-1"></i>
+                                                    Cancel
+                                                </Button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    {/* Mobile Card View */}
+                    <div className="d-md-none">
+                        <div className="payment-cards-container">
                             {payments.map((payment, index) => (
-                                <tr key={payment.id || index}>
-                                    <td>{payment.date_paid || 'N/A'}</td>
-                                    <td className="fw-bold text-success">
-                                        {formatCurrency(payment.amount_paid)}
-                                    </td>
-                                    <td>
-                                        <span className="badge bg-secondary">
-                                            {payment.category || 'RENT'}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span className={`badge ${payment.status === 'success' ? 'bg-success' : 'bg-warning'}`}>
-                                            {payment.status || 'pending'}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <Button 
-                                            variant="outline-danger" 
-                                            size="sm"
-                                            onClick={() => {
-                                                setSelectedPayment(payment);
-                                                setShowCancelModal(true);
-                                            }}
-                                            disabled={payment.status !== 'success'}
-                                        >
-                                            <i className="bi bi-x-circle me-1"></i>
-                                            Cancel
-                                        </Button>
-                                    </td>
-                                </tr>
+                                <div key={payment.id || index} className="payment-card-mobile">
+                                    <div className="payment-card-header">
+                                        <div className="payment-date">
+                                            <i className="bi bi-calendar3 me-1"></i>
+                                            {payment.date_paid}
+                                        </div>
+                                        <div className="payment-amount">
+                                            {formatCurrency(payment.amount_paid)}
+                                        </div>
+                                    </div>
+                                    <div className="payment-card-body">
+                                        <div className="payment-card-row">
+                                            <span className="payment-card-label">
+                                                <i className="bi bi-tag me-1"></i>
+                                                Category:
+                                            </span>
+                                            <span className="badge bg-secondary">
+                                                {payment.category || 'RENT'}
+                                            </span>
+                                        </div>
+                                        <div className="payment-card-row">
+                                            <span className="payment-card-label">
+                                                <i className="bi bi-check-circle me-1"></i>
+                                                Status:
+                                            </span>
+                                            <span className={`badge ${payment.status === 'success' ? 'bg-success' : 'bg-warning'}`}>
+                                                {payment.status || 'pending'}
+                                            </span>
+                                        </div>
+                                        {payment.status === 'success' && (
+                                            <div className="payment-card-actions">
+                                                <Button 
+                                                    variant="outline-danger" 
+                                                    size="sm"
+                                                    onClick={() => {
+                                                        setSelectedPayment(payment);
+                                                        setShowCancelModal(true);
+                                                    }}
+                                                    className="w-100"
+                                                >
+                                                    <i className="bi bi-x-circle me-1"></i>
+                                                    Cancel Payment
+                                                </Button>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
                             ))}
-                        </tbody>
-                    </table>
+                        </div>
+                    </div>
                 </div>
             );
         }

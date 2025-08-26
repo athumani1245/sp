@@ -563,7 +563,7 @@ function Lease() {
 
             {/* Payments Tab */}
             {activeTab === "payments" && (
-              <div>
+              <div className="payments-tab-content">
                 <Payments 
                   payments={lease.payments || []}
                   leaseId={leaseId}
