@@ -16,6 +16,7 @@ function Property() {
     const [unitsError, setUnitsError] = useState("");
     const [pagination, setPagination] = useState({});
     const [currentPage, setCurrentPage] = useState(1);
+    const [activeTab, setActiveTab] = useState("details");
     
     // Edit functionality states
     const [isEditing, setIsEditing] = useState(false);
@@ -345,6 +346,16 @@ function Property() {
         }));
     };
 
+    // Handle tab selection
+    const handleTabSelect = (tab) => {
+        setActiveTab(tab);
+        
+        // Load units when units tab is selected for the first time
+        if (tab === "units" && units.length === 0 && !unitsLoading) {
+            fetchUnits(1);
+        }
+    };
+
     // Handle property update
     const handleSave = async () => {
         setUpdateLoading(true);
@@ -637,49 +648,74 @@ function Property() {
                 
                 
                 
-                                {/* Property Information Form */}
+                {/* Tab Navigation */}
                 <div className="leases-filters-section">
-                    {error && <div className="alert alert-danger">{error}</div>}
-                    {success && <div className="alert alert-success">{success}</div>}
-
-                    <div className="row g-3 align-items-center mb-4">
-                        <div className="col-md-8">
-                            <h5 className="mb-0">
-                                <i className="bi bi-building me-2"></i>
-                                {property.property_name || "Property Details"}
-                            </h5>
-                        </div>
-                        <div className="col-md-4">
-                            {!isEditing ? (
-                                <button
-                                    className="btn btn-primary w-100"
-                                    onClick={() => setIsEditing(true)}
-                                >
-                                    <i className="bi bi-pencil me-2"></i>
-                                    Edit Property
-                                </button>
-                            ) : (
-                                <div className="d-flex gap-2">
-                                    <button
-                                        className="btn btn-success flex-fill"
-                                        onClick={handleSave}
-                                        disabled={updateLoading}
-                                    >
-                                        <i className="bi bi-check me-2"></i>
-                                        {updateLoading ? "Saving..." : "Save"}
-                                    </button>
-                                    <button
-                                        className="btn btn-secondary flex-fill"
-                                        onClick={handleCancel}
-                                        disabled={updateLoading}
-                                    >
-                                        <i className="bi bi-x me-2"></i>
-                                        Cancel
-                                    </button>
-                                </div>
-                            )}
-                        </div>
+                    <div className="property-tabs-container">
+                        <button
+                            className={`property-tab ${activeTab === 'details' ? 'active' : ''}`}
+                            onClick={() => handleTabSelect('details')}
+                        >
+                            <i className="bi bi-info-circle me-1"></i>
+                            <span className="d-none d-md-inline">Property Details</span>
+                            <span className="d-md-none">Details</span>
+                        </button>
+                        <button
+                            className={`property-tab ${activeTab === 'units' ? 'active' : ''}`}
+                            onClick={() => handleTabSelect('units')}
+                        >
+                            <i className="bi bi-door-open me-1"></i>
+                            <span className="d-none d-md-inline">Units Management</span>
+                            <span className="d-md-none">Units</span>
+                        </button>
                     </div>
+                </div>
+
+                {/* Property Details Tab */}
+                {activeTab === "details" && (
+                    <div className="property-details-tab-content">
+                        {/* Property Information Form */}
+                        <div className="leases-filters-section">
+                            {error && <div className="alert alert-danger">{error}</div>}
+                            {success && <div className="alert alert-success">{success}</div>}
+
+                            <div className="row g-3 align-items-center mb-4">
+                                <div className="col-md-8">
+                                    <h5 className="mb-0">
+                                        <i className="bi bi-building me-2"></i>
+                                        {property.property_name || "Property Details"}
+                                    </h5>
+                                </div>
+                                <div className="col-md-4">
+                                    {!isEditing ? (
+                                        <button
+                                            className="btn btn-primary w-100"
+                                            onClick={() => setIsEditing(true)}
+                                        >
+                                            <i className="bi bi-pencil me-2"></i>
+                                            Edit Property
+                                        </button>
+                                    ) : (
+                                        <div className="d-flex gap-2">
+                                            <button
+                                                className="btn btn-success flex-fill"
+                                                onClick={handleSave}
+                                                disabled={updateLoading}
+                                            >
+                                                <i className="bi bi-check me-2"></i>
+                                                {updateLoading ? "Saving..." : "Save"}
+                                            </button>
+                                            <button
+                                                className="btn btn-secondary flex-fill"
+                                                onClick={handleCancel}
+                                                disabled={updateLoading}
+                                            >
+                                                <i className="bi bi-x me-2"></i>
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
 
                     <div className="property-form-compact">
                         <form>
@@ -819,18 +855,20 @@ function Property() {
                             </div>
                         </form>
                     </div>
-                </div>                
-                
-                
-                
-                
+                </div>
+            </div>
+        )}
+
+        {/* Units Tab */}
+        {activeTab === "units" && (
+            <div className="units-tab-content">
                 {/* Units Section */}
-                <div className="leases-filters-section mt-4">
+                <div className="leases-filters-section">
                     <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
                         <div className="d-flex align-items-center">
                             <h5 className="mb-0 me-3">
                                 <i className="bi bi-door-open me-2"></i>
-                                Units
+                                Units Management
                             </h5>
                             {/* Page Information */}
                             {(pagination && (pagination.total_pages > 1 || pagination.count > 0)) && (
@@ -1343,9 +1381,10 @@ function Property() {
                 )}
             </div>
         </div>
+        )}
 
-            {/* Delete Confirmation Modal */}
-            <Modal show={showDeleteModal} onHide={cancelDeleteUnit} centered>
+        {/* Delete Confirmation Modal */}
+        <Modal show={showDeleteModal} onHide={cancelDeleteUnit} centered>
                 <Modal.Header closeButton>
                     <Modal.Title>Confirm Delete</Modal.Title>
                 </Modal.Header>
@@ -1365,6 +1404,7 @@ function Property() {
                     </Button>
                 </Modal.Footer>
             </Modal>
+            </div>
         </Layout>
     );
 }
