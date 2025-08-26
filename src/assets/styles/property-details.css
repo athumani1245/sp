@@ -657,3 +657,29 @@
         font-size: 0.75rem;
     }
 }
+
+/* Units Pagination Styles */
+.units-pagination-section {
+    background: #f8f9fa;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #e9ecef;
+}
+
+.units-pagination-section .pagination-info {
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .units-pagination-section {
+        padding: 0.75rem 1rem;
+    }
+    
+    .units-pagination-section .btn {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.875rem;
+    }
+    
+    .units-pagination-section .pagination-info span {
+        font-size: 0.875rem;
+    }
+}

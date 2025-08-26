@@ -879,27 +879,7 @@ function Property() {
                             )}
                         </div>
                         <div className="d-flex align-items-center gap-2">
-                            {/* Pagination Navigation */}
-                            {pagination && pagination.total_pages > 1 && (
-                                <div className="pagination-controls d-flex gap-1 me-3">
-                                    <button 
-                                        className="btn btn-outline-secondary btn-sm"
-                                        onClick={() => handlePageChange((pagination.current_page || 1) - 1)}
-                                        disabled={(pagination.current_page || 1) <= 1}
-                                        title="Previous Page"
-                                    >
-                                        <i className="bi bi-chevron-left"></i>
-                                    </button>
-                                    <button 
-                                        className="btn btn-outline-secondary btn-sm"
-                                        onClick={() => handlePageChange((pagination.current_page || 1) + 1)}
-                                        disabled={(pagination.current_page || 1) >= (pagination.total_pages || 1)}
-                                        title="Next Page"
-                                    >
-                                        <i className="bi bi-chevron-right"></i>
-                                    </button>
-                                </div>
-                            )}
+                            {/* Add Unit Button */}
                             {/* Add Unit Button */}
                             {!isAddingUnit && (
                                 <button 
@@ -1322,61 +1302,38 @@ function Property() {
                             </div>
 
                                         {/* Additional pagination for large datasets */}
-                                        {pagination && pagination.total_pages > 5 && (
-                                            <div className="mt-4">
+                                        {/* Units Pagination */}
+                                        {pagination && pagination.total_pages > 1 && (
+                                            <div className="units-pagination-section mt-4">
                                                 <nav aria-label="Units pagination">
-                                                    <ul className="pagination justify-content-center">
-                                                        <li className={`page-item ${(pagination.current_page || 1) <= 1 ? 'disabled' : ''}`}>
-                                                            <button 
-                                                                className="page-link"
-                                                                onClick={() => handlePageChange(1)}
-                                                                disabled={(pagination.current_page || 1) <= 1}
-                                                                title="First Page"
-                                                            >
-                                                                <i className="bi bi-chevron-double-left"></i>
-                                                            </button>
-                                                        </li>
-                                                        
-                                                        {/* Page Numbers */}
-                                                        {(() => {
-                                                            const current = pagination.current_page || 1;
-                                                            const total = pagination.total_pages || 1;
-                                                            const pages = [];
-                                                            
-                                                            for (let i = Math.max(1, current - 2); i <= Math.min(total, current + 2); i++) {
-                                                                pages.push(i);
-                                                            }
-                                                            
-                                                            return pages.map((page) => (
-                                                                <li 
-                                                                    key={page}
-                                                                    className={`page-item ${current === page ? 'active' : ''}`}
-                                                                >
-                                                                    <button 
-                                                                        className="page-link"
-                                                                        onClick={() => handlePageChange(page)}
-                                                                        title={`Go to page ${page}`}
-                                                                    >
-                                                                        {page}
-                                                                    </button>
-                                                                </li>
-                                                            ));
-                                                        })()}
-                                                        
-                                                        <li className={`page-item ${(pagination.current_page || 1) >= (pagination.total_pages || 1) ? 'disabled' : ''}`}>
-                                                            <button 
-                                                                className="page-link"
-                                                                onClick={() => handlePageChange(pagination.total_pages || 1)}
-                                                                disabled={(pagination.current_page || 1) >= (pagination.total_pages || 1)}
-                                                                title="Last Page"
-                                                            >
-                                                                <i className="bi bi-chevron-double-right"></i>
-                                                            </button>
-                                                        </li>
-                                                    </ul>
+                                                    <div className="d-flex justify-content-between align-items-center">
+                                                        <button
+                                                            className="btn btn-outline-secondary"
+                                                            disabled={(pagination.current_page || 1) <= 1}
+                                                            onClick={() => handlePageChange((pagination.current_page || 1) - 1)}
+                                                        >
+                                                            <i className="bi bi-chevron-left me-1"></i>
+                                                            Previous
+                                                        </button>
+
+                                                        <div className="pagination-info">
+                                                            <span className="text-muted">
+                                                                Page {pagination.current_page || 1} of {pagination.total_pages || 1}
+                                                            </span>
+                                                        </div>
+
+                                                        <button
+                                                            className="btn btn-outline-secondary"
+                                                            disabled={(pagination.current_page || 1) >= (pagination.total_pages || 1)}
+                                                            onClick={() => handlePageChange((pagination.current_page || 1) + 1)}
+                                                        >
+                                                            Next
+                                                            <i className="bi bi-chevron-right ms-1"></i>
+                                                        </button>
+                                                    </div>
                                                 </nav>
                                             </div>
-                        )}
+                                        )}
                     </>
                 )}
             </div>

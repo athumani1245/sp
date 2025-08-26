@@ -58,6 +58,10 @@ function Properties() {
     }
   };
 
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
+  };
+
   useEffect(() => {
     fetchProperties();
   }, [search, page]);
@@ -115,9 +119,7 @@ function Properties() {
               </span>
             </div>
           )}
-          <div className="text-end small text-muted mt-2">
-            {pagination.total ? `Showing ${(page - 1) * (pagination.per_page || 50) + 1}–${Math.min(page * (pagination.per_page || 50),pagination.total)} of ${pagination.total}` : "Showing properties"}
-          </div>
+         
         </div>
         {error && (
           <div className="alert alert-danger" role="alert">
@@ -267,28 +269,28 @@ function Properties() {
 
           {/* Pagination */}
           {pagination && pagination.total_pages > 1 && (
-            <div className="card-footer">
+            <div className="properties-pagination-section">
               <nav aria-label="Properties pagination">
                 <div className="d-flex justify-content-between align-items-center">
                   <button
                     className="btn btn-outline-secondary"
-                    disabled={page === 1 || loading}
-                    onClick={() => setPage(page - 1)}
+                    disabled={(pagination.current_page || page) <= 1}
+                    onClick={() => handlePageChange((pagination.current_page || page) - 1)}
                   >
                     <i className="bi bi-chevron-left me-1"></i>
-                    Previous
+                    Prev
                   </button>
 
                   <div className="pagination-info">
                     <span className="text-muted">
-                      Page {page} of {pagination.total_pages || 1}
+                      Page {pagination.current_page || page} of {pagination.total_pages || 1}
                     </span>
                   </div>
 
                   <button
                     className="btn btn-outline-secondary"
-                    disabled={page >= (pagination.total_pages || 1) || loading}
-                    onClick={() => setPage(page + 1)}
+                    disabled={(pagination.current_page || page) >= (pagination.total_pages || 1)}
+                    onClick={() => handlePageChange((pagination.current_page || page) + 1)}
                   >
                     Next
                     <i className="bi bi-chevron-right ms-1"></i>

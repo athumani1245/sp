@@ -525,3 +525,21 @@
     transform: scale(1.05);
     transition: transform 0.15s ease-in-out;
 }
+
+/* Properties Pagination Styles */
+.properties-pagination-section {
+    background: #f8f9fa;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #e9ecef;
+}
+
+/* Responsive styles for pagination */
+@media (max-width: 576px) {
+    .properties-pagination-section {
+        padding: 0.75rem 1rem;
+    }
+    
+    .pagination-info {
+        font-size: 0.8rem;
+    }
+}
