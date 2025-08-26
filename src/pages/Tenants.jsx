@@ -5,6 +5,7 @@ import AddTenantModal from "../components/forms/AddTenant";
 import { getTenants, deleteTenant, updateTenant } from "../services/tenantService";
 import "../assets/styles/profile.css";
 import "../assets/styles/leases.css";
+import "../assets/styles/tenants.css";
 
 function Tenants() {
   const [search, setSearch] = useState("");
@@ -61,8 +62,14 @@ function Tenants() {
       
       if (result.success) {
         console.log('Tenants data:', result.data);
-        setTenants(result.data || []);
-        setPagination(result.pagination || {});
+        setTenants(result.data?.items || []);
+        setPagination({
+          current_page: result.data?.current_page || 1,
+          total_pages: result.data?.total_pages || 1,
+          count: result.data?.count || 0,
+          next: result.data?.next,
+          previous: result.data?.previous
+        });
       } else {
         console.error('Failed to fetch tenants:', result.error);
         setError(result.error || "Failed to fetch tenants");
@@ -255,9 +262,8 @@ function Tenants() {
       <div className="main-content">
         {/* Filters Section */}
         <div className="tenants-filters-section">
-          <div className="row g-3 align-items-end">
-            <div className="col-md-4">
-              <label className="form-label" htmlFor="tenant-search">Search Tenants</label>
+          <div className="d-flex flex-column flex-md-row gap-3 align-items-md-center">
+            <div className="flex-fill">
               <div className="input-group">
                 <span className="input-group-text">
                   <i className="bi bi-search"></i>
@@ -272,12 +278,12 @@ function Tenants() {
                 />
               </div>
             </div>
-            <div className="col-md-3">
-              <label className="form-label" htmlFor="status-filter">Status Filter</label>
+            <div className="flex-shrink-0">
               <select
                 className="form-select"
                 value={status}
                 onChange={handleStatusFilter}
+                style={{ minWidth: '150px' }}
               >
                 <option value="">All Statuses</option>
                 <option value="active">Active</option>
@@ -286,10 +292,11 @@ function Tenants() {
                 <option value="blacklisted">Blacklisted</option>
               </select>
             </div>
-            <div className="col-md-5">
+            <div className="flex-shrink-0">
               <button 
-                className="btn btn-primary w-100"
+                className="btn btn-primary"
                 onClick={() => setShowAddModal(true)}
+                style={{ minWidth: '160px' }}
               >
                 <i className="bi bi-person-plus me-2"></i>
                 Add New Tenant
@@ -334,8 +341,8 @@ function Tenants() {
             <h5 className="tenants-title">
               <i className="bi bi-people me-2"></i>
               Tenants
-              {tenants.length > 0 && (
-                <span className="badge bg-primary ms-2">{tenants.length}</span>
+              {(tenants.length > 0 || pagination.count > 0) && (
+                <span className="badge bg-primary ms-2">{pagination.count || tenants.length}</span>
               )}
             </h5>
           </div>

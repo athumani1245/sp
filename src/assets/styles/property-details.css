@@ -55,6 +55,85 @@
     padding: 1.5rem;
 }
 
+/* Compact Property Form Styles */
+.property-form-compact {
+    padding: 0;
+}
+
+.compact-form-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.2rem;
+    gap: 0.75rem;
+}
+
+.compact-inline-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #495057;
+    min-width: 120px;
+    flex-shrink: 0;
+    text-align: left;
+    margin: 0;
+}
+
+.underline-input,
+.underline-select {
+    flex: 1;
+    font-size: 0.9rem;
+    padding: 0.5rem 0.25rem;
+    border: none;
+    border-bottom: 2px solid #e9ecef;
+    background-color: transparent;
+    transition: border-bottom-color 0.15s ease-in-out;
+    outline: none;
+    border-radius: 0;
+}
+
+.underline-input:focus,
+.underline-select:focus {
+    border-bottom-color: #0d6efd;
+    background-color: transparent;
+}
+
+.underline-input:disabled,
+.underline-input[readonly],
+.underline-select:disabled {
+    background-color: transparent;
+    border-bottom-color: #dee2e6;
+    color: #6c757d;
+    opacity: 1;
+}
+
+.underline-select {
+    cursor: pointer;
+}
+
+.underline-select:disabled {
+    cursor: not-allowed;
+}
+
+.loading-text {
+    display: block;
+    font-size: 0.75rem;
+    color: #6c757d;
+    margin-top: 0.25rem;
+    font-style: italic;
+}
+
+.property-form-compact .row.g-3 {
+    margin: 0;
+}
+
+.property-form-compact .col-md-6 {
+    padding-left: 0;
+    padding-right: 1rem;
+}
+
+.property-form-compact .col-md-6:last-child {
+    padding-right: 0;
+}
+
 /* Form styling */
 .form-label {
     font-weight: 600;
@@ -308,5 +387,31 @@
     .btn-group-sm .btn {
         padding: 0.2rem 0.4rem;
         font-size: 0.8rem;
+    }
+    
+    /* Compact form mobile styles */
+    .property-form-compact .col-md-6 {
+        padding-right: 0;
+        margin-bottom: 0.5rem;
+    }
+    
+    .compact-form-row {
+        flex-direction: column;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+        gap: 0.3rem;
+    }
+    
+    .compact-inline-label {
+        font-size: 0.8rem;
+        min-width: auto;
+        text-align: left;
+    }
+    
+    .underline-input,
+    .underline-select {
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: 0.6rem 0.4rem;
+        width: 100%;
     }
 }

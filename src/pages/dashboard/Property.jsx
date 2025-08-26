@@ -15,6 +15,7 @@ function Property() {
     const [unitsLoading, setUnitsLoading] = useState(false);    const [error, setError] = useState("");
     const [unitsError, setUnitsError] = useState("");
     const [pagination, setPagination] = useState({});
+    const [currentPage, setCurrentPage] = useState(1);
     
     // Edit functionality states
     const [isEditing, setIsEditing] = useState(false);
@@ -133,18 +134,26 @@ function Property() {
     };
 
     // Fetch property units
-    const fetchUnits = async () => {
+    const fetchUnits = async (page = 1) => {
         try {
             setUnitsLoading(true);
             setUnitsError("");
             const result = await getPropertyUnits({ 
                 property: propertyId,
+                page: page     
             });
             console.log(result)
             
             if (result.success) {
-                setUnits(result.data || []);
-                setPagination(result.pagination || {});
+                console.log("Fetched units:", result.data?.items);
+                setUnits(result.data.data?.items || []);
+                setPagination({
+                    current_page: result.data.current_page,
+                    total_pages: result.data.total_pages,
+                    count: result.data.count,
+                    next: result.data.next,
+                    previous: result.data.previous
+                });
             } else {
                 setUnitsError(result.error || "Failed to fetch units");
                 setUnits([]);
@@ -161,7 +170,7 @@ function Property() {
     useEffect(() => {
         if (propertyId) {
             fetchProperty();
-            fetchUnits();
+            fetchUnits(currentPage);
         }
     }, [propertyId]);
 
@@ -289,6 +298,7 @@ function Property() {
     };    
 
     const handlePageChange = (newPage) => {
+        setCurrentPage(newPage);
         fetchUnits(newPage);
     };
 
@@ -450,8 +460,8 @@ function Property() {
                 setIsAddingUnit(false);
                 setSuccess('Unit added successfully!');
                 
-                // Refresh the units list to get latest data
-                fetchUnits();
+                // Refresh the current page to get latest data
+                fetchUnits(currentPage);
             } else {
                 setError(result.error || 'Failed to add unit');
             }
@@ -671,163 +681,143 @@ function Property() {
                         </div>
                     </div>
 
-                    <div>
-                                    <form>
-                                        <div className="row">
-                                            <div className="col-md-6 col-6">
-                                                <div className="mb-3">
-                                                    <label htmlFor="propertyName" className="form-label">Property Name</label>
-                                                    <input
-                                                        type="text"
-                                                        className="form-control"
-                                                        id="propertyName"
-                                                        name="propertyName"
-                                                        value={isEditing ? editData.propertyName : (property.property_name || '')}
-                                                        onChange={handleInputChange}
-                                                        disabled={!isEditing}
-                                                        readOnly={!isEditing}
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div className="col-md-6 col-6">
-                                                <div className="mb-3">
-                                                    <label htmlFor="propertyType" className="form-label">Property Type</label>
-                                                    <select
-                                                        className="form-control"
-                                                        id="propertyType"
-                                                        name="propertyType"
-                                                        value={isEditing ? editData.propertyType : (property.property_type || '')}
-                                                        onChange={handleInputChange}
-                                                        disabled={!isEditing}
-                                                    >
-                                                        <option value="">Select Type</option>
-                                                        <option value="Standalone">Standalone</option>
-                                                        <option value="Apartment">Apartment</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
+                    <div className="property-form-compact">
+                        <form>
+                            <div className="row g-3">
+                                {/* Left Column */}
+                                <div className="col-md-6">
+                                    <div className="compact-form-row">
+                                        <label className="compact-inline-label">Property Name:</label>
+                                        <input
+                                            type="text"
+                                            className="underline-input"
+                                            name="propertyName"
+                                            value={isEditing ? editData.propertyName : (property.property_name || '')}
+                                            onChange={handleInputChange}
+                                            disabled={!isEditing}
+                                            readOnly={!isEditing}
+                                            placeholder="Property name..."
+                                        />
+                                    </div>
+                                    <div className="compact-form-row">
+                                        <label className="compact-inline-label">Property Type:</label>
+                                        <select
+                                            className="underline-select"
+                                            name="propertyType"
+                                            value={isEditing ? editData.propertyType : (property.property_type || '')}
+                                            onChange={handleInputChange}
+                                            disabled={!isEditing}
+                                        >
+                                            <option value="">Select Type</option>
+                                            <option value="Standalone">Standalone</option>
+                                            <option value="Apartment">Apartment</option>
+                                        </select>
+                                    </div>
+                                    <div className="compact-form-row">
+                                        <label className="compact-inline-label">Region:</label>
+                                        {isEditing ? (
+                                            <select
+                                                className="underline-select"
+                                                name="region"
+                                                value={selectedRegionId}
+                                                onChange={handleRegionChange}
+                                                disabled={locationLoading}
+                                            >
+                                                <option value="">Select Region</option>
+                                                {regions.map(region => (
+                                                    <option key={region.region_code} value={region.region_code}>
+                                                        {region.region_name}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        ) : (
+                                            <input
+                                                type="text"
+                                                className="underline-input"
+                                                value={getLocationDisplayValue(property.address, 'region')}
+                                                disabled
+                                                readOnly
+                                                placeholder="Region..."
+                                            />
+                                        )}
+                                        {isEditing && locationLoading && <small className="loading-text">Loading...</small>}
+                                    </div>
+                                </div>
 
-                                        <div className="row">
-                                            <div className="col-md-6 col-6">
-                                                <div className="mb-3">
-                                                    <label htmlFor="region" className="form-label">Region</label>
-                                                    {isEditing ? (
-                                                        <select
-                                                            className="form-control"
-                                                            id="region"
-                                                            name="region"
-                                                            value={selectedRegionId}
-                                                            onChange={handleRegionChange}
-                                                            disabled={locationLoading}
-                                                        >
-                                                            <option value="">Select Region</option>
-                                                            {regions.map(region => (
-                                                                <option key={region.region_code} value={region.region_code}>
-                                                                    {region.region_name}
-                                                                </option>
-                                                            ))}
-                                                        </select>
-                                                    ) : (
-                                                        <input
-                                                            type="text"
-                                                            className="form-control"
-                                                            id="region"
-                                                            name="region"
-                                                            value={getLocationDisplayValue(property.address, 'region')}
-                                                            disabled
-                                                            readOnly
-                                                        />
-                                                    )}
-                                                    {isEditing && locationLoading && <small className="text-muted">Loading regions...</small>}
-                                                </div>
-                                            </div>
-                                            <div className="col-md-6 col-6">
-                                                <div className="mb-3">
-                                                    <label htmlFor="district" className="form-label">District</label>
-                                                    {isEditing ? (
-                                                        <select
-                                                            className="form-control"
-                                                            id="district"
-                                                            name="district"
-                                                            value={selectedDistrictId}
-                                                            onChange={handleDistrictChange}
-                                                            disabled={!selectedRegionId || locationLoading}
-                                                        >
-                                                            <option value="">Select District</option>
-                                                            {districts.map(district => (
-                                                                <option key={district.district_code} value={district.district_code}>
-                                                                    {district.district_name}
-                                                                </option>
-                                                            ))}
-                                                        </select>
-                                                    ) : (
-                                                        <input
-                                                            type="text"
-                                                            className="form-control"
-                                                            id="district"
-                                                            name="district"
-                                                            value={getLocationDisplayValue(property.address, 'district')}
-                                                            disabled
-                                                            readOnly
-                                                        />
-                                                    )}
-                                                    {isEditing && locationLoading && <small className="text-muted">Loading districts...</small>}
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="row">
-                                            <div className="col-md-6 col-6">
-                                                <div className="mb-3">
-                                                    <label htmlFor="ward" className="form-label">Ward</label>
-                                                    {isEditing ? (
-                                                        <select
-                                                            className="form-control"
-                                                            id="ward"
-                                                            name="ward"
-                                                            value={selectedWardId}
-                                                            onChange={handleWardChange}
-                                                            disabled={!selectedDistrictId || locationLoading}
-                                                        >
-                                                            <option value="">Select Ward</option>
-                                                            {wards.map(ward => (
-                                                                <option key={ward.ward_code} value={ward.ward_code}>
-                                                                    {ward.ward_name}
-                                                                </option>
-                                                            ))}
-                                                        </select>
-                                                    ) : (
-                                                        <input
-                                                            type="text"
-                                                            className="form-control"
-                                                            id="ward"
-                                                            name="ward"
-                                                            value={getLocationDisplayValue(property.address, 'ward')}
-                                                            disabled
-                                                            readOnly
-                                                        />
-                                                    )}
-                                                    {isEditing && locationLoading && <small className="text-muted">Loading wards...</small>}
-                                                </div>
-                                            </div>
-                                            <div className="col-md-6 col-6">
-                                                <div className="mb-3">
-                                                    <label htmlFor="street" className="form-label">Street</label>
-                                                    <input
-                                                        type="text"
-                                                        className="form-control"
-                                                        id="street"
-                                                        name="street"
-                                                        value={isEditing ? editData.street : (property.address?.street || '')}
-                                                        onChange={handleInputChange}
-                                                        disabled={!isEditing}
-                                                        readOnly={!isEditing}
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </form>
+                                {/* Right Column */}
+                                <div className="col-md-6">
+                                    <div className="compact-form-row">
+                                        <label className="compact-inline-label">District:</label>
+                                        {isEditing ? (
+                                            <select
+                                                className="underline-select"
+                                                name="district"
+                                                value={selectedDistrictId}
+                                                onChange={handleDistrictChange}
+                                                disabled={!selectedRegionId || locationLoading}
+                                            >
+                                                <option value="">Select District</option>
+                                                {districts.map(district => (
+                                                    <option key={district.district_code} value={district.district_code}>
+                                                        {district.district_name}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        ) : (
+                                            <input
+                                                type="text"
+                                                className="underline-input"
+                                                value={getLocationDisplayValue(property.address, 'district')}
+                                                disabled
+                                                readOnly
+                                                placeholder="District..."
+                                            />
+                                        )}
+                                    </div>
+                                    <div className="compact-form-row">
+                                        <label className="compact-inline-label">Ward:</label>
+                                        {isEditing ? (
+                                            <select
+                                                className="underline-select"
+                                                name="ward"
+                                                value={selectedWardId}
+                                                onChange={handleWardChange}
+                                                disabled={!selectedDistrictId || locationLoading}
+                                            >
+                                                <option value="">Select Ward</option>
+                                                {wards.map(ward => (
+                                                    <option key={ward.ward_code} value={ward.ward_code}>
+                                                        {ward.ward_name}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        ) : (
+                                            <input
+                                                type="text"
+                                                className="underline-input"
+                                                value={getLocationDisplayValue(property.address, 'ward')}
+                                                disabled
+                                                readOnly
+                                                placeholder="Ward..."
+                                            />
+                                        )}
+                                    </div>
+                                    <div className="compact-form-row">
+                                        <label className="compact-inline-label">Street Address:</label>
+                                        <input
+                                            type="text"
+                                            className="underline-input"
+                                            name="street"
+                                            value={isEditing ? editData.street : (property.address?.street || '')}
+                                            onChange={handleInputChange}
+                                            disabled={!isEditing}
+                                            readOnly={!isEditing}
+                                            placeholder="Street address..."
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>                
                 
@@ -836,19 +826,49 @@ function Property() {
                 
                 {/* Units Section */}
                 <div className="leases-filters-section mt-4">
-                    <div className="row g-3 align-items-center mb-4">
-                        <div className="col-md-8">
-                            <h5 className="mb-0">
+                    <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+                        <div className="d-flex align-items-center">
+                            <h5 className="mb-0 me-3">
                                 <i className="bi bi-door-open me-2"></i>
                                 Units
                             </h5>
+                            {/* Page Information */}
+                            {(pagination && (pagination.total_pages > 1 || pagination.count > 0)) && (
+                                <small className="text-muted">
+                                    Page {pagination.current_page || 1} of {pagination.total_pages || 1} 
+                                    ({pagination.count || units.length} total)
+                                </small>
+                            )}
                         </div>
-                        <div className="col-md-4">
+                        <div className="d-flex align-items-center gap-2">
+                            {/* Pagination Navigation */}
+                            {pagination && pagination.total_pages > 1 && (
+                                <div className="pagination-controls d-flex gap-1 me-3">
+                                    <button 
+                                        className="btn btn-outline-secondary btn-sm"
+                                        onClick={() => handlePageChange((pagination.current_page || 1) - 1)}
+                                        disabled={(pagination.current_page || 1) <= 1}
+                                        title="Previous Page"
+                                    >
+                                        <i className="bi bi-chevron-left"></i>
+                                    </button>
+                                    <button 
+                                        className="btn btn-outline-secondary btn-sm"
+                                        onClick={() => handlePageChange((pagination.current_page || 1) + 1)}
+                                        disabled={(pagination.current_page || 1) >= (pagination.total_pages || 1)}
+                                        title="Next Page"
+                                    >
+                                        <i className="bi bi-chevron-right"></i>
+                                    </button>
+                                </div>
+                            )}
+                            {/* Add Unit Button */}
                             {!isAddingUnit && (
                                 <button 
-                                    className="btn btn-primary w-100"
+                                    className="btn btn-primary"
                                     onClick={() => setIsAddingUnit(true)}
                                     disabled={editingUnitId !== null}
+                                    style={{ minWidth: '120px' }}
                                 >
                                     <i className="bi bi-plus-circle me-2"></i>
                                     Add Unit
@@ -1263,48 +1283,61 @@ function Property() {
                                 </div>
                             </div>
 
-                                        {/* Pagination */}
-                                        {pagination && pagination.total_pages > 1 && (
-                                            <nav aria-label="Units pagination" className="mt-3">
-                                                <ul className="pagination justify-content-center">
-                                                    <li className={`page-item ${pagination.current_page <= 1 ? 'disabled' : ''}`}>
-                                                        <button 
-                                                            className="page-link"
-                                                            onClick={() => handlePageChange(pagination.current_page - 1)}
-                                                            disabled={pagination.current_page <= 1}
-                                                        >
-                                                            Previous
-                                                        </button>
-                                                    </li>
-                                                    
-                                                    {[...Array(pagination.total_pages)].map((_, index) => {
-                                                        const pageNum = index + 1;
-                                                        return (
-                                                            <li 
-                                                                key={pageNum}
-                                                                className={`page-item ${pagination.current_page === pageNum ? 'active' : ''}`}
+                                        {/* Additional pagination for large datasets */}
+                                        {pagination && pagination.total_pages > 5 && (
+                                            <div className="mt-4">
+                                                <nav aria-label="Units pagination">
+                                                    <ul className="pagination justify-content-center">
+                                                        <li className={`page-item ${(pagination.current_page || 1) <= 1 ? 'disabled' : ''}`}>
+                                                            <button 
+                                                                className="page-link"
+                                                                onClick={() => handlePageChange(1)}
+                                                                disabled={(pagination.current_page || 1) <= 1}
+                                                                title="First Page"
                                                             >
-                                                                <button 
-                                                                    className="page-link"
-                                                                    onClick={() => handlePageChange(pageNum)}
+                                                                <i className="bi bi-chevron-double-left"></i>
+                                                            </button>
+                                                        </li>
+                                                        
+                                                        {/* Page Numbers */}
+                                                        {(() => {
+                                                            const current = pagination.current_page || 1;
+                                                            const total = pagination.total_pages || 1;
+                                                            const pages = [];
+                                                            
+                                                            for (let i = Math.max(1, current - 2); i <= Math.min(total, current + 2); i++) {
+                                                                pages.push(i);
+                                                            }
+                                                            
+                                                            return pages.map((page) => (
+                                                                <li 
+                                                                    key={page}
+                                                                    className={`page-item ${current === page ? 'active' : ''}`}
                                                                 >
-                                                                    {pageNum}
-                                                                </button>
-                                                            </li>
-                                                        );
-                                                    })}
-                                                    
-                                                    <li className={`page-item ${pagination.current_page >= pagination.total_pages ? 'disabled' : ''}`}>
-                                                        <button 
-                                                            className="page-link"
-                                                            onClick={() => handlePageChange(pagination.current_page + 1)}
-                                                            disabled={pagination.current_page >= pagination.total_pages}
-                                                        >
-                                                            Next
-                                                        </button>
-                                                    </li>
-                                                </ul>
-                                            </nav>
+                                                                    <button 
+                                                                        className="page-link"
+                                                                        onClick={() => handlePageChange(page)}
+                                                                        title={`Go to page ${page}`}
+                                                                    >
+                                                                        {page}
+                                                                    </button>
+                                                                </li>
+                                                            ));
+                                                        })()}
+                                                        
+                                                        <li className={`page-item ${(pagination.current_page || 1) >= (pagination.total_pages || 1) ? 'disabled' : ''}`}>
+                                                            <button 
+                                                                className="page-link"
+                                                                onClick={() => handlePageChange(pagination.total_pages || 1)}
+                                                                disabled={(pagination.current_page || 1) >= (pagination.total_pages || 1)}
+                                                                title="Last Page"
+                                                            >
+                                                                <i className="bi bi-chevron-double-right"></i>
+                                                            </button>
+                                                        </li>
+                                                    </ul>
+                                                </nav>
+                                            </div>
                         )}
                     </>
                 )}

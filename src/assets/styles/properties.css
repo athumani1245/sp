@@ -103,6 +103,44 @@
     margin-bottom: 1.5rem;
 }
 
+/* Properties filters section alignment fix */
+.properties-filters-section {
+    background: #f8f9fa;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e9ecef;
+    margin-bottom: 1rem;
+}
+
+.properties-filters-section .d-flex {
+    align-items: center !important;
+}
+
+.properties-filters-section .d-flex > div {
+    display: flex;
+    align-items: center;
+}
+
+.properties-filters-section .input-group,
+.properties-filters-section .form-select,
+.properties-filters-section .btn {
+    height: 38px; /* Consistent height for all elements */
+}
+
+.properties-filters-section .input-group {
+    margin-bottom: 0;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 767.98px) {
+    .properties-filters-section .d-flex {
+        align-items: stretch !important;
+    }
+    
+    .properties-filters-section .d-flex > div {
+        display: block;
+    }
+}
+
 .property-card {
     transition: transform 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }

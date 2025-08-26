@@ -11,8 +11,7 @@ const AddPayment = ({ isOpen, onClose, leaseId, onPaymentAdded }) => {
     const [formData, setFormData] = useState({
         amount_paid: '',
         date_paid: new Date().toISOString().slice(0, 16), // Format: YYYY-MM-DDThh:mm
-        category: 'RENT',
-        status: 'success'
+        category: 'RENT'
     });
 
     // Reset form when modal opens/closes
@@ -26,8 +25,7 @@ const AddPayment = ({ isOpen, onClose, leaseId, onPaymentAdded }) => {
         setFormData({
             amount_paid: '',
             date_paid: new Date().toISOString().slice(0, 16),
-            category: 'RENT',
-            status: 'success'
+            category: 'RENT'
         });
         setError('');
         setSuccess('');
@@ -82,8 +80,7 @@ const AddPayment = ({ isOpen, onClose, leaseId, onPaymentAdded }) => {
                 setFormData({
                     amount_paid: '',
                     date_paid: new Date(),
-                    category: 'RENT',
-                    status: 'success'
+                    category: 'RENT'
                 });
                 if (onPaymentAdded) {
                     onPaymentAdded(response.data);
@@ -177,7 +174,7 @@ const AddPayment = ({ isOpen, onClose, leaseId, onPaymentAdded }) => {
                     </Row>
 
                     <Row className="mb-3">
-                        <Col xs={12} md={6} className="mb-3">
+                        <Col xs={12} className="mb-3">
                             <Form.Group>
                                 <Form.Label className="form-label">Category *</Form.Label>
                                 <Form.Select
@@ -193,24 +190,6 @@ const AddPayment = ({ isOpen, onClose, leaseId, onPaymentAdded }) => {
                                     <option value="MAINTENANCE">Maintenance</option>
                                     <option value="OTHER">Other</option>
                                 </Form.Select>
-                            </Form.Group>
-                        </Col>
-                        <Col xs={12} md={6} className="mb-3">
-                            <Form.Group>
-                                <Form.Label className="form-label">Status</Form.Label>
-                                <Form.Select
-                                    className="form-select"
-                                    name="status"
-                                    value={formData.status}
-                                    onChange={handleInputChange}
-                                >
-                                    <option value="success">Successful</option>
-                                    <option value="pending">Pending</option>
-                                    <option value="failed">Failed</option>
-                                </Form.Select>
-                                <Form.Text className="form-text">
-                                    Payment processing status
-                                </Form.Text>
                             </Form.Group>
                         </Col>
                     </Row>

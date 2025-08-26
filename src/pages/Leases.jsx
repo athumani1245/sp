@@ -45,8 +45,14 @@ function Leases() {
       
       if (result.success) {
         console.log('Leases data:', result.data);
-        setLeases(result.data || []);
-        setPagination(result.pagination || {});
+        setLeases(result.data?.items || []);
+        setPagination({
+          current_page: result.data?.current_page || 1,
+          total_pages: result.data?.total_pages || 1,
+          count: result.data?.count || 0,
+          next: result.data?.next,
+          previous: result.data?.previous
+        });
       } else {
         console.error('Failed to fetch leases:', result.error);
         setError(result.error || "Failed to fetch leases");
@@ -139,9 +145,8 @@ function Leases() {
       <div className="main-content">
         {/* Filters Section */}
         <div className="leases-filters-section">
-          <div className="row g-3 align-items-end">
-            <div className="col-md-4">
-              <label className="form-label">Search Leases</label>
+          <div className="d-flex flex-column flex-md-row gap-3 align-items-md-center">
+            <div className="flex-fill">
               <div className="input-group">
                 <span className="input-group-text">
                   <i className="bi bi-search"></i>
@@ -155,12 +160,12 @@ function Leases() {
                 />
               </div>
             </div>
-            <div className="col-md-3">
-              <label className="form-label">Status Filter</label>
+            <div className="flex-shrink-0">
               <select
                 className="form-select"
                 value={status}
                 onChange={handleStatusFilter}
+                style={{ minWidth: '150px' }}
               >
                 <option value="">All Statuses</option>
                 <option value="active">Active</option>
@@ -169,10 +174,11 @@ function Leases() {
                 <option value="terminated">Terminated</option>
               </select>
             </div>
-            <div className="col-md-5">
+            <div className="flex-shrink-0">
               <button 
-                className="btn btn-primary w-100"
+                className="btn btn-primary"
                 onClick={() => setShowAddModal(true)}
+                style={{ minWidth: '140px' }}
               >
                 <i className="bi bi-plus me-2"></i>
                 Add New Lease
@@ -204,8 +210,8 @@ function Leases() {
             <h5 className="leases-title">
               <i className="bi bi-file-earmark-text me-2"></i>
               Lease Agreements
-              {leases.length > 0 && (
-                <span className="badge bg-primary ms-2">{leases.length}</span>
+              {(leases.length > 0 || pagination.count > 0) && (
+                <span className="badge bg-primary ms-2">{pagination.count || leases.length}</span>
               )}
             </h5>
           </div>

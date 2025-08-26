@@ -12,6 +12,169 @@
     margin-bottom: 1rem;
 }
 
+/* Compact Lease Form Styles */
+.lease-form-compact {
+    padding: 0;
+}
+
+.lease-form-compact .compact-form-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.2rem;
+    gap: 0.75rem;
+}
+
+.lease-form-compact .compact-inline-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #495057;
+    min-width: 120px;
+    flex-shrink: 0;
+    text-align: left;
+    margin: 0;
+}
+
+.lease-form-compact .underline-input,
+.lease-form-compact .underline-select {
+    flex: 1;
+    font-size: 0.9rem;
+    padding: 0.5rem 0.25rem;
+    border: none;
+    border-bottom: 2px solid #e9ecef;
+    background-color: transparent;
+    transition: border-bottom-color 0.15s ease-in-out;
+    outline: none;
+    border-radius: 0;
+}
+
+.lease-form-compact .underline-input:focus,
+.lease-form-compact .underline-select:focus {
+    border-bottom-color: #0d6efd;
+    background-color: transparent;
+}
+
+.lease-form-compact .underline-input:disabled,
+.lease-form-compact .underline-input[readonly],
+.lease-form-compact .underline-select:disabled {
+    background-color: transparent;
+    border-bottom-color: #dee2e6;
+    color: #6c757d;
+    opacity: 1;
+}
+
+.lease-form-compact .underline-select {
+    cursor: pointer;
+}
+
+.lease-form-compact .underline-select:disabled {
+    cursor: not-allowed;
+}
+
+.lease-form-compact .row.g-3 {
+    margin: 0;
+}
+
+.lease-form-compact .col-md-6 {
+    padding-left: 0;
+    padding-right: 1rem;
+}
+
+.lease-form-compact .col-md-6:last-child {
+    padding-right: 0;
+}
+
+/* Lease Tabs Styling */
+.lease-tabs-container {
+    display: flex;
+    border-bottom: 2px solid #e9ecef;
+    background: transparent;
+    padding: 0;
+    margin-bottom: 0;
+}
+
+.lease-tab {
+    background: transparent;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #6c757d;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+    border-bottom: 2px solid transparent;
+    position: relative;
+}
+
+.lease-tab:hover {
+    color: #495057;
+    background-color: rgba(0, 0, 0, 0.025);
+}
+
+.lease-tab.active {
+    color: #495057;
+    font-weight: 600;
+    border-bottom-color: #007bff;
+    background-color: transparent;
+}
+
+.lease-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: #007bff;
+}
+
+.lease-tab i {
+    font-size: 0.85rem;
+}
+
+@media (max-width: 768px) {
+    .lease-tab {
+        padding: 0.6rem 1rem;
+        font-size: 0.8rem;
+        flex: 1;
+        text-align: center;
+    }
+    
+    .lease-tab i {
+        font-size: 0.8rem;
+    }
+}
+
+/* Filters alignment fix */
+.leases-filters-section .d-flex {
+    align-items: center !important;
+}
+
+.leases-filters-section .d-flex > div {
+    display: flex;
+    align-items: center;
+}
+
+.leases-filters-section .input-group,
+.leases-filters-section .form-select,
+.leases-filters-section .btn {
+    height: 38px; /* Consistent height for all elements */
+}
+
+.leases-filters-section .input-group {
+    margin-bottom: 0;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 767.98px) {
+    .leases-filters-section .d-flex {
+        align-items: stretch !important;
+    }
+    
+    .leases-filters-section .d-flex > div {
+        display: block;
+    }
+}
+
 .leases-actions-section {
     padding: 0 1.5rem 1rem;
     border-bottom: 1px solid #e9ecef;
@@ -42,23 +205,29 @@
 .lease-list-container {
     width: 100%;
     margin: 0;
-    padding: 0;
+    padding: 1rem 1.5rem;
 }
 
 .lease-list-item {
     background: #fff;
-    border-bottom: 1px solid #e9ecef;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: all 0.2s ease;
     padding: 1rem 1.5rem;
+    margin-bottom: 0.75rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .lease-list-item:hover {
     background-color: #f8f9fa;
+    border-color: #dc3545;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.15);
 }
 
 .lease-list-item:last-child {
-    border-bottom: none;
+    margin-bottom: 0;
 }
 
 .lease-list-header {
@@ -439,24 +608,6 @@
     border-color: #007bff;
 }
 
-.lease-card {
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    border: 2px solid #dee2e6;
-    min-height: auto;
-    margin: 0;
-    padding: 1rem;
-}
-
-.lease-card:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    border-color: #007bff;
-}
-
 .lease-card.editing {
     border-color: #ffc107;
     background-color: #fff3cd;
@@ -532,10 +683,6 @@
     font-weight: 600;
     color: #333;
     margin: 0;
-}
-
-.lease-card-body {
-    padding: 0 1rem 0.75rem;
 }
 
 .lease-card-row {
@@ -661,8 +808,14 @@
         padding: 0.75rem 1rem;
     }
     
+    .lease-list-container {
+        padding: 0.75rem 1rem;
+    }
+    
     .lease-list-item {
         padding: 0.875rem 1rem;
+        margin-bottom: 0.5rem;
+        border-radius: 6px;
     }
     
     .lease-reference-mobile {
@@ -672,6 +825,32 @@
     .lease-list-label,
     .lease-list-value {
         font-size: 0.8rem;
+    }
+    
+    /* Compact lease form mobile styles */
+    .lease-form-compact .col-md-6 {
+        padding-right: 0;
+        margin-bottom: 0.5rem;
+    }
+    
+    .lease-form-compact .compact-form-row {
+        flex-direction: column;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+        gap: 0.3rem;
+    }
+    
+    .lease-form-compact .compact-inline-label {
+        font-size: 0.8rem;
+        min-width: auto;
+        text-align: left;
+    }
+    
+    .lease-form-compact .underline-input,
+    .lease-form-compact .underline-select {
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: 0.6rem 0.4rem;
+        width: 100%;
     }
 }
 
@@ -693,17 +872,15 @@
         align-items: center !important;
     }
     
-    /* Full width cards on very small screens */
-    .lease-card-mobile {
-        border-radius: 0;
-        border-left: none;
-        border-right: none;
-        margin: 0;
+    /* Maintain card separation on very small screens */
+    .lease-list-container {
+        padding: 0.5rem 0.75rem;
     }
     
-    .lease-cards-container {
-        padding: 0;
-        gap: 1px;
+    .lease-list-item {
+        padding: 0.75rem;
+        margin-bottom: 0.5rem;
+        border-radius: 6px;
     }
     
     /* Very small screen adjustments for new layout */
@@ -725,10 +902,6 @@
     
     .leases-title {
         font-size: 1rem;
-    }
-    
-    .lease-list-item {
-        padding: 0.75rem;
     }
     
     .lease-reference-mobile {

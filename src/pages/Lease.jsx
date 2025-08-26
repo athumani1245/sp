@@ -317,10 +317,10 @@ function Lease() {
                   </li>
                 </ol>
               </nav>
-              <h4 className="mb-1">
+              {/* <h4 className="mb-1">
                 <i className="bi bi-file-earmark-text me-2"></i>
                 {lease.lease_number}
-              </h4>
+              </h4> */}
               <small className="text-muted">
                 Reference: {lease.lease_number} | Status: {lease.status}
               </small>
@@ -423,9 +423,9 @@ function Lease() {
 
         {/* Main Content Tabs */}
         <div className="leases-filters-section">
-          <div className="nav nav-pills nav-fill" role="tablist">
+          <div className="lease-tabs-container">
             <button
-              className={`nav-link ${activeTab === 'details' ? 'active' : ''}`}
+              className={`lease-tab ${activeTab === 'details' ? 'active' : ''}`}
               onClick={() => handleTabSelect('details')}
             >
               <i className="bi bi-info-circle me-1"></i>
@@ -433,7 +433,7 @@ function Lease() {
               <span className="d-md-none">Info</span>
             </button>
             <button
-              className={`nav-link ${activeTab === 'payments' ? 'active' : ''}`}
+              className={`lease-tab ${activeTab === 'payments' ? 'active' : ''}`}
               onClick={() => handleTabSelect('payments')}
             >
               <i className="bi bi-credit-card me-1"></i>
@@ -446,94 +446,80 @@ function Lease() {
         <div className="leases-filters-section">
             {/* Details Tab */}
             {activeTab === "details" && (
-              <div>
+              <div className="lease-form-compact">
                 {/* General Information Fields */}
                 <div className="row g-3 mb-4">
-                  <div className="col-md-6 col-6">
-                    <div className="mb-3">
-                      <label className="form-label">Tenant</label>
+                  <div className="col-md-6">
+                    <div className="compact-form-row">
+                      <label className="compact-inline-label">Tenant:</label>
                       <input 
                         type="text" 
-                        className="form-control" 
+                        className="underline-input" 
                         value={`${lease.tenant.first_name || ''} ${lease.tenant.last_name || ''}`}
                         readOnly 
                       />
                     </div>
-                  </div>
-                  <div className="col-md-6 col-6">
-                    <div className="mb-3">
-                      <label className="form-label">Phone Number</label>
+                    <div className="compact-form-row">
+                      <label className="compact-inline-label">Property Name:</label>
                       <input 
                         type="text" 
-                        className="form-control" 
-                        value={(lease.tenant.username || '')} 
-                        readOnly 
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="col-md-6 col-6">
-                    <div className="mb-3">
-                      <label className="form-label">Property Name</label>
-                      <input 
-                        type="text" 
-                        className="form-control" 
+                        className="underline-input" 
                         value={lease.property.property_name || ''} 
                         readOnly 
                       />
                     </div>
-                  </div>
-                  <div className="col-md-6 col-6">
-                    <div className="mb-3">
-                      <label className="form-label">Property Location</label>
+                    <div className="compact-form-row">
+                      <label className="compact-inline-label">Unit Number:</label>
                       <input 
                         type="text" 
-                        className="form-control" 
-                        value={getPropertyAddress(lease) || 'N/A'} 
-                        readOnly 
-                      />
-                    </div>
-                  </div>
-                  <div className="col-md-6 col-6">
-                    <div className="mb-3">
-                      <label className="form-label">Unit Number/Name</label>
-                      <input 
-                        type="text" 
-                        className="form-control" 
+                        className="underline-input" 
                         value={getUnitInfo(lease)} 
                         readOnly 
                       />
                     </div>
-                  </div>
-                  
-                  <div className="col-md-6 col-6">
-                    <div className="mb-3">
-                      <label className="form-label">Start Date</label>
+                    <div className="compact-form-row">
+                      <label className="compact-inline-label">Start Date:</label>
                       <input 
                         type="text" 
-                        className="form-control" 
+                        className="underline-input" 
                         value={formatDate(lease.start_date)} 
                         readOnly 
                       />
                     </div>
                   </div>
-                  <div className="col-md-6 col-6">
-                    <div className="mb-3">
-                      <label className="form-label">End Date</label>
+                  <div className="col-md-6">
+                    <div className="compact-form-row">
+                      <label className="compact-inline-label">Phone Number:</label>
                       <input 
                         type="text" 
-                        className="form-control" 
+                        className="underline-input" 
+                        value={(lease.tenant.username || '')} 
+                        readOnly 
+                      />
+                    </div>
+                    <div className="compact-form-row">
+                      <label className="compact-inline-label">Property Location:</label>
+                      <input 
+                        type="text" 
+                        className="underline-input" 
+                        value={getPropertyAddress(lease) || 'N/A'} 
+                        readOnly 
+                      />
+                    </div>
+                    <div className="compact-form-row">
+                      <label className="compact-inline-label">End Date:</label>
+                      <input 
+                        type="text" 
+                        className="underline-input" 
                         value={formatDate(lease.end_date)} 
                         readOnly 
                       />
                     </div>
-                  </div>
-                  <div className="col-md-6 col-6">
-                    <div className="mb-3">
-                      <label className="form-label">Lease Duration</label>
+                    <div className="compact-form-row">
+                      <label className="compact-inline-label">Lease Duration:</label>
                       <input 
                         type="text" 
-                        className="form-control" 
+                        className="underline-input" 
                         value={`${lease.number_of_month || 'N/A'} months`} 
                         readOnly 
                       />
@@ -541,7 +527,7 @@ function Lease() {
                   </div>
                 </div>
 
-                {/* Financial Summary - Bottom Left */}
+                {/* Financial Summary - Bottom Right */}
                 <div className="row mt-4">
                   <div className="col-md-8">
                     {/* Empty space for other content if needed */}
@@ -550,7 +536,7 @@ function Lease() {
                     <div className="bg-light p-3 rounded">
                       <h6 className="mb-3">
                         <i className="bi bi-calculator me-2"></i>
-                        Financial Summary
+                        Payments Summary
                       </h6>
                       <div className="d-flex justify-content-between mb-2">
                         <span>Total Amount:</span>

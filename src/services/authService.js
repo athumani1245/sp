@@ -45,9 +45,14 @@ export const logout = async () => {
         await api.post(
             `${API_BASE}/logout/`,
             { refresh },
-            { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem("token")}` } }
+            { headers: { 'Content-Type': 'application/json' } }
         );
+        localStorage.removeItem("token");
+        localStorage.removeItem("refresh");
+        // redirect
+        window.location.href = '/';
         return { success: true };
+
     }
     catch (err) {
         console.error("Logout API error:", err);

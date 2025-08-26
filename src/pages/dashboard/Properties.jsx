@@ -37,8 +37,14 @@ function Properties() {
       });
 
       if (result.success) {
-        setProperties(result.data || []);
-        setPagination(result.pagination || {});
+        setProperties(result.data?.items || []);
+        setPagination({
+          current_page: result.data?.current_page || 1,
+          total_pages: result.data?.total_pages || 1,
+          count: result.data?.count || 0,
+          next: result.data?.next,
+          previous: result.data?.previous
+        });
       } else {
         setError(result.error || "Failed to fetch properties");
         setProperties([]);
@@ -59,40 +65,45 @@ function Properties() {
   return (
     <Layout>
       <div className="main-content">
-        <div className="mb-3">
-         
-          <div className="d-flex flex-wrap align-items-center mb-2 gap-2">
-            <div className="input-group" style={{ maxWidth: 300 }}>
-              <span className="input-group-text bg-white border-end-0">
-                <i className="fa fa-search" />
-              </span>
-              <input
-                type="text"
-                className="form-control border-start-0"
-                placeholder="Search"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                style={{ borderLeft: 0 }}
-              />
+        {/* Filters Section */}
+        <div className="properties-filters-section mb-3">
+          <div className="d-flex flex-column flex-md-row gap-3 align-items-md-center">
+            <div className="flex-fill">
+              <div className="input-group" style={{ maxWidth: '100%' }}>
+                <span className="input-group-text bg-white">
+                  <i className="fa fa-search" />
+                </span>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Search properties..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+              </div>
             </div>
-            <button
-              className="btn btn-outline-secondary d-flex align-items-center"
-              type="button"
-            >
-              <i className="fa fa-filter me-2" /> Filters
-            </button>{" "}
-            <div className="ms-auto">
+            <div className="flex-shrink-0">
+              <button
+                className="btn btn-outline-secondary d-flex align-items-center"
+                type="button"
+                style={{ minWidth: '100px' }}
+              >
+                <i className="fa fa-filter me-2" /> Filters
+              </button>
+            </div>
+            <div className="flex-shrink-0">
               <button
                 className="btn btn-dark d-flex align-items-center"
                 onClick={() => setShowModal(true)}
                 type="button"
+                style={{ minWidth: '180px' }}
               >
                 <i className="fa fa-cube me-2" /> Add New Property
               </button>
             </div>
           </div>
           {tag && (
-            <div className="mb-2">
+            <div className="mt-2">
               <span className="badge bg-light text-dark border me-2">
                 Tag{" "}
                 <span
@@ -103,8 +114,8 @@ function Properties() {
                 </span>
               </span>
             </div>
-          )}{" "}
-          <div className="text-end small text-muted mb-2">
+          )}
+          <div className="text-end small text-muted mt-2">
             {pagination.total ? `Showing ${(page - 1) * (pagination.per_page || 50) + 1}–${Math.min(page * (pagination.per_page || 50),pagination.total)} of ${pagination.total}` : "Showing properties"}
           </div>
         </div>
@@ -121,8 +132,8 @@ function Properties() {
             <h5 className="properties-title">
               <i className="bi bi-building me-2"></i>
               Properties
-              {properties.length > 0 && (
-                <span className="badge bg-primary ms-2">{properties.length}</span>
+              {(properties.length > 0 || pagination.count > 0) && (
+                <span className="badge bg-primary ms-2">{pagination.count || properties.length}</span>
               )}
             </h5>
           </div>

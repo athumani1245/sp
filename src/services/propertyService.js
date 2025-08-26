@@ -220,16 +220,25 @@ export const getPropertyUnits = async (params = {}) => {
         }
         const queryParams = new URLSearchParams();
         queryParams.append('property', params.property);
+        if (params.page) queryParams.append('page', params.page);
+        
 
         const response = await axios.get(
             `${API_BASE}/units/?${queryParams.toString()}`,
             { headers: getAuthHeaders() }
         );
+        console.log(response);
 
         return {
             success: true,
-            data: response.data.data,
-            pagination: response.data.pagination || {}
+            data: response.data, // Return the full data structure
+            pagination: {
+                current_page: response.data.current_page,
+                total_pages: response.data.total_pages,
+                count: response.data.count,
+                next: response.data.next,
+                previous: response.data.previous
+            }
         };
     } catch (err) {
         return handleApiError(err, "Failed to fetch property units.");
