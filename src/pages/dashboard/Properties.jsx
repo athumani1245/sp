@@ -74,8 +74,8 @@ function Properties() {
           <div className="d-flex flex-column flex-md-row gap-3 align-items-md-center">
             <div className="flex-fill">
               <div className="input-group" style={{ maxWidth: '100%' }}>
-                <span className="input-group-text bg-white">
-                  <i className="fa fa-search" />
+                <span className="input-group-text bg-white" tabIndex="-1" style={{ outline: 'none' }}>
+                  <i className="bi bi-search" />
                 </span>
                 <input
                   type="text"
@@ -83,21 +83,13 @@ function Properties() {
                   placeholder="Search properties..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
+                  style={{ outline: 'none' }}
                 />
               </div>
             </div>
             <div className="flex-shrink-0">
               <button
-                className="btn btn-outline-secondary d-flex align-items-center"
-                type="button"
-                style={{ minWidth: '100px' }}
-              >
-                <i className="fa fa-filter me-2" /> Filters
-              </button>
-            </div>
-            <div className="flex-shrink-0">
-              <button
-                className="btn btn-dark d-flex align-items-center"
+                className="btn btn-danger d-flex align-items-center"
                 onClick={() => setShowModal(true)}
                 type="button"
                 style={{ minWidth: '180px' }}

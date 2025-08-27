@@ -58,6 +58,25 @@ body {
     background-color: #CC5B4B !important;
 }
 
+/* Global focus outline removal */
+*:focus,
+*:focus-visible {
+    outline: none !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus,
+button:focus,
+.form-control:focus,
+.form-select:focus,
+.input-group-text:focus,
+span:focus,
+i:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;

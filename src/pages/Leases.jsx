@@ -9,6 +9,7 @@ import "../assets/styles/leases.css";
 function Leases() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [status, setStatus] = useState("");
   const [page, setPage] = useState(1);
   const [leases, setLeases] = useState([]);
@@ -16,6 +17,17 @@ function Leases() {
   const [error, setError] = useState("");
   const [pagination, setPagination] = useState({});
   const [showAddModal, setShowAddModal] = useState(false);
+
+  // Debounce search input to avoid too many API calls
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 500); // 500ms delay
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [search]);
 
   const fetchLeases = async () => {
     try {
@@ -28,8 +40,8 @@ function Leases() {
         limit: 10 // Number of leases per page
       };
       
-      if (search) {
-        params.search = search;
+      if (debouncedSearch) {
+        params.search = debouncedSearch;
       }
       
       if (status) {
@@ -69,13 +81,14 @@ function Leases() {
   };
 
   useEffect(() => {
-    console.log('useEffect triggered with:', { search, status, page });
+    console.log('useEffect triggered with:', { debouncedSearch, status, page });
     fetchLeases();
-  }, [search, status, page]);
+  }, [debouncedSearch, status, page]);
 
   const handleSearch = (e) => {
-    setSearch(e.target.value);
-    setPage(1);
+    const searchValue = e.target.value;
+    setSearch(searchValue);
+    setPage(1); // Reset to first page when searching
   };
 
   const handleStatusFilter = (e) => {
@@ -90,8 +103,7 @@ function Leases() {
   const getStatusBadge = (status) => {
     const statusClasses = {
       active: "badge bg-success",
-      pending: "badge bg-warning text-dark",
-      expired: "badge bg-danger",
+      draft: "badge bg-info",
       terminated: "badge bg-secondary",
     };
     return statusClasses[status] || "badge bg-secondary";
@@ -149,7 +161,13 @@ function Leases() {
             <div className="flex-fill">
               <div className="input-group">
                 <span className="input-group-text">
-                  <i className="bi bi-search"></i>
+                  {loading && debouncedSearch !== search ? (
+                    <div className="spinner-border spinner-border-sm" role="status">
+                      <span className="visually-hidden">Searching...</span>
+                    </div>
+                  ) : (
+                    <i className="bi bi-search"></i>
+                  )}
                 </span>
                 <input
                   type="text"
@@ -158,6 +176,19 @@ function Leases() {
                   value={search}
                   onChange={handleSearch}
                 />
+                {search && (
+                  <button
+                    className="btn btn-outline-secondary"
+                    type="button"
+                    onClick={() => {
+                      setSearch("");
+                      setPage(1);
+                    }}
+                    title="Clear search"
+                  >
+                    <i className="bi bi-x"></i>
+                  </button>
+                )}
               </div>
             </div>
             <div className="flex-shrink-0">
@@ -169,8 +200,7 @@ function Leases() {
               >
                 <option value="">All Statuses</option>
                 <option value="active">Active</option>
-                <option value="pending">Pending</option>
-                <option value="expired">Expired</option>
+                <option value="draft">Draft</option>
                 <option value="terminated">Terminated</option>
               </select>
             </div>

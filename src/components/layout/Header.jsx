@@ -96,6 +96,16 @@ function Header() {
         setSubscribing(false);
     };
 
+    const handleCloseSubscriptionModal = () => {
+        if (!subscribing) {
+            setShowSubscribeModal(false);
+            setSelectedPlan(null);
+            setPhoneNumber('');
+            setSubscriptionError('');
+            setSelectedPlanDetails(null);
+        }
+    };
+
     const handleSubscribe = async () => {
         setSubscribing(true);
         setSubscriptionError('');
@@ -387,22 +397,11 @@ function Header() {
             {/* Subscription Modal */}
             <Modal 
                 show={showSubscribeModal} 
-                onHide={() => {
-                    setShowSubscribeModal(false);
-                    setSelectedPlan(null);
-                    setPhoneNumber('');
-                    setSubscriptionError('');
-                }} 
-                backdrop="static"
+                onHide={handleCloseSubscriptionModal}
+                backdrop={subscribing ? "static" : true}
+                keyboard={!subscribing}
                 size="lg"
-                className={showConfirmModal ? 'modal-blur' : ''}
-                style={{
-                    opacity: showConfirmModal ? '0.6' : '1',
-                    filter: showConfirmModal ? 'blur(4px)' : 'none',
-                    transition: 'all 0.3s ease',
-                    backgroundColor: showConfirmModal ? 'rgba(0, 0, 0, 0.1)' : 'transparent',
-                    boxShadow: showConfirmModal ? '0 0 20px rgba(0, 0, 0, 0.3)' : 'none'
-                }}
+                centered
             >
                 <Modal.Header closeButton>
                     <Modal.Title>
@@ -440,9 +439,9 @@ function Header() {
                                             onClick={() => setSelectedPlan(plan.id)}
                                             style={{ cursor: 'pointer' }}
                                         >
-                                            <div className="card-body p-0">
+                                            <div className="card-body p-3">
                                                 
-                                                <div className="d-flex justify-content-between align-items-center mb-1">
+                                                <div className="d-flex justify-content-between align-items-center mb-2">
                                                     <h6 className="card-title mb-0">{plan.name}</h6>
                                                     {selectedPlan === plan.id && (
                                                         <i className="bi bi-check-circle-fill text-danger"></i>
@@ -464,7 +463,7 @@ function Header() {
                                                 <hr className="my-3" />
                                                 <div className="small">
                                                     <strong>Features:</strong>
-                                                    <p>{plan.description}</p>
+                                                    <p className="mb-0">{plan.description}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -585,16 +584,17 @@ function Header() {
             <Modal 
                 show={showConfirmModal} 
                 onHide={() => {
-                    setShowConfirmModal(false);
-                    setSubscriptionError('');
+                    if (!subscribing) {
+                        setShowConfirmModal(false);
+                        setSubscriptionError('');
+                    }
                 }} 
-                backdrop={false}
+                backdrop={subscribing ? "static" : true}
+                keyboard={!subscribing}
                 centered
                 style={{
-                    zIndex: 1060,
-                    boxShadow: '0 0 30px rgba(0, 0, 0, 0.5)'
+                    zIndex: 1060
                 }}
-                className="confirmation-modal"
             >
                 <Modal.Header closeButton>
                     <Modal.Title>
