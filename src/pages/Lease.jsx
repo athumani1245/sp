@@ -482,7 +482,7 @@ function Lease() {
                       <input 
                         type="text" 
                         className="underline-input" 
-                        value={formatDate(lease.start_date)} 
+                        value={lease.start_date} 
                         readOnly 
                       />
                     </div>
@@ -511,7 +511,7 @@ function Lease() {
                       <input 
                         type="text" 
                         className="underline-input" 
-                        value={formatDate(lease.end_date)} 
+                        value={lease.end_date} 
                         readOnly 
                       />
                     </div>
