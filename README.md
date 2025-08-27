@@ -1,70 +1,194 @@
-# Getting Started with Create React App
+# Tanaka 🏠
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+**Smart Pangisha** is a comprehensive property management web application designed to streamline property, tenant, and lease management for property owners and managers. Built with modern React technologies, it offers a responsive, mobile-first interface with powerful management capabilities.
 
-## Available Scripts
+## 🌟 Features
 
-In the project directory, you can run:
+### 🏢 Property Management
+- **Property Portfolio**: View and manage all properties in a unified dashboard
+- **Property Details**: Comprehensive property information with tabbed interface
+- **Units Management**: Organize and track individual units within properties
+- **Mobile-Responsive Cards**: Card-based mobile view for better UX on small screens
 
-### `npm start`
+### 👥 Tenant Management
+- **Tenant Directory**: Complete tenant database with search and filtering
+- **Tenant Profiles**: Detailed tenant information and contact management
+- **Tenant Status Tracking**: Monitor active, inactive, and pending tenants
+- **Advanced Search**: Search tenants by name, email, or phone
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### 📋 Lease Management
+- **Lease Tracking**: Monitor active, terminated, and draft leases
+- **Lease Details**: Comprehensive lease information and terms
+- **Lease Operations**: Create, renew, and terminate leases
+- **Advanced Filtering**: Filter by status (active, terminated, draft)
+- **Smart Search**: Search leases by tenant or property name
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### 💰 Payment Management
+- **Payment Tracking**: Monitor rent payments and outstanding amounts
+- **Payment History**: Complete payment records and transaction history
+- **Outstanding Management**: Track and manage overdue payments
+- **Mobile-Optimized**: Card-based payment views for mobile devices
 
-### `npm test`
+### 📊 Dashboard & Analytics
+- **Overview Dashboard**: Key metrics and performance indicators
+- **Financial Insights**: Income tracking and financial summaries
+- **Occupancy Rates**: Real-time occupancy statistics
+- **Outstanding Payments**: Quick view of pending payments
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### 🔐 Authentication & Security
+- **Secure Login**: JWT-based authentication system
+- **Password Recovery**: Forgot password with OTP verification
+- **User Registration**: New user account creation
+- **Profile Management**: User profile and settings management
 
-### `npm run build`
+## 🛠️ Technology Stack
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Frontend
+- **React 19.1.0** - Modern React with latest features
+- **React Router DOM 7.6.0** - Client-side routing
+- **React Bootstrap 2.10.10** - UI components and responsive design
+- **Bootstrap 5.3.6** - CSS framework for styling
+- **Axios 1.9.0** - HTTP client for API communication
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### State Management
+- **Redux Toolkit 2.8.2** - State management
+- **React Redux 9.2.0** - React bindings for Redux
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Styling & UI
+- **Custom CSS** - Tailored styling for each component
+- **Bootstrap Icons** - Comprehensive icon set
+- **Responsive Design** - Mobile-first approach
+- **Custom Color Scheme** - Consistent branding (#CC5B4B theme)
 
-### `npm run eject`
+### Development & Testing
+- **React Scripts 5.0.1** - Build and development tools
+- **Testing Library** - Comprehensive testing suite
+- **ESLint** - Code quality and consistency
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## 🚀 Getting Started
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Prerequisites
+- Node.js (v14 or higher)
+- npm or yarn package manager
+- Backend API server running
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### Installation
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/athumani1245/sp.git
+   cd sp
+   ```
 
-## Learn More
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+3. **Environment Setup**
+   Create a `.env` file in the root directory:
+   ```env
+   REACT_APP_API_BASE=your_backend_api_url
+   ```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+4. **Start the development server**
+   ```bash
+   npm start
+   ```
+   
+   The app will open at [http://localhost:3000](http://localhost:3000)
 
-### Code Splitting
+### Available Scripts
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+- **`npm start`** - Runs the development server
+- **`npm build`** - Creates production build
+- **`npm test`** - Runs the test suite
+- **`npm run eject`** - Ejects from Create React App (one-way operation)
 
-### Analyzing the Bundle Size
+## 📁 Project Structure
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+```
+src/
+├── components/           # Reusable components
+│   ├── Layout.jsx       # Main layout wrapper
+│   ├── forms/           # Form components
+│   ├── layout/          # Header and navigation
+│   └── snippets/        # Dashboard widgets
+├── pages/               # Page components
+│   ├── auth/           # Authentication pages
+│   ├── dashboard/      # Main dashboard pages
+│   └── entity/         # Entity detail pages
+├── services/           # API service layers
+│   ├── authService.js  # Authentication
+│   ├── propertyService.js
+│   ├── tenantService.js
+│   ├── leaseService.js
+│   └── paymentService.js
+├── assets/
+│   └── styles/         # Component-specific CSS
+└── utils/              # Utility functions
+```
 
-### Making a Progressive Web App
+## 🎨 Design Features
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+### Mobile-First Responsive Design
+- **Breakpoint Optimization**: Optimized for all screen sizes
+- **Card-Based Mobile UI**: Properties, tenants, and payments display as cards on mobile
+- **Touch-Friendly**: Large touch targets and intuitive navigation
+- **Responsive Tables**: Tables adapt to mobile screens
 
-### Advanced Configuration
+### User Experience
+- **Consistent Navigation**: Unified header and sidebar navigation
+- **Search & Filtering**: Advanced search capabilities across all entities
+- **Pagination**: Efficient data loading with pagination
+- **Loading States**: User feedback during API calls
+- **Error Handling**: Comprehensive error management
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+### Visual Design
+- **Custom Color Scheme**: Professional branding with #CC5B4B accent
+- **Clean Typography**: Readable fonts and consistent sizing
+- **Intuitive Icons**: Bootstrap Icons throughout the interface
+- **Modern UI Elements**: Contemporary design patterns
 
-### Deployment
+## 🔗 API Integration
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+The application integrates with a backend API for:
+- User authentication and authorization
+- Property, tenant, and lease CRUD operations
+- Payment processing and tracking
+- File uploads and document management
 
-### `npm run build` fails to minify
+## 🚀 Deployment
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### Build for Production
+```bash
+npm run build
+```
+
+The build creates optimized files in the `build/` folder ready for deployment.
+
+### Deployment Options
+- **Netlify**: Connect your repository for automatic deployments
+- **Vercel**: Deploy with zero configuration
+- **AWS S3 + CloudFront**: For scalable static hosting
+- **Traditional Web Servers**: Deploy build files to any web server
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📝 License
+
+This project is private and proprietary.
+
+## 👤 Author
+
+**Athumani** - [@athumani1245](https://github.com/athumani1245)
+
+---
+
+**Tanaka** - Making property management smart and efficient! 🏠✨
