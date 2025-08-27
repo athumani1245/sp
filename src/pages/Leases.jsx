@@ -324,10 +324,10 @@ function Leases() {
                         <td>
                           <div className="lease-period">
                             <span className="lease-dates">
-                              {formatDate(lease.start_date)}
+                              {lease.start_date}
                             </span>
                             <span className="lease-duration">
-                              to {formatDate(lease.end_date)}
+                              to {lease.end_date}
                             </span>
                           </div>
                         </td>
