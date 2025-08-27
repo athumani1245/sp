@@ -189,20 +189,18 @@ const AddTenantModal = ({ isOpen, onClose, onTenantAdded }) => {
                                     placeholder="0712345678"
                                     required
                                 />
-                                <Form.Text className="form-text">
-                                    This will be used as the username. Format: 0XXXXXXXXX
-                                </Form.Text>
+                               
                             </Form.Group>
                         </Col>
                         <Col xs={12} md={6} className="mb-3">
                             <div className="info-card p-3 bg-light rounded">
                                 <h6 className="text-muted mb-2">
                                     <i className="bi bi-info-circle me-2"></i>
-                                    Default Login Credentials
+                                    Information:
                                 </h6>
-                                <p className="small mb-1"><strong>Username:</strong> Phone number</p>
-                                <p className="small mb-0"><strong>Password:</strong> StrongPass123</p>
-                                <small className="text-muted">Tenant can change password after first login</small>
+                                <p className="small mb-1">Tenant Will be selected on Creation of Lease</p>
+                                <p className="small mb-0">All information filled in here will also appear on Lease</p>
+                                <small className="text-muted">after Lease creation, Tenant can not be deleted.</small>
                             </div>
                         </Col>
                     </Row>

@@ -185,9 +185,9 @@ const AddPayment = ({ isOpen, onClose, leaseId, onPaymentAdded }) => {
                                     required
                                 >
                                     <option value="RENT">Rent</option>
-                                    <option value="DEPOSIT">Deposit</option>
-                                    <option value="UTILITIES">Utilities</option>
-                                    <option value="MAINTENANCE">Maintenance</option>
+                                    <option value="WATER">Water</option>
+                                    <option value="ELECTRICITY">Electricity</option>
+                                    <option value="SERVICE_CHARGE">Service Charge</option>
                                     <option value="OTHER">Other</option>
                                 </Form.Select>
                             </Form.Group>
