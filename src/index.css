@@ -7,6 +7,57 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Custom Bootstrap danger color override */
+:root {
+  --bs-danger: #CC5B4B;
+  --bs-danger-rgb: 204, 91, 75;
+}
+
+.btn-danger,
+.btn-danger:hover,
+.btn-danger:focus,
+.btn-danger:active,
+.btn-danger.active,
+.show > .btn-danger.dropdown-toggle {
+    background-color: #CC5B4B !important;
+    border-color: #CC5B4B !important;
+}
+
+.btn-outline-danger {
+    color: #CC5B4B !important;
+    border-color: #CC5B4B !important;
+}
+
+.btn-outline-danger:hover,
+.btn-outline-danger:focus,
+.btn-outline-danger:active {
+    background-color: #CC5B4B !important;
+    border-color: #CC5B4B !important;
+    color: white !important;
+}
+
+.bg-danger {
+    background-color: #CC5B4B !important;
+}
+
+.text-danger {
+    color: #CC5B4B !important;
+}
+
+.alert-danger {
+    background-color: rgba(204, 91, 75, 0.1) !important;
+    border-color: rgba(204, 91, 75, 0.2) !important;
+    color: #CC5B4B !important;
+}
+
+.border-danger {
+    border-color: #CC5B4B !important;
+}
+
+.badge.bg-danger {
+    background-color: #CC5B4B !important;
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;

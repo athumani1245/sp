@@ -106,7 +106,7 @@
 
 .add-property-modal .form-control:focus,
 .add-property-modal .form-select:focus {
-    border-color: #dc3545;
+    border-color: #CC5B4B;
     box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.1);
     background: #fff;
     outline: none;
@@ -157,20 +157,20 @@
 
 .add-property-modal .btn-secondary:hover {
     background: #f8f9fa;
-    border-color: #dc3545;
-    color: #dc3545;
+    border-color: #CC5B4B;
+    color: #CC5B4B;
     transform: translateY(-1px);
 }
 
 .add-property-modal .btn-primary {
-    background: #dc3545;
+    background: #CC5B4B;
     color: #fff;
-    border: 1px solid #dc3545;
+    border: 1px solid #CC5B4B;
 }
 
 .add-property-modal .btn-primary:hover {
-    background: #c82333;
-    border-color: #c82333;
+    background: #B84A3A;
+    border-color: #B84A3A;
     transform: translateY(-1px);
 }
 
@@ -180,7 +180,7 @@
 
 /* Form Validation Styles */
 .add-property-modal .form-control:invalid {
-    border-color: #dc3545;
+    border-color: #CC5B4B;
 }
 
 .add-property-modal .form-control:valid {

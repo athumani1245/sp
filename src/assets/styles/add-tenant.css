@@ -4,7 +4,7 @@
 }
 
 .add-tenant-modal .modal-header {
-    background: #dc3545;
+    background: #CC5B4B;
     color: white;
     border-bottom: none;
 }
@@ -76,7 +76,7 @@
 .add-tenant-modal .form-label:has(+ .form-control[required])::after,
 .add-tenant-modal .form-label:has(+ .form-select[required])::after {
     content: ' *';
-    color: #dc3545;
+    color: #CC5B4B;
     font-weight: bold;
 }
 
@@ -105,8 +105,8 @@
 
 /* Button styling */
 .add-tenant-modal .btn-primary {
-    background: #dc3545;
-    border: 1px solid #dc3545;
+    background: #CC5B4B;
+    border: 1px solid #CC5B4B;
     padding: 0.75rem 1.5rem;
     font-weight: 500;
     border-radius: 0.375rem;
@@ -115,8 +115,8 @@
 }
 
 .add-tenant-modal .btn-primary:hover:not(:disabled) {
-    background: #c82333;
-    border-color: #c82333;
+    background: #B84A3A;
+    border-color: #B84A3A;
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
 }
@@ -167,7 +167,7 @@
 /* Form validation styles */
 .add-tenant-modal .form-control.is-invalid,
 .add-tenant-modal .form-select.is-invalid {
-    border-color: #dc3545;
+    border-color: #CC5B4B;
 }
 
 .add-tenant-modal .form-control.is-valid,

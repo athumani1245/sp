@@ -209,13 +209,13 @@
 }
 
 .btn-outline-danger {
-    color: #dc3545;
-    border-color: #dc3545;
+    color: #CC5B4B;
+    border-color: #CC5B4B;
 }
 
 .btn-outline-danger:hover {
-    background: #dc3545;
-    border-color: #dc3545;
+    background: #CC5B4B;
+    border-color: #CC5B4B;
     color: #fff;
 }
 
@@ -233,7 +233,7 @@
 }
 
 .alert-danger {
-    background: #f8d7da;
+    background: #f5e9e7;
     color: #721c24;
 }
 

@@ -99,7 +99,7 @@
 
 .form-control:focus,
 .form-select:focus {
-    border-color: #dc3545;
+    border-color: #CC5B4B;
     box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.15);
     outline: none;
     background: #fff;
@@ -123,8 +123,8 @@
 }
 
 .input-group:focus-within .input-group-text {
-    border-color: #dc3545;
-    color: #dc3545;
+    border-color: #CC5B4B;
+    color: #CC5B4B;
     background: #fff;
 }
 
@@ -158,7 +158,7 @@
     .form-select:focus {
         transform: translateY(-1px);
         box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.15);
-        border-color: #dc3545;
+        border-color: #CC5B4B;
     }
     
     .input-group:focus-within .input-group-text {
@@ -201,15 +201,15 @@
 }
 
 .btn-primary {
-    background-color: #dc3545;
-    border-color: #dc3545;
+    background-color: #CC5B4B;
+    border-color: #CC5B4B;
     color: #fff;
 }
 
 .btn-primary:hover,
 .btn-primary:focus {
-    background-color: #c82333;
-    border-color: #c82333;
+    background-color: #B84A3A;
+    border-color: #B84A3A;
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
 }
@@ -256,7 +256,7 @@
 }
 
 .alert-danger {
-    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    background: linear-gradient(135deg, #f5e9e7 0%, #f0ddd9 100%);
     color: #721c24;
 }
 
@@ -287,7 +287,7 @@
 
 .form-section-header i {
     margin-right: 0.5rem;
-    color: #dc3545;
+    color: #CC5B4B;
 }
 
 @media (max-width: 576px) {
@@ -381,7 +381,7 @@
 .btn:focus-visible,
 .form-control:focus-visible,
 .form-select:focus-visible {
-    outline: 2px solid #dc3545;
+    outline: 2px solid #CC5B4B;
     outline-offset: 2px;
 }
 

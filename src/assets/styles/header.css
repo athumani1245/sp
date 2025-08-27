@@ -49,14 +49,14 @@
 }
 
 .mobile-nav .list-group-item.active {
-    background-color: #dc3545;
-    border-color: #dc3545;
+    background-color: #CC5B4B;
+    border-color: #CC5B4B;
     color: white;
 }
 
 .mobile-nav .list-group-item:not(.active):hover {
     background-color: #f8f9fa;
-    color: #dc3545;
+    color: #CC5B4B;
 }
 
 /* Header Layout */
@@ -99,7 +99,7 @@
 }
 
 .dropdown-item:active {
-    background-color: #dc3545;
+    background-color: #CC5B4B;
 }
 
 /* Modal Blur Effect */
@@ -127,6 +127,6 @@
 }
 
 .subscription-card.selected {
-    border-color: #dc3545;
-    box-shadow: 0 0 0 2px #dc3545;
+    border-color: #CC5B4B;
+    box-shadow: 0 0 0 2px #CC5B4B;
 }

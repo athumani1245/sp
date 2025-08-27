@@ -6,20 +6,20 @@
 }
 
 .verify-otp-header .text-brand {
-    color: #dc3545;
+    color: #CC5B4B;
     font-weight: 600;
     font-size: 1.25rem;
 }
 
 .verify-otp-header .nav-link {
-    color: #dc3545;
+    color: #CC5B4B;
     font-weight: 500;
     text-decoration: none;
     transition: all 0.2s ease;
 }
 
 .verify-otp-header .nav-link:hover {
-    color: #c82333;
+    color: #B84A3A;
     text-decoration: underline;
 }
 
@@ -57,7 +57,7 @@
 }
 
 .otp-input:focus {
-    border-color: #dc3545 !important;
+    border-color: #CC5B4B !important;
     box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25) !important;
     outline: none !important;
     background: #fff !important;
@@ -70,7 +70,7 @@
 
 .btn-verify {
     background-color: #fff !important;
-    border: 2px solid #dc3545 !important;
+    border: 2px solid #CC5B4B !important;
     color: #000 !important;
     font-weight: 500;
     height: calc(2.5rem + 2px);
@@ -81,15 +81,15 @@
 
 .btn-verify:hover,
 .btn-verify:focus {
-    background-color: #dc3545 !important;
-    border-color: #dc3545 !important;
+    background-color: #CC5B4B !important;
+    border-color: #CC5B4B !important;
     color: #fff !important;
     box-shadow: none !important;
 }
 
 .btn-verify:disabled {
     background-color: #fff !important;
-    border-color: #dc3545 !important;
+    border-color: #CC5B4B !important;
     color: #000 !important;
     opacity: 0.65;
     box-shadow: none !important;
@@ -113,7 +113,7 @@
 
 .countdown-number {
     font-weight: 700;
-    color: #dc3545;
+    color: #CC5B4B;
     font-size: 1.1em;
     display: inline-block;
     min-width: 20px;
@@ -234,7 +234,7 @@
     }
     
     .otp-input:focus {
-        border-color: #dc3545 !important;
+        border-color: #CC5B4B !important;
         box-shadow: 0 0 0 0.3rem rgba(220, 53, 69, 0.15) !important;
         background: #fff !important;
         transform: translateY(-2px);
@@ -262,15 +262,15 @@
         letter-spacing: 0.5px;
         margin-top: 1rem;
         background: #fff !important;
-        border: 2px solid #dc3545 !important;
+        border: 2px solid #CC5B4B !important;
         color: #000 !important;
         box-shadow: none !important;
         transition: all 0.3s ease;
     }
     
     .btn-verify:hover {
-        background: #dc3545 !important;
-        border-color: #dc3545 !important;
+        background: #CC5B4B !important;
+        border-color: #CC5B4B !important;
         color: #fff !important;
         box-shadow: none !important;
     }
@@ -285,11 +285,11 @@
     }
     
     .btn-link.text-danger {
-        background: rgba(220, 53, 69, 0.08);
+        background: rgba(204, 91, 75, 0.08);
     }
     
     .btn-link.text-danger:hover {
-        background: rgba(220, 53, 69, 0.15);
+        background: rgba(204, 91, 75, 0.15);
         text-decoration: underline !important;
     }
     
@@ -304,7 +304,7 @@
     }
     
     .alert-danger {
-        background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+        background: linear-gradient(135deg, #f5e9e7 0%, #f0ddd9 100%);
         color: #721c24;
     }
     
@@ -325,7 +325,7 @@
     .verify-otp-header .nav-link {
         font-size: 0.9rem;
         font-weight: 600;
-        color: #dc3545 !important;
+        color: #CC5B4B !important;
         text-decoration: none;
         padding: 0.5rem 1rem;
         border-radius: 6px;
@@ -335,7 +335,7 @@
     
     .verify-otp-header .nav-link:hover {
         background: rgba(220, 53, 69, 0.15);
-        color: #c82333 !important;
+        color: #B84A3A !important;
     }
     
     /* Hide text on very small screens */
@@ -353,7 +353,7 @@
     
     .countdown-number {
         font-weight: 700;
-        color: #dc3545;
+        color: #CC5B4B;
         font-size: 1.3em;
         display: inline-block;
         min-width: 25px;
@@ -373,13 +373,13 @@
     }
     
     .text-center a.small:hover {
-        color: #dc3545 !important;
+        color: #CC5B4B !important;
         text-decoration: underline !important;
     }
     
     /* Countdown styling */
     .text-danger.fw-bold {
-        color: #dc3545 !important;
+        color: #CC5B4B !important;
         font-size: 1.1em;
         font-weight: 700 !important;
     }

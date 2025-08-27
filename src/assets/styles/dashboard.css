@@ -23,7 +23,7 @@
 .sidebar .nav-link.active, .sidebar .nav-link:hover {
     background: #f7fafc;
     color: #000;
-    border-left: 3px solid #dc3545;
+    border-left: 3px solid #CC5B4B;
 }
 .sidebar .nav-link .badge {
     background: #f7fafc;
@@ -101,7 +101,7 @@
     margin-left: 1rem;
 }
 .record-btn {
-    background: #dc3545;
+    background: #CC5B4B;
     color: #fff;
     border: none;
     border-radius: 0;
@@ -110,7 +110,7 @@
     font-size: 1rem;
 }
 .record-btn:hover {
-    background: #c82333;
+    background: #B84A3A;
     color: #fff;
 }
 .activity-card {
@@ -151,7 +151,7 @@
     background: #e6f9f0;
 }
 .activity-card .stat-change.negative {
-    color: #dc3545;
+    color: #CC5B4B;
     background: #fbe9e6;
 }
 .tenant-table {

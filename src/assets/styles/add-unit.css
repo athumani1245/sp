@@ -121,9 +121,9 @@
 }
 
 .add-unit-modal .alert-danger {
-    background-color: #f8d7da;
+    background-color: #f5e9e7;
     color: #721c24;
-    border-left: 4px solid #dc3545;
+    border-left: 4px solid #CC5B4B;
 }
 
 .add-unit-modal .alert-success {
@@ -163,19 +163,19 @@
 
 .add-unit-modal .btn-secondary:hover:not(:disabled) {
     background-color: #f8f9fa;
-    border-color: #dc3545;
-    color: #dc3545;
+    border-color: #CC5B4B;
+    color: #CC5B4B;
 }
 
 .add-unit-modal .btn-primary {
-    background-color: #dc3545;
-    border-color: #dc3545;
+    background-color: #CC5B4B;
+    border-color: #CC5B4B;
     color: #fff;
 }
 
 .add-unit-modal .btn-primary:hover:not(:disabled) {
-    background-color: #c82333;
-    border-color: #c82333;
+    background-color: #B84A3A;
+    border-color: #B84A3A;
 }
 
 .add-unit-modal .btn:disabled {
@@ -234,7 +234,7 @@
 
 /* Form validation styles */
 .add-unit-modal .form-control:invalid {
-    border-color: #dc3545;
+    border-color: #CC5B4B;
 }
 
 .add-unit-modal .form-control:valid {

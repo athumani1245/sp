@@ -7,17 +7,17 @@
 }
 
 .auth-link {
-    color: #dc3545;
+    color: #CC5B4B;
     text-decoration: none;
 }
 
 .auth-link:hover {
-    color: #c82333;
+    color: #B84A3A;
     text-decoration: underline;
 }
 
 .text-brand {
-    color: #dc3545;
+    color: #CC5B4B;
     font-weight: 600;
     font-size: 1.25rem;
 }
@@ -50,15 +50,15 @@
 }
 
 .form-control:focus {
-    border-color: #dc3545;
+    border-color: #CC5B4B;
     box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
     outline: none;
 }
 
 .btn-submit {
     background-color: #fff !important;
-    border: 0.5px solid #dc3545 !important;
-    color: #f00101 !important;
+    border: 0.5px solid #CC5B4B !important;
+    color: #CC5B4B !important;
     font-weight: 500;
     height: calc(2.5rem + 2px);
     transition: all 0.2s ease;
@@ -68,16 +68,16 @@
 
 .btn-submit:hover,
 .btn-submit:focus {
-    background-color: #c82333;
-    border-color: #c82333;
+    background-color: #B84A3A;
+    border-color: #B84A3A;
     color: #fff;
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
 }
 
 .btn-submit:disabled {
-    background-color: #dc3545;
-    border-color: #dc3545;
+    background-color: #CC5B4B;
+    border-color: #CC5B4B;
     opacity: 0.65;
 }
 
@@ -92,25 +92,25 @@
 
 .form-control:focus + .input-group-text,
 .input-group .form-control:focus ~ .input-group-text {
-    border-color: #dc3545;
-    color: #dc3545;
+    border-color: #CC5B4B;
+    color: #CC5B4B;
 }
 
 .btn-outline-secondary {
-    border-color: #dc3545;
-    color: #dc3545;
+    border-color: #CC5B4B;
+    color: #CC5B4B;
     transition: all 0.2s ease;
 }
 
 .btn-outline-secondary:hover,
 .btn-outline-secondary:focus {
-    background-color: #dc3545;
+    background-color: #CC5B4B;
     color: #fff;
-    border-color: #dc3545;
+    border-color: #CC5B4B;
 }
 
 .text-danger {
-    color: #dc3545 !important;
+    color: #CC5B4B !important;
     text-decoration: none;
 }
 
