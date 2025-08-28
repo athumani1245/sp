@@ -219,6 +219,48 @@
     color: #fff;
 }
 
+/* Profile specific responsive enhancements */
+.profile-picture-section {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+@media (max-width: 767.98px) {
+    .profile-picture-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 1rem 0.5rem;
+    }
+    
+    .profile-picture-section .profile-image-section {
+        margin-bottom: 1rem;
+    }
+    
+    .profile-summary {
+        text-align: center;
+        width: 100%;
+    }
+}
+
+/* Mobile button group improvements */
+@media (max-width: 575.98px) {
+    .btn-group.d-flex {
+        flex-direction: column !important;
+        gap: 0.5rem !important;
+    }
+    
+    .btn-group .btn {
+        border-radius: 6px !important;
+    }
+    
+    /* Ensure account settings buttons stack properly */
+    .row .col-12:not(:last-child) {
+        margin-bottom: 0.5rem;
+    }
+}
+
 /* Alert Styles */
 .alert {
     border-radius: 6px;
@@ -264,13 +306,55 @@
     }
 }
 
-@media (max-width: 576px) {
+/* Main content responsive adjustments */
+.main-content {
+    padding: 2rem 1.5rem;
+}
+
+@media (min-width: 992px) {
     .main-content {
-        padding: 1.5rem;
+        padding: 2.5rem;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .main-content {
+        padding: 1.5rem 1rem;
+    }
+    
+    .profile-container {
+        max-width: 100%;
+    }
+    
+    .profile-card {
+        padding: 1.5rem 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .card-header .btn-group {
+        align-self: stretch;
+    }
+    
+    .card-header .btn-group .btn {
+        flex: 1;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .main-content {
+        padding: 1rem;
     }
     
     .profile-card {
         padding: 1rem;
+        border-radius: 6px;
     }
     
     .profile-image,
@@ -279,11 +363,196 @@
         height: 100px;
     }
     
+    .profile-image-placeholder {
+        font-size: 2rem;
+    }
+    
     .user-name {
         font-size: 1.2rem;
     }
     
     .page-title {
         font-size: 1.5rem;
+    }
+    
+    .page-subtitle {
+        font-size: 1rem;
+    }
+    
+    /* Stack profile sections on mobile */
+    .profile-row {
+        flex-direction: column;
+    }
+    
+    .profile-info-section {
+        margin-top: 1rem;
+    }
+    
+    /* Make buttons full width on mobile */
+    .btn-mobile-full {
+        width: 100% !important;
+        margin-bottom: 0.75rem;
+    }
+    
+    /* Optimize form layout for mobile */
+    .mobile-form-row {
+        margin-bottom: 1rem;
+    }
+    
+    .mobile-form-row .col-md-6 {
+        margin-bottom: 1rem;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .main-content {
+        padding: 0.75rem;
+    }
+    
+    .profile-header {
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+    
+    .profile-card {
+        padding: 0.75rem;
+        margin-bottom: 1rem;
+    }
+    
+    .card-title {
+        font-size: 1.1rem;
+    }
+    
+    .form-control {
+        padding: 0.6rem 0.8rem;
+        font-size: 0.9rem;
+    }
+    
+    .btn {
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
+    }
+}
+
+@media (min-width: 992px) {
+    .main-content {
+        padding: 2.5rem;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .main-content {
+        padding: 1.5rem 1rem;
+    }
+    
+    .profile-container {
+        max-width: 100%;
+    }
+    
+    .profile-card {
+        padding: 1.5rem 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .card-header .btn-group {
+        align-self: stretch;
+    }
+    
+    .card-header .btn-group .btn {
+        flex: 1;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .main-content {
+        padding: 1rem;
+    }
+    
+    .profile-card {
+        padding: 1rem;
+        border-radius: 6px;
+    }
+    
+    .profile-image,
+    .profile-image-placeholder {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .profile-image-placeholder {
+        font-size: 2rem;
+    }
+    
+    .user-name {
+        font-size: 1.2rem;
+    }
+    
+    .page-title {
+        font-size: 1.5rem;
+    }
+    
+    .page-subtitle {
+        font-size: 1rem;
+    }
+    
+    /* Stack profile sections on mobile */
+    .profile-row {
+        flex-direction: column;
+    }
+    
+    .profile-info-section {
+        margin-top: 1rem;
+    }
+    
+    /* Make buttons full width on mobile */
+    .btn-mobile-full {
+        width: 100% !important;
+        margin-bottom: 0.75rem;
+    }
+    
+    /* Optimize form layout for mobile */
+    .mobile-form-row {
+        margin-bottom: 1rem;
+    }
+    
+    .mobile-form-row .col-md-6 {
+        margin-bottom: 1rem;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .main-content {
+        padding: 0.75rem;
+    }
+    
+    .profile-header {
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+    
+    .profile-card {
+        padding: 0.75rem;
+        margin-bottom: 1rem;
+    }
+    
+    .card-title {
+        font-size: 1.1rem;
+    }
+    
+    .form-control {
+        padding: 0.6rem 0.8rem;
+        font-size: 0.9rem;
+    }
+    
+    .btn {
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
     }
 }

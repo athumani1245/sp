@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../assets/styles/profile.css";
-import Header from "../components/layout/Header";
-import Sidenav from "../components/layout/Sidenav";
+import Layout from "../components/Layout";
 import { 
     getUserProfile, 
     updateUserProfile, 
@@ -110,55 +109,6 @@ function Profile() {
         setSuccess("");
     };    
 
-    // const handleDownloadData = async () => {
-    //     setLoading(true);
-    //     setError("");
-    //     setSuccess("");
-        
-    //     try {
-    //         const result = await downloadUserData();
-    //         if (result.success) {
-    //             setSuccess(result.message || "Data downloaded successfully!");
-    //         } else {
-    //             setError(result.error);
-    //             if (result.error.includes("Session expired")) {
-    //                 navigate("/");
-    //             }
-    //         }
-    //     } catch (err) {
-    //         console.error("Download data error:", err);
-    //         setError("Failed to download user data");
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // };
-
-    // const handleDeleteAccount = async () => {
-    //     const password = prompt("Please enter your password to confirm account deletion:");
-    //     if (!password) return;
-
-    //     if (window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
-    //         setLoading(true);
-    //         setError("");
-    //         setSuccess("");
-            
-    //         try {
-    //             const result = await deleteAccount(password);
-    //             if (result.success) {
-    //                 alert("Account deleted successfully. You will be redirected to the login page.");
-    //                 localStorage.clear();
-    //                 navigate("/");
-    //             } else {
-    //                 setError(result.error);
-    //             }
-    //         } catch (err) {
-    //             console.error("Delete account error:", err);
-    //             setError("Failed to delete account");
-    //         } finally {
-    //             setLoading(false);
-    //         }
-    //     }
-    // };
 
     const handleChangePassword = () => {
         // This could open a modal or navigate to a change password page
@@ -171,13 +121,9 @@ function Profile() {
     };
 
     return (
-        <>
-            <Header />
-            <div className="container-fluid">
-                <div className="row">
-                    <Sidenav />
-                    <main className="col-md-10 main-content">
-                        <div className="profile-container">
+        <Layout>
+            <div className="main-content">
+                <div className="profile-container">
                             <div className="profile-header">
                                 <h2 className="page-title">My Profile</h2>
                                 <p className="page-subtitle">Manage your personal information and account settings</p>
@@ -186,10 +132,10 @@ function Profile() {
                             {error && <div className="alert alert-danger">{error}</div>}
                             {success && <div className="alert alert-success">{success}</div>}
 
-                            <div className="row">
+                            <div className="row profile-row">
                                 {/* Profile Picture Section */}
-                                <div className="col-md-4">
-                                    <div className="profile-card">
+                                <div className="col-12 col-md-4 col-lg-3">
+                                    <div className="profile-card profile-picture-section">
                                         <div className="profile-image-section">
                                             <div className="profile-image-container">
                                                 {userInfo.profileImage ? (
@@ -224,7 +170,7 @@ function Profile() {
                                 </div>
 
                                 {/* Profile Information Section */}
-                                <div className="col-md-8">
+                                <div className="col-12 col-md-8 col-lg-9 profile-info-section">
                                     <div className="profile-card">
                                         <div className="card-header">
                                             <h5 className="card-title">Personal Information</h5>
@@ -237,9 +183,9 @@ function Profile() {
                                                     Edit Profile
                                                 </button>
                                             ) : (
-                                                <div>
+                                                <div className="btn-group d-flex flex-column flex-sm-row gap-2">
                                                     <button
-                                                        className="btn btn-success btn-sm me-2"
+                                                        className="btn btn-success btn-sm"
                                                         onClick={handleSave}
                                                         disabled={loading}
                                                     >
@@ -314,7 +260,7 @@ function Profile() {
                                                                 className="form-control"
                                                                 id="phone"
                                                                 name="phone"
-                                                                value={userInfo.username}
+                                                                value={userInfo.phone}
                                                                 onChange={handleInputChange}
                                                                 disabled={!isEditing}
                                                             />
@@ -347,9 +293,9 @@ function Profile() {
                                             <h5 className="card-title">Account Settings</h5>
                                         </div>                                        <div className="card-body">
                                             <div className="row">
-                                                <div className="col-md-6">
+                                                <div className="col-12 col-sm-6 col-md-6">
                                                     <button 
-                                                        className="btn btn-outline-primary w-100 mb-3"
+                                                        className="btn btn-outline-primary w-100 mb-3 btn-mobile-full"
                                                         onClick={handleChangePassword}
                                                         disabled={loading}
                                                     >
@@ -357,9 +303,9 @@ function Profile() {
                                                         Change Password
                                                     </button>
                                                 </div>
-                                                <div className="col-md-6">
+                                                <div className="col-12 col-sm-6 col-md-6">
                                                     <button 
-                                                        className="btn btn-outline-secondary w-100 mb-3"
+                                                        className="btn btn-outline-secondary w-100 mb-3 btn-mobile-full"
                                                         onClick={handleNotificationSettings}
                                                         disabled={loading}
                                                     >
@@ -369,9 +315,9 @@ function Profile() {
                                                 </div>
                                             </div>
                                             <div className="row">
-                                                <div className="col-md-6">
+                                                <div className="col-12 col-sm-6 col-md-6">
                                                     <button 
-                                                        className="btn btn-outline-info w-100 mb-3"
+                                                        className="btn btn-outline-info w-100 mb-3 btn-mobile-full"
                                                         // onClick={handleDownloadData}
                                                         disabled={loading}
                                                     >
@@ -379,9 +325,9 @@ function Profile() {
                                                         {loading ? "Downloading..." : "Download My Data"}
                                                     </button>
                                                 </div>
-                                                <div className="col-md-6">
+                                                <div className="col-12 col-sm-6 col-md-6">
                                                     <button 
-                                                        className="btn btn-outline-danger w-100 mb-3"
+                                                        className="btn btn-outline-danger w-100 mb-3 btn-mobile-full"
                                                         // onClick={handleDeleteAccount}
                                                         disabled={loading}
                                                     >
@@ -395,10 +341,8 @@ function Profile() {
                                 </div>
                             </div>
                         </div>
-                    </main>
-                </div>
-            </div>
-        </>
+                    </div>
+        </Layout>
     );
 }
 
