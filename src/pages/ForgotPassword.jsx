@@ -117,7 +117,7 @@ function ForgotPassword() {
             {/* Footer */}
             <footer className="py-4 text-center">
                 <div className="text-muted small">
-                    &copy; {new Date().getFullYear()} Tanaka. All rights reserved.
+                    &copy; {new Date().getFullYear()} SmartHaven Tanzania. All rights reserved.
                 </div>
             </footer>
         </div>
