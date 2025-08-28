@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Modal, Button, Form, Alert } from "react-bootstrap";
 import "../assets/styles/profile.css";
 import Layout from "../components/Layout";
 import { 
     getUserProfile, 
-    updateUserProfile, 
- 
+    updateUserProfile,
+    changePassword
 } from "../services/profileService";
 
 function Profile() {
@@ -23,6 +24,18 @@ function Profile() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
+    
+    // Change password modal states
+    const [showPasswordModal, setShowPasswordModal] = useState(false);
+    const [passwordForm, setPasswordForm] = useState({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: ""
+    });
+    const [passwordError, setPasswordError] = useState("");
+    const [passwordSuccess, setPasswordSuccess] = useState("");
+    const [passwordLoading, setPasswordLoading] = useState(false);
+    
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -107,17 +120,99 @@ function Profile() {
         loadUserProfile(); // Reload original data
         setError("");
         setSuccess("");
+    };
+
+    const handlePasswordInputChange = (e) => {
+        const { name, value } = e.target;
+        setPasswordForm(prev => ({
+            ...prev,
+            [name]: value
+        }));
+        setPasswordError("");
+        setPasswordSuccess("");
+    };
+
+    const validatePasswordForm = () => {
+        if (!passwordForm.currentPassword) {
+            setPasswordError("Please enter your current password");
+            return false;
+        }
+        if (!passwordForm.newPassword) {
+            setPasswordError("Please enter a new password");
+            return false;
+        }
+        if (passwordForm.newPassword.length < 8) {
+            setPasswordError("New password must be at least 8 characters long");
+            return false;
+        }
+        if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+            setPasswordError("New passwords do not match");
+            return false;
+        }
+        if (passwordForm.currentPassword === passwordForm.newPassword) {
+            setPasswordError("New password must be different from current password");
+            return false;
+        }
+        return true;
+    };
+
+    const handlePasswordSubmit = async (e) => {
+        e.preventDefault();
+        
+        if (!validatePasswordForm()) {
+            return;
+        }
+
+        setPasswordLoading(true);
+        setPasswordError("");
+        
+        try {
+            const result = await changePassword(
+                passwordForm.currentPassword,
+                passwordForm.newPassword
+            );
+            
+            if (result.success) {
+                setPasswordSuccess(result.message || "Password changed successfully!");
+                setPasswordForm({
+                    currentPassword: "",
+                    newPassword: "",
+                    confirmPassword: ""
+                });
+                
+                // Close modal after 2 seconds
+                setTimeout(() => {
+                    setShowPasswordModal(false);
+                    setPasswordSuccess("");
+                }, 2000);
+            } else {
+                setPasswordError(result.error);
+                // If session expired, redirect to login
+                if (result.error.includes("Session expired")) {
+                    navigate("/");
+                }
+            }
+        } catch (err) {
+            setPasswordError("Failed to change password");
+        } finally {
+            setPasswordLoading(false);
+        }
+    };
+
+    const handleClosePasswordModal = () => {
+        setShowPasswordModal(false);
+        setPasswordForm({
+            currentPassword: "",
+            newPassword: "",
+            confirmPassword: ""
+        });
+        setPasswordError("");
+        setPasswordSuccess("");
     };    
 
 
     const handleChangePassword = () => {
-        // This could open a modal or navigate to a change password page
-        alert("Change password functionality would be implemented here. This could open a modal or navigate to a dedicated page.");
-    };
-
-    const handleNotificationSettings = () => {
-        // This could open a modal or navigate to notification settings page
-        alert("Notification settings functionality would be implemented here. This could open a modal or navigate to a dedicated page.");
+        setShowPasswordModal(true);
     };
 
     return (
@@ -305,34 +400,12 @@ function Profile() {
                                                 </div>
                                                 <div className="col-12 col-sm-6 col-md-6">
                                                     <button 
-                                                        className="btn btn-outline-secondary w-100 mb-3 btn-mobile-full"
-                                                        onClick={handleNotificationSettings}
-                                                        disabled={loading}
-                                                    >
-                                                        <i className="fas fa-bell me-2"></i>
-                                                        Notification Settings
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <div className="row">
-                                                <div className="col-12 col-sm-6 col-md-6">
-                                                    <button 
                                                         className="btn btn-outline-info w-100 mb-3 btn-mobile-full"
                                                         // onClick={handleDownloadData}
                                                         disabled={loading}
                                                     >
                                                         <i className="fas fa-download me-2"></i>
                                                         {loading ? "Downloading..." : "Download My Data"}
-                                                    </button>
-                                                </div>
-                                                <div className="col-12 col-sm-6 col-md-6">
-                                                    <button 
-                                                        className="btn btn-outline-danger w-100 mb-3 btn-mobile-full"
-                                                        // onClick={handleDeleteAccount}
-                                                        disabled={loading}
-                                                    >
-                                                        <i className="fas fa-trash me-2"></i>
-                                                        Delete Account
                                                     </button>
                                                 </div>
                                             </div>
@@ -342,6 +415,123 @@ function Profile() {
                             </div>
                         </div>
                     </div>
+            
+            {/* Change Password Modal */}
+            <Modal 
+                show={showPasswordModal} 
+                onHide={handleClosePasswordModal}
+                backdrop="static"
+                keyboard={false}
+                centered
+                className="change-password-modal"
+            >
+                <Modal.Header closeButton className="border-0">
+                    <Modal.Title className="text-center w-100 h5 fw-bold text-dark">
+                        <i className="fas fa-key me-2 text-danger"></i>
+                        Change Password
+                    </Modal.Title>
+                </Modal.Header>
+                
+                <Form onSubmit={handlePasswordSubmit}>
+                    <Modal.Body>
+                        {passwordError && (
+                            <Alert variant="danger" className="alert alert-danger">
+                                <i className="bi bi-exclamation-triangle me-2" />
+                                {passwordError}
+                            </Alert>
+                        )}
+                        
+                        {passwordSuccess && (
+                            <Alert variant="success" className="alert alert-success">
+                                <i className="bi bi-check-circle me-2" />
+                                {passwordSuccess}
+                            </Alert>
+                        )}
+
+                        <div className="mb-3">
+                            <Form.Group>
+                                <Form.Label className="form-label">Current Password *</Form.Label>
+                                <Form.Control
+                                    type="password"
+                                    name="currentPassword"
+                                    value={passwordForm.currentPassword}
+                                    onChange={handlePasswordInputChange}
+                                    placeholder="Enter your current password"
+                                    required
+                                    disabled={passwordLoading}
+                                    className="form-control"
+                                />
+                            </Form.Group>
+                        </div>
+
+                        <div className="mb-3">
+                            <Form.Group>
+                                <Form.Label className="form-label">New Password *</Form.Label>
+                                <Form.Control
+                                    type="password"
+                                    name="newPassword"
+                                    value={passwordForm.newPassword}
+                                    onChange={handlePasswordInputChange}
+                                    placeholder="Enter new password (min. 8 characters)"
+                                    required
+                                    disabled={passwordLoading}
+                                    className="form-control"
+                                    minLength="8"
+                                />
+                                <Form.Text className="text-muted">
+                                    Password must be at least 8 characters long.
+                                </Form.Text>
+                            </Form.Group>
+                        </div>
+
+                        <div className="mb-3">
+                            <Form.Group>
+                                <Form.Label className="form-label">Confirm New Password *</Form.Label>
+                                <Form.Control
+                                    type="password"
+                                    name="confirmPassword"
+                                    value={passwordForm.confirmPassword}
+                                    onChange={handlePasswordInputChange}
+                                    placeholder="Confirm your new password"
+                                    required
+                                    disabled={passwordLoading}
+                                    className="form-control"
+                                />
+                            </Form.Group>
+                        </div>
+                    </Modal.Body>
+                    
+                    <Modal.Footer className="border-0 pt-0">
+                        <Button 
+                            variant="secondary" 
+                            onClick={handleClosePasswordModal}
+                            disabled={passwordLoading}
+                            className="btn btn-secondary"
+                        >
+                            <i className="bi bi-x-circle me-2"></i>
+                            Cancel
+                        </Button>
+                        <Button 
+                            variant="primary" 
+                            type="submit"
+                            disabled={passwordLoading}
+                            className="btn btn-danger"
+                        >
+                            {passwordLoading ? (
+                                <>
+                                    <span className="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+                                    Changing Password...
+                                </>
+                            ) : (
+                                <>
+                                    <i className="fas fa-key me-2"></i>
+                                    Change Password
+                                </>
+                            )}
+                        </Button>
+                    </Modal.Footer>
+                </Form>
+            </Modal>
         </Layout>
     );
 }

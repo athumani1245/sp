@@ -98,7 +98,7 @@ export const updateUserProfile = async (profileData) => {
 // Change user password
 export const changePassword = async (currentPassword, newPassword) => {
     try {
-        const response = await axios.post(
+        const response = await axios.put(
             `${API_BASE}/profile/change-password/`,
             {
                 old_password: currentPassword,
