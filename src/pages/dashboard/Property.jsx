@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
 import Layout from "../../components/Layout";
@@ -12,8 +12,8 @@ function Property() {
     const [property, setProperty] = useState(null);
     const [units, setUnits] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [unitsLoading, setUnitsLoading] = useState(false);    const [error, setError] = useState("");
-    const [unitsError, setUnitsError] = useState("");
+    const [unitsLoading, setUnitsLoading] = useState(false);
+    const [error, setError] = useState("");
     const [pagination, setPagination] = useState({});
     const [currentPage, setCurrentPage] = useState(1);
     const [activeTab, setActiveTab] = useState("details");
@@ -65,15 +65,13 @@ function Property() {
     const [deletingUnit, setDeletingUnit] = useState(false);
 
     // Fetch property details
-    const fetchProperty = async () => {
+    const fetchProperty = useCallback(async () => {
         try {
             setLoading(true);
             setError("");
             const result = await getPropertyById(propertyId);
               if (result.success) {
                 setProperty(result.data);
-                console.log('Property data:', result.data); // Debug log
-                console.log('Address data:', result.data.address); // Debug log
                 // Populate edit data and location IDs
                 setEditData({
                     propertyName: result.data.property_name || "",
@@ -94,12 +92,11 @@ function Property() {
                 setError(result.error || "Failed to fetch property details");
             }
         } catch (error) {
-            console.error("Failed to fetch property:", error);
             setError("Failed to fetch property details");
         } finally {
             setLoading(false);
         }
-    };
+    }, [propertyId]);
 
 
     const handleDeleteUnit = (unitId) => {
@@ -135,18 +132,15 @@ function Property() {
     };
 
     // Fetch property units
-    const fetchUnits = async (page = 1) => {
+    const fetchUnits = useCallback(async (page = 1) => {
         try {
             setUnitsLoading(true);
-            setUnitsError("");
             const result = await getPropertyUnits({ 
                 property: propertyId,
                 page: page     
             });
-            console.log(result)
             
             if (result.success) {
-                console.log("Fetched units:", result.data?.items);
                 setUnits(result.data.data?.items || []);
                 setPagination({
                     current_page: result.data.current_page,
@@ -156,24 +150,21 @@ function Property() {
                     previous: result.data.previous
                 });
             } else {
-                setUnitsError(result.error || "Failed to fetch units");
                 setUnits([]);
             }
         } catch (error) {
-            console.error("Failed to fetch units:", error);
-            setUnitsError("Failed to fetch units");
             setUnits([]);
         } finally {
             setUnitsLoading(false);
         }
-    };
+    }, [propertyId]);
 
     useEffect(() => {
         if (propertyId) {
             fetchProperty();
             fetchUnits(currentPage);
         }
-    }, [propertyId]);
+    }, [propertyId, fetchProperty, fetchUnits, currentPage]);
 
     // Load location data when the component mounts or property changes
     useEffect(() => {
@@ -186,8 +177,6 @@ function Property() {
                 if (regionsResponse.success) {
                     setRegions(regionsResponse.data || []);
                 }
-                
-                // If we have a selected region, load districts
                 if (selectedRegionId) {
                     const districtsResponse = await getDistricts(selectedRegionId);
                     if (districtsResponse.success) {
@@ -321,22 +310,6 @@ function Property() {
         }
     };
 
-    const formatAddress = (address) => {
-        if (!address) return "N/A";
-        const parts = [address.street, address.ward, address.district, address.region].filter(Boolean);
-        return parts.join(", ") || "N/A";
-    };
-
-    const getStatusBadge = (status) => {
-        const statusClasses = {
-            'available': 'badge bg-success',
-            'occupied': 'badge bg-primary',
-            'maintenance': 'badge bg-warning text-dark',
-            'unavailable': 'badge bg-secondary'
-        };
-        return statusClasses[status?.toLowerCase()] || 'badge bg-secondary';
-    };
-
     // Handle input changes
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -421,15 +394,6 @@ function Property() {
         
         setError("");
         setSuccess("");
-    };
-
-    // Handle successful unit addition
-    const handleUnitAdded = (newUnit) => {
-        // Add the new unit to the existing list
-        setUnits(prev => [...prev, newUnit]);
-        setIsAddingUnit(false);
-        // Optionally refresh the units list
-        fetchUnits();
     };
 
     // Handle inline unit input changes

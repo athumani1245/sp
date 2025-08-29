@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import React, { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import Layout from "../../components/Layout";
 import AddPropertyModal from "../../components/forms/AddProperty";
 import { getProperties } from "../../services/propertyService";
@@ -26,7 +26,7 @@ function Properties() {
     fetchProperties();
   };
 
-  const fetchProperties = async () => {
+  const fetchProperties = useCallback(async () => {
     try {
       setLoading(true);
       setError("");
@@ -56,7 +56,7 @@ function Properties() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [search, page]);
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -64,7 +64,7 @@ function Properties() {
 
   useEffect(() => {
     fetchProperties();
-  }, [search, page]);
+  }, [fetchProperties]);
 
   return (
     <Layout>

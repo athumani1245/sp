@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import AddLeaseModal from "../components/forms/addLease";
@@ -29,7 +29,7 @@ function Leases() {
     };
   }, [search]);
 
-  const fetchLeases = async () => {
+    const fetchLeases = useCallback(async (page = 1, searchTerm = '', filter = '') => {
     try {
       setLoading(true);
       setError("");
@@ -48,15 +48,8 @@ function Leases() {
         params.status = status;
       }
       
-      console.log('Fetching leases with params:', params);
-      
       // Call the actual lease service
-      const result = await getLeases(params);
-      
-      console.log('Lease service result:', result);
-      
-      if (result.success) {
-        console.log('Leases data:', result.data);
+      const result = await getLeases(params);      if (result.success) {
         setLeases(result.data?.items || []);
         setPagination({
           current_page: result.data?.current_page || 1,
@@ -78,12 +71,11 @@ function Leases() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    console.log('useEffect triggered with:', { debouncedSearch, status, page });
     fetchLeases();
-  }, [debouncedSearch, status, page]);
+  }, [fetchLeases, debouncedSearch, status, page]);
 
   const handleSearch = (e) => {
     const searchValue = e.target.value;
@@ -107,15 +99,6 @@ function Leases() {
       terminated: "badge bg-secondary",
     };
     return statusClasses[status] || "badge bg-secondary";
-  };
-
-  const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
-    try {
-      return new Date(dateString).toLocaleDateString();
-    } catch (error) {
-      return 'Invalid Date';
-    }
   };
 
   const formatCurrency = (amount) => {
@@ -146,7 +129,6 @@ function Leases() {
   };
 
   const handleLeaseAdded = (newLease) => {
-    console.log('New lease added:', newLease);
     setShowAddModal(false);
     // Refresh the lease list to get the latest data from the server
     fetchLeases();
@@ -222,15 +204,6 @@ function Leases() {
           <div className="alert alert-danger" role="alert">
             <i className="bi bi-exclamation-triangle me-2"></i>
             <strong>Error:</strong> {error}
-            <details className="mt-2">
-              <summary>Debug Info</summary>
-              <small>
-                <div>API Base: {process.env.REACT_APP_API_BASE || 'Not configured'}</div>
-                <div>Current Page: {page}</div>
-                <div>Search: {search || 'None'}</div>
-                <div>Status Filter: {status || 'None'}</div>
-              </small>
-            </details>
           </div>
         )}
 

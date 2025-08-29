@@ -1,4 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
+import ErrorBoundary from './components/ErrorBoundary';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from "./pages/Dashboard";
@@ -21,12 +22,13 @@ import './App.css';
 function App() {
   return (
     <AuthProvider>
-      <div className="App">
-        <Routes>
-          {/* Public routes */}
-          <Route path="/" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
+      <ErrorBoundary>
+        <div className="App">
+          <Routes>
+            {/* Public routes */}
+            <Route path="/" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/otp-verify" element={<OtpVerify />} />
 
           {/* Protected routes */}
@@ -77,6 +79,7 @@ function App() {
           } />
         </Routes>
       </div>
+      </ErrorBoundary>
     </AuthProvider>
   );
 }

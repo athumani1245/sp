@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from "react-router-dom";
 import { Modal, Button, Form, Alert } from "react-bootstrap";
 import "../assets/styles/profile.css";
@@ -48,7 +48,9 @@ function Profile() {
 
         // Load user profile data (this would typically come from an API)
         loadUserProfile();
-    }, [navigate]);    const loadUserProfile = async () => {
+    }, [navigate, loadUserProfile]);
+
+    const loadUserProfile = useCallback(async () => {
         setLoading(true);
         try {
             const result = await getUserProfile();
@@ -72,7 +74,7 @@ function Profile() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [navigate]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -80,7 +82,9 @@ function Profile() {
             ...prev,
             [name]: value
         }));
-    };    const handleSave = async () => {
+    };
+
+    const handleSave = async () => {
         setLoading(true);
         setError("");
         setSuccess("");

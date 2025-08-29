@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Spinner, Modal } from 'react-bootstrap';
+import { Button, Modal } from 'react-bootstrap';
 import AddPayment from '../forms/addPayment';
 import { cancelPayment } from '../../services/paymentService';
 

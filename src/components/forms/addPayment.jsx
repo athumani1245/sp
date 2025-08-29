@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form, Row, Col, Alert } from 'react-bootstrap';
 import '../../assets/styles/forms-responsive.css';
-import PropTypes from 'prop-types';
 import { createPayment } from '../../services/paymentService';
 
 const AddPayment = ({ isOpen, onClose, leaseId, onPaymentAdded }) => {
@@ -93,7 +92,6 @@ const AddPayment = ({ isOpen, onClose, leaseId, onPaymentAdded }) => {
             }
         } catch (err) {
             setError('An error occurred while adding the payment');
-            console.error('Payment error:', err);
         } finally {
             setSubmitLoading(false);
         }

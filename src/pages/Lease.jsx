@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { Container, Row, Col, Button, Tab, Tabs, Alert, Spinner, Modal } from "react-bootstrap";
+import { Button, Alert, Modal } from "react-bootstrap";
 import Layout from "../components/Layout";
 import Payments from "../components/snippets/Payments";
-import { getLeaseById, getLeaseDocuments, terminateLease, renewLease } from "../services/leaseService";
+import { getLeaseById, getLeaseDocuments, terminateLease } from "../services/leaseService";
 import "../assets/styles/leases.css";
 
 function Lease() {
@@ -13,7 +13,6 @@ function Lease() {
   const [lease, setLease] = useState(null);
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [documentsLoading, setDocumentsLoading] = useState(false);
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState("details");
   const [isCancelling, setIsCancelling] = useState(false);
@@ -23,12 +22,32 @@ function Lease() {
     reason: ""
   });
 
+  const fetchLeaseDetails = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError("");
+      
+      // Call the actual lease service
+      const result = await getLeaseById(leaseId);
+      
+      if (result.success) {
+        setLease(result.data);
+      } else {
+        setError(result.error || "Failed to fetch lease details");
+      }
+      
+    } catch (error) {
+      setError("Failed to fetch lease details");
+    } finally {
+      setLoading(false);
+    }
+  }, [leaseId]);
 
   useEffect(() => {
     if (leaseId) {
       fetchLeaseDetails();
     }
-  }, [leaseId]);
+  }, [leaseId, fetchLeaseDetails]);
 
   const handleCancelClick = () => {
     setShowCancelConfirmation(true);
@@ -42,7 +61,6 @@ function Lease() {
 
     setIsCancelling(true);
     try {
-      console.log('Sending termination data:', terminationData);
       const result = await terminateLease(leaseId, terminationData);
       
       if (result.success) {
@@ -72,54 +90,20 @@ function Lease() {
     setShowCancelConfirmation(false);
   };
 
-  const fetchLeaseDetails = async () => {
-    try {
-      setLoading(true);
-      setError("");
-      
-      console.log('Fetching lease details for ID:', leaseId);
-      
-      // Call the actual lease service
-      const result = await getLeaseById(leaseId);
-      
-      console.log('Lease details result:', result);
-      
-      if (result.success) {
-        setLease(result.data);
-      } else {
-        setError(result.error || "Failed to fetch lease details");
-      }
-      
-    } catch (error) {
-      console.error("Error fetching lease details:", error);
-      setError("Failed to fetch lease details");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   // Payments are now loaded as part of lease data
 
   const fetchDocuments = async () => {
     try {
-      setDocumentsLoading(true);
-      
-      console.log('Fetching documents for lease ID:', leaseId);
-      
       // Call the actual documents service
       const result = await getLeaseDocuments(leaseId);
       
       if (result.success) {
         setDocuments(result.data || []);
       } else {
-        console.error("Failed to fetch documents:", result.error);
         setDocuments([]);
       }
     } catch (error) {
-      console.error("Error fetching documents:", error);
       setDocuments([]);
-    } finally {
-      setDocumentsLoading(false);
     }
   };
 

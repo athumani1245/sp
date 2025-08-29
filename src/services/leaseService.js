@@ -62,7 +62,6 @@ const formatDateForApi = (dateString) => {
         const [year, month, day] = dateString.split('-');
         return `${day}-${month}-${year}`;
     } catch (error) {
-        console.error("Error formatting date:", error);
         return dateString; // Return original if formatting fails
     }
 };
@@ -98,8 +97,6 @@ export const createLease = async (leaseData) => {
         // Format lease data
         const formattedData = formatLeaseData(leaseData);
         
-        console.log("Formatted Lease Data:", formattedData);
-
         const response = await axios.post(
             `${API_BASE}/leases/`,
             formattedData,

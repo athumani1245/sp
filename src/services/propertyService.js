@@ -224,10 +224,11 @@ export const getPropertyUnits = async (params = {}) => {
         
 
         const response = await axios.get(
-            `${API_BASE}/units/?${queryParams.toString()}`,
+            `${API_BASE}/units/available/?${queryParams.toString()}`,
             { headers: getAuthHeaders() }
         );
         console.log(response);
+
 
         return {
             success: true,

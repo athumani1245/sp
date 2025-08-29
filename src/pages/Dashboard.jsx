@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "../assets/styles/dashboard.css";
 import Outstanding from "../components/snippets/Outstanding";
 import Properties from "../components/snippets/Properties";
@@ -47,7 +47,6 @@ function Dashboard() {
             }
         } catch (err) {
             setError("An error occurred while loading dashboard data");
-            console.error("Dashboard error:", err);
         } finally {
             setLoading(false);
         }

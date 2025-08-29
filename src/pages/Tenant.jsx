@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
 import Layout from "../components/Layout";
@@ -16,7 +16,6 @@ function Tenant() {
     const [error, setError] = useState("");
     const [leasesError, setLeasesError] = useState("");
     const [success, setSuccess] = useState("");
-    const [leasesPagination, setLeasesPagination] = useState({});
     
     // Edit functionality states
     const [isEditing, setIsEditing] = useState(false);
@@ -35,7 +34,7 @@ function Tenant() {
     const [deletingTenant, setDeletingTenant] = useState(false);
 
     // Fetch tenant details
-    const fetchTenant = async () => {
+    const fetchTenant = useCallback(async () => {
         try {
             setLoading(true);
             setError("");
@@ -43,7 +42,6 @@ function Tenant() {
             
             if (result.success) {
                 setTenant(result.data);
-                console.log('Tenant data:', result.data);
                 
                 // Populate edit data
                 setEditData({
@@ -58,15 +56,14 @@ function Tenant() {
                 setError(result.error || "Failed to fetch tenant details");
             }
         } catch (error) {
-            console.error("Failed to fetch tenant:", error);
             setError("Failed to fetch tenant details");
         } finally {
             setLoading(false);
         }
-    };
+    }, [tenantId]);
 
     // Fetch tenant's leases
-    const fetchTenantLeases = async () => {
+    const fetchTenantLeases = useCallback(async () => {
         try {
             setLeasesLoading(true);
             setLeasesError("");
@@ -74,26 +71,24 @@ function Tenant() {
             
             if (result.success) {
                 setLeases(result.data || []);
-                setLeasesPagination(result.pagination || {});
             } else {
                 setLeasesError(result.error || "Failed to fetch tenant leases");
                 setLeases([]);
             }
         } catch (error) {
-            console.error("Failed to fetch tenant leases:", error);
             setLeasesError("Failed to fetch tenant leases");
             setLeases([]);
         } finally {
             setLeasesLoading(false);
         }
-    };
+    }, [tenantId]);
 
     useEffect(() => {
         if (tenantId) {
             fetchTenant();
             fetchTenantLeases();
         }
-    }, [tenantId]);
+    }, [tenantId, fetchTenant, fetchTenantLeases]);
 
     // Handle input changes
     const handleInputChange = (e) => {

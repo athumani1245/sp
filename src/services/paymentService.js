@@ -41,19 +41,6 @@ const handleApiError = (err, defaultMessage) => {
 ////////////////////////////////////////////// Data Validation and Handling /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Helper function to format date from YYYY-MM-DD to DD-MM-YYYY
-const formatDateForApi = (dateString) => {
-    if (!dateString) return "";
-    
-    try {
-        const [year, month, day] = dateString.split('-');
-        return `${day}-${month}-${year}`;
-    } catch (error) {
-        console.error("Error formatting date:", error);
-        return dateString;
-    }
-};
-
 // Helper function to format payment data for API
 const formatPaymentData = (paymentData) => {
     // Convert the date to dd-mm-yyyy format
@@ -82,8 +69,6 @@ export const createPayment = async (paymentData) => {
     try {
         const formattedData = formatPaymentData(paymentData);
         
-        console.log("Formatted Payment Data:", formattedData);
-
         const response = await axios.post(
             `${API_BASE}/payments/`,
             formattedData,

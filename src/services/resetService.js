@@ -39,9 +39,8 @@ export const sendOtp = async (username, navigate, setError, setLoading) => {
 // done
 export const verifyOtp = async (username, otp, setOtpError) => {
     try {
-        console.log(username, otp);
         const otp_code = otp
-        const response = await axios.post(
+        await axios.post(
             `${API_BASE}/otp/verify-otp/`,
             {
                 username,

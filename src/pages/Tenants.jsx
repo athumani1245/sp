@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Modal, Button } from 'react-bootstrap';
 import Layout from "../components/Layout";
 import AddTenantModal from "../components/forms/AddTenant";
@@ -34,7 +34,7 @@ function Tenants() {
   const [tenantToDelete, setTenantToDelete] = useState(null);
   const [deletingTenant, setDeletingTenant] = useState(false);
 
-  const fetchTenants = async () => {
+  const fetchTenants = useCallback(async () => {
     try {
       setLoading(true);
       setError("");
@@ -53,15 +53,10 @@ function Tenants() {
         params.status = status;
       }
       
-      console.log('Fetching tenants with params:', params);
-      
       // Call the tenant service
       const result = await getTenants(params);
       
-      console.log('Tenant service result:', result);
-      
       if (result.success) {
-        console.log('Tenants data:', result.data);
         setTenants(result.data?.items || []);
         setPagination({
           current_page: result.data?.current_page || 1,
@@ -83,12 +78,11 @@ function Tenants() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, search, status]);
 
   useEffect(() => {
-    console.log('useEffect triggered with:', { search, status, page });
     fetchTenants();
-  }, [search, status, page]);
+  }, [fetchTenants, search, status, page]);
 
   const handleSearch = (e) => {
     setSearch(e.target.value);

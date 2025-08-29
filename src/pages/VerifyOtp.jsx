@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { verifyOtp, sendOtp } from "../services/resetService";
-import { useNavigate } from "react-router-dom";
 import "../assets/styles/verify-otp.css";
 
 function OtpVerify() {
