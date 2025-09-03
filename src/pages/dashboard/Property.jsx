@@ -16,7 +16,7 @@ function Property() {
     const [error, setError] = useState("");
     const [pagination, setPagination] = useState({});
     const [currentPage, setCurrentPage] = useState(1);
-    const [activeTab, setActiveTab] = useState("details");
+    const [activeTab, setActiveTab] = useState("units");
     
     // Edit functionality states
     const [isEditing, setIsEditing] = useState(false);
@@ -616,20 +616,20 @@ function Property() {
                 <div className="leases-filters-section">
                     <div className="property-tabs-container">
                         <button
-                            className={`property-tab ${activeTab === 'details' ? 'active' : ''}`}
-                            onClick={() => handleTabSelect('details')}
-                        >
-                            <i className="bi bi-info-circle me-1"></i>
-                            <span className="d-none d-md-inline">Property Details</span>
-                            <span className="d-md-none">Details</span>
-                        </button>
-                        <button
                             className={`property-tab ${activeTab === 'units' ? 'active' : ''}`}
                             onClick={() => handleTabSelect('units')}
                         >
                             <i className="bi bi-door-open me-1"></i>
                             <span className="d-none d-md-inline">Units Management</span>
                             <span className="d-md-none">Units</span>
+                        </button>
+                        <button
+                            className={`property-tab ${activeTab === 'details' ? 'active' : ''}`}
+                            onClick={() => handleTabSelect('details')}
+                        >
+                            <i className="bi bi-info-circle me-1"></i>
+                            <span className="d-none d-md-inline">Property Details</span>
+                            <span className="d-md-none">Details</span>
                         </button>
                     </div>
                 </div>

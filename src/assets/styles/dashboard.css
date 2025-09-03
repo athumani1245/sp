@@ -198,6 +198,15 @@
         left: 0;
     }
 }
+
+/* Avatar styles */
+.avatar-sm {
+    width: 32px;
+    height: 32px;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
 @media (max-width: 767px) {
     .sidebar { 
         min-width: 250px; 

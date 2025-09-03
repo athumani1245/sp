@@ -17,19 +17,20 @@ function Sidenav(){
                         <i className="bi bi-building"></i> Properties
                     </NavLink>
                 </li>
-                 <li className="nav-item">
-                    <NavLink className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
-                             to="/leases">
-                        <i className="bi bi-file-earmark-text"></i> Leases
-                    </NavLink>
-                </li>
-                
                 <li className="nav-item">
                     <NavLink className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
                              to="/tenants">
                         <i className="bi bi-person"></i> Tenants
                     </NavLink>
                 </li>
+                <li className="nav-item">
+                    <NavLink className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
+                             to="/leases">
+                        <i className="bi bi-file-earmark-text"></i> Leases
+                    </NavLink>
+                </li>
+                
+                
                 {/*
                 <li className="nav-item">
                     <NavLink className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
