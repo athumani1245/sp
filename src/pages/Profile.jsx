@@ -38,18 +38,6 @@ function Profile() {
     
     const navigate = useNavigate();
 
-    useEffect(() => {
-        // Check if user is authenticated
-        const token = localStorage.getItem("token");
-        if (!token) {
-            navigate("/");
-            return;
-        }
-
-        // Load user profile data (this would typically come from an API)
-        loadUserProfile();
-    }, [navigate, loadUserProfile]);
-
     const loadUserProfile = useCallback(async () => {
         setLoading(true);
         try {
@@ -75,6 +63,18 @@ function Profile() {
             setLoading(false);
         }
     }, [navigate]);
+
+    useEffect(() => {
+        // Check if user is authenticated
+        const token = localStorage.getItem("token");
+        if (!token) {
+            navigate("/");
+            return;
+        }
+
+        // Load user profile data (this would typically come from an API)
+        loadUserProfile();
+    }, [navigate, loadUserProfile]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
