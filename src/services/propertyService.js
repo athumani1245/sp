@@ -212,6 +212,28 @@ export const deleteProperty = async (propertyId) => {
     }
 };
 
+
+//  get available units
+export const getAvailableUnits = async (params = {}) => {
+    try {
+        const queryParams = new URLSearchParams();
+
+        if (params.property) queryParams.append('property', params.property);
+
+        const response = await axios.get(
+            `${API_BASE}/units/available/?${queryParams.toString()}`,
+            { headers: getAuthHeaders() }
+        );
+
+        return {
+            success: true,
+            data: response.data.data
+        };
+    } catch (err) {
+        return handleApiError(err, "Failed to fetch available units.");
+    }
+};
+
 // Get property units
 export const getPropertyUnits = async (params = {}) => {
     try {

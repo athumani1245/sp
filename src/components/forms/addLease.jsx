@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form, Row, Col, Alert } from 'react-bootstrap';
-import { getProperties, getPropertyUnits } from '../../services/propertyService';
+import { getProperties, getAvailableUnits } from '../../services/propertyService';
 import { createLease } from '../../services/leaseService';
 import { getTenants } from '../../services/tenantService';
 import '../../assets/styles/add-lease.css';
@@ -103,14 +103,11 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
     const loadAvailableUnits = async (propertyId) => {
         try {
             setLoading(true);
-            const result = await getPropertyUnits({ property: propertyId });
+            const result = await getAvailableUnits({ property: propertyId });
             
             if (result.success) {
-                // Filter only available units (assuming units have a status field)
-                const availableUnits = result.data.filter(unit => 
-                    !unit.status || unit.status === 'available' || unit.status === 'vacant'
-                );
-                setAvailableUnits(availableUnits);
+                // No need to filter since API already returns only available units
+                setAvailableUnits(result.data);
             } else {
                 setError(result.error || 'Failed to load available units');
                 setAvailableUnits([]);
