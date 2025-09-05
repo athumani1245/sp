@@ -14,7 +14,6 @@ function Register() {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const [loading, setLoading] = useState(false);
-    const [showSuccessModal, setShowSuccessModal] = useState(false);
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -35,18 +34,29 @@ function Register() {
             'password': password,
         }
         const result = await registerUser(data);
-        if (result.success) {
-            setShowSuccessModal(true);
+
+        if (result.statusCode === 200) {
+            // Clear form data
+            setFirstName("");
+            setLastName("");
+            setEmail("");
+            setUsername("");
+            setPassword("");
+            setConfirmPassword("");
+            
+            // Show success message briefly and redirect
+            setSuccess("Registration successful! Redirecting to login...");
+            
+            // Immediate redirect
+            setTimeout(() => {
+                navigate("/", { replace: true });
+            }, 1500);
         } else {
             setError(result.error);
         }
         setLoading(false);
     };
     
-    const handleSuccessModalClose = () => {
-        setShowSuccessModal(false);
-        navigate("/");
-    };
     return (
         <div className="min-vh-100 d-flex flex-column">
             {/* Header */}
@@ -202,31 +212,6 @@ function Register() {
                     &copy; {new Date().getFullYear()} owned by AAA HOLDING COMPANY LIMITED. All rights reserved.
                 </div>
             </footer>
-
-            {/* Success Modal */}
-            {showSuccessModal && (
-                <div className="modal d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-                    <div className="modal-dialog modal-dialog-centered">
-                        <div className="modal-content">
-                            <div className="modal-body text-center p-4">
-                                <div className="mb-3">
-                                    <i className="bi bi-check-circle-fill text-success" style={{ fontSize: '3rem' }}></i>
-                                </div>
-                                <h5 className="mb-3">Registration Successful!</h5>
-                                <p className="text-muted mb-4">
-                                    Your account has been created successfully. You can now log in to access your dashboard.
-                                </p>
-                                <button 
-                                    className="btn btn-success px-4"
-                                    onClick={handleSuccessModalClose}
-                                >
-                                    Continue to Login
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 }
