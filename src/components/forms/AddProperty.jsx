@@ -1,7 +1,195 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import '../../assets/styles/add-property.css';
 import '../../assets/styles/forms-responsive.css';
 import { addProperty, getRegions, getDistricts, getWards } from '../../services/propertyService';
+
+// SearchableSelect Component
+const SearchableSelect = ({ 
+    options, 
+    value, 
+    onChange, 
+    placeholder, 
+    disabled, 
+    name,
+    getOptionLabel,
+    getOptionValue,
+    noOptionsMessage = "No options available"
+}) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filteredOptions, setFilteredOptions] = useState(options);
+    const dropdownRef = useRef(null);
+    const inputRef = useRef(null);
+
+    useEffect(() => {
+        setFilteredOptions(options);
+    }, [options]);
+
+    useEffect(() => {
+        if (searchTerm === '') {
+            setFilteredOptions(options);
+        } else {
+            const filtered = options.filter(option => 
+                getOptionLabel(option).toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            setFilteredOptions(filtered);
+        }
+    }, [searchTerm, options, getOptionLabel]);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setIsOpen(false);
+                setSearchTerm('');
+            }
+        };
+
+        const handleKeyDown = (event) => {
+            // Handle Escape key to close dropdown
+            if (event.key === 'Escape' && isOpen) {
+                event.preventDefault();
+                event.stopPropagation();
+                setIsOpen(false);
+                setSearchTerm('');
+            }
+        };
+
+        if (isOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+            document.addEventListener('keydown', handleKeyDown, true); // Use capture phase
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('keydown', handleKeyDown, true);
+        };
+    }, [isOpen]);
+
+    const handleInputClick = () => {
+        if (!disabled) {
+            setIsOpen(!isOpen);
+            if (!isOpen) {
+                setTimeout(() => inputRef.current?.focus(), 100);
+            }
+        }
+    };
+
+    const handleOptionSelect = (option) => {
+        const optionValue = getOptionValue(option);
+        onChange({ target: { name, value: optionValue } });
+        setIsOpen(false);
+        setSearchTerm('');
+    };
+
+    const getDisplayValue = () => {
+        if (!value) return '';
+        const selectedOption = options.find(option => getOptionValue(option) === value);
+        return selectedOption ? getOptionLabel(selectedOption) : '';
+    };
+
+    return (
+        <div className="searchable-select position-relative" ref={dropdownRef}>
+            <div 
+                className={`form-select d-flex align-items-center justify-content-between ${disabled ? 'disabled' : ''}`}
+                onClick={handleInputClick}
+                onKeyDown={(e) => {
+                    // Prevent Bootstrap dropdown handlers
+                    if (e.key === 'Escape' || e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                    if (e.key === 'Escape' && isOpen) {
+                        setIsOpen(false);
+                        setSearchTerm('');
+                    }
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        if (!disabled) {
+                            setIsOpen(!isOpen);
+                        }
+                    }
+                }}
+                tabIndex={disabled ? -1 : 0}
+                role="combobox"
+                aria-expanded={isOpen}
+                aria-haspopup="listbox"
+                style={{ 
+                    cursor: disabled ? 'not-allowed' : 'pointer',
+                    backgroundColor: disabled ? '#e9ecef' : 'white'
+                }}
+            >
+                <span className={!value ? 'text-muted' : ''}>
+                    {!value ? placeholder : getDisplayValue()}
+                </span>
+                <i className={`bi bi-chevron-${isOpen ? 'up' : 'down'}`}></i>
+            </div>
+            
+            {isOpen && (
+                <div 
+                    className="dropdown-menu show w-100 position-absolute"
+                    role="listbox"
+                    aria-label="Options"
+                    style={{ 
+                        zIndex: 1050, 
+                        maxHeight: '200px', 
+                        overflowY: 'auto',
+                        top: '100%',
+                        left: 0
+                    }}
+                    onKeyDown={(e) => {
+                        // Prevent Bootstrap interference at dropdown level
+                        if (e.key === 'Escape') {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setIsOpen(false);
+                            setSearchTerm('');
+                        }
+                    }}
+                >
+                    <div className="p-2 border-bottom">
+                        <input
+                            ref={inputRef}
+                            type="text"
+                            className="form-control form-control-sm"
+                            placeholder="Type to search..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            onClick={(e) => e.stopPropagation()}
+                            onKeyDown={(e) => {
+                                // Prevent Bootstrap dropdown handlers from interfering
+                                if (e.key === 'Escape') {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setIsOpen(false);
+                                    setSearchTerm('');
+                                }
+                            }}
+                        />
+                    </div>
+                    
+                    <div className="dropdown-items">
+                        {filteredOptions.length > 0 ? (
+                            filteredOptions.map((option, index) => (
+                                <div
+                                    key={getOptionValue(option)}
+                                    className={`dropdown-item ${getOptionValue(option) === value ? 'active' : ''}`}
+                                    onClick={() => handleOptionSelect(option)}
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    {getOptionLabel(option)}
+                                </div>
+                            ))
+                        ) : (
+                            <div className="dropdown-item-text text-muted">
+                                {noOptionsMessage}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
 
 
 const AddPropertyModal = ({isOpen, onClose, onPropertyAdded})=>{
@@ -59,7 +247,8 @@ const AddPropertyModal = ({isOpen, onClose, onPropertyAdded})=>{
 
     const handleRegionChange = async (e) => {
         const regionId = e.target.value;
-        const regionName = regionId ? e.target.options[e.target.selectedIndex].text : '';
+        const selectedRegion = regions.find(region => region.region_code === regionId);
+        const regionName = selectedRegion ? selectedRegion.region_name : '';
         
         setSelectedRegionId(regionId);
         setFormData(prev => ({
@@ -97,7 +286,8 @@ const AddPropertyModal = ({isOpen, onClose, onPropertyAdded})=>{
 
     const handleDistrictChange = async (e) => {
         const districtId = e.target.value;
-        const districtName = districtId ? e.target.options[e.target.selectedIndex].text : '';
+        const selectedDistrict = districts.find(district => district.district_code === districtId);
+        const districtName = selectedDistrict ? selectedDistrict.district_name : '';
         
         setSelectedDistrictId(districtId);
         setFormData(prev => ({
@@ -285,42 +475,32 @@ const AddPropertyModal = ({isOpen, onClose, onPropertyAdded})=>{
                             <div className="row mb-3">
                                 <div className="col-12 col-md-6 mb-3">
                                     <label htmlFor="region" className="form-label">Region *</label>
-                                    <select
-                                        className="form-select"
-                                        id="region"
-                                        name="region"
+                                    <SearchableSelect
+                                        options={regions}
                                         value={selectedRegionId}
                                         onChange={handleRegionChange}
-                                        required
+                                        placeholder="Select Region"
                                         disabled={locationLoading}
-                                    >
-                                        <option value="">Select Region</option>
-                                        {regions.map(region => (
-                                            <option key={region.region_code} value={region.region_code}>
-                                                {region.region_name}
-                                            </option>
-                                        ))}
-                                    </select>
+                                        name="region"
+                                        getOptionLabel={(region) => region.region_name}
+                                        getOptionValue={(region) => region.region_code}
+                                        noOptionsMessage="No regions available"
+                                    />
                                     {locationLoading && <small className="form-text text-muted">Loading regions...</small>}
                                 </div>
                                 <div className="col-12 col-md-6 mb-3">
                                     <label htmlFor="district" className="form-label">District *</label>
-                                    <select
-                                        className="form-select"
-                                        id="district"
-                                        name="district"
+                                    <SearchableSelect
+                                        options={districts}
                                         value={selectedDistrictId}
                                         onChange={handleDistrictChange}
-                                        required
+                                        placeholder="Select District"
                                         disabled={!selectedRegionId || locationLoading}
-                                    >
-                                        <option value="">Select District</option>
-                                        {districts.map(district => (
-                                            <option key={district.district_code} value={district.district_code}>
-                                                {district.district_name}
-                                            </option>
-                                        ))}
-                                    </select>
+                                        name="district"
+                                        getOptionLabel={(district) => district.district_name}
+                                        getOptionValue={(district) => district.district_code}
+                                        noOptionsMessage={!selectedRegionId ? "Please select a region first" : "No districts available"}
+                                    />
                                     {locationLoading && <small className="form-text text-muted">Loading districts...</small>}
                                 </div>
                             </div>
@@ -329,25 +509,21 @@ const AddPropertyModal = ({isOpen, onClose, onPropertyAdded})=>{
                             <div className="row mb-3">
                                 <div className="col-12 col-md-6 mb-3">
                                     <label htmlFor="ward" className="form-label">Ward</label>
-                                    <select
-                                        className="form-select"
-                                        id="ward"
-                                        name="ward"
+                                    <SearchableSelect
+                                        options={wards}
                                         value={selectedWardId}
                                         onChange={handleWardChange}
+                                        placeholder="Select Ward"
                                         disabled={!selectedDistrictId || locationLoading}
-                                    >
-                                        <option value="">Select Ward</option>
-                                        {wards.map(ward => (
-                                            <option key={ward.ward_code} value={ward.ward_code}>
-                                                {ward.ward_name}
-                                            </option>
-                                        ))}
-                                    </select>
+                                        name="ward"
+                                        getOptionLabel={(ward) => ward.ward_name}
+                                        getOptionValue={(ward) => ward.ward_code}
+                                        noOptionsMessage={!selectedDistrictId ? "Please select a district first" : "No wards available"}
+                                    />
                                     {locationLoading && <small className="form-text text-muted">Loading wards...</small>}
                                 </div>
                                 <div className="col-12 col-md-6 mb-3">
-                                    <label htmlFor="street" className="form-label">Street Address</label>
+                                    <label htmlFor="street" className="form-label">Street Address *</label>
                                     <input
                                         type="text"
                                         className="form-control"
@@ -356,37 +532,13 @@ const AddPropertyModal = ({isOpen, onClose, onPropertyAdded})=>{
                                         value={formData.street}
                                         onChange={handleInputChange}
                                         placeholder="e.g., 123 Beach Road"
+                                        required
                                     />
                                 </div>
                             </div>
 
-                            <div className="form-section-header mb-form-section">
-                                <i className="fas fa-cogs text-danger"></i>
-                                Additional Settings
-                            </div>
                             
-                            {/* Auto Generate Units */}
-                            <div className="row mb-3">
-                                <div className="col-12 mb-3">
-                                    <div className="form-check">
-                                        <input
-                                            className="form-check-input"
-                                            type="checkbox"
-                                            id="autoGenerate"
-                                            name="autoGenerate"
-                                            checked={formData.autoGenerate}
-                                            onChange={handleInputChange}
-                                        />
-                                        <label className="form-check-label" htmlFor="autoGenerate">
-                                            <i className="fas fa-magic me-2 text-primary"></i>
-                                            Auto-generate units based on floors and units per floor
-                                        </label>
-                                        <div className="form-text">
-                                            Enable this option to automatically create units when the property is saved
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            
                         </div>
                         
                         <div className="modal-footer border-0 pt-0">
