@@ -1,10 +1,198 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Modal, Button, Form, Row, Col, Alert } from 'react-bootstrap';
 import { getProperties, getAvailableUnits } from '../../services/propertyService';
 import { createLease } from '../../services/leaseService';
 import { getTenants } from '../../services/tenantService';
 import '../../assets/styles/add-lease.css';
 import '../../assets/styles/forms-responsive.css';
+
+// SearchableSelect Component
+const SearchableSelect = ({ 
+    options, 
+    value, 
+    onChange, 
+    placeholder, 
+    disabled, 
+    name,
+    getOptionLabel,
+    getOptionValue,
+    noOptionsMessage = "No options available"
+}) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filteredOptions, setFilteredOptions] = useState(options);
+    const dropdownRef = useRef(null);
+    const inputRef = useRef(null);
+
+    useEffect(() => {
+        setFilteredOptions(options);
+    }, [options]);
+
+    useEffect(() => {
+        if (searchTerm === '') {
+            setFilteredOptions(options);
+        } else {
+            const filtered = options.filter(option => 
+                getOptionLabel(option).toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            setFilteredOptions(filtered);
+        }
+    }, [searchTerm, options, getOptionLabel]);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setIsOpen(false);
+                setSearchTerm('');
+            }
+        };
+
+        const handleKeyDown = (event) => {
+            // Handle Escape key to close dropdown
+            if (event.key === 'Escape' && isOpen) {
+                event.preventDefault();
+                event.stopPropagation();
+                setIsOpen(false);
+                setSearchTerm('');
+            }
+        };
+
+        if (isOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+            document.addEventListener('keydown', handleKeyDown, true); // Use capture phase
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('keydown', handleKeyDown, true);
+        };
+    }, [isOpen]);
+
+    const handleInputClick = () => {
+        if (!disabled) {
+            setIsOpen(!isOpen);
+            if (!isOpen) {
+                setTimeout(() => inputRef.current?.focus(), 100);
+            }
+        }
+    };
+
+    const handleOptionSelect = (option) => {
+        const optionValue = getOptionValue(option);
+        onChange({ target: { name, value: optionValue } });
+        setIsOpen(false);
+        setSearchTerm('');
+    };
+
+    const getDisplayValue = () => {
+        if (!value) return '';
+        const selectedOption = options.find(option => getOptionValue(option) === value);
+        return selectedOption ? getOptionLabel(selectedOption) : '';
+    };
+
+    return (
+        <div className="searchable-select position-relative" ref={dropdownRef}>
+            <div 
+                className={`form-select d-flex align-items-center justify-content-between ${disabled ? 'disabled' : ''}`}
+                onClick={handleInputClick}
+                onKeyDown={(e) => {
+                    // Prevent Bootstrap dropdown handlers
+                    if (e.key === 'Escape' || e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                    if (e.key === 'Escape' && isOpen) {
+                        setIsOpen(false);
+                        setSearchTerm('');
+                    }
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        if (!disabled) {
+                            setIsOpen(!isOpen);
+                        }
+                    }
+                }}
+                tabIndex={disabled ? -1 : 0}
+                role="combobox"
+                aria-expanded={isOpen}
+                aria-haspopup="listbox"
+                style={{ 
+                    cursor: disabled ? 'not-allowed' : 'pointer',
+                    backgroundColor: disabled ? '#e9ecef' : 'white'
+                }}
+            >
+                <span className={!value ? 'text-muted' : ''}>
+                    {!value ? placeholder : getDisplayValue()}
+                </span>
+                {/* <i className={`bi bi-chevron-${isOpen ? 'up' : 'down'}`}></i> */}
+            </div>
+            
+            {isOpen && (
+                <div 
+                    className="dropdown-menu show w-100 position-absolute"
+                    role="listbox"
+                    aria-label="Options"
+                    style={{ 
+                        zIndex: 1050, 
+                        maxHeight: '200px', 
+                        overflowY: 'auto',
+                        top: '100%',
+                        left: 0
+                    }}
+                    onKeyDown={(e) => {
+                        // Prevent Bootstrap interference at dropdown level
+                        if (e.key === 'Escape') {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setIsOpen(false);
+                            setSearchTerm('');
+                        }
+                    }}
+                >
+                    <div className="p-2 border-bottom">
+                        <input
+                            ref={inputRef}
+                            type="text"
+                            className="form-control form-control-sm"
+                            placeholder="Type to search..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            onClick={(e) => e.stopPropagation()}
+                            onKeyDown={(e) => {
+                                // Prevent Bootstrap dropdown handlers from interfering
+                                if (e.key === 'Escape') {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setIsOpen(false);
+                                    setSearchTerm('');
+                                }
+                            }}
+                        />
+                    </div>
+                    
+                    <div className="dropdown-items">
+                        {filteredOptions.length > 0 ? (
+                            filteredOptions.map((option, index) => (
+                                <div
+                                    key={getOptionValue(option)}
+                                    className={`dropdown-item ${getOptionValue(option) === value ? 'active' : ''}`}
+                                    onClick={() => handleOptionSelect(option)}
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    {getOptionLabel(option)}
+                                </div>
+                            ))
+                        ) : (
+                            <div className="dropdown-item-text text-muted">
+                                {noOptionsMessage}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
 
 
 
@@ -355,42 +543,34 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                         <Col xs={12} md={6} className="mb-3">
                             <Form.Group>
                                 <Form.Label className="form-label">Property *</Form.Label>
-                                <Form.Select
-                                    className="form-select"
-                                    name="property_id"
+                                <SearchableSelect
+                                    options={properties}
                                     value={formData.property_id}
                                     onChange={handleInputChange}
+                                    placeholder="Select Property"
                                     disabled={loading}
-                                    required
-                                >
-                                    <option value="">Select Property</option>
-                                    {properties.map(property => (
-                                        <option key={property.id} value={property.id}>
-                                            {property.property_name}
-                                        </option>
-                                    ))}
-                                </Form.Select>
+                                    name="property_id"
+                                    getOptionLabel={(property) => property.property_name}
+                                    getOptionValue={(property) => property.id}
+                                    noOptionsMessage="No properties available"
+                                />
                             </Form.Group>
                         </Col>
                         
                         <Col xs={12} md={6} className="mb-3">
                             <Form.Group>
                                 <Form.Label className="form-label">Available Unit *</Form.Label>
-                                <Form.Select
-                                    className="form-select"
-                                    name="unit"
+                                <SearchableSelect
+                                    options={availableUnits}
                                     value={formData.unit}
                                     onChange={handleInputChange}
+                                    placeholder="Select Unit"
                                     disabled={!formData.property_id || loading}
-                                    required
-                                >
-                                    <option value="">Select Unit</option>
-                                    {availableUnits.map(unit => (
-                                        <option key={unit.id} value={unit.id}>
-                                            {unit.unit_name || unit.unit_number} - TSh {(unit.rent_per_month || unit.rent_amount || 0).toLocaleString()}/month
-                                        </option>
-                                    ))}
-                                </Form.Select>
+                                    name="unit"
+                                    getOptionLabel={(unit) => `${unit.unit_name || unit.unit_number} - TSh ${(unit.rent_per_month || unit.rent_amount || 0).toLocaleString()}/month`}
+                                    getOptionValue={(unit) => unit.id}
+                                    noOptionsMessage={!formData.property_id ? "Please select a property first" : "No available units"}
+                                />
                                 {loading && formData.property_id && (
                                     <Form.Text className="form-text">
                                         <i className="spinner-border spinner-border-sm me-1"></i>
@@ -410,21 +590,17 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                         <Col xs={12} className="mb-3">
                             <Form.Group>
                                 <Form.Label className="form-label">Select Tenant *</Form.Label>
-                                <Form.Select
-                                    className="form-select"
-                                    name="tenant_id"
+                                <SearchableSelect
+                                    options={tenants}
                                     value={formData.tenant_id}
                                     onChange={handleInputChange}
+                                    placeholder="Select Tenant"
                                     disabled={loading}
-                                    required
-                                >
-                                    <option value="">Select Tenant</option>
-                                    {tenants.map(tenant => (
-                                        <option key={tenant.id} value={tenant.id}>
-                                            {tenant.first_name} {tenant.last_name} - {tenant.username || tenant.phone}
-                                        </option>
-                                    ))}
-                                </Form.Select>
+                                    name="tenant_id"
+                                    getOptionLabel={(tenant) => `${tenant.first_name} ${tenant.last_name} - ${tenant.username || tenant.phone}`}
+                                    getOptionValue={(tenant) => tenant.id}
+                                    noOptionsMessage="No tenants available. Please add a tenant first."
+                                />
                                 {tenants.length === 0 && (
                                     <Form.Text className="form-text text-warning">
                                         <i className="bi bi-info-circle me-1"></i>

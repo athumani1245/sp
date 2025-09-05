@@ -916,7 +916,7 @@ function Property() {
                                         value={newUnitData.rent_per_month}
                                         onChange={handleNewUnitChange}
                                         onKeyPress={handleUnitKeyPress}
-                                        placeholder="Rent amount *"
+                                        placeholder="Rent per month *"
                                         disabled={addingUnitLoading}
                                     />
                                 </div>
@@ -994,7 +994,7 @@ function Property() {
                                                             onChange={handleEditUnitChange}
                                                             onKeyPress={handleEditUnitKeyPress}
                                                             disabled={updatingUnit}
-                                                            placeholder="Rent amount"
+                                                            placeholder="Rent per month"
                                                         />
                                                     ) : (
                                                         <span className="unit-rent-amount">
@@ -1081,7 +1081,7 @@ function Property() {
                                                         value={newUnitData.rent_per_month}
                                                         onChange={handleNewUnitChange}
                                                         onKeyPress={handleUnitKeyPress}
-                                                        placeholder="Rent amount *"
+                                                        placeholder="Rent per month *"
                                                         disabled={addingUnitLoading}
                                                     />
                                                 </div>
@@ -1118,7 +1118,7 @@ function Property() {
                                         <thead className="table-light">
                                             <tr>
                                                 <th>Unit Name</th>
-                                                <th>Rent Amount</th>
+                                                <th>Rent per Month</th>
                                                 <th>Status</th>
                                                 <th>Actions</th>
                                             </tr>
@@ -1154,7 +1154,7 @@ function Property() {
                                                                 onChange={handleEditUnitChange}
                                                                 onKeyPress={handleEditUnitKeyPress}
                                                                 disabled={updatingUnit}
-                                                                placeholder="Rent amount"
+                                                                placeholder="Rent per month"
                                                             />
                                                         ) : (
                                                             <span className="fw-semibold text-success">
@@ -1240,7 +1240,7 @@ function Property() {
                                                             value={newUnitData.rent_per_month}
                                                             onChange={handleNewUnitChange}
                                                             onKeyPress={handleUnitKeyPress}
-                                                            placeholder="Rent amount *"
+                                                            placeholder="Rent per month *"
                                                             disabled={addingUnitLoading}
                                                         />
                                                     </td>
