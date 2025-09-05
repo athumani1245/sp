@@ -64,6 +64,10 @@ function Property() {
     const [unitToDelete, setUnitToDelete] = useState(null);
     const [deletingUnit, setDeletingUnit] = useState(false);
 
+    // Error notification modal states
+    const [showErrorModal, setShowErrorModal] = useState(false);
+    const [errorModalMessage, setErrorModalMessage] = useState("");
+
     // Fetch property details
     const fetchProperty = useCallback(async () => {
         try {
@@ -115,12 +119,14 @@ function Property() {
                 setShowDeleteModal(false);
                 setUnitToDelete(null);
             } else {
-                console.error("Failed to delete unit:", result.error);
-                setError("Failed to delete unit");
+                    setErrorModalMessage("Cannot delete unit because it has an active lease.");
+                setShowErrorModal(true);
             }
         } catch (error) {
             console.error("Error deleting unit:", error);
             setError("Failed to delete unit");
+            setShowDeleteModal(false);
+            setUnitToDelete(null);
         } finally {
             setDeletingUnit(false);
         }
@@ -129,6 +135,11 @@ function Property() {
     const cancelDeleteUnit = () => {
         setShowDeleteModal(false);
         setUnitToDelete(null);
+    };
+
+    const closeErrorModal = () => {
+        setShowErrorModal(false);
+        setErrorModalMessage("");
     };
 
     // Fetch property units
@@ -1325,6 +1336,24 @@ function Property() {
                     </Button>
                 </Modal.Footer>
             </Modal>
+
+        {/* Error Notification Modal */}
+        <Modal show={showErrorModal} onHide={closeErrorModal} centered>
+            <Modal.Header closeButton>
+                <Modal.Title>
+                    <i className="bi bi-exclamation-triangle text-warning me-2"></i>
+                    Cannot Delete Unit
+                </Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                <p className="mb-0">{errorModalMessage}</p>
+            </Modal.Body>
+            <Modal.Footer>
+                <Button variant="primary" onClick={closeErrorModal}>
+                    OK
+                </Button>
+            </Modal.Footer>
+        </Modal>
             </div>
         </Layout>
     );
