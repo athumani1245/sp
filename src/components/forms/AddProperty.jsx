@@ -462,6 +462,7 @@ const AddPropertyModal = ({isOpen, onClose, onPropertyAdded})=>{
                                     >
                                         <option value="Standalone">Standalone</option>
                                         <option value="Apartment">Apartment</option>
+                                        <option value="Commercial building">Commercial building</option>
                                     </select>
                                 </div>
                             </div>
