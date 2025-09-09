@@ -428,7 +428,7 @@ function Tenants() {
                           </div>
                         </td>
                         <td>
-                          <div className="contact-info">
+                          <div>
                             {editingTenantId === tenant.id ? (
                               <div>
                                 <input
@@ -443,8 +443,7 @@ function Tenants() {
                                 />
                               </div>
                             ) : (
-                              <span className="phone text-muted">
-                                <i className="bi bi-telephone me-1"></i>
+                              <span className="text-muted">
                                 {formatPhone(tenant.username) || 'No phone'}
                               </span>
                             )}

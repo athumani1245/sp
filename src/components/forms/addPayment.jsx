@@ -10,7 +10,7 @@ const AddPayment = ({ isOpen, onClose, leaseId, onPaymentAdded }) => {
     const [success, setSuccess] = useState('');
     const [formData, setFormData] = useState({
         amount_paid: '',
-        date_paid: new Date().toISOString().slice(0, 16), // Format: YYYY-MM-DDThh:mm
+        date_paid: new Date().toISOString().slice(0, 10), // Format: YYYY-MM-DD
         category: 'RENT'
     });
 
@@ -24,7 +24,7 @@ const AddPayment = ({ isOpen, onClose, leaseId, onPaymentAdded }) => {
     const resetForm = () => {
         setFormData({
             amount_paid: '',
-            date_paid: new Date().toISOString().slice(0, 16),
+            date_paid: new Date().toISOString().slice(0, 10),
             category: 'RENT'
         });
         setError('');
@@ -58,7 +58,7 @@ const AddPayment = ({ isOpen, onClose, leaseId, onPaymentAdded }) => {
             return false;
         }
         if (!formData.date_paid) {
-            setError('Please select the payment date and time');
+            setError('Please select the payment date');
             return false;
         }
         if (parseFloat(formData.amount_paid) <= 0) {
@@ -168,10 +168,10 @@ const AddPayment = ({ isOpen, onClose, leaseId, onPaymentAdded }) => {
                         </Col>
                         <Col xs={12} md={6} className="mb-3">
                             <Form.Group>
-                                <Form.Label className="form-label">Payment Date & Time *</Form.Label>
+                                <Form.Label className="form-label">Payment Date *</Form.Label>
                                 <Form.Control
                                     className="form-control"
-                                    type="datetime-local"
+                                    type="date"
                                     name="date_paid"
                                     value={formData.date_paid}
                                     onChange={handleInputChange}
@@ -196,6 +196,7 @@ const AddPayment = ({ isOpen, onClose, leaseId, onPaymentAdded }) => {
                                     <option value="WATER">Water</option>
                                     <option value="ELECTRICITY">Electricity</option>
                                     <option value="SERVICE_CHARGE">Service Charge</option>
+                                    <option value="Security Deposit">Security Deposit</option>
                                     <option value="OTHER">Other</option>
                                 </Form.Select>
                             </Form.Group>
