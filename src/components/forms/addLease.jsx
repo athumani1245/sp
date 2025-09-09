@@ -3,6 +3,7 @@ import { Modal, Button, Form, Row, Col, Alert } from 'react-bootstrap';
 import { getProperties, getAvailableUnits } from '../../services/propertyService';
 import { createLease } from '../../services/leaseService';
 import { getTenants } from '../../services/tenantService';
+import { formatNumberWithCommas, parseFormattedNumber } from '../../utils/formatUtils';
 import '../../assets/styles/add-lease.css';
 import '../../assets/styles/forms-responsive.css';
 
@@ -331,10 +332,22 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
+        
+        // Handle monetary fields with comma formatting
+        const monetaryFields = ['rent_amount_per_unit', 'amount_paid', 'discount'];
+        
+        if (monetaryFields.includes(name)) {
+            const rawValue = parseFormattedNumber(value);
+            setFormData(prev => ({
+                ...prev,
+                [name]: rawValue
+            }));
+        } else {
+            setFormData(prev => ({
+                ...prev,
+                [name]: value
+            }));
+        }
 
         // Clear previous errors
         setError('');
@@ -399,8 +412,9 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
 
         // Calculate total amount when monthly rent changes
         if (name === 'rent_amount_per_unit') {
-            if (value && formData.number_of_month) {
-                const totalAmount = calculateTotalAmount(value, formData.number_of_month);
+            const rawValue = parseFormattedNumber(value);
+            if (rawValue && formData.number_of_month) {
+                const totalAmount = calculateTotalAmount(rawValue, formData.number_of_month);
                 setFormData(prev => ({ ...prev, total_amount: totalAmount }));
             }
         }
@@ -676,12 +690,11 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                                 <Form.Label className="form-label">Monthly Rent (TSh) *</Form.Label>
                                 <Form.Control
                                     className="form-control"
-                                    type="number"
+                                    type="text"
                                     name="rent_amount_per_unit"
-                                    value={formData.rent_amount_per_unit}
+                                    value={formatNumberWithCommas(formData.rent_amount_per_unit)}
                                     onChange={handleInputChange}
                                     placeholder="0"
-                                    step="0.01"
                                     required
                                 />
                             </Form.Group>
@@ -692,9 +705,9 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                                 <Form.Label className="form-label">Total Amount (TSh)</Form.Label>
                                 <Form.Control
                                     className="form-control"
-                                    type="number"
+                                    type="text"
                                     name="total_amount"
-                                    value={formData.total_amount}
+                                    value={formatNumberWithCommas(formData.total_amount)}
                                     readOnly
                                     style={{backgroundColor: '#f8f9fa', cursor: 'not-allowed'}}
                                 />
@@ -710,12 +723,11 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                                 <Form.Label className="form-label">Paid Amount (TSh)</Form.Label>
                                 <Form.Control
                                     className="form-control"
-                                    type="number"
+                                    type="text"
                                     name="amount_paid"
-                                    value={formData.amount_paid}
+                                    value={formatNumberWithCommas(formData.amount_paid)}
                                     onChange={handleInputChange}
                                     placeholder="0"
-                                    step="0.01"
                                 />
                             </Form.Group>
                         </Col>
@@ -726,12 +738,11 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                                 <Form.Label className="form-label">Discount (TSh)</Form.Label>
                                 <Form.Control
                                     className="form-control"
-                                    type="number"
+                                    type="text"
                                     name="discount"
-                                    value={formData.discount}
+                                    value={formatNumberWithCommas(formData.discount)}
                                     onChange={handleInputChange}
                                     placeholder="0"
-                                    step="0.01"
                                 />
                                 <Form.Text className="form-text">
                                     Optional discount amount

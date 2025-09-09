@@ -13,6 +13,7 @@ import Lease from "./pages/Lease";
 import Tenants from "./pages/Tenants";
 import Tenant from "./pages/Tenant";
 import Profile from './pages/Profile';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 import PrivateRoute from './components/PrivateRoute';
 import { AuthProvider } from './context/AuthContext';
 import './App.css';
@@ -29,6 +30,7 @@ function App() {
             <Route path="/" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/otp-verify" element={<OtpVerify />} />
 
           {/* Protected routes */}

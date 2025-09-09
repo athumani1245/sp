@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form, Row, Col, Alert } from 'react-bootstrap';
 import '../../assets/styles/forms-responsive.css';
 import { createPayment } from '../../services/paymentService';
+import { formatNumberWithCommas, parseFormattedNumber } from '../../utils/formatUtils';
 
 const AddPayment = ({ isOpen, onClose, leaseId, onPaymentAdded }) => {
     const [submitLoading, setSubmitLoading] = useState(false);
@@ -32,10 +33,21 @@ const AddPayment = ({ isOpen, onClose, leaseId, onPaymentAdded }) => {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prevState => ({
-            ...prevState,
-            [name]: value
-        }));
+        
+        if (name === 'amount_paid') {
+            // Handle monetary input with comma formatting
+            const rawValue = parseFormattedNumber(value);
+            setFormData(prevState => ({
+                ...prevState,
+                [name]: rawValue
+            }));
+        } else {
+            setFormData(prevState => ({
+                ...prevState,
+                [name]: value
+            }));
+        }
+        
         setError('');
         setSuccess('');
     };
@@ -144,14 +156,12 @@ const AddPayment = ({ isOpen, onClose, leaseId, onPaymentAdded }) => {
                                     <span className="input-group-text">TSh</span>
                                     <Form.Control
                                         className="form-control"
-                                        type="number"
+                                        type="text"
                                         name="amount_paid"
-                                        value={formData.amount_paid}
+                                        value={formatNumberWithCommas(formData.amount_paid)}
                                         onChange={handleInputChange}
-                                        placeholder="0.00"
+                                        placeholder="0"
                                         required
-                                        min="0"
-                                        step="0.01"
                                     />
                                 </div>
                             </Form.Group>

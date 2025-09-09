@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import '../../assets/styles/add-unit.css';
 import { addPropertyUnit } from '../../services/propertyService';
+import { formatNumberWithCommas, parseFormattedNumber } from '../../utils/formatUtils';
 
 const AddUnitModal = ({ isOpen, onClose, onUnitAdded, propertyId }) => {
     const [formData, setFormData] = useState({
@@ -20,10 +21,20 @@ const AddUnitModal = ({ isOpen, onClose, onUnitAdded, propertyId }) => {
 
     const handleInputChange = (e) => {
         const { name, value, type } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: type === 'number' ? (value === '' ? '' : Number(value)) : value
-        }));
+        
+        if (name === 'rentAmount') {
+            // Handle monetary input with comma formatting
+            const rawValue = parseFormattedNumber(value);
+            setFormData(prev => ({
+                ...prev,
+                [name]: rawValue
+            }));
+        } else {
+            setFormData(prev => ({
+                ...prev,
+                [name]: type === 'number' ? (value === '' ? '' : Number(value)) : value
+            }));
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -235,14 +246,13 @@ const AddUnitModal = ({ isOpen, onClose, onUnitAdded, propertyId }) => {
                                     <div className="mb-3">
                                         <label htmlFor="rentAmount" className="form-label">Rent Amount (TSh)</label>
                                         <input
-                                            type="number"
+                                            type="text"
                                             className="form-control"
                                             id="rentAmount"
                                             name="rentAmount"
-                                            value={formData.rentAmount}
+                                            value={formatNumberWithCommas(formData.rentAmount)}
                                             onChange={handleInputChange}
                                             placeholder="Monthly rent amount"
-                                            min="0"
                                         />
                                     </div>
                                 </div>
