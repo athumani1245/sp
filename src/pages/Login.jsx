@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import PhoneInput from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
 import "../assets/styles/login.css";
 import { login as loginService } from "../services/authService";
 import { useAuth } from "../context/AuthContext";
-
 function Login() {
-    const [username, setUsername] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
@@ -29,7 +30,7 @@ function Login() {
         setLoading(true);
 
         try {
-            const result = await loginService(username, password);
+            const result = await loginService(phoneNumber, password);
             if (result.success) {
                 // Update auth context
                 login(result.token, result.user);
@@ -76,16 +77,15 @@ function Login() {
                             )}
                             <form onSubmit={handleSubmit}>
                                 <div className="mb-3">
-                                    <div className="input-group">
-                                        <span className="input-group-text">
-                                            <i className="bi bi-person"></i>
-                                        </span>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            placeholder="Phone number"
-                                            value={username}
-                                            onChange={e => setUsername(e.target.value)}
+                                    <div className="phone-input-wrapper">
+                                        <PhoneInput
+                                            international
+                                            countryCallingCodeEditable={false}
+                                            defaultCountry="TZ"
+                                            value={phoneNumber}
+                                            onChange={setPhoneNumber}
+                                            className="phone-input-custom"
+                                            placeholder="Enter phone number"
                                             required
                                         />
                                     </div>
@@ -95,6 +95,7 @@ function Login() {
                                         <span className="input-group-text">
                                             <i className="bi bi-key"></i>
                                         </span>
+
                                         <input
                                             type={showPassword ? "text" : "password"}
                                             className="form-control"
