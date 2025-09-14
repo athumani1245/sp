@@ -50,30 +50,42 @@ function OtpVerify() {
         setOtpError("");
         setOtpLoading(true);
 
-        await verifyOtp(username, otp.join(""), setOtpError, navigate);
+        try {
+            const result = await verifyOtp(username, otp.join(""), setOtpError);
+            if (result.status === true && result.statusCode === 200) {
+                // Extract token from the response data
+                const token = result.data?.token;
+                
+                // Navigate to reset password page with username and token
+                navigate("/reset-password", {
+                    state: {
+                        username: username,
+                        token: token
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('OTP verification error:', error);
+        }
+
         setOtpLoading(false);
     };
 
     const handleResendOtp = async () => {
         if (!canResend) return;
-        
+
         setResendLoading(true);
         setOtpError("");
-        
+
         try {
             await sendOtp(username, navigate, setOtpError, setResendLoading);
-            // Reset timer
-            setCountdown(60);
-            setCanResend(false);
-            // Clear OTP inputs
-            setOtp(["", "", "", ""]);
-            inputRefs[0].current.focus();
         } catch (error) {
             console.error('Resend OTP error:', error);
         }
-        
+
         setResendLoading(false);
     };
+
 
     return (
         <div className="min-vh-100 d-flex flex-column">

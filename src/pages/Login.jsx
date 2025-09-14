@@ -19,10 +19,9 @@ function Login() {
     const { isAuthenticated } = useAuth();
     useEffect(() => {
         if (isAuthenticated) {
-            const from = location.state?.from?.pathname || "/dashboard";
-            navigate(from);
+            navigate("/dashboard");
         }
-    }, [isAuthenticated, navigate, location]);
+    }, [isAuthenticated, navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -35,9 +34,8 @@ function Login() {
                 // Update auth context
                 login(result.token, result.user);
                 
-                // Navigate to the page user tried to access or dashboard
-                const from = location.state?.from?.pathname || "/dashboard";
-                navigate(from, { replace: true });
+                // Always navigate to dashboard
+                navigate("/dashboard", { replace: true });
             } else {
                 setError(result.error || "Login failed");
             }

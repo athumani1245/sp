@@ -202,6 +202,91 @@
 }
 
 /* Phone input styling */
+.add-tenant-modal .phone-input-wrapper {
+    position: relative;
+}
+
+.add-tenant-modal .phone-input-custom {
+    width: 100%;
+}
+
+.add-tenant-modal .phone-input-custom .PhoneInputInput {
+    height: calc(2.5rem + 2px);
+    font-size: 0.95rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid #ced4da;
+    border-left: none;
+    border-radius: 0 4px 4px 0;
+    transition: all 0.2s ease;
+}
+
+.add-tenant-modal .phone-input-custom .PhoneInputInput:focus {
+    border-color: #CC5B4B;
+    box-shadow: 0 0 0 0.25rem rgba(204, 91, 75, 0.25);
+    outline: none;
+}
+
+.add-tenant-modal .phone-input-custom .PhoneInputCountrySelect {
+    border: 1px solid #ced4da;
+    border-right: none;
+    background-color: #f8f9fa;
+    height: calc(2.5rem + 2px);
+    border-radius: 4px 0 0 4px;
+    padding: 0 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.add-tenant-modal .phone-input-custom .PhoneInputCountrySelect:focus {
+    border-color: #CC5B4B;
+    outline: none;
+}
+
+.add-tenant-modal .phone-input-custom .PhoneInputCountrySelect:focus + .PhoneInputInput {
+    border-left-color: #CC5B4B;
+}
+
+.add-tenant-modal .phone-input-custom .PhoneInputCountrySelectArrow {
+    color: #6c757d;
+    margin-left: 0.25rem;
+}
+
+/* Flag icons styling */
+.add-tenant-modal .phone-input-custom .PhoneInputCountryIcon {
+    width: 1.2rem;
+    height: auto;
+    margin-right: 0.25rem;
+}
+
+/* Mobile responsive styles for PhoneInput */
+@media (max-width: 768px) {
+    .add-tenant-modal .phone-input-custom .PhoneInputInput {
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: 0.75rem;
+    }
+    
+    .add-tenant-modal .phone-input-custom .PhoneInputCountrySelect {
+        padding: 0 0.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .add-tenant-modal .phone-input-custom .PhoneInputInput {
+        font-size: 16px;
+        height: calc(2.75rem + 2px);
+        padding: 0.875rem;
+    }
+    
+    .add-tenant-modal .phone-input-custom .PhoneInputCountrySelect {
+        height: calc(2.75rem + 2px);
+        padding: 0 0.75rem;
+    }
+    
+    .add-tenant-modal .phone-input-custom .PhoneInputCountryIcon {
+        width: 1.5rem;
+    }
+}
+
+/* Old phone input styles - keeping for backward compatibility but will be overridden by PhoneInput */
 .add-tenant-modal .phone-input-group .phone-flag {
     background: #f8f9fa;
     border: 1px solid #d1d5db;

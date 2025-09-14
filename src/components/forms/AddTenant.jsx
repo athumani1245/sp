@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form, Row, Col, Alert } from 'react-bootstrap';
 import PropTypes from 'prop-types';
+import PhoneInput from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
 import { createTenant } from '../../services/tenantService';
 import '../../assets/styles/add-tenant.css';
 import '../../assets/styles/forms-responsive.css';
@@ -11,6 +13,7 @@ const AddTenantModal = ({ isOpen, onClose, onTenantAdded }) => {
         last_name: '',
         username: '', // will hold phone number
     });
+    const [phoneNumber, setPhoneNumber] = useState('');
 
     const [submitLoading, setSubmitLoading] = useState(false);
     const [error, setError] = useState('');
@@ -29,24 +32,27 @@ const AddTenantModal = ({ isOpen, onClose, onTenantAdded }) => {
             last_name: '',
             username: '',
         });
+        setPhoneNumber('');
         setError('');
         setSuccess('');
     };
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        // For phone input, store in username
-        if (name === 'phone') {
-            setFormData(prev => ({
-                ...prev,
-                username: value
-            }));
-        } else {
-            setFormData(prev => ({
-                ...prev,
-                [name]: value
-            }));
-        }
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+        setError('');
+        setSuccess('');
+    };
+
+    const handlePhoneChange = (value) => {
+        setPhoneNumber(value);
+        setFormData(prev => ({
+            ...prev,
+            username: value || ''
+        }));
         setError('');
         setSuccess('');
     };
@@ -63,9 +69,9 @@ const AddTenantModal = ({ isOpen, onClose, onTenantAdded }) => {
                 return false;
             }
         }
-        // Validate phone number format (basic)
-        if (!/^0\d{9}$/.test(formData.username)) {
-            setError('Phone number must be 10 digits and start with 0');
+        // Validate phone number format (international)
+        if (!phoneNumber || phoneNumber.length < 10) {
+            setError('Please enter a valid phone number');
             return false;
         }
         return true;
@@ -180,16 +186,18 @@ const AddTenantModal = ({ isOpen, onClose, onTenantAdded }) => {
                         <Col xs={12} md={6} className="mb-3">
                             <Form.Group>
                                 <Form.Label className="form-label">Phone Number *</Form.Label>
-                                <Form.Control
-                                    className="form-control"
-                                    type="tel"
-                                    name="phone"
-                                    value={formData.username}
-                                    onChange={handleInputChange}
-                                    placeholder="0712345678"
-                                    required
-                                />
-                               
+                                <div className="phone-input-wrapper">
+                                    <PhoneInput
+                                        international
+                                        countryCallingCodeEditable={false}
+                                        defaultCountry="TZ"
+                                        value={phoneNumber}
+                                        onChange={handlePhoneChange}
+                                        className="phone-input-custom"
+                                        placeholder="Enter phone number"
+                                        required
+                                    />
+                                </div>
                             </Form.Group>
                         </Col>
                         <Col xs={12} md={6} className="mb-3">

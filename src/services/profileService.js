@@ -113,7 +113,7 @@ export const changePassword = async (currentPassword, newPassword) => {
     } catch (err) {
         const errorResponse = handleApiError(err, "Failed to change password.");
         if (err.response?.status === 400) {
-            errorResponse.error = "Current password is incorrect.";
+            errorResponse.error = err.response?.description || errorResponse.error;
         }
         return errorResponse;
     }

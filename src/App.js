@@ -1,9 +1,11 @@
 import { Routes, Route } from 'react-router-dom';
 import ErrorBoundary from './components/ErrorBoundary';
+import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from "./pages/Dashboard";
 import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/resetPassword";
 import OtpVerify from "./pages/VerifyOtp";
 import Home from "./pages/Home";
 import Properties from "./pages/dashboard/Properties";
@@ -27,9 +29,11 @@ function App() {
         <div className="App">
           <Routes>
             {/* Public routes */}
-            <Route path="/" element={<Login />} />
+            <Route path="/" element={<Landing />} />
+            <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/otp-verify" element={<OtpVerify />} />
 

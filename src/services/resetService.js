@@ -40,7 +40,7 @@ export const sendOtp = async (username, navigate, setError, setLoading) => {
 export const verifyOtp = async (username, otp, setOtpError) => {
     try {
         const otp_code = otp
-        await axios.post(
+        const response = await axios.post(
             `${API_BASE}/otp/verify-otp/`,
             {
                 username,
@@ -52,11 +52,52 @@ export const verifyOtp = async (username, otp, setOtpError) => {
                 }
             }
         )
+        // Return the actual API response structure
+        return response.data;
     }
     catch (err) {
         console.log(err);
         if (err.response?.data?.description) {
             setOtpError(err.response.data.description);
         }
+        // Return error response structure similar to API
+        return {
+            status: false,
+            statusCode: err.response?.status || 500,
+            description: err.response?.data?.description || 'OTP verification failed'
+        };
     }
 }
+
+// Reset Password
+export const resetPassword = async (newPassword, token) => {
+    try {
+        const headers = {
+            'Content-Type': 'application/json'
+        };
+        
+        
+        
+        const response = await axios.post(
+            `${API_BASE}/reset-password/`,
+            {
+                token,
+                new_password: newPassword
+            },
+            { headers }
+        );
+        
+        return {
+            success: true,
+            message: response.data.message || 'Password reset successfully'
+        };
+    } catch (err) {
+        console.error('Error resetting password:', err);
+        return {
+            success: false,
+            error: err.response?.data?.error || err.response?.data?.description || 'Failed to reset password'
+        };
+    }
+};
+
+
