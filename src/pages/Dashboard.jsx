@@ -123,7 +123,6 @@ function Dashboard() {
                             Hello, {userProfile.first_name ? `${userProfile.first_name} ${userProfile.last_name}` : 'User'}
                         </h2>
                     </div>
-                    <button className="record-btn"><i className="bi bi-plus-lg me-2"></i>Add</button>
                 </div>
                 <div className="mb-4">
                     {loading ? (
