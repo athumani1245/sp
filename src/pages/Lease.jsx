@@ -348,7 +348,7 @@ function Lease() {
                 <li>Tenant: {lease.tenant.first_name} {lease.tenant.last_name}</li>
                 <li>Property: {lease.property.property_name}</li>
                 <li>Unit: {getUnitInfo(lease)}</li>
-                <li>Duration: {lease.lease_months} months</li>
+                <li>Duration: {lease.number_of_month} months</li>
               </ul>
             </div>
 
@@ -422,7 +422,7 @@ function Lease() {
             >
               <i className="bi bi-credit-card me-1"></i>
               <span className="d-none d-md-inline">Payments</span>
-              <span className="d-md-none">Pay</span>
+              <span className="d-md-none">Payments</span>
             </button>
           </div>
         </div>

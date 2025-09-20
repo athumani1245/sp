@@ -120,15 +120,23 @@ export const createSubscription = async (subscriptionData) => {
         const formattedData = formatSubscriptionData(subscriptionData);
         
         const response = await axios.post(
-            `${API_BASE}/subscriptions/`,
+            `${API_BASE}/subscribe/initiate/`,
             formattedData,
             { headers: getAuthHeaders() }
         );
 
+        // Handle different response scenarios
+        // If status is 200, check if it requires user action (phone prompt)
+        const responseData = response.data;
+        
         return {
             success: true,
-            data: response.data.data,
-            message: "Subscription created successfully!"
+            data: responseData.data,
+            description: responseData.description || responseData.message,
+            message: responseData.message || "Subscription initiated successfully!",
+            status: response.status,
+            transactionId: responseData.transaction_id || responseData.data?.transaction_id || responseData.data?.id,
+            requiresUserAction: response.status === 200 && responseData.description
         };
     } catch (err) {
         return handleApiError(err, "Failed to create subscription.");
@@ -316,5 +324,167 @@ export const updateBillingInfo = async (billingData) => {
         };
     } catch (err) {
         return handleApiError(err, "Failed to update billing information.");
+    }
+};
+
+////////////////////////////////////////////// Payment Status Monitoring //////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Global storage for active payment listeners
+const activePaymentListeners = new Map();
+
+// Check payment status for a specific transaction
+export const checkPaymentStatus = async (transactionId) => {
+    try {
+        const response = await axios.get(
+            `${API_BASE}/payments/status/${transactionId}/`,
+            { headers: getAuthHeaders() }
+        );
+
+        const statusData = response.data;
+        
+        return {
+            success: true,
+            status: statusData.status, // pending, processing, completed, failed, cancelled
+            message: statusData.message || statusData.description,
+            data: statusData.data,
+            transactionId: transactionId
+        };
+    } catch (err) {
+        return handleApiError(err, "Failed to check payment status.");
+    }
+};
+
+// Start monitoring payment status with polling
+export const startPaymentStatusListener = (transactionId, callback, options = {}) => {
+    const {
+        pollInterval = 3000, // Poll every 3 seconds
+        maxAttempts = 20, // Maximum 20 attempts (60 seconds)
+        onTimeout = null,
+        onError = null
+    } = options;
+
+    let attempts = 0;
+    let isActive = true;
+
+    const pollPaymentStatus = async () => {
+        if (!isActive || attempts >= maxAttempts) {
+            if (attempts >= maxAttempts && onTimeout) {
+                onTimeout({
+                    success: false,
+                    error: "Payment status check timed out",
+                    transactionId
+                });
+            }
+            stopPaymentStatusListener(transactionId);
+            return;
+        }
+
+        attempts++;
+
+        try {
+            const result = await checkPaymentStatus(transactionId);
+            
+            if (result.success) {
+                // Call the callback with the status update
+                callback(result);
+                
+                // Stop polling if payment is completed or failed
+                if (result.status === 'completed' || result.status === 'failed' || result.status === 'cancelled') {
+                    stopPaymentStatusListener(transactionId);
+                    return;
+                }
+            } else {
+                // Handle API errors
+                if (onError) {
+                    onError(result);
+                }
+            }
+        } catch (error) {
+            console.error('Error polling payment status:', error);
+            if (onError) {
+                onError({
+                    success: false,
+                    error: 'Failed to check payment status',
+                    transactionId
+                });
+            }
+        }
+
+        // Schedule next poll if still active
+        if (isActive) {
+            setTimeout(pollPaymentStatus, pollInterval);
+        }
+    };
+
+    // Store the listener for cleanup
+    activePaymentListeners.set(transactionId, {
+        isActive: () => isActive,
+        stop: () => { isActive = false; }
+    });
+
+    // Start polling
+    pollPaymentStatus();
+
+    // Return control object
+    return {
+        transactionId,
+        stop: () => stopPaymentStatusListener(transactionId),
+        isActive: () => isActive
+    };
+};
+
+// Stop monitoring payment status
+export const stopPaymentStatusListener = (transactionId) => {
+    const listener = activePaymentListeners.get(transactionId);
+    if (listener) {
+        listener.stop();
+        activePaymentListeners.delete(transactionId);
+        console.log(`Stopped payment listener for transaction: ${transactionId}`);
+    }
+};
+
+// Stop all active payment listeners
+export const stopAllPaymentListeners = () => {
+    activePaymentListeners.forEach((listener, transactionId) => {
+        listener.stop();
+        console.log(`Stopped payment listener for transaction: ${transactionId}`);
+    });
+    activePaymentListeners.clear();
+};
+
+// Get payment transaction details
+export const getPaymentTransaction = async (transactionId) => {
+    try {
+        const response = await axios.get(
+            `${API_BASE}/payments/transaction/${transactionId}/`,
+            { headers: getAuthHeaders() }
+        );
+
+        return {
+            success: true,
+            data: response.data.data
+        };
+    } catch (err) {
+        return handleApiError(err, "Failed to fetch payment transaction details.");
+    }
+};
+
+// Cancel a pending payment transaction
+export const cancelPaymentTransaction = async (transactionId) => {
+    try {
+        const response = await axios.post(
+            `${API_BASE}/payments/cancel/${transactionId}/`,
+            {},
+            { headers: getAuthHeaders() }
+        );
+
+        return {
+            success: true,
+            data: response.data.data,
+            message: "Payment transaction cancelled successfully!"
+        };
+    } catch (err) {
+        return handleApiError(err, "Failed to cancel payment transaction.");
     }
 };

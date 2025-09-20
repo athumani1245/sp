@@ -6,7 +6,10 @@ import { logout } from "../../services/authService";
 import { 
     getLicenseStatus, 
     getSubscriptionPlans, 
-    createSubscription 
+    createSubscription,
+    startPaymentStatusListener,
+    stopPaymentStatusListener,
+    stopAllPaymentListeners
 } from "../../services/licenseService";
 import "../../assets/styles/header.css";
 
@@ -24,6 +27,11 @@ function Header() {
     const [subscriptionError, setSubscriptionError] = useState('');
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [selectedPlanDetails, setSelectedPlanDetails] = useState(null);
+    const [showPaymentModal, setShowPaymentModal] = useState(false);
+    const [paymentStatus, setPaymentStatus] = useState('pending'); // pending, processing, success, failed
+    const [apiResponseDescription, setApiResponseDescription] = useState('');
+    const [currentTransactionId, setCurrentTransactionId] = useState(null);
+    const [paymentListener, setPaymentListener] = useState(null);
 
     const handleLogout = async () => {
         await logout(navigate);
@@ -87,13 +95,26 @@ function Header() {
     };
 
     const handleCancelSubscription = () => {
+        // Stop any active payment listeners
+        if (currentTransactionId) {
+            stopPaymentStatusListener(currentTransactionId);
+        }
+        if (paymentListener) {
+            paymentListener.stop();
+        }
+        
         setShowSubscribeModal(false);
         setShowConfirmModal(false);
+        setShowPaymentModal(false);
         setSelectedPlan(null);
         setPhoneNumber('');
         setSubscriptionError('');
         setSelectedPlanDetails(null);
         setSubscribing(false);
+        setPaymentStatus('pending');
+        setApiResponseDescription('');
+        setCurrentTransactionId(null);
+        setPaymentListener(null);
     };
 
     const handleCloseSubscriptionModal = () => {
@@ -107,36 +128,134 @@ function Header() {
     };
 
     const handleSubscribe = async () => {
+        // Show payment modal and hide confirmation modal immediately
+        setShowConfirmModal(false);
+        setShowPaymentModal(true);
+        setPaymentStatus('processing');
         setSubscribing(true);
         setSubscriptionError('');
+        setApiResponseDescription('');
 
         try {
+            // Create a single subscription transaction - no retries allowed
             const result = await createSubscription({
                 plan: selectedPlan,
                 phone_number: `255${phoneNumber}`,
                 auto_renew: true
             });
 
+            console.log('API Response:', result); // Debug log
+
             if (result.success) {
-                setShowConfirmModal(false);
-                setShowSubscribeModal(false);
-                // Reset form states
-                setSelectedPlan(null);
-                setPhoneNumber('');
-                setSubscriptionError('');
-                setSelectedPlanDetails(null);
-                // Refresh license status
-                const licenseResult = await getLicenseStatus();
-                if (licenseResult.success) {
-                    setLicenseData(licenseResult.data);
+                // Store the API response description and transaction ID
+                setApiResponseDescription(result.description || result.message || '');
+                setCurrentTransactionId(result.transactionId);
+                
+                // If the API requires user action (phone prompt), start payment listener
+                if (result.requiresUserAction || result.status === 200) {
+                    setPaymentStatus('processing');
+                    
+                    // Start payment status listener for this single transaction
+                    if (result.transactionId) {
+                        const listener = startPaymentStatusListener(
+                            result.transactionId,
+                            (statusUpdate) => {
+                                console.log('Payment status update:', statusUpdate);
+                                
+                                // Update the modal based on payment status
+                                if (statusUpdate.status === 'completed') {
+                                    setPaymentStatus('success');
+                                    setApiResponseDescription('Payment completed successfully!');
+                                    setSubscribing(false);
+                                    
+                                    // Auto-close after 3 seconds on success
+                                    setTimeout(() => {
+                                        setShowPaymentModal(false);
+                                        setShowSubscribeModal(false);
+                                        // Reset form states
+                                        setSelectedPlan(null);
+                                        setPhoneNumber('');
+                                        setSubscriptionError('');
+                                        setSelectedPlanDetails(null);
+                                        setPaymentStatus('pending');
+                                        setApiResponseDescription('');
+                                        setCurrentTransactionId(null);
+                                        setPaymentListener(null);
+                                        
+                                        // Refresh license status
+                                        getLicenseStatus().then(licenseResult => {
+                                            if (licenseResult.success) {
+                                                setLicenseData(licenseResult.data);
+                                            }
+                                        });
+                                    }, 3000);
+                                    
+                                } else if (statusUpdate.status === 'failed' || statusUpdate.status === 'cancelled') {
+                                    setPaymentStatus('failed');
+                                    setSubscriptionError(statusUpdate.message || 'Payment failed');
+                                    setSubscribing(false);
+                                    
+                                } else if (statusUpdate.status === 'processing') {
+                                    // Update description with latest status message
+                                    if (statusUpdate.message) {
+                                        setApiResponseDescription(statusUpdate.message);
+                                    }
+                                }
+                            },
+                            {
+                                pollInterval: 3000, // Poll every 3 seconds
+                                maxAttempts: 20, // 60 seconds timeout (20 attempts × 3 seconds)
+                                onTimeout: (timeoutInfo) => {
+                                    console.log('Payment status check timed out:', timeoutInfo);
+                                    setPaymentStatus('failed');
+                                    setSubscriptionError('Payment verification timed out after 60 seconds. The transaction may still be processing. Please check your mobile money account or contact support for assistance.');
+                                    setSubscribing(false);
+                                },
+                                onError: (errorInfo) => {
+                                    console.error('Payment status check error:', errorInfo);
+                                    // Don't fail immediately on errors, keep trying until timeout
+                                }
+                            }
+                        );
+                        
+                        setPaymentListener(listener);
+                    }
+                } else {
+                    // Immediate success case (no user action required)
+                    setPaymentStatus('success');
+                    setSubscribing(false);
+                    
+                    // Auto-close after 3 seconds on success
+                    setTimeout(() => {
+                        setShowPaymentModal(false);
+                        setShowSubscribeModal(false);
+                        // Reset form states
+                        setSelectedPlan(null);
+                        setPhoneNumber('');
+                        setSubscriptionError('');
+                        setSelectedPlanDetails(null);
+                        setPaymentStatus('pending');
+                        setApiResponseDescription('');
+                        setCurrentTransactionId(null);
+                        setPaymentListener(null);
+                        
+                        // Refresh license status
+                        getLicenseStatus().then(licenseResult => {
+                            if (licenseResult.success) {
+                                setLicenseData(licenseResult.data);
+                            }
+                        });
+                    }, 3000);
                 }
             } else {
+                setPaymentStatus('failed');
                 setSubscriptionError(result.error || 'Failed to create subscription');
+                setSubscribing(false);
             }
         } catch (error) {
             console.error('Error creating subscription:', error);
+            setPaymentStatus('failed');
             setSubscriptionError('Failed to process subscription');
-        } finally {
             setSubscribing(false);
         }
     };
@@ -150,6 +269,28 @@ function Header() {
         }
 
     }, [navigate]);
+
+    // Add/remove payment modal class to body for background blur effect
+    useEffect(() => {
+        if (showPaymentModal) {
+            document.body.classList.add('payment-modal-active');
+        } else {
+            document.body.classList.remove('payment-modal-active');
+        }
+
+        // Cleanup on unmount
+        return () => {
+            document.body.classList.remove('payment-modal-active');
+        };
+    }, [showPaymentModal]);
+
+    // Cleanup payment listeners on component unmount
+    useEffect(() => {
+        return () => {
+            // Stop all payment listeners when component unmounts
+            stopAllPaymentListeners();
+        };
+    }, []);
 
     // Extracted modal body content to avoid nested ternary
     let licenseModalBody;
@@ -671,6 +812,262 @@ function Header() {
                             </>
                         )}
                     </Button>
+                </Modal.Footer>
+            </Modal>
+
+            {/* Payment Completion Modal */}
+            <Modal 
+                show={showPaymentModal} 
+                onHide={() => {
+                    if (paymentStatus !== 'processing') {
+                        setShowPaymentModal(false);
+                        if (paymentStatus === 'failed') {
+                            setShowConfirmModal(true); // Go back to confirmation modal on failure
+                        } else {
+                            // Reset everything on success or manual close
+                            setShowSubscribeModal(false);
+                            setSelectedPlan(null);
+                            setPhoneNumber('');
+                            setSubscriptionError('');
+                            setSelectedPlanDetails(null);
+                            setPaymentStatus('pending');
+                            setApiResponseDescription('');
+                        }
+                    }
+                }}
+                backdrop={paymentStatus === 'processing' ? "static" : true}
+                keyboard={paymentStatus !== 'processing'}
+                centered
+                className="payment-modal"
+                backdropClassName="payment-modal-backdrop"
+                contentClassName="payment-modal-content"
+                style={{
+                    zIndex: 1070
+                }}
+            >
+                <Modal.Header closeButton={paymentStatus !== 'processing'}>
+                    <Modal.Title>
+                        {paymentStatus === 'processing' && (
+                            <>
+                                <i className="bi bi-phone text-primary me-2"></i>
+                                Complete Payment on Your Phone
+                            </>
+                        )}
+                        {paymentStatus === 'success' && (
+                            <>
+                                <i className="bi bi-check-circle-fill text-success me-2"></i>
+                                Payment Successful
+                            </>
+                        )}
+                        {paymentStatus === 'failed' && (
+                            <>
+                                <i className="bi bi-x-circle-fill text-danger me-2"></i>
+                                Payment Failed
+                            </>
+                        )}
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {paymentStatus === 'processing' && (
+                        <div className="text-center py-4">
+                            <div className="mb-4">
+                                <div className="spinner-border text-primary mb-3" style={{ width: '3rem', height: '3rem' }} role="status">
+                                    <span className="visually-hidden">Processing...</span>
+                                </div>
+                                <h5 className="mb-3">Waiting for Payment Confirmation</h5>
+                            </div>
+                            
+                            <div className="alert alert-info mb-4">
+                                <i className="bi bi-info-circle me-2"></i>
+                                <strong>
+                                    {apiResponseDescription || "Please check your phone for a payment prompt"}
+                                </strong>
+                            </div>
+
+                            <div className="bg-light p-4 rounded mb-4">
+                                <div className="row text-start">
+                                    <div className="col-6">
+                                        <strong className="text-muted d-block mb-1">Amount:</strong>
+                                        <span className="text-success fw-bold">
+                                            TSh {selectedPlanDetails ? parseFloat(selectedPlanDetails.price).toLocaleString() : '0'}
+                                        </span>
+                                    </div>
+                                    <div className="col-6">
+                                        <strong className="text-muted d-block mb-1">Phone:</strong>
+                                        <span>+255 {phoneNumber}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="text-start">
+                                <h6 className="mb-3">Follow these steps:</h6>
+                                <ol className="list-unstyled">
+                                    <li className="mb-2">
+                                        <span className="badge bg-primary rounded-circle me-3">1</span>
+                                        Check your phone for a USSD prompt
+                                    </li>
+                                    <li className="mb-2">
+                                        <span className="badge bg-primary rounded-circle me-3">2</span>
+                                        Enter your PIN when prompted
+                                    </li>
+                                    <li className="mb-2">
+                                        <span className="badge bg-primary rounded-circle me-3">3</span>
+                                        Confirm the payment amount and details
+                                    </li>
+                                    <li className="mb-2">
+                                        <span className="badge bg-success rounded-circle me-3">4</span>
+                                        Wait for confirmation (this page will update automatically)
+                                    </li>
+                                </ol>
+                            </div>
+
+                            <div className="text-muted small mt-4">
+                                <i className="bi bi-clock me-1"></i>
+                                This may take a few moments to process...
+                            </div>
+                        </div>
+                    )}
+
+                    {paymentStatus === 'success' && (
+                        <div className="text-center py-4">
+                            <div className="mb-4">
+                                <i className="bi bi-check-circle-fill text-success" style={{ fontSize: '4rem' }}></i>
+                            </div>
+                            <h4 className="text-success mb-3">Payment Completed Successfully!</h4>
+                            <p className="text-muted mb-4">
+                                Your subscription has been activated. You can now enjoy all the features of your selected plan.
+                            </p>
+                            
+                            {selectedPlanDetails && (
+                                <div className="bg-light p-3 rounded mb-4">
+                                    <div className="row">
+                                        <div className="col-6">
+                                            <strong className="d-block text-muted">Plan:</strong>
+                                            <span>{selectedPlanDetails.name}</span>
+                                        </div>
+                                        <div className="col-6">
+                                            <strong className="d-block text-muted">Duration:</strong>
+                                            <span>{selectedPlanDetails.duration_days} days</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="alert alert-success">
+                                <i className="bi bi-shield-check me-2"></i>
+                                Your account has been upgraded successfully!
+                            </div>
+
+                            <p className="text-muted small">
+                                This modal will close automatically in a few seconds...
+                            </p>
+                        </div>
+                    )}
+
+                    {paymentStatus === 'failed' && (
+                        <div className="text-center py-4">
+                            <div className="mb-4">
+                                <i className="bi bi-x-circle-fill text-danger" style={{ fontSize: '4rem' }}></i>
+                            </div>
+                            <h4 className="text-danger mb-3">Payment Failed</h4>
+                            
+                            {subscriptionError && (
+                                <div className="alert alert-danger mb-4">
+                                    <i className="bi bi-exclamation-triangle-fill me-2"></i>
+                                    {subscriptionError}
+                                </div>
+                            )}
+
+                            <div className="mb-4">
+                                <p className="text-muted">
+                                    Your payment could not be processed. This might be due to:
+                                </p>
+                                <ul className="text-start text-muted">
+                                    <li>Insufficient balance in your mobile money account</li>
+                                    <li>Network connectivity issues</li>
+                                    <li>Incorrect PIN entered</li>
+                                    <li>Payment timeout</li>
+                                </ul>
+                            </div>
+
+                            <div className="alert alert-info">
+                                <i className="bi bi-info-circle me-2"></i>
+                                Please contact support if you need assistance or try the payment process again later.
+                            </div>
+                        </div>
+                    )}
+                </Modal.Body>
+                <Modal.Footer>
+                    {paymentStatus === 'processing' && (
+                        <div className="w-100 text-center">
+                            <button 
+                                className="btn btn-outline-secondary"
+                                onClick={() => {
+                                    // Stop payment listener
+                                    if (currentTransactionId) {
+                                        stopPaymentStatusListener(currentTransactionId);
+                                    }
+                                    if (paymentListener) {
+                                        paymentListener.stop();
+                                    }
+                                    
+                                    setShowPaymentModal(false);
+                                    setShowConfirmModal(true);
+                                    setPaymentStatus('pending');
+                                    setSubscribing(false);
+                                    setCurrentTransactionId(null);
+                                    setPaymentListener(null);
+                                }}
+                            >
+                                <i className="bi bi-arrow-left me-2"></i>
+                                Cancel Payment
+                            </button>
+                        </div>
+                    )}
+                    
+                    {paymentStatus === 'success' && (
+                        <Button 
+                            variant="success" 
+                            onClick={() => {
+                                setShowPaymentModal(false);
+                                setShowSubscribeModal(false);
+                                setSelectedPlan(null);
+                                setPhoneNumber('');
+                                setSubscriptionError('');
+                                setSelectedPlanDetails(null);
+                                setPaymentStatus('pending');
+                                setApiResponseDescription('');
+                                setCurrentTransactionId(null);
+                                setPaymentListener(null);
+                            }}
+                            className="w-100"
+                        >
+                            <i className="bi bi-check-circle me-2"></i>
+                            Continue
+                        </Button>
+                    )}
+
+                    {paymentStatus === 'failed' && (
+                        <Button 
+                            variant="outline-secondary" 
+                            onClick={() => {
+                                setShowPaymentModal(false);
+                                setShowSubscribeModal(false);
+                                setSelectedPlan(null);
+                                setPhoneNumber('');
+                                setSubscriptionError('');
+                                setSelectedPlanDetails(null);
+                                setPaymentStatus('pending');
+                                setApiResponseDescription('');
+                                setCurrentTransactionId(null);
+                                setPaymentListener(null);
+                            }}
+                            className="w-100"
+                        >
+                            <i className="bi bi-x-circle me-2"></i>
+                            Close
+                        </Button>
+                    )}
                 </Modal.Footer>
             </Modal>
 

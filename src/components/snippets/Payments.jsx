@@ -9,6 +9,12 @@ const Payments = ({ payments = [], onPaymentAdded, leaseId, refreshData }) => {
     const [selectedPayment, setSelectedPayment] = useState(null);
     const [isCancelling, setIsCancelling] = useState(false);
 
+    const canCancelPayment = (payment) => {
+        // Allow cancellation for successful or pending payments, but not for already cancelled payments
+        const status = payment.status?.toLowerCase();
+        return status === 'paid'; 
+    };
+
     const formatDate = (dateString) => {
         if (!dateString) return 'N/A';
         try {
@@ -55,7 +61,13 @@ const Payments = ({ payments = [], onPaymentAdded, leaseId, refreshData }) => {
                                                 </span>
                                             </td>
                                             <td>
-                                                <span className={`badge ${payment.status === 'success' ? 'bg-success' : 'bg-warning'}`}>
+                                                <span className={`badge ${
+                                                    payment.status?.toLowerCase() === 'success' || payment.status?.toLowerCase() === 'successful' 
+                                                    ? 'bg-success' 
+                                                    : payment.status?.toLowerCase() === 'cancelled' 
+                                                    ? 'bg-danger'
+                                                    : 'bg-warning'
+                                                }`}>
                                                     {payment.status || 'pending'}
                                                 </span>
                                             </td>
@@ -67,7 +79,8 @@ const Payments = ({ payments = [], onPaymentAdded, leaseId, refreshData }) => {
                                                         setSelectedPayment(payment);
                                                         setShowCancelModal(true);
                                                     }}
-                                                    disabled={payment.status !== 'success'}
+                                                    disabled={!canCancelPayment(payment) || isCancelling}
+                                                    title={!canCancelPayment(payment) ? 'Payment cannot be cancelled' : 'Cancel this payment'}
                                                 >
                                                     <i className="bi bi-x-circle me-1"></i>
                                                     Cancel
@@ -109,11 +122,17 @@ const Payments = ({ payments = [], onPaymentAdded, leaseId, refreshData }) => {
                                                 <i className="bi bi-check-circle me-1"></i>
                                                 Status:
                                             </span>
-                                            <span className={`badge ${payment.status === 'success' ? 'bg-success' : 'bg-warning'}`}>
+                                            <span className={`badge ${
+                                                payment.status?.toLowerCase() === 'success' || payment.status?.toLowerCase() === 'successful' 
+                                                ? 'bg-success' 
+                                                : payment.status?.toLowerCase() === 'cancelled' 
+                                                ? 'bg-danger'
+                                                : 'bg-warning'
+                                            }`}>
                                                 {payment.status || 'pending'}
                                             </span>
                                         </div>
-                                        {payment.status === 'success' && (
+                                        {canCancelPayment(payment) && (
                                             <div className="payment-card-actions">
                                                 <Button 
                                                     variant="outline-danger" 
@@ -123,6 +142,8 @@ const Payments = ({ payments = [], onPaymentAdded, leaseId, refreshData }) => {
                                                         setShowCancelModal(true);
                                                     }}
                                                     className="w-100"
+                                                    disabled={isCancelling}
+                                                    title="Cancel this payment"
                                                 >
                                                     <i className="bi bi-x-circle me-1"></i>
                                                     Cancel Payment
@@ -206,19 +227,21 @@ const Payments = ({ payments = [], onPaymentAdded, leaseId, refreshData }) => {
                     </Button>
                     <Button 
                         variant="warning" 
-                        onClick={() => {
-                            // Add your cancel payment logic here
+                        onClick={async () => {
                             setIsCancelling(true);
-                            // call a method to cancel the payment
-                            cancelPayment(selectedPayment.id)
-                                .then(() => {
-                                    setShowCancelModal(false);
+                            try {
+                                await cancelPayment(selectedPayment.id);
+                                setShowCancelModal(false);
+                                if (refreshData) {
                                     refreshData();
-                                })
-                                .catch((error) => {
-                                    console.error("Error cancelling payment:", error);
-                                    setIsCancelling(false);
-                                });
+                                }
+                            } catch (error) {
+                                console.error("Error cancelling payment:", error);
+                                // You might want to show an error message here
+                                alert("Failed to cancel payment. Please try again.");
+                            } finally {
+                                setIsCancelling(false);
+                            }
                         }} 
                         disabled={isCancelling}
                     >

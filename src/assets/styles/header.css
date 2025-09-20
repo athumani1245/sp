@@ -107,6 +107,64 @@
     backdrop-filter: blur(4px);
 }
 
+/* Payment Modal Backdrop */
+.payment-modal-backdrop {
+    backdrop-filter: blur(8px) !important;
+    background-color: rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Payment Modal Content */
+.payment-modal-content {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    border: none;
+    border-radius: 1rem;
+}
+
+/* Ensure other modals are behind the payment modal */
+.modal.fade:not(.payment-modal) {
+    z-index: 1050;
+}
+
+.payment-modal {
+    z-index: 1070;
+}
+
+/* Blur background content when payment modal is active */
+.payment-modal-active .modal:not(.payment-modal) {
+    filter: blur(2px);
+    opacity: 0.6;
+    transition: filter 0.3s ease, opacity 0.3s ease;
+}
+
+.payment-modal-active .modal:not(.payment-modal) .modal-content {
+    filter: blur(1px);
+    opacity: 0.8;
+}
+
+/* Enhanced backdrop for payment modal */
+.payment-modal-backdrop {
+    backdrop-filter: blur(12px) saturate(180%) !important;
+    background-color: rgba(0, 0, 0, 0.65) !important;
+    animation: fadeInBlur 0.3s ease-out;
+}
+
+@keyframes fadeInBlur {
+    from {
+        backdrop-filter: blur(0px);
+        opacity: 0;
+    }
+    to {
+        backdrop-filter: blur(12px) saturate(180%);
+        opacity: 1;
+    }
+}
+
+/* Enhance modal backdrop blur for better visual separation */
+.payment-modal .modal-backdrop {
+    backdrop-filter: blur(10px);
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
 /* Payment Network Logos */
 .payment-network-logo {
     height: 40px;
