@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { Button, Alert, Modal } from "react-bootstrap";
 import Layout from "../components/Layout";
 import Payments from "../components/snippets/Payments";
-import { getLeaseById, getLeaseDocuments, terminateLease } from "../services/leaseService";
+import { getLeaseById, getLeaseDocuments, terminateLease, cancelLease } from "../services/leaseService";
 import "../assets/styles/leases.css";
 
 function Lease() {
@@ -17,6 +17,8 @@ function Lease() {
   const [activeTab, setActiveTab] = useState("details");
   const [isCancelling, setIsCancelling] = useState(false);
   const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
+  const [showTerminateConfirmation, setShowTerminateConfirmation] = useState(false);
+  const [isTerminating, setIsTerminating] = useState(false);
   const [terminationData, setTerminationData] = useState({
     termination_date: new Date().toISOString().split('T')[0],
     reason: ""
@@ -53,15 +55,14 @@ function Lease() {
     setShowCancelConfirmation(true);
   };
 
-  const handleCancelConfirm = async () => {
-    if (!terminationData.reason.trim()) {
-      setError("Please provide a reason for termination");
-      return;
-    }
+  const handleTerminateClick = () => {
+    setShowTerminateConfirmation(true);
+  };
 
+  const handleCancelConfirm = async () => {
     setIsCancelling(true);
     try {
-      const result = await terminateLease(leaseId, terminationData);
+      const result = await cancelLease(leaseId);
       
       if (result.success) {
         setError(""); // Clear any existing errors
@@ -78,6 +79,31 @@ function Lease() {
     }
   };
 
+  const handleTerminateConfirm = async () => {
+    if (!terminationData.reason.trim()) {
+      setError("Please provide a reason for termination");
+      return;
+    }
+
+    setIsTerminating(true);
+    try {
+      const result = await terminateLease(leaseId, terminationData);
+      
+      if (result.success) {
+        setError(""); // Clear any existing errors
+        navigate('/leases');
+      } else {
+        setError(result.error || 'Failed to terminate lease');
+      }
+    } catch (error) {
+      console.error('Error terminating lease:', error);
+      setError('Failed to terminate lease');
+    } finally {
+      setIsTerminating(false);
+      setShowTerminateConfirmation(false);
+    }
+  };
+
   const handleTerminationDataChange = (e) => {
     const { name, value } = e.target;
     setTerminationData(prev => ({
@@ -88,6 +114,10 @@ function Lease() {
 
   const handleCancelModalClose = () => {
     setShowCancelConfirmation(false);
+  };
+
+  const handleTerminateModalClose = () => {
+    setShowTerminateConfirmation(false);
   };
 
   // Payments are now loaded as part of lease data
@@ -319,12 +349,20 @@ function Lease() {
                   <span className="d-none d-md-inline">Back to </span>Leases
                 </button>
                 <button
-                  className="btn btn-warning flex-fill"
+                  className="btn btn-danger flex-fill"
                   onClick={handleCancelClick}
                   disabled={isCancelling}
                 >
                   <i className="bi bi-x-circle me-1"></i>
                   {isCancelling ? 'Cancelling...' : 'Cancel'}
+                </button>
+                <button
+                  className="btn btn-warning flex-fill"
+                  onClick={handleTerminateClick}
+                  disabled={isTerminating}
+                >
+                  <i className="bi bi-x-octagon me-1"></i>
+                  {isTerminating ? 'Terminating...' : 'Terminate Lease'}
                 </button>
               </div>
             </div>
@@ -335,8 +373,58 @@ function Lease() {
         <Modal show={showCancelConfirmation} onHide={handleCancelModalClose} backdrop="static">
           <Modal.Header closeButton>
             <Modal.Title>
-              <i className="bi bi-exclamation-triangle-fill text-warning me-2"></i>
+              <i className="bi bi-exclamation-triangle-fill text-danger me-2"></i>
               Cancel Lease
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <div className="text-center py-3">
+              <i className="bi bi-exclamation-triangle-fill text-danger" style={{ fontSize: '3rem' }}></i>
+              <h5 className="mt-3 mb-3">Are you sure you want to cancel this lease?</h5>
+              <p className="text-muted mb-4">
+                This action will immediately cancel the lease. This cannot be undone.
+              </p>
+              
+              <div className="mt-3 p-3 bg-light rounded">
+                <strong>Lease Details:</strong>
+                <ul className="mt-2 mb-0 text-start">
+                  <li>Tenant: {lease.tenant.first_name} {lease.tenant.last_name}</li>
+                  <li>Property: {lease.property.property_name}</li>
+                  <li>Unit: {getUnitInfo(lease)}</li>
+                  <li>Duration: {lease.number_of_month} months</li>
+                </ul>
+              </div>
+            </div>
+
+            {error && (
+              <Alert variant="danger" className="mt-3">
+                <i className="bi bi-exclamation-triangle me-2"></i>
+                {error}
+              </Alert>
+            )}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={handleCancelModalClose}>
+              <i className="bi bi-x-circle me-2"></i>
+              No, Keep Lease
+            </Button>
+            <Button 
+              variant="danger" 
+              onClick={handleCancelConfirm} 
+              disabled={isCancelling}
+            >
+              <i className="bi bi-check-circle me-2"></i>
+              {isCancelling ? 'Cancelling...' : 'Yes, Cancel Lease'}
+            </Button>
+          </Modal.Footer>
+        </Modal>
+
+        {/* Terminate Confirmation Modal */}
+        <Modal show={showTerminateConfirmation} onHide={handleTerminateModalClose} backdrop="static">
+          <Modal.Header closeButton>
+            <Modal.Title>
+              <i className="bi bi-exclamation-triangle-fill text-warning me-2"></i>
+              Terminate Lease
             </Modal.Title>
           </Modal.Header>
           <Modal.Body>
@@ -388,17 +476,17 @@ function Lease() {
             )}
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="secondary" onClick={handleCancelModalClose}>
+            <Button variant="secondary" onClick={handleTerminateModalClose}>
               <i className="bi bi-x-circle me-2"></i>
               Close
             </Button>
             <Button 
               variant="warning" 
-              onClick={handleCancelConfirm} 
-              disabled={isCancelling || !terminationData.reason.trim()}
+              onClick={handleTerminateConfirm} 
+              disabled={isTerminating || !terminationData.reason.trim()}
             >
-              <i className="bi bi-x-circle me-2"></i>
-              {isCancelling ? 'Cancelling...' : 'Confirm Termination'}
+              <i className="bi bi-x-octagon me-2"></i>
+              {isTerminating ? 'Terminating...' : 'Confirm Termination'}
             </Button>
           </Modal.Footer>
         </Modal>
