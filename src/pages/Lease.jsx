@@ -66,7 +66,8 @@ function Lease() {
       
       if (result.success) {
         setError(""); // Clear any existing errors
-        navigate('/leases');
+        // Refresh lease data to show updated status
+        await fetchLeaseDetails();
       } else {
         setError(result.error || 'Failed to cancel lease');
       }
@@ -91,7 +92,8 @@ function Lease() {
       
       if (result.success) {
         setError(""); // Clear any existing errors
-        navigate('/leases');
+        // Refresh lease data to show updated status
+        await fetchLeaseDetails();
       } else {
         setError(result.error || 'Failed to terminate lease');
       }
@@ -228,6 +230,7 @@ function Lease() {
       active: "bg-success",
       expired: "bg-danger",
       terminated: "bg-warning",
+      cancelled: "bg-dark",
       pending: "bg-secondary",
       renewed: "bg-info"
     };
@@ -348,22 +351,28 @@ function Lease() {
                   <i className="bi bi-arrow-left me-1"></i>
                   <span className="d-none d-md-inline">Back to </span>Leases
                 </button>
-                <button
-                  className="btn btn-danger flex-fill"
-                  onClick={handleCancelClick}
-                  disabled={isCancelling}
-                >
-                  <i className="bi bi-x-circle me-1"></i>
-                  {isCancelling ? 'Cancelling...' : 'Cancel'}
-                </button>
-                <button
-                  className="btn btn-warning flex-fill"
-                  onClick={handleTerminateClick}
-                  disabled={isTerminating}
-                >
-                  <i className="bi bi-x-octagon me-1"></i>
-                  {isTerminating ? 'Terminating...' : 'Terminate Lease'}
-                </button>
+                {/* Only show Cancel button if lease is not already cancelled, terminated, or expired */}
+                {lease.status !== 'cancelled' && lease.status !== 'terminated' && lease.status !== 'expired' && (
+                  <button
+                    className="btn btn-danger flex-fill"
+                    onClick={handleCancelClick}
+                    disabled={isCancelling}
+                  >
+                    <i className="bi bi-x-circle me-1"></i>
+                    {isCancelling ? 'Cancelling...' : 'Cancel'}
+                  </button>
+                )}
+                {/* Only show Terminate Lease button if lease is active */}
+                {lease.status === 'active' && (
+                  <button
+                    className="btn btn-warning flex-fill"
+                    onClick={handleTerminateClick}
+                    disabled={isTerminating}
+                  >
+                    <i className="bi bi-x-octagon me-1"></i>
+                    {isTerminating ? 'Terminating...' : 'Terminate Lease'}
+                  </button>
+                )}
               </div>
             </div>
           </div>

@@ -246,25 +246,23 @@ export const terminateLease = async (leaseId, terminationData = {}) => {
 };
 
 
-// calcel lease
-
+// Cancel lease
 export const cancelLease = async (leaseId) => {
     try {
-        
         console.log("Lease ID for cancellation:", leaseId);
         const response = await axios.post(
             `${API_BASE}/leases/${leaseId}/cancel/`,
+            {},
             { headers: getAuthHeaders() }
         );
-        
 
         return {
             success: true,
             data: response.data.data,
-            message: "Lease Cancelled successfully!"
+            message: "Lease cancelled successfully!"
         };
     } catch (err) {
-        return handleApiError(err, "Failed to Cancel lease.");
+        return handleApiError(err, "Failed to cancel lease.");
     }
 };
 
