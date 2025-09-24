@@ -9,6 +9,8 @@ function Property() {
     const { propertyId } = useParams();
     const navigate = useNavigate();
     
+    console.log('Property component rendering with propertyId:', propertyId);
+    
     const [property, setProperty] = useState(null);
     const [units, setUnits] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -144,6 +146,7 @@ function Property() {
 
     // Fetch property units
     const fetchUnits = useCallback(async (page = 1) => {
+        console.log('fetchUnits called with:', { propertyId, page });
         try {
             setUnitsLoading(true);
             const result = await getPropertyUnits({ 
@@ -151,17 +154,22 @@ function Property() {
                 page: page     
             });
             
+            console.log('getPropertyUnits result:', result);
+            
             if (result.success) {
-                setUnits(result.data.data?.items || []);
+                console.log('Setting units:', result.data?.items);
+                setUnits(result.data?.items || []);
                 setPagination({
-                    current_page: result.data.current_page,
-                    total_pages: result.data.total_pages,
-                    count: result.data.count,
-                    next: result.data.next,
-                    previous: result.data.previous
+                    current_page: result.data?.current_page || 1,
+                    total_pages: result.data?.total_pages || 1,
+                    count: result.data?.count || 0,
+                    next: result.data?.next,
+                    previous: result.data?.previous
                 });
             } else {
+                console.error('fetchUnits failed:', result.error);
                 setUnits([]);
+                setPagination({});
             }
         } catch (error) {
             setUnits([]);
@@ -170,12 +178,22 @@ function Property() {
         }
     }, [propertyId]);
 
+    // Initial load when property changes
     useEffect(() => {
         if (propertyId) {
             fetchProperty();
+            setCurrentPage(1);
+        }
+    }, [propertyId, fetchProperty]);
+
+    // Handle units fetching when tab or page changes
+    useEffect(() => {
+        console.log('Units useEffect triggered:', { activeTab, propertyId, currentPage });
+        if (activeTab === "units" && propertyId) {
+            console.log('Calling fetchUnits with page:', currentPage);
             fetchUnits(currentPage);
         }
-    }, [propertyId, fetchProperty, fetchUnits, currentPage]);
+    }, [activeTab, currentPage, propertyId, fetchUnits]);
 
     // Load location data when the component mounts or property changes
     useEffect(() => {
@@ -315,10 +333,9 @@ function Property() {
     // Handle tab selection
     const handleTabSelect = (tab) => {
         setActiveTab(tab);
-        
-        // Load units when units tab is selected for the first time
-        if (tab === "units" && units.length === 0 && !unitsLoading) {
-            fetchUnits(1);
+        // Reset to page 1 when switching to units tab
+        if (tab === "units") {
+            setCurrentPage(1);
         }
     };
 

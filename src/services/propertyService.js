@@ -254,12 +254,12 @@ export const getPropertyUnits = async (params = {}) => {
 
         return {
             success: true,
-            data: response.data, // Return the full data structure
+            data: response.data.data, // Return the full data structure
             pagination: {
-                current_page: response.data.current_page,
-                total_pages: response.data.total_pages,
-                count: response.data.count,
-                next: response.data.next,
+                current_page: response.data.data.current_page,
+                total_pages: response.data.data.total_pages,
+                count: response.data.data.count,
+                next: response.data.data.next,
                 previous: response.data.previous
             }
         };
