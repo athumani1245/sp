@@ -210,25 +210,7 @@ function Property() {
         };
 
         loadLocationData();
-    }, [property]);
-
-    const loadRegions = async () => {
-        try {
-            setLocationLoading(true);
-            const response = await getRegions();
-            if (response.success) {
-                setRegions(response.data || []);
-            } else {
-                console.error('Failed to load regions:', response.error);
-                setRegions([]);
-            }
-        } catch (error) {
-            console.error('Error loading regions:', error);
-            setRegions([]);
-        } finally {
-            setLocationLoading(false);
-        }
-    };
+    }, [property, selectedRegionId, selectedDistrictId]);
 
     const handleRegionChange = async (e) => {
         const regionId = e.target.value;
@@ -655,9 +637,13 @@ function Property() {
 
                             <div className="row g-3 align-items-center mb-4">
                                 <div className="col-md-8">
-                                    <h5 className="mb-0">
+                                    <h5 className="mb-0 d-flex align-items-center">
                                         <i className="bi bi-building me-2"></i>
                                         {property.property_name || "Property Details"}
+                                        <span className="badge bg-primary ms-3">
+                                            <i className="bi bi-door-open me-1"></i>
+                                            {pagination?.count || units.length} Units
+                                        </span>
                                     </h5>
                                 </div>
                                 <div className="col-md-4">
@@ -841,9 +827,12 @@ function Property() {
                 <div className="leases-filters-section">
                     <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
                         <div className="d-flex align-items-center">
-                            <h5 className="mb-0 me-3">
+                            <h5 className="mb-0 me-3 d-flex align-items-center">
                                 <i className="bi bi-door-open me-2"></i>
                                 Units Management
+                                <span className="badge bg-primary ms-3">
+                                    {pagination?.count || units.length} Units
+                                </span>
                             </h5>
                             {/* Page Information */}
                             {(pagination && (pagination.total_pages > 1 || pagination.count > 0)) && (

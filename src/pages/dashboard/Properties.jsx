@@ -170,8 +170,9 @@ function Properties() {
                   <thead className="table-light">
                     <tr>
                       <th style={{ width: '20%' }}>Property Name</th>
-                      <th style={{ width: '40%' }}>Address</th>
-                      <th style={{ width: '20%' }}>Property Type</th>
+                      <th style={{ width: '30%' }}>Address</th>
+                      <th style={{ width: '15%' }}>Property Type</th>
+                      <th style={{ width: '15%' }}>Units</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -206,6 +207,14 @@ function Properties() {
                           <span className="badge bg-secondary">
                             {property.property_type || "Residential"}
                           </span>
+                        </td>
+                        <td>
+                          <div className="d-flex align-items-center">
+                            <i className="bi bi-door-open me-2 text-muted"></i>
+                            <span className="fw-semibold">
+                              {property.units_count || property.total_units || 0} units
+                            </span>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -251,6 +260,17 @@ function Properties() {
                             </div>
                           </div>
                         )}
+                        
+                        <div className="property-list-row">
+                          <div className="property-list-label">
+                            <i className="bi bi-door-open me-1"></i>Units
+                          </div>
+                          <div className="property-list-value">
+                            <span className="fw-semibold">
+                              {property.units_count || property.total_units || 0} units
+                            </span>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   ))}

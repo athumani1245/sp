@@ -29,23 +29,23 @@ function Leases() {
     };
   }, [search]);
 
-    const fetchLeases = useCallback(async (page = 1, searchTerm = '', filter = '') => {
+    const fetchLeases = useCallback(async (pageNum = page, searchTerm = debouncedSearch, statusFilter = status) => {
     try {
       setLoading(true);
       setError("");
       
       // Prepare parameters for the API call
       const params = {
-        page: page,
+        page: pageNum,
         limit: 10 // Number of leases per page
       };
       
-      if (debouncedSearch) {
-        params.search = debouncedSearch;
+      if (searchTerm) {
+        params.search = searchTerm;
       }
       
-      if (status) {
-        params.status = status;
+      if (statusFilter) {
+        params.status = statusFilter;
       }
       
       // Call the actual lease service
@@ -71,11 +71,11 @@ function Leases() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [page, debouncedSearch, status]);
 
   useEffect(() => {
     fetchLeases();
-  }, [fetchLeases, debouncedSearch, status, page]);
+  }, [fetchLeases]);
 
   const handleSearch = (e) => {
     const searchValue = e.target.value;
