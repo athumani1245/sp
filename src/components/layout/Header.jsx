@@ -409,7 +409,7 @@ function Header() {
                         </a>
 
                         {/* Right Section - Always right aligned */}
-                        <div className="ms-auto d-flex align-items-center">
+                        <div className="ms-auto d-flex align-items-right">
                             <button className="btn btn-link d-none d-lg-block p-1 text-dark me-2">
                                 <i className="bi bi-bell fs-5"></i>
                             </button>
