@@ -135,7 +135,7 @@ export const createSubscription = async (subscriptionData) => {
             description: responseData.description || responseData.message,
             message: responseData.message || "Subscription initiated successfully!",
             status: response.status,
-            transactionId: responseData.transaction_id || responseData.data?.transaction_id || responseData.data?.id,
+            transactionId: responseData.transaction_ref || responseData.data?.transaction_ref,
             requiresUserAction: response.status === 200 && responseData.description
         };
     } catch (err) {
@@ -337,7 +337,7 @@ const activePaymentListeners = new Map();
 export const checkPaymentStatus = async (transactionId) => {
     try {
         const response = await axios.get(
-            `${API_BASE}/payments/status/${transactionId}/`,
+            `${API_BASE}/subscribe/status/${transactionId}/`,
             { headers: getAuthHeaders() }
         );
 
@@ -385,12 +385,12 @@ export const startPaymentStatusListener = (transactionId, callback, options = {}
         try {
             const result = await checkPaymentStatus(transactionId);
             
-            if (result.success) {
+            if (result.statusCode === 200 || result.status == true) {
                 // Call the callback with the status update
                 callback(result);
                 
                 // Stop polling if payment is completed or failed
-                if (result.status === 'completed' || result.status === 'failed' || result.status === 'cancelled') {
+                if (result.description === 'success' || result.description === 'failed') {
                     stopPaymentStatusListener(transactionId);
                     return;
                 }

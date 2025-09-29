@@ -160,7 +160,7 @@ function Leases() {
                 />
                 {search && (
                   <button
-                    className="btn btn-outline-secondary"
+                    className="odoo-btn odoo-btn-secondary"
                     type="button"
                     onClick={() => {
                       setSearch("");
@@ -188,7 +188,7 @@ function Leases() {
             </div>
             <div className="flex-shrink-0">
               <button 
-                className="btn btn-primary"
+                className="odoo-btn odoo-btn-primary"
                 onClick={() => setShowAddModal(true)}
                 style={{ minWidth: '140px' }}
               >
@@ -239,7 +239,7 @@ function Leases() {
               </p>
               {!search && !status && (
                 <button 
-                  className="btn btn-primary btn-lg"
+                  className="odoo-btn odoo-btn-primary odoo-btn-lg"
                   onClick={() => setShowAddModal(true)}
                 >
                   <i className="bi bi-plus me-2"></i>
@@ -392,7 +392,7 @@ function Leases() {
               <nav aria-label="Leases pagination">
                 <div className="d-flex justify-content-between align-items-center">
                   <button
-                    className="btn btn-outline-secondary"
+                    className="odoo-btn odoo-btn-secondary"
                     disabled={pagination.current_page <= 1}
                     onClick={() => handlePageChange(pagination.current_page - 1)}
                   >
@@ -407,7 +407,7 @@ function Leases() {
                   </div>
 
                   <button
-                    className="btn btn-outline-secondary"
+                    className="odoo-btn odoo-btn-secondary"
                     disabled={pagination.current_page >= pagination.total_pages}
                     onClick={() => handlePageChange(pagination.current_page + 1)}
                   >

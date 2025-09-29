@@ -29,6 +29,12 @@ function Sidenav(){
                         <i className="bi bi-file-earmark-text"></i> Leases
                     </NavLink>
                 </li>
+                <li className="nav-item">
+                    <NavLink className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
+                             to="/reports">
+                        <i className="bi bi-folder"></i> Reports
+                    </NavLink>
+                </li>
                 
                 
                 {/*

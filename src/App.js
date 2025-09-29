@@ -14,6 +14,7 @@ import Leases from "./pages/Leases";
 import Lease from "./pages/Lease";
 import Tenants from "./pages/Tenants";
 import Tenant from "./pages/Tenant";
+import Reports from "./pages/Reports";
 import Profile from './pages/Profile';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import PrivateRoute from './components/PrivateRoute';
@@ -76,6 +77,11 @@ function App() {
           <Route path="/tenants/:tenantId" element={
             <PrivateRoute>
               <Tenant />
+            </PrivateRoute>
+          } />
+          <Route path="/reports" element={
+            <PrivateRoute>
+              <Reports />
             </PrivateRoute>
           } />
           <Route path="/profile" element={

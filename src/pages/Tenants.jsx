@@ -288,7 +288,7 @@ function Tenants() {
             </div>
             <div className="flex-shrink-0">
               <button 
-                className="btn btn-primary"
+                className="odoo-btn odoo-btn-primary"
                 onClick={() => setShowAddModal(true)}
                 style={{ minWidth: '160px' }}
               >
@@ -361,7 +361,7 @@ function Tenants() {
               </p>
               {!search && !status && (
                 <button 
-                  className="btn btn-primary btn-lg"
+                  className="odoo-btn odoo-btn-primary odoo-btn-lg"
                   onClick={() => setShowAddModal(true)}
                 >
                   <i className="bi bi-person-plus me-2"></i>
@@ -459,7 +459,7 @@ function Tenants() {
                             {editingTenantId === tenant.id ? (
                               <>
                                 <button
-                                  className="btn btn-sm btn-success me-1"
+                                  className="odoo-btn odoo-btn-success odoo-btn-sm me-1"
                                   onClick={handleSaveEditTenant}
                                   disabled={updatingTenant}
                                   title="Press Enter to confirm"
@@ -467,7 +467,7 @@ function Tenants() {
                                   <i className="bi bi-check2"></i>
                                 </button>
                                 <button
-                                  className="btn btn-sm btn-secondary"
+                                  className="odoo-btn odoo-btn-secondary odoo-btn-sm"
                                   onClick={handleCancelEditTenant}
                                   disabled={updatingTenant}
                                   title="Press Esc to cancel"
@@ -478,14 +478,14 @@ function Tenants() {
                             ) : (
                               <>
                                 <button
-                                  className="btn btn-sm btn-outline-primary me-1"
+                                  className="odoo-btn odoo-btn-outline-primary odoo-btn-sm me-1"
                                   onClick={(e) => handleEditTenant(e, tenant)}
                                   title="Edit Tenant"
                                 >
                                   <i className="bi bi-pencil"></i>
                                 </button>
                                 <button
-                                  className="btn btn-sm btn-outline-danger"
+                                  className="odoo-btn odoo-btn-outline-primary odoo-btn-sm"
                                   onClick={(e) => handleDeleteTenant(e, tenant)}
                                   title="Delete Tenant"
                                 >

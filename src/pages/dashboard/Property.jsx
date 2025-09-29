@@ -578,7 +578,7 @@ function Property() {
                         <h4 className="alert-heading">Error</h4>
                         <p>{error || "Property not found"}</p>
                         <hr />
-                        <Link to="/dashboard/properties" className="btn btn-outline-primary">
+                        <Link to="/dashboard/properties" className="odoo-btn odoo-btn-outline-primary">
                             <i className="bi bi-arrow-left me-2"></i>
                             Back to Properties
                         </Link>
@@ -610,7 +610,7 @@ function Property() {
                             </nav>
                         </div>
                         <div className="col-md-4">
-                            <Link to="/properties" className="btn btn-secondary w-100">
+                            <Link to="/properties" className="odoo-btn odoo-btn-secondary w-100">
                                 <i className="bi bi-arrow-left me-2"></i>
                                 Back to Properties
                             </Link>
@@ -666,7 +666,7 @@ function Property() {
                                 <div className="col-md-4">
                                     {!isEditing ? (
                                         <button
-                                            className="btn btn-primary w-100"
+                                            className="odoo-btn odoo-btn-primary w-100"
                                             onClick={() => setIsEditing(true)}
                                         >
                                             <i className="bi bi-pencil me-2"></i>
@@ -675,7 +675,7 @@ function Property() {
                                     ) : (
                                         <div className="d-flex gap-2">
                                             <button
-                                                className="btn btn-success flex-fill"
+                                                className="odoo-btn odoo-btn-success flex-fill"
                                                 onClick={handleSave}
                                                 disabled={updateLoading}
                                             >
@@ -683,7 +683,7 @@ function Property() {
                                                 {updateLoading ? "Saving..." : "Save"}
                                             </button>
                                             <button
-                                                className="btn btn-secondary flex-fill"
+                                                className="odoo-btn odoo-btn-secondary flex-fill"
                                                 onClick={handleCancel}
                                                 disabled={updateLoading}
                                             >
@@ -864,7 +864,7 @@ function Property() {
                             {/* Add Unit Button */}
                             {!isAddingUnit && (
                                 <button 
-                                    className="btn btn-primary"
+                                    className="odoo-btn odoo-btn-primary"
                                     onClick={() => setIsAddingUnit(true)}
                                     disabled={editingUnitId !== null}
                                     style={{ minWidth: '120px' }}
@@ -929,7 +929,7 @@ function Property() {
                                 <div className="col-12">
                                     <div className="d-flex gap-2">
                                         <button 
-                                            className="btn btn-success flex-fill"
+                                            className="odoo-btn odoo-btn-success flex-fill"
                                             onClick={handleSaveNewUnit}
                                             disabled={addingUnitLoading || !newUnitData.unit_name.trim() || !newUnitData.rent_per_month}
                                         >
@@ -937,7 +937,7 @@ function Property() {
                                             {addingUnitLoading ? 'Adding...' : 'Add Unit'}
                                         </button>
                                         <button 
-                                            className="btn btn-secondary flex-fill"
+                                            className="odoo-btn odoo-btn-secondary flex-fill"
                                             onClick={handleCancelNewUnit}
                                             disabled={addingUnitLoading}
                                         >
@@ -1016,7 +1016,7 @@ function Property() {
                                                 {editingUnitId === unit.id ? (
                                                     <div className="d-flex gap-2">
                                                         <button 
-                                                            className="btn btn-success btn-sm flex-fill"
+                                                            className="odoo-btn odoo-btn-success odoo-btn-sm flex-fill"
                                                             onClick={handleSaveEditUnit}
                                                             disabled={updatingUnit || !editUnitData.unit_name.trim()}
                                                         >
@@ -1024,7 +1024,7 @@ function Property() {
                                                             {updatingUnit ? 'Saving...' : 'Save'}
                                                         </button>
                                                         <button 
-                                                            className="btn btn-secondary btn-sm flex-fill"
+                                                            className="odoo-btn odoo-btn-secondary odoo-btn-sm flex-fill"
                                                             onClick={handleCancelEditUnit}
                                                             disabled={updatingUnit}
                                                         >
@@ -1035,7 +1035,7 @@ function Property() {
                                                 ) : (
                                                     <div className="d-flex gap-2">
                                                         <button 
-                                                            className="btn btn-outline-primary btn-sm flex-fill"
+                                                            className="odoo-btn odoo-btn-outline-primary odoo-btn-sm flex-fill"
                                                             onClick={() => handleEditUnit(unit)}
                                                             disabled={isAddingUnit || editingUnitId !== null}
                                                         >
@@ -1043,7 +1043,7 @@ function Property() {
                                                             Edit
                                                         </button>
                                                         <button 
-                                                            className="btn btn-outline-danger btn-sm flex-fill"
+                                                            className="odoo-btn odoo-btn-outline-primary odoo-btn-sm flex-fill"
                                                             disabled={isAddingUnit || editingUnitId !== null}
                                                             onClick={() => handleDeleteUnit(unit.id)}
                                                         >
@@ -1095,7 +1095,7 @@ function Property() {
                                             <div className="unit-card-actions">
                                                 <div className="d-flex gap-2">
                                                     <button 
-                                                        className="btn btn-success btn-sm flex-fill"
+                                                        className="odoo-btn odoo-btn-success odoo-btn-sm flex-fill"
                                                         onClick={handleSaveNewUnit}
                                                         disabled={addingUnitLoading || !newUnitData.unit_name.trim() || !newUnitData.rent_per_month}
                                                     >
@@ -1103,7 +1103,7 @@ function Property() {
                                                         {addingUnitLoading ? 'Adding...' : 'Add'}
                                                     </button>
                                                     <button 
-                                                        className="btn btn-secondary btn-sm flex-fill"
+                                                        className="odoo-btn odoo-btn-secondary odoo-btn-sm flex-fill"
                                                         onClick={handleCancelNewUnit}
                                                         disabled={addingUnitLoading}
                                                     >
@@ -1182,7 +1182,7 @@ function Property() {
                                                         {editingUnitId === unit.id ? (
                                                             <div className="btn-group btn-group-sm">
                                                                 <button 
-                                                                    className="btn btn-success btn-sm"
+                                                                    className="odoo-btn odoo-btn-success odoo-btn-sm"
                                                                     onClick={handleSaveEditUnit}
                                                                     disabled={updatingUnit || !editUnitData.unit_name.trim()}
                                                                     title="Save Changes"
@@ -1190,7 +1190,7 @@ function Property() {
                                                                     <i className="bi bi-check"></i>
                                                                 </button>
                                                                 <button 
-                                                                    className="btn btn-secondary btn-sm"
+                                                                    className="odoo-btn odoo-btn-secondary odoo-btn-sm"
                                                                     onClick={handleCancelEditUnit}
                                                                     disabled={updatingUnit}
                                                                     title="Cancel Edit"
@@ -1201,7 +1201,7 @@ function Property() {
                                                         ) : (
                                                             <div className="btn-group btn-group-sm" role="group">
                                                                 <button 
-                                                                    className="btn btn-outline-success"
+                                                                    className="odoo-btn odoo-btn-outline-primary odoo-btn-sm"
                                                                     title="Edit Unit"
                                                                     onClick={() => handleEditUnit(unit)}
                                                                     disabled={isAddingUnit || editingUnitId !== null}
@@ -1209,7 +1209,7 @@ function Property() {
                                                                     <i className="bi bi-pencil"></i>
                                                                 </button>
                                                                 <button 
-                                                                    className="btn btn-outline-danger"
+                                                                    className="odoo-btn odoo-btn-outline-primary odoo-btn-sm"
                                                                     title="Delete Unit"
                                                                     disabled={isAddingUnit || editingUnitId !== null}
                                                                     onClick={() => handleDeleteUnit(unit.id)}
@@ -1258,7 +1258,7 @@ function Property() {
                                                     <td>
                                                         <div className="btn-group btn-group-sm">
                                                             <button 
-                                                                className="btn btn-success btn-sm"
+                                                                className="odoo-btn odoo-btn-success odoo-btn-sm"
                                                                 onClick={handleSaveNewUnit}
                                                                 disabled={addingUnitLoading || !newUnitData.unit_name.trim() || !newUnitData.rent_per_month}
                                                                 title="Save Unit"
@@ -1266,7 +1266,7 @@ function Property() {
                                                                 <i className="bi bi-check"></i>
                                                             </button>
                                                             <button 
-                                                                className="btn btn-secondary btn-sm"
+                                                                className="odoo-btn odoo-btn-secondary odoo-btn-sm"
                                                                 onClick={handleCancelNewUnit}
                                                                 disabled={addingUnitLoading}
                                                                 title="Cancel"
@@ -1289,7 +1289,7 @@ function Property() {
                                                 <nav aria-label="Units pagination">
                                                     <div className="d-flex justify-content-between align-items-center">
                                                         <button
-                                                            className="btn btn-outline-secondary"
+                                                            className="odoo-btn odoo-btn-secondary"
                                                             disabled={(pagination.current_page || 1) <= 1}
                                                             onClick={() => handlePageChange((pagination.current_page || 1) - 1)}
                                                         >
@@ -1304,7 +1304,7 @@ function Property() {
                                                         </div>
 
                                                         <button
-                                                            className="btn btn-outline-secondary"
+                                                            className="odoo-btn odoo-btn-secondary"
                                                             disabled={(pagination.current_page || 1) >= (pagination.total_pages || 1)}
                                                             onClick={() => handlePageChange((pagination.current_page || 1) + 1)}
                                                         >
@@ -1330,13 +1330,14 @@ function Property() {
                     <p>Are you sure you want to delete this unit? This action cannot be undone.</p>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={cancelDeleteUnit} disabled={deletingUnit}>
+                    <Button variant="secondary" onClick={cancelDeleteUnit} disabled={deletingUnit} className="odoo-btn odoo-btn-secondary">
                         Cancel
                     </Button>
                     <Button 
                         variant="danger" 
                         onClick={confirmDeleteUnit} 
                         disabled={deletingUnit}
+                        className="odoo-btn odoo-btn-danger"
                     >
                         {deletingUnit ? 'Deleting...' : 'Delete Unit'}
                     </Button>
@@ -1355,7 +1356,7 @@ function Property() {
                 <p className="mb-0">{errorModalMessage}</p>
             </Modal.Body>
             <Modal.Footer>
-                <Button variant="primary" onClick={closeErrorModal}>
+                <Button variant="primary" onClick={closeErrorModal} className="odoo-btn odoo-btn-primary">
                     OK
                 </Button>
             </Modal.Footer>

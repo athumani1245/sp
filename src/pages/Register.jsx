@@ -190,7 +190,7 @@ function Register() {
                                     <div className="col-12">
                                         <button 
                                             type="submit" 
-                                            className="btn btn-submit w-100 mt-2" 
+                                            className="odoo-btn odoo-btn-primary w-100 mt-2" 
                                             disabled={loading}
                                         >
                                             {loading ? "Registering..." : "Create Account"}

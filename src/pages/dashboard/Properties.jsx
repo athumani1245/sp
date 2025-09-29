@@ -89,7 +89,7 @@ function Properties() {
             </div>
             <div className="flex-shrink-0">
               <button
-                className="btn btn-danger d-flex align-items-center"
+                className="odoo-btn odoo-btn-primary d-flex align-items-center"
                 onClick={() => setShowModal(true)}
                 type="button"
                 style={{ minWidth: '180px' }}
@@ -152,7 +152,7 @@ function Properties() {
               </p>
               {!search && (
                 <button 
-                  className="btn btn-primary btn-lg"
+                  className="odoo-btn odoo-btn-primary odoo-btn-lg"
                   onClick={() => setShowModal(true)}
                 >
                   <i className="bi bi-plus me-2"></i>
@@ -285,7 +285,7 @@ function Properties() {
               <nav aria-label="Properties pagination">
                 <div className="d-flex justify-content-between align-items-center">
                   <button
-                    className="btn btn-outline-secondary"
+                    className="odoo-btn odoo-btn-secondary"
                     disabled={(pagination.current_page || page) <= 1}
                     onClick={() => handlePageChange((pagination.current_page || page) - 1)}
                   >
@@ -300,7 +300,7 @@ function Properties() {
                   </div>
 
                   <button
-                    className="btn btn-outline-secondary"
+                    className="odoo-btn odoo-btn-secondary"
                     disabled={(pagination.current_page || page) >= (pagination.total_pages || 1)}
                     onClick={() => handlePageChange((pagination.current_page || page) + 1)}
                   >

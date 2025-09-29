@@ -103,3 +103,213 @@ i:focus-visible {
     outline: none !important;
     box-shadow: none !important;
 }
+
+/* Odoo-Style Button System */
+.odoo-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.5;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease-in-out;
+    min-height: 38px;
+    gap: 6px;
+}
+
+.odoo-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.odoo-btn i {
+    font-size: 14px;
+}
+
+/* Primary Button */
+.odoo-btn-primary {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+    box-shadow: 0 1px 3px rgba(204, 91, 75, 0.2);
+}
+
+.odoo-btn-primary:hover {
+    background: var(--primary-hover);
+    border-color: var(--primary-hover);
+    box-shadow: 0 2px 6px rgba(204, 91, 75, 0.3);
+    color: white;
+    transform: translateY(-1px);
+}
+
+.odoo-btn-primary:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(204, 91, 75, 0.2);
+}
+
+/* Secondary Button */
+.odoo-btn-secondary {
+    background: white;
+    color: var(--text-dark);
+    border-color: #d0d5dd;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
+}
+
+.odoo-btn-secondary:hover {
+    background: #f9fafb;
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    box-shadow: 0 1px 3px rgba(16, 24, 40, 0.1);
+    transform: translateY(-1px);
+}
+
+.odoo-btn-secondary:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
+}
+
+/* Danger Button */
+.odoo-btn-danger {
+    background: #dc3545;
+    color: white;
+    border-color: #dc3545;
+    box-shadow: 0 1px 3px rgba(220, 53, 69, 0.2);
+}
+
+.odoo-btn-danger:hover {
+    background: #c82333;
+    border-color: #c82333;
+    color: white;
+    box-shadow: 0 2px 6px rgba(220, 53, 69, 0.3);
+    transform: translateY(-1px);
+}
+
+.odoo-btn-danger:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(220, 53, 69, 0.2);
+}
+
+/* Success Button */
+.odoo-btn-success {
+    background: #28a745;
+    color: white;
+    border-color: #28a745;
+    box-shadow: 0 1px 3px rgba(40, 167, 69, 0.2);
+}
+
+.odoo-btn-success:hover {
+    background: #218838;
+    border-color: #218838;
+    color: white;
+    box-shadow: 0 2px 6px rgba(40, 167, 69, 0.3);
+    transform: translateY(-1px);
+}
+
+.odoo-btn-success:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(40, 167, 69, 0.2);
+}
+
+/* Warning Button */
+.odoo-btn-warning {
+    background: #ffc107;
+    color: #212529;
+    border-color: #ffc107;
+    box-shadow: 0 1px 3px rgba(255, 193, 7, 0.2);
+}
+
+.odoo-btn-warning:hover {
+    background: #e0a800;
+    border-color: #e0a800;
+    color: #212529;
+    box-shadow: 0 2px 6px rgba(255, 193, 7, 0.3);
+    transform: translateY(-1px);
+}
+
+.odoo-btn-warning:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(255, 193, 7, 0.2);
+}
+
+/* Outline variants */
+.odoo-btn-outline-primary {
+    background: transparent;
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.odoo-btn-outline-primary:hover {
+    background: var(--primary-color);
+    color: white;
+    transform: translateY(-1px);
+}
+
+.odoo-btn-outline-secondary {
+    background: transparent;
+    color: var(--text-dark);
+    border-color: #d0d5dd;
+}
+
+.odoo-btn-outline-secondary:hover {
+    background: var(--text-dark);
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* Button sizes */
+.odoo-btn-sm {
+    padding: 6px 12px;
+    font-size: 12px;
+    min-height: 32px;
+}
+
+.odoo-btn-lg {
+    padding: 12px 24px;
+    font-size: 16px;
+    min-height: 48px;
+}
+
+/* Button group styles for mobile */
+.odoo-btn-group {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+    .odoo-btn {
+        flex: 1;
+        min-width: 0;
+        font-size: 13px;
+        padding: 8px 12px;
+    }
+    
+    .odoo-btn-group {
+        gap: 6px;
+    }
+    
+    .odoo-btn-group .odoo-btn {
+        flex: 1;
+    }
+}
+
+/* Loading state */
+.odoo-btn.loading {
+    pointer-events: none;
+}
+
+.odoo-btn.loading i {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}

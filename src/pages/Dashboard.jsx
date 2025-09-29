@@ -137,7 +137,7 @@ function Dashboard() {
                             <i className="bi bi-exclamation-triangle me-2"></i>
                             {error}
                             <button 
-                                className="btn btn-sm btn-outline-danger ms-2"
+                                className="odoo-btn odoo-btn-outline-primary odoo-btn-sm ms-2"
                                 onClick={fetchDashboardData}
                             >
                                 <i className="bi bi-arrow-clockwise me-1"></i>
@@ -174,7 +174,7 @@ function Dashboard() {
                                 <i className="bi bi-exclamation-triangle me-2"></i>
                                 {leasesError}
                                 <button 
-                                    className="btn btn-sm btn-outline-danger ms-2"
+                                    className="odoo-btn odoo-btn-outline-primary odoo-btn-sm ms-2"
                                     onClick={fetchRecentLeases}
                                 >
                                     <i className="bi bi-arrow-clockwise me-1"></i>

@@ -545,7 +545,7 @@ const AddPropertyModal = ({isOpen, onClose, onPropertyAdded})=>{
                         <div className="modal-footer border-0 pt-0">
                             <button 
                                 type="button" 
-                                className="btn btn-secondary"
+                                className="odoo-btn odoo-btn-secondary"
                                 onClick={handleClose}
                                 disabled={loading}
                             >
@@ -554,7 +554,7 @@ const AddPropertyModal = ({isOpen, onClose, onPropertyAdded})=>{
                             </button>
                             <button 
                                 type="submit" 
-                                className="btn btn-primary"
+                                className="odoo-btn odoo-btn-primary"
                                 disabled={loading}
                             >
                                 {loading ? (

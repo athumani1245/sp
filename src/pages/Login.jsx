@@ -103,7 +103,7 @@ function Login() {
                                             required
                                         />
                                         <button
-                                            className="btn btn-outline-secondary"
+                                            className="odoo-btn odoo-btn-secondary"
                                             type="button"
                                             onClick={() => setShowPassword(!showPassword)}
                                             tabIndex="-1"
@@ -114,7 +114,7 @@ function Login() {
                                 </div>
                                 <button 
                                     type="submit" 
-                                    className="btn btn-submit w-100" 
+                                    className="odoo-btn odoo-btn-primary w-100" 
                                     disabled={loading}
                                 >
                                     {loading ? "Logging in..." : "Log in"}

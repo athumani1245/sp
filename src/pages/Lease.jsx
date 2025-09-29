@@ -3,7 +3,9 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { Button, Alert, Modal } from "react-bootstrap";
 import Layout from "../components/Layout";
 import Payments from "../components/snippets/Payments";
+import Toast from "../components/Toast";
 import { getLeaseById, getLeaseDocuments, /* terminateLease, */ cancelLease } from "../services/leaseService";
+import { generateLeaseAgreementPDF } from "../reports";
 import "../assets/styles/leases.css";
 
 function Lease() {
@@ -17,6 +19,9 @@ function Lease() {
   const [activeTab, setActiveTab] = useState("details");
   const [isCancelling, setIsCancelling] = useState(false);
   const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [toastConfig, setToastConfig] = useState({});
   // const [showTerminateConfirmation, setShowTerminateConfirmation] = useState(false);
   // const [isTerminating, setIsTerminating] = useState(false);
   // const [terminationData, setTerminationData] = useState({
@@ -154,6 +159,39 @@ function Lease() {
     return `TSh ${numAmount.toLocaleString()}`;
   };
 
+  const showToastMessage = (title, message, variant = 'success') => {
+    setToastConfig({ title, message, variant });
+    setShowToast(true);
+  };
+
+  const handlePreviewLeaseDocument = async () => {
+    setIsGeneratingPDF(true);
+    setError(""); // Clear any existing errors
+    
+    try {
+      await generateLeaseAgreementPDF(lease, {
+        download: false,
+        preview: true,
+        filename: `lease-agreement-${lease.lease_number}-${lease.tenant.first_name}-${lease.tenant.last_name}.pdf`
+      });
+      
+      showToastMessage(
+        'Success!', 
+        'Lease agreement document preview opened in new tab. You can download it from there.',
+        'success'
+      );
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      showToastMessage(
+        'Error',
+        'Failed to generate lease document. Please try again.',
+        'danger'
+      );
+    } finally {
+      setIsGeneratingPDF(false);
+    }
+  };
+
   const getUnitInfo = (lease) => {
     // Handle different possible field names for unit information
     if (lease.unit_number) {
@@ -241,6 +279,17 @@ function Lease() {
 
   return (
     <Layout>
+      {/* Toast notification */}
+      <Toast
+        show={showToast}
+        onClose={() => setShowToast(false)}
+        title={toastConfig.title}
+        message={toastConfig.message}
+        variant={toastConfig.variant}
+        autoHide={true}
+        delay={4000}
+      />
+      
       <div className="main-content">
         {/* Header */}
         <div className="leases-filters-section">
@@ -265,25 +314,72 @@ function Lease() {
               </small>
             </div>
             <div className="col-md-4">
-              <div className="d-flex flex-column flex-md-row gap-2">
+              {/* Desktop: horizontal button group, Mobile: 2 buttons per row */}
+              <div className="d-none d-md-flex odoo-button-group">
                 <button
-                  className="btn btn-outline-secondary flex-fill"
+                  className="odoo-button odoo-secondary"
                   onClick={() => navigate("/leases")}
                 >
-                  <i className="bi bi-arrow-left me-1"></i>
-                  <span className="d-none d-md-inline">Back to </span>Leases
+                  <i className="bi bi-arrow-left"></i>
+                  <span>Back</span>
+                </button>
+                <button
+                  className={`odoo-button odoo-primary ${isGeneratingPDF ? 'loading' : ''}`}
+                  onClick={handlePreviewLeaseDocument}
+                  disabled={isGeneratingPDF}
+                >
+                  {!isGeneratingPDF && <i className="bi bi-file-text"></i>}
+                  {isGeneratingPDF ? 'Generating...' : 'Document'}
                 </button>
                 {/* Only show Cancel button if lease is not already cancelled, terminated, or expired */}
                 {lease.status !== 'cancelled' && lease.status !== 'terminated' && lease.status !== 'expired' && (
                   <button
-                    className="btn btn-danger flex-fill"
+                    className={`odoo-button odoo-danger ${isCancelling ? 'loading' : ''}`}
                     onClick={handleCancelClick}
                     disabled={isCancelling}
                   >
-                    <i className="bi bi-x-circle me-1"></i>
-                    {isCancelling ? 'Cancelling...' : 'Cancel'}
+                    {!isCancelling && <i className="bi bi-x-circle"></i>}
+                    {isCancelling ? 'Cancelling...' : 'Cancel Lease'}
                   </button>
                 )}
+              </div>
+              
+              {/* Mobile: 2 buttons per row using grid */}
+              <div className="d-md-none">
+                <div className="row g-2">
+                  <div className="col-6">
+                    <button
+                      className="odoo-button odoo-secondary w-100"
+                      onClick={() => navigate("/leases")}
+                    >
+                      <i className="bi bi-arrow-left"></i>
+                      <span>Back</span>
+                    </button>
+                  </div>
+                  <div className="col-6">
+                    <button
+                      className={`odoo-button odoo-primary w-100 ${isGeneratingPDF ? 'loading' : ''}`}
+                      onClick={handlePreviewLeaseDocument}
+                      disabled={isGeneratingPDF}
+                    >
+                      {!isGeneratingPDF && <i className="bi bi-eye"></i>}
+                      {isGeneratingPDF ? 'Generating...' : 'Document'}
+                    </button>
+                  </div>
+                  {/* Only show Cancel button if lease is not already cancelled, terminated, or expired */}
+                  {lease.status !== 'cancelled' && lease.status !== 'terminated' && lease.status !== 'expired' && (
+                    <div className="col-12 mt-1">
+                      <button
+                        className={`odoo-button odoo-danger w-100 ${isCancelling ? 'loading' : ''}`}
+                        onClick={handleCancelClick}
+                        disabled={isCancelling}
+                      >
+                        {!isCancelling && <i className="bi bi-x-circle"></i>}
+                        {isCancelling ? 'Cancelling...' : 'Cancel Lease'}
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>

@@ -219,7 +219,7 @@ const AddTenantModal = ({ isOpen, onClose, onTenantAdded }) => {
                         variant="secondary" 
                         onClick={onClose}
                         disabled={submitLoading}
-                        className="btn btn-secondary"
+                        className="odoo-btn odoo-btn-secondary"
                     >
                         <i className="bi bi-x-circle me-2"></i>
                         Cancel
@@ -228,7 +228,7 @@ const AddTenantModal = ({ isOpen, onClose, onTenantAdded }) => {
                         variant="primary" 
                         type="submit"
                         disabled={submitLoading}
-                        className="btn btn-primary"
+                        className="odoo-btn odoo-btn-primary"
                     >
                         {submitLoading ? (
                             <>
