@@ -1127,6 +1127,13 @@ function Header() {
                         >
                             <i className="bi bi-person me-2"></i> Tenants
                         </NavLink>
+                        <NavLink 
+                            to="/reports" 
+                            className={({isActive}) => `list-group-item list-group-item-action ${isActive ? 'active' : ''}`}
+                            onClick={handleMobileNavToggle}
+                        >
+                            <i className="bi bi-file-earmark-bar-graph me-2"></i> Reports
+                        </NavLink>
                     </div>
                 </nav>
             </div>

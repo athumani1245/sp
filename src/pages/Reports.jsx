@@ -17,6 +17,7 @@ function Reports() {
   const [reportData, setReportData] = useState(null);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [showDateRangeModal, setShowDateRangeModal] = useState(false);
+  const [selectedFormat, setSelectedFormat] = useState('pdf');
   const [dateFilter, setDateFilter] = useState({
     startDate: new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0], // Start of current year
     endDate: new Date().toISOString().split('T')[0] // Today
@@ -141,9 +142,10 @@ function Reports() {
     setShowToast(true);
   };
 
-  const handleGenerateReport = async (report) => {
+  const handleGenerateReport = async (report, format = 'pdf') => {
     setSelectedReport(report);
-
+    setSelectedFormat(format);
+    
     if (report.id === 'lease_agreements') {
       // Show date range selection for lease agreements
       setShowDateRangeModal(true);
@@ -151,7 +153,7 @@ function Reports() {
       // For other reports, generate directly
       setLoading(true);
       try {
-        await generateGenericReport(report);
+        await generateGenericReport(report, format);
       } catch (error) {
         console.error('Error generating report:', error);
         showToastMessage('Error', 'Failed to generate report. Please try again.', 'danger');
@@ -161,12 +163,15 @@ function Reports() {
     }
   };
 
-  const generateGenericReport = async (report) => {
+
+
+  const generateGenericReport = async (report, format = 'pdf') => {
     // Placeholder for generic report generation
-    // In a real implementation, you would create different report templates
+    // In a real implementation, you would create different report templates for PDF and Excel
+    const formatName = format.toUpperCase();
     showToastMessage(
       'Report Generated',
-      `${report.title} has been prepared and will be available for download shortly.`,
+      `${report.title} (${formatName}) has been prepared and will be available for download shortly.`,
       'success'
     );
   };
@@ -176,22 +181,42 @@ function Reports() {
     setShowDateRangeModal(false);
 
     try {
-      // Fetch leases within the selected date range
-      const result = await getLeases({ 
-        limit: 100,
-        start_date: dateFilter.startDate,
-        end_date: dateFilter.endDate
-      });
-      
-      if (result.success && result.data?.items?.length > 0) {
-        setReportData(result.data.items);
-        setShowPreviewModal(true);
+      // For lease agreements, only PDF is supported for individual lease documents
+      if (selectedFormat === 'excel') {
+        // Generate Excel report with all leases in date range
+        const result = await getLeases({ 
+          limit: 100,
+          start_date: dateFilter.startDate,
+          end_date: dateFilter.endDate
+        });
+        
+        if (result.success && result.data?.items?.length > 0) {
+          await generateGenericReport(selectedReport, 'excel');
+        } else {
+          showToastMessage(
+            'No Data', 
+            `No leases found between ${dateFilter.startDate} and ${dateFilter.endDate}.`, 
+            'warning'
+          );
+        }
       } else {
-        showToastMessage(
-          'No Data', 
-          `No leases found between ${dateFilter.startDate} and ${dateFilter.endDate}.`, 
-          'warning'
-        );
+        // PDF format - show lease selection
+        const result = await getLeases({ 
+          limit: 100,
+          start_date: dateFilter.startDate,
+          end_date: dateFilter.endDate
+        });
+        
+        if (result.success && result.data?.items?.length > 0) {
+          setReportData(result.data.items);
+          setShowPreviewModal(true);
+        } else {
+          showToastMessage(
+            'No Data', 
+            `No leases found between ${dateFilter.startDate} and ${dateFilter.endDate}.`, 
+            'warning'
+          );
+        }
       }
     } catch (error) {
       console.error('Error fetching leases:', error);
@@ -256,23 +281,22 @@ function Reports() {
         {/* Header */}
         <div className="leases-filters-section">
           <div className="row g-3 align-items-center">
-            <div className="col-md-8">
+            <div className="col-8">
               <h4 className="mb-1">
                 <i className="bi bi-file-earmark-text me-2"></i>
-                Reports & Exports
+                <span className="d-none d-sm-inline">Reports & Exports</span>
+                <span className="d-inline d-sm-none">Reports</span>
               </h4>
-              <small className="text-muted">
-                Generate and export various reports for your property management data
-              </small>
             </div>
-            <div className="col-md-4">
+            <div className="col-4">
               <div className="d-flex justify-content-end">
                 <button
-                  className="odoo-btn odoo-btn-secondary"
+                  className="odoo-btn odoo-btn-secondary odoo-btn-sm"
                   onClick={() => navigate("/dashboard")}
                 >
                   <i className="bi bi-arrow-left me-1"></i>
-                  <span className="d-none d-md-inline">Back to </span>Dashboard
+                  <span className="d-none d-md-inline">Back to </span>
+                  <span className="d-none d-sm-inline d-md-none">Back</span>
                 </button>
               </div>
             </div>
@@ -289,7 +313,7 @@ function Reports() {
               </h6>
               <div className="row g-2">
                 {reports.map((report) => (
-                  <div key={report.id} className="col-xl-3 col-lg-4 col-md-6 col-sm-6">
+                  <div key={report.id} className="col-xl-3 col-lg-4 col-md-6 col-6">
                     <div className="report-card compact">
                       <div className="report-card-header">
                         <div className={`report-icon bg-${report.color}`}>
@@ -301,23 +325,42 @@ function Reports() {
                         </div>
                       </div>
                       <div className="report-card-footer">
-                        <button
-                          className={`odoo-btn odoo-btn-${report.color} odoo-btn-sm w-100`}
-                          onClick={() => handleGenerateReport(report)}
-                          disabled={loading && selectedReport?.id === report.id}
-                        >
-                          {loading && selectedReport?.id === report.id ? (
-                            <>
-                              <i className="bi bi-arrow-clockwise loading me-1"></i>
-                              Generating...
-                            </>
-                          ) : (
-                            <>
-                              <i className="bi bi-download me-1"></i>
-                              Export
-                            </>
-                          )}
-                        </button>
+                        <div className="d-flex gap-2">
+                          <button
+                            className="odoo-btn odoo-btn-danger odoo-btn-sm flex-fill"
+                            onClick={() => handleGenerateReport(report, 'pdf')}
+                            disabled={loading && selectedReport?.id === report.id && selectedFormat === 'pdf'}
+                          >
+                            {loading && selectedReport?.id === report.id && selectedFormat === 'pdf' ? (
+                              <>
+                                <i className="bi bi-arrow-clockwise loading me-1"></i>
+                                <span className="d-none d-sm-inline">Generating...</span>
+                              </>
+                            ) : (
+                              <>
+                                <i className="bi bi-file-earmark-pdf me-1"></i>
+                                <span className="d-none d-sm-inline">PDF</span>
+                              </>
+                            )}
+                          </button>
+                          <button
+                            className="odoo-btn odoo-btn-success odoo-btn-sm flex-fill"
+                            onClick={() => handleGenerateReport(report, 'excel')}
+                            disabled={loading && selectedReport?.id === report.id && selectedFormat === 'excel'}
+                          >
+                            {loading && selectedReport?.id === report.id && selectedFormat === 'excel' ? (
+                              <>
+                                <i className="bi bi-arrow-clockwise loading me-1"></i>
+                                <span className="d-none d-sm-inline">Generating...</span>
+                              </>
+                            ) : (
+                              <>
+                                <i className="bi bi-file-earmark-excel me-1"></i>
+                                <span className="d-none d-sm-inline">Excel</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -378,6 +421,8 @@ function Reports() {
         </div>
       </div>
 
+
+
       {/* Date Range Selection Modal */}
       {showDateRangeModal && selectedReport?.id === 'lease_agreements' && (
         <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
@@ -385,8 +430,8 @@ function Reports() {
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title">
-                  <i className="bi bi-calendar-range me-2"></i>
-                  Select Date Range for Lease Agreements
+                  <i className={`bi ${selectedFormat === 'pdf' ? 'bi-file-earmark-pdf' : 'bi-file-earmark-excel'} me-2`}></i>
+                  Select Date Range for Lease Agreements ({selectedFormat.toUpperCase()})
                 </h5>
                 <button
                   type="button"
@@ -395,8 +440,20 @@ function Reports() {
                 ></button>
               </div>
               <div className="modal-body">
+                <div className="alert alert-info d-flex align-items-center mb-4">
+                  <i className={`bi ${selectedFormat === 'pdf' ? 'bi-file-earmark-pdf' : 'bi-file-earmark-excel'} me-2`}></i>
+                  <div>
+                    <strong>Export Format:</strong> {selectedFormat.toUpperCase()}
+                    <br />
+                    <small>
+                      {selectedFormat === 'pdf' 
+                        ? 'Individual lease documents will be available for selection and download' 
+                        : 'A summary report of all leases in the date range will be generated'}
+                    </small>
+                  </div>
+                </div>
                 <p className="text-muted mb-4">
-                  Choose the date range for lease agreements you want to include in the report:
+                  Choose the date range for lease agreements you want to include in the {selectedFormat.toUpperCase()} report:
                 </p>
                 
                 <div className="date-range-selector">
@@ -434,10 +491,10 @@ function Reports() {
                         />
                       </div>
                     </div>
-                    
-                   
                   </div>
                 </div>
+
+
 
                 
               </div>
@@ -463,8 +520,8 @@ function Reports() {
                     </>
                   ) : (
                     <>
-                      <i className="bi bi-search me-2"></i>
-                      Find Leases
+                      <i className={`bi ${selectedFormat === 'pdf' ? 'bi-file-earmark-pdf' : 'bi-file-earmark-excel'} me-2`}></i>
+                      Generate {selectedFormat.toUpperCase()} Report
                     </>
                   )}
                 </button>
