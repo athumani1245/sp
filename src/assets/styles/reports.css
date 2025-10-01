@@ -682,3 +682,223 @@
     text-align: right;
   }
 }
+
+/* Data Table Modal Styles */
+.modal-xl {
+  max-width: 95%;
+}
+
+.data-table-toolbar {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.data-table-container {
+  max-height: 70vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.table-responsive {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 60vh;
+}
+
+.data-table-container table {
+  font-size: 13px;
+}
+
+.data-table-container th {
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #dee2e6;
+  font-weight: 600;
+  font-size: 12px;
+  padding: 12px 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.data-table-container td {
+  padding: 10px 8px;
+  vertical-align: middle;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+.data-table-container tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.data-table-container tbody tr.table-primary {
+  background-color: #cce5ff !important;
+}
+
+.data-table-container tbody tr.table-primary:hover {
+  background-color: #b3d9ff !important;
+}
+
+/* Search box styling */
+.search-box {
+  position: relative;
+  min-width: 250px;
+}
+
+.search-box input {
+  padding-right: 35px;
+  border-radius: 6px;
+  border: 1px solid #d1d3e2;
+  font-size: 13px;
+}
+
+.search-box::after {
+  content: '\f52a';
+  font-family: 'Bootstrap Icons';
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6c757d;
+  pointer-events: none;
+}
+
+/* Pagination styling */
+.pagination .page-link {
+  border: 1px solid #dee2e6;
+  color: #495057;
+  font-size: 13px;
+  padding: 6px 12px;
+}
+
+.pagination .page-item.active .page-link {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.pagination .page-link:hover {
+  background-color: #f8f9fa;
+  border-color: #adb5bd;
+}
+
+/* Export buttons */
+.data-table-toolbar .btn {
+  border-radius: 6px;
+  font-size: 12px;
+  padding: 6px 12px;
+  font-weight: 500;
+}
+
+.data-table-toolbar .btn-success {
+  background-color: #28a745;
+  border-color: #28a745;
+}
+
+.data-table-toolbar .btn-danger {
+  background-color: #dc3545;
+  border-color: #dc3545;
+}
+
+/* Badge styling */
+.badge {
+  font-size: 10px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+/* Date inputs in toolbar */
+.data-table-toolbar input[type="date"] {
+  width: 130px;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #d1d3e2;
+}
+
+/* Empty state */
+.data-table-container .display-1 {
+  font-size: 4rem;
+  opacity: 0.3;
+}
+
+/* Mobile responsive for data table */
+@media (max-width: 768px) {
+  .modal-xl {
+    max-width: 98%;
+    margin: 5px;
+  }
+  
+  .data-table-toolbar {
+    padding: 15px !important;
+  }
+  
+  .data-table-toolbar .d-flex {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch !important;
+  }
+  
+  .search-box {
+    min-width: 100%;
+  }
+  
+  .data-table-container {
+    max-height: 65vh;
+  }
+  
+  .table-responsive {
+    max-height: 55vh;
+  }
+  
+  .data-table-container th,
+  .data-table-container td {
+    padding: 8px 4px;
+    font-size: 11px;
+  }
+  
+  .data-table-container th {
+    font-size: 10px;
+  }
+  
+  .badge {
+    font-size: 9px;
+    padding: 2px 4px;
+  }
+  
+  /* Hide some columns on mobile */
+  .data-table-container th:nth-child(n+6),
+  .data-table-container td:nth-child(n+6) {
+    display: none;
+  }
+  
+  .pagination {
+    justify-content: center;
+    margin-bottom: 0;
+  }
+  
+  .pagination .page-link {
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+}
+
+@media (max-width: 576px) {
+  .data-table-toolbar .btn {
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+  
+  .data-table-toolbar .d-flex.align-items-center.gap-2 {
+    flex-direction: column;
+    gap: 8px !important;
+  }
+  
+  /* Hide even more columns on very small screens */
+  .data-table-container th:nth-child(n+4),
+  .data-table-container td:nth-child(n+4) {
+    display: none;
+  }
+}

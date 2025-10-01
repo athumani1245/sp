@@ -6,6 +6,7 @@ import { generateLeaseAgreementPDF } from "../reports";
 import { getLeases } from "../services/leaseService";
 import { getProperties } from "../services/propertyService";
 import { getTenants } from "../services/tenantService";
+import { LeaseReportModal, PropertyReportModal, TenantReportModal } from "./reports/index";
 import "../assets/styles/reports.css";
 
 function Reports() {
@@ -18,6 +19,9 @@ function Reports() {
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [showDateRangeModal, setShowDateRangeModal] = useState(false);
   const [selectedFormat, setSelectedFormat] = useState('pdf');
+  const [showLeaseModal, setShowLeaseModal] = useState(false);
+  const [showPropertyModal, setShowPropertyModal] = useState(false);
+  const [showTenantModal, setShowTenantModal] = useState(false);
   const [dateFilter, setDateFilter] = useState({
     startDate: new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0], // Start of current year
     endDate: new Date().toISOString().split('T')[0] // Today
@@ -146,20 +150,16 @@ function Reports() {
     setSelectedReport(report);
     setSelectedFormat(format);
     
-    if (report.id === 'lease_agreements') {
-      // Show date range selection for lease agreements
-      setShowDateRangeModal(true);
+    // Show appropriate modal based on report data source
+    if (report.dataSource === 'leases' || report.id === 'lease_agreements' || report.id === 'lease_expiry' || report.id === 'lease_renewal_termination') {
+      setShowLeaseModal(true);
+    } else if (report.dataSource === 'properties' || report.id === 'property_summary' || report.id === 'units_availability' || report.id === 'property_performance' || report.id === 'occupancy_report') {
+      setShowPropertyModal(true);
+    } else if (report.dataSource === 'tenants' || report.id === 'tenant_directory' || report.id === 'tenant_payment_history' || report.id === 'tenant_outstanding_balance') {
+      setShowTenantModal(true);
     } else {
-      // For other reports, generate directly
-      setLoading(true);
-      try {
-        await generateGenericReport(report, format);
-      } catch (error) {
-        console.error('Error generating report:', error);
-        showToastMessage('Error', 'Failed to generate report. Please try again.', 'danger');
-      } finally {
-        setLoading(false);
-      }
+      // Default to lease modal for other reports
+      setShowLeaseModal(true);
     }
   };
 
@@ -256,6 +256,8 @@ function Reports() {
     }));
   };
 
+
+
   const groupedReports = reportTypes.reduce((acc, report) => {
     if (!acc[report.category]) {
       acc[report.category] = [];
@@ -325,42 +327,23 @@ function Reports() {
                         </div>
                       </div>
                       <div className="report-card-footer">
-                        <div className="d-flex gap-2">
-                          <button
-                            className="odoo-btn odoo-btn-danger odoo-btn-sm flex-fill"
-                            onClick={() => handleGenerateReport(report, 'pdf')}
-                            disabled={loading && selectedReport?.id === report.id && selectedFormat === 'pdf'}
-                          >
-                            {loading && selectedReport?.id === report.id && selectedFormat === 'pdf' ? (
-                              <>
-                                <i className="bi bi-arrow-clockwise loading me-1"></i>
-                                <span className="d-none d-sm-inline">Generating...</span>
-                              </>
-                            ) : (
-                              <>
-                                <i className="bi bi-file-earmark-pdf me-1"></i>
-                                <span className="d-none d-sm-inline">PDF</span>
-                              </>
-                            )}
-                          </button>
-                          <button
-                            className="odoo-btn odoo-btn-success odoo-btn-sm flex-fill"
-                            onClick={() => handleGenerateReport(report, 'excel')}
-                            disabled={loading && selectedReport?.id === report.id && selectedFormat === 'excel'}
-                          >
-                            {loading && selectedReport?.id === report.id && selectedFormat === 'excel' ? (
-                              <>
-                                <i className="bi bi-arrow-clockwise loading me-1"></i>
-                                <span className="d-none d-sm-inline">Generating...</span>
-                              </>
-                            ) : (
-                              <>
-                                <i className="bi bi-file-earmark-excel me-1"></i>
-                                <span className="d-none d-sm-inline">Excel</span>
-                              </>
-                            )}
-                          </button>
-                        </div>
+                        <button
+                          className="odoo-btn odoo-btn-primary odoo-btn-sm w-100"
+                          onClick={() => handleGenerateReport(report, 'preview')}
+                          disabled={loading && selectedReport?.id === report.id}
+                        >
+                          {loading && selectedReport?.id === report.id ? (
+                            <>
+                              <i className="bi bi-arrow-clockwise loading me-1"></i>
+                              <span className="d-none d-sm-inline">Loading...</span>
+                            </>
+                          ) : (
+                            <>
+                              <i className="bi bi-eye me-1"></i>
+                              <span className="d-none d-sm-inline">Preview</span>
+                            </>
+                          )}
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -409,11 +392,11 @@ function Reports() {
             <div className="col-md-3">
               <div className="stat-card">
                 <div className="stat-icon bg-warning">
-                  <i className="bi bi-download"></i>
+                  <i className="bi bi-eye"></i>
                 </div>
                 <div className="stat-info">
-                  <h6>Export Format</h6>
-                  <span className="stat-number">PDF</span>
+                  <h6>Preview Mode</h6>
+                  <span className="stat-number">Interactive</span>
                 </div>
               </div>
             </div>
@@ -604,6 +587,28 @@ function Reports() {
           </div>
         </div>
       )}
+
+      {/* Report Modals */}
+      <LeaseReportModal
+        show={showLeaseModal}
+        onHide={() => setShowLeaseModal(false)}
+        reportConfig={selectedReport}
+        selectedFormat={selectedFormat}
+      />
+      
+      <PropertyReportModal
+        show={showPropertyModal}
+        onHide={() => setShowPropertyModal(false)}
+        reportConfig={selectedReport}
+        selectedFormat={selectedFormat}
+      />
+      
+      <TenantReportModal
+        show={showTenantModal}
+        onHide={() => setShowTenantModal(false)}
+        reportConfig={selectedReport}
+        selectedFormat={selectedFormat}
+      />
     </Layout>
   );
 }
