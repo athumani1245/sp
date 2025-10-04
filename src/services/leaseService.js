@@ -144,6 +144,36 @@ export const getLeases = async (params = {}) => {
     }
 };
 
+// Get all leases without pagination (for summary statistics)
+export const getAllLeases = async (filters = {}) => {
+    try {
+        const queryParams = new URLSearchParams();
+        
+        // Add filters but no pagination parameters
+        if (filters.status) queryParams.append('status', filters.status);
+        if (filters.property_id) queryParams.append('property_id', filters.property_id);
+        if (filters.tenant_name) queryParams.append('tenant_name', filters.tenant_name);
+        if (filters.start_date) queryParams.append('start_date', filters.start_date);
+        if (filters.end_date) queryParams.append('end_date', filters.end_date);
+        
+        // Use a very high limit to get all records, or don't include limit at all
+        queryParams.append('limit', '10000'); // High limit to ensure we get all records
+
+        const response = await axios.get(
+            `${API_BASE}/leases/?${queryParams.toString()}`,
+            { headers: getAuthHeaders() }
+        );
+
+        return {
+            success: true,
+            data: response.data.data,
+            count: response.data.pagination?.count || (response.data.data?.items || response.data.data || []).length
+        };
+    } catch (err) {
+        return handleApiError(err, "Failed to fetch all leases.");
+    }
+};
+
 
 
 
