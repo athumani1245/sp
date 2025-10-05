@@ -160,36 +160,59 @@ function Leases() {
       return sum + (outstanding > 0 ? outstanding : 0);
     }, 0);
 
-    // Calculate expiring soon (within 30 days) - improved logic
+    // Calculate expiring soon (within 30 days) - fixed logic
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Start of today
     
-    const oneMonthFromNow = new Date(today);
-    oneMonthFromNow.setDate(today.getDate() + 30);
-    oneMonthFromNow.setHours(23, 59, 59, 999); // End of that day
+    const thirtyDaysFromNow = new Date(today);
+    thirtyDaysFromNow.setDate(today.getDate() + 30);
+    thirtyDaysFromNow.setHours(23, 59, 59, 999); // End of that day
+
+    console.log('Calculating expiring leases:');
+    console.log('Today:', today.toISOString());
+    console.log('30 days from now:', thirtyDaysFromNow.toISOString());
 
     stats.expiringSoon = leaseData.filter(lease => {
       // Only check leases that have an end date
-      if (!lease.end_date) return false;
+      if (!lease.end_date) {
+        console.log(`Lease ${lease.lease_number || lease.id}: No end date`);
+        return false;
+      }
       
-      // Parse the end date
+      // Parse the end date - handle both YYYY-MM-DD and other formats
       const endDate = new Date(lease.end_date);
       
       // Check if date is valid
-      if (isNaN(endDate.getTime())) return false;
+      if (isNaN(endDate.getTime())) {
+        console.log(`Lease ${lease.lease_number || lease.id}: Invalid end date ${lease.end_date}`);
+        return false;
+      }
       
-      // Set to end of day for proper comparison
-      endDate.setHours(23, 59, 59, 999);
+      // Set to start of day for the lease end date for consistent comparison
+      endDate.setHours(0, 0, 0, 0);
       
       // Check if lease expires within the next 30 days (including today)
-      // and hasn't already expired (end date is today or in the future)
-      const isWithinMonth = endDate >= today && endDate <= oneMonthFromNow;
+      // The lease is expiring soon if its end date is between today and 30 days from now
+      const isExpiringSoon = endDate >= today && endDate <= thirtyDaysFromNow;
       
-      // Optionally, only consider active leases for expiring soon
-      const isActiveOrRelevant = lease.status === 'active' || lease.status === 'pending';
+      // Only consider active leases for expiring soon (not terminated or draft)
+      const isActiveOrRelevant = lease.status === 'active';
       
-      return isWithinMonth && isActiveOrRelevant;
+      const shouldCount = isExpiringSoon && isActiveOrRelevant;
+      
+      console.log(`Lease ${lease.lease_number || lease.id}:`, {
+        endDate: lease.end_date,
+        parsedEndDate: endDate.toISOString(),
+        status: lease.status,
+        isExpiringSoon,
+        isActiveOrRelevant,
+        shouldCount
+      });
+      
+      return shouldCount;
     }).length;
+
+    console.log(`Total expiring soon: ${stats.expiringSoon}`);
 
     return stats;
   };

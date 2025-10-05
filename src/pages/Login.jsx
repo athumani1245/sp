@@ -102,14 +102,22 @@ function Login() {
                                             onChange={e => setPassword(e.target.value)}
                                             required
                                         />
-                                        <button
-                                            className="odoo-btn odoo-btn-secondary"
-                                            type="button"
+                                        <span 
+                                            className="input-group-text" 
+                                            role="button"
                                             onClick={() => setShowPassword(!showPassword)}
-                                            tabIndex="-1"
+                                            style={{ cursor: "pointer", userSelect: "none" }}
+                                            tabIndex="0"
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter' || e.key === ' ') {
+                                                    e.preventDefault();
+                                                    setShowPassword(!showPassword);
+                                                }
+                                            }}
+                                            title={showPassword ? "Hide password" : "Show password"}
                                         >
                                             <i className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"}`}></i>
-                                        </button>
+                                        </span>
                                     </div>
                                 </div>
                                 <button 
