@@ -317,15 +317,6 @@ function Tenants() {
           <div className="alert alert-danger" role="alert">
             <i className="bi bi-exclamation-triangle me-2"></i>
             <strong>Error:</strong> {error}
-            <details className="mt-2">
-              <summary>Debug Info</summary>
-              <small>
-                <div>API Base: {process.env.REACT_APP_API_BASE || 'Not configured'}</div>
-                <div>Current Page: {page}</div>
-                <div>Search: {search || 'None'}</div>
-                <div>Status Filter: {status || 'None'}</div>
-              </small>
-            </details>
           </div>
         )}
 

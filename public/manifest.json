@@ -1,25 +1,85 @@
 {
   "short_name": "Tanaka",
-  "name": "Tanaka Property Management",
+  "name": "Tanaka Property Management - Professional Property Management System",
+  "description": "Streamline your property management in Tanzania with Tanaka's comprehensive platform. Manage properties, tenants, rent collection, and financial reporting.",
+  "version": "1.0.0",
+  "manifest_version": 2,
   "icons": [
     {
-      "src": "Logo.png",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
-    },  
+      "src": "favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
     {
-      "src": "Logo.png",
-      "type": "image/png",
-      "sizes": "192x192"
+      "src": "favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
     },
     {
       "src": "Logo.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "Logo.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
     }
   ],
-  "start_url": ".",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "orientation": "portrait-primary",
+  "theme_color": "#0066cc",
+  "background_color": "#ffffff",
+  "categories": ["business", "productivity", "utilities"],
+  "lang": "en",
+  "dir": "ltr",
+  "prefer_related_applications": false,
+  "screenshots": [
+    {
+      "src": "dashboard-screenshot.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "platform": "wide",
+      "label": "Property Management Dashboard"
+    },
+    {
+      "src": "mobile-screenshot.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "platform": "narrow",
+      "label": "Mobile Property Management"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "View your property management dashboard",
+      "url": "/dashboard",
+      "icons": [{ "src": "Logo.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Add Property",
+      "short_name": "Add Property",
+      "description": "Add a new property to manage",
+      "url": "/properties/add",
+      "icons": [{ "src": "Logo.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Reports",
+      "short_name": "Reports",
+      "description": "View property management reports",
+      "url": "/reports",
+      "icons": [{ "src": "Logo.png", "sizes": "192x192" }]
+    }
+  ]
 }

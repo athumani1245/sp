@@ -7,6 +7,26 @@ import { formatNumberWithCommas, parseFormattedNumber } from '../../utils/format
 import '../../assets/styles/add-lease.css';
 import '../../assets/styles/forms-responsive.css';
 
+// Add custom styles for underlined inputs
+const underlineInputStyles = {
+    border: 'none',
+    borderBottom: '2px solid #dee2e6',
+    borderRadius: '0',
+    backgroundColor: 'transparent',
+    padding: '8px 0',
+    fontSize: '0.95rem',
+    transition: 'border-bottom-color 0.3s ease',
+    boxShadow: 'none'
+};
+
+const underlineInputFocusStyles = {
+    border: 'none',
+    borderBottom: '2px solid #CC5B4B',
+    backgroundColor: 'transparent',
+    boxShadow: 'none',
+    outline: 'none'
+};
+
 // SearchableSelect Component
 const SearchableSelect = ({ 
     options, 
@@ -94,7 +114,7 @@ const SearchableSelect = ({
     return (
         <div className="searchable-select position-relative" ref={dropdownRef}>
             <div 
-                className={`form-select d-flex align-items-center justify-content-between ${disabled ? 'disabled' : ''}`}
+                className={`d-flex align-items-center justify-content-between ${disabled ? 'disabled' : ''}`}
                 onClick={handleInputClick}
                 onKeyDown={(e) => {
                     // Prevent Bootstrap dropdown handlers
@@ -118,8 +138,11 @@ const SearchableSelect = ({
                 aria-expanded={isOpen}
                 aria-haspopup="listbox"
                 style={{ 
+                    ...underlineInputStyles,
                     cursor: disabled ? 'not-allowed' : 'pointer',
-                    backgroundColor: disabled ? '#e9ecef' : 'white'
+                    backgroundColor: 'transparent',
+                    minHeight: '38px',
+                    borderBottomColor: disabled ? '#e9ecef' : (isOpen ? '#CC5B4B' : '#dee2e6')
                 }}
             >
                 <span className={!value ? 'text-muted' : ''}>
@@ -520,16 +543,16 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
         <Modal 
             show={isOpen} 
             onHide={onClose} 
-            size="lg" 
             backdrop="static"
             keyboard={false}
             centered
             className="responsive-modal"
+            dialogClassName="modal-95w"
         >
             <Modal.Header closeButton className="border-0">
                 <Modal.Title className="text-center w-100 h5 fw-bold text-dark">
                     <i className="bi bi-file-earmark-plus me-2 text-danger"></i>
-                    Add New Lease Agreement
+                    New Lease Agreement
                 </Modal.Title>
             </Modal.Header>
             
@@ -549,224 +572,291 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                         </Alert>
                     )}
 
-                    <div className="form-section-header mb-form-section">
-                        <i className="fas fa-building text-danger"></i>
-                        Property & Unit Selection
-                    </div>
-                    <Row className="mb-3">
-                        <Col xs={12} md={6} className="mb-3">
-                            <Form.Group>
-                                <Form.Label className="form-label">Property *</Form.Label>
-                                <SearchableSelect
-                                    options={properties}
-                                    value={formData.property_id}
-                                    onChange={handleInputChange}
-                                    placeholder="Select Property"
-                                    disabled={loading}
-                                    name="property_id"
-                                    getOptionLabel={(property) => property.property_name}
-                                    getOptionValue={(property) => property.id}
-                                    noOptionsMessage="No properties available"
-                                />
-                            </Form.Group>
-                        </Col>
-                        
-                        <Col xs={12} md={6} className="mb-3">
-                            <Form.Group>
-                                <Form.Label className="form-label">Available Unit *</Form.Label>
-                                <SearchableSelect
-                                    options={availableUnits}
-                                    value={formData.unit}
-                                    onChange={handleInputChange}
-                                    placeholder="Select Unit"
-                                    disabled={!formData.property_id || loading}
-                                    name="unit"
-                                    getOptionLabel={(unit) => `${unit.unit_name || unit.unit_number} - TSh ${(unit.rent_per_month || unit.rent_amount || 0).toLocaleString()}/month`}
-                                    getOptionValue={(unit) => unit.id}
-                                    noOptionsMessage={!formData.property_id ? "Please select a property first" : "No available units"}
-                                />
-                                {loading && formData.property_id && (
-                                    <Form.Text className="form-text">
-                                        <i className="spinner-border spinner-border-sm me-1"></i>
-                                        Loading available units...
-                                    </Form.Text>
-                                )}
-                            </Form.Group>
-                        </Col>
-                    </Row>
+                    {/* Two-column layout */}
+                    <Row className="g-4">
+                        {/* Left Column - Tenant & Property Selection */}
+                        <Col lg={6}>
+                            <div className="form-section-header mb-3">
+                                <i className="fas fa-user text-danger"></i>
+                                Property and Tenant Selection
+                            </div>
+                            
+                            <Row className="mb-3">
+                                <Col xs={12} className="mb-3">
+                                    <Form.Group>
+                                        <Form.Label className="form-label">Tenant *</Form.Label>
+                                        <SearchableSelect
+                                            options={tenants}
+                                            value={formData.tenant_id}
+                                            onChange={handleInputChange}
+                                            placeholder="Select Tenant"
+                                            disabled={loading}
+                                            name="tenant_id"
+                                            getOptionLabel={(tenant) => `${tenant.first_name} ${tenant.last_name} - ${tenant.username || tenant.phone}`}
+                                            getOptionValue={(tenant) => tenant.id}
+                                            noOptionsMessage="No tenants available. Please add a tenant first."
+                                        />
+                                        {tenants.length === 0 && (
+                                            <Form.Text className="form-text text-warning">
+                                                <i className="bi bi-info-circle me-1"></i>
+                                                No tenants available. Please add a tenant first.
+                                            </Form.Text>
+                                        )}
+                                    </Form.Group>
+                                </Col>
+                            </Row>
 
-                    <div className="form-section-header mb-form-section">
-                        <i className="fas fa-user text-danger"></i>
-                        Tenant Information
-                    </div>
+                           
+                            
+                            {/* Property and Unit in one row */}
+                            <Row className="mb-3">
+                                <Col xs={12} sm={6} className="mb-3">
+                                    <Form.Group>
+                                        <Form.Label className="form-label">Property *</Form.Label>
+                                        <SearchableSelect
+                                            options={properties}
+                                            value={formData.property_id}
+                                            onChange={handleInputChange}
+                                            placeholder="Select Property"
+                                            disabled={loading}
+                                            name="property_id"
+                                            getOptionLabel={(property) => property.property_name}
+                                            getOptionValue={(property) => property.id}
+                                            noOptionsMessage="No properties available"
+                                        />
+                                    </Form.Group>
+                                </Col>
+                                
+                                <Col xs={12} sm={6} className="mb-3">
+                                    <Form.Group>
+                                        <Form.Label className="form-label">Available Unit *</Form.Label>
+                                        <SearchableSelect
+                                            options={availableUnits}
+                                            value={formData.unit}
+                                            onChange={handleInputChange}
+                                            placeholder="Select Unit"
+                                            disabled={!formData.property_id || loading}
+                                            name="unit"
+                                            getOptionLabel={(unit) => `${unit.unit_name || unit.unit_number} - TSh ${(unit.rent_per_month || unit.rent_amount || 0).toLocaleString()}/month`}
+                                            getOptionValue={(unit) => unit.id}
+                                            noOptionsMessage={!formData.property_id ? "Please select a property first" : "No available units"}
+                                        />
+                                        {loading && formData.property_id && (
+                                            <Form.Text className="form-text small">
+                                                <i className="spinner-border spinner-border-sm me-1"></i>
+                                                Loading units...
+                                            </Form.Text>
+                                        )}
+                                    </Form.Group>
+                                </Col>
+                            </Row>
 
-                    <Row className="mb-3">
-                        <Col xs={12} className="mb-3">
-                            <Form.Group>
-                                <Form.Label className="form-label">Select Tenant *</Form.Label>
-                                <SearchableSelect
-                                    options={tenants}
-                                    value={formData.tenant_id}
-                                    onChange={handleInputChange}
-                                    placeholder="Select Tenant"
-                                    disabled={loading}
-                                    name="tenant_id"
-                                    getOptionLabel={(tenant) => `${tenant.first_name} ${tenant.last_name} - ${tenant.username || tenant.phone}`}
-                                    getOptionValue={(tenant) => tenant.id}
-                                    noOptionsMessage="No tenants available. Please add a tenant first."
-                                />
-                                {tenants.length === 0 && (
-                                    <Form.Text className="form-text text-warning">
-                                        <i className="bi bi-info-circle me-1"></i>
-                                        No tenants available. Please add a tenant first.
-                                    </Form.Text>
-                                )}
-                            </Form.Group>
-                        </Col>
-                    </Row>
+                            {/* Display selected tenant info */}
+                            {formData.tenant_id && (
+                                <div className="mt-4 p-3 bg-light rounded">
+                                    <h6 className="text-primary mb-2">
+                                        <i className="bi bi-person-check me-2"></i>
+                                        Selected Tenant Information
+                                    </h6>
+                                    <div className="small text-muted">
+                                        <div><strong>Name:</strong> {formData.first_name} {formData.last_name}</div>
+                                        <div><strong>Contact:</strong> {formData.tenant_phone}</div>
+                                    </div>
+                                </div>
+                            )}
 
-                    <div className="form-section-header mb-form-section">
-                        <i className="fas fa-calendar-alt text-danger"></i>
-                        Lease Terms
-                    </div>
-
-                    <Row className="mb-3">
-                        <Col xs={12} sm={6} md={4} className="mb-3">
-                            <Form.Group>
-                                <Form.Label className="form-label">Start Date *</Form.Label>
-                                <Form.Control
-                                    className="form-control"
-                                    type="date"
-                                    name="start_date"
-                                    value={formData.start_date}
-                                    onChange={handleInputChange}
-                                    required
-                                />
-                            </Form.Group>
-                        </Col>
-                        
-                        <Col xs={12} sm={6} md={4} className="mb-3">
-                            <Form.Group>
-                                <Form.Label className="form-label">Lease Duration (Months) *</Form.Label>
-                                <Form.Control
-                                    className="form-control"
-                                    type="number"
-                                    name="number_of_month"
-                                    value={formData.number_of_month}
-                                    onChange={handleInputChange}
-                                    placeholder="Enter number of months"
-                                    min="1"
-                                    required
-                                />
-                            </Form.Group>
+                            {/* Display selected property/unit info */}
+                            {formData.property_id && formData.unit && (
+                                <div className="mt-3 p-3 bg-light rounded">
+                                    <h6 className="text-success mb-2">
+                                        <i className="bi bi-building-check me-2"></i>
+                                        Selected Property & Unit
+                                    </h6>
+                                    <div className="small text-muted">
+                                        <div><strong>Property:</strong> {properties.find(p => p.id === formData.property_id)?.property_name}</div>
+                                        <div><strong>Unit:</strong> {availableUnits.find(u => u.id.toString() === formData.unit)?.unit_name}</div>
+                                        <div><strong>Rent:</strong> TSh {formatNumberWithCommas(formData.rent_amount_per_unit)}/month</div>
+                                    </div>
+                                </div>
+                            )}
                         </Col>
 
-                        <Col xs={12} sm={6} md={4} className="mb-3">
-                            <Form.Group>
-                                <Form.Label className="form-label">End Date</Form.Label>
-                                <Form.Control
-                                    className="form-control"
-                                    type="date"
-                                    name="end_date"
-                                    value={formData.end_date}
-                                    readOnly
-                                    style={{backgroundColor: '#f8f9fa', cursor: 'not-allowed'}}
-                                />
-                                <Form.Text className="form-text">
-                                    <i className="bi bi-info-circle me-1"></i>
-                                    Auto-calculated
-                                </Form.Text>
-                            </Form.Group>
-                        </Col>
-                    </Row>
+                        {/* Right Column - Lease Terms & Financial Information */}
+                        <Col lg={6}>
+                            <div className="form-section-header mb-3">
+                                <i className="fas fa-calendar-alt text-danger"></i>
+                                Lease Terms
+                            </div>
+                            
+                            {/* Date fields in one row */}
+                            <Row className="mb-3">
+                                <Col xs={12} sm={4} className="mb-3">
+                                    <Form.Group>
+                                        <Form.Label className="form-label">Start Date *</Form.Label>
+                                        <Form.Control
+                                            className="form-control"
+                                            type="date"
+                                            name="start_date"
+                                            value={formData.start_date}
+                                            onChange={handleInputChange}
+                                            required
+                                            style={underlineInputStyles}
+                                            onFocus={(e) => Object.assign(e.target.style, underlineInputFocusStyles)}
+                                            onBlur={(e) => Object.assign(e.target.style, underlineInputStyles)}
+                                        />
+                                    </Form.Group>
+                                </Col>
+                                
+                                <Col xs={12} sm={4} className="mb-3">
+                                    <Form.Group>
+                                        <Form.Label className="form-label">Duration (Months) *</Form.Label>
+                                        <Form.Control
+                                            className="form-control"
+                                            type="number"
+                                            name="number_of_month"
+                                            value={formData.number_of_month}
+                                            onChange={handleInputChange}
+                                            placeholder="Months"
+                                            min="1"
+                                            required
+                                            style={underlineInputStyles}
+                                            onFocus={(e) => Object.assign(e.target.style, underlineInputFocusStyles)}
+                                            onBlur={(e) => Object.assign(e.target.style, underlineInputStyles)}
+                                        />
+                                    </Form.Group>
+                                </Col>
 
-                    <div className="form-section-header mb-form-section">
-                        <i className="fas fa-dollar-sign text-danger"></i>
-                        Financial Information
-                    </div>
-                    <Row className="mb-3">
-                        <Col xs={12} sm={6} md={4} className="mb-3">
-                            <Form.Group>
-                                <Form.Label className="form-label">Monthly Rent (TSh) *</Form.Label>
-                                <Form.Control
-                                    className="form-control"
-                                    type="text"
-                                    name="rent_amount_per_unit"
-                                    value={formatNumberWithCommas(formData.rent_amount_per_unit)}
-                                    onChange={handleInputChange}
-                                    placeholder="0"
-                                    required
-                                />
-                            </Form.Group>
-                        </Col>
-                        
-                        <Col xs={12} sm={6} md={4} className="mb-3">
-                            <Form.Group>
-                                <Form.Label className="form-label">Total Amount (TSh)</Form.Label>
-                                <Form.Control
-                                    className="form-control"
-                                    type="text"
-                                    name="total_amount"
-                                    value={formatNumberWithCommas(formData.total_amount)}
-                                    readOnly
-                                    style={{backgroundColor: '#f8f9fa', cursor: 'not-allowed'}}
-                                />
-                                <Form.Text className="form-text">
-                                    <i className="bi bi-calculator me-1"></i>
-                                    Monthly rent × Duration
-                                </Form.Text>
-                            </Form.Group>
-                        </Col>
-                        
-                        <Col xs={12} sm={6} md={4} className="mb-3">
-                            <Form.Group>
-                                <Form.Label className="form-label">Paid Amount (TSh)</Form.Label>
-                                <Form.Control
-                                    className="form-control"
-                                    type="text"
-                                    name="amount_paid"
-                                    value={formatNumberWithCommas(formData.amount_paid)}
-                                    onChange={handleInputChange}
-                                    placeholder="0"
-                                />
-                            </Form.Group>
-                        </Col>
-                    </Row>
-                    <Row className="mb-3">
-                        <Col xs={12} sm={6} md={4} className="mb-3">
-                            <Form.Group>
-                                <Form.Label className="form-label">Discount (TSh)</Form.Label>
-                                <Form.Control
-                                    className="form-control"
-                                    type="text"
-                                    name="discount"
-                                    value={formatNumberWithCommas(formData.discount)}
-                                    onChange={handleInputChange}
-                                    placeholder="0"
-                                />
-                                <Form.Text className="form-text">
-                                    Optional discount amount
-                                </Form.Text>
-                            </Form.Group>
+                                <Col xs={12} sm={4} className="mb-3">
+                                    <Form.Group>
+                                        <Form.Label className="form-label">End Date</Form.Label>
+                                        <Form.Control
+                                            className="form-control"
+                                            type="date"
+                                            name="end_date"
+                                            value={formData.end_date}
+                                            readOnly
+                                            style={{
+                                                ...underlineInputStyles,
+                                                backgroundColor: 'transparent',
+                                                cursor: 'not-allowed',
+                                                color: '#6c757d',
+                                                borderBottomColor: '#e9ecef'
+                                            }}
+                                        />
+                                        <Form.Text className="form-text small">
+                                            Auto-calculated
+                                        </Form.Text>
+                                    </Form.Group>
+                                </Col>
+                            </Row>
+
+                            <div className="form-section-header mb-3 mt-4">
+                                <i className="fas fa-dollar-sign text-danger"></i>
+                                Financial Information
+                            </div>
+                            
+                            {/* Monthly rent and total amount in one row */}
+                            <Row className="mb-3">
+                                <Col xs={12} sm={6} className="mb-3">
+                                    <Form.Group>
+                                        <Form.Label className="form-label">Monthly Rent (TSh) *</Form.Label>
+                                        <Form.Control
+                                            className="form-control"
+                                            type="text"
+                                            name="rent_amount_per_unit"
+                                            value={formatNumberWithCommas(formData.rent_amount_per_unit)}
+                                            onChange={handleInputChange}
+                                            placeholder="0"
+                                            required
+                                            style={underlineInputStyles}
+                                            onFocus={(e) => Object.assign(e.target.style, underlineInputFocusStyles)}
+                                            onBlur={(e) => Object.assign(e.target.style, underlineInputStyles)}
+                                        />
+                                    </Form.Group>
+                                </Col>
+                                
+                                <Col xs={12} sm={6} className="mb-3">
+                                    <Form.Group>
+                                        <Form.Label className="form-label">Total Amount (TSh)</Form.Label>
+                                        <Form.Control
+                                            className="form-control"
+                                            type="text"
+                                            name="total_amount"
+                                            value={formatNumberWithCommas(formData.total_amount)}
+                                            readOnly
+                                            style={{
+                                                ...underlineInputStyles,
+                                                backgroundColor: 'transparent',
+                                                cursor: 'not-allowed',
+                                                color: '#6c757d',
+                                                borderBottomColor: '#e9ecef'
+                                            }}
+                                        />
+                                        <Form.Text className="form-text small">
+                                            <i className="bi bi-calculator me-1"></i>
+                                            Rent × Duration
+                                        </Form.Text>
+                                    </Form.Group>
+                                </Col>
+                            </Row>
+                            
+                            {/* Paid amount and discount in one row */}
+                            <Row className="mb-3">
+                                <Col xs={12} sm={6} className="mb-3">
+                                    <Form.Group>
+                                        <Form.Label className="form-label">Paid Amount (TSh)</Form.Label>
+                                        <Form.Control
+                                            className="form-control"
+                                            type="text"
+                                            name="amount_paid"
+                                            value={formatNumberWithCommas(formData.amount_paid)}
+                                            onChange={handleInputChange}
+                                            placeholder="0"
+                                            style={underlineInputStyles}
+                                            onFocus={(e) => Object.assign(e.target.style, underlineInputFocusStyles)}
+                                            onBlur={(e) => Object.assign(e.target.style, underlineInputStyles)}
+                                        />
+                                    </Form.Group>
+                                </Col>
+                                
+                                <Col xs={12} sm={6} className="mb-3">
+                                    <Form.Group>
+                                        <Form.Label className="form-label">Discount (TSh)</Form.Label>
+                                        <Form.Control
+                                            className="form-control"
+                                            type="text"
+                                            name="discount"
+                                            value={formatNumberWithCommas(formData.discount)}
+                                            onChange={handleInputChange}
+                                            placeholder="0"
+                                            style={underlineInputStyles}
+                                            onFocus={(e) => Object.assign(e.target.style, underlineInputFocusStyles)}
+                                            onBlur={(e) => Object.assign(e.target.style, underlineInputStyles)}
+                                        />
+                                        <Form.Text className="form-text small">
+                                            Optional
+                                        </Form.Text>
+                                    </Form.Group>
+                                </Col>
+                            </Row>
                         </Col>
                     </Row>
                 </Modal.Body>
                 
-                <Modal.Footer className="border-0 pt-0">
-                    <Button 
-                        variant="secondary" 
+                <Modal.Footer className="border-0 pt-0 d-flex justify-content-center gap-3">
+                    <button 
+                        type="button"
                         onClick={onClose}
                         disabled={submitLoading}
-                        className="btn btn-secondary"
+                        className="odoo-btn odoo-btn-secondary"
                     >
                         <i className="bi bi-x-circle me-2"></i>
                         Cancel
-                    </Button>
-                    <Button 
-                        variant="primary" 
+                    </button>
+                    <button 
                         type="submit"
                         disabled={submitLoading}
-                        className="btn btn-primary"
+                        className="odoo-btn odoo-btn-primary"
                     >
                         {submitLoading ? (
                             <>
@@ -779,7 +869,7 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                                 Create Lease
                             </>
                         )}
-                    </Button>
+                    </button>
                 </Modal.Footer>
             </Form>
         </Modal>

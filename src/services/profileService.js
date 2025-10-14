@@ -54,7 +54,7 @@ export const getUserProfile = async () => {
 // Update user profile information
 export const updateUserProfile = async (profileData) => {
     try {
-        const response = await axios.put(
+        const response = await axios.patch(
             `${API_BASE}/profile/update/`,
             profileData,
             { headers: getAuthHeaders() }

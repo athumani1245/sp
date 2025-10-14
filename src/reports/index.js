@@ -2,6 +2,9 @@ import React from 'react';
 
 // Templates
 export { default as LeaseAgreementTemplate } from './templates/LeaseAgreementTemplate.jsx';
+export { default as LeaseReportTemplate } from './templates/LeaseReportTemplate.jsx';
+export { default as OutstandingPaymentsReportTemplate } from './templates/OutstandingPaymentsReportTemplate.jsx';
+export { default as PropertyPerformanceReportTemplate } from './templates/PropertyPerformanceReportTemplate.jsx';
 
 // Utils
 export {

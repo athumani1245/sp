@@ -15,10 +15,7 @@ function Profile() {
         lastName: "",
         email: "",
         phone: "",
-        address: "",
-        city: "",
-        country: "",
-        profileImage: ""
+        address: ""
     });
     const [isEditing, setIsEditing] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -232,50 +229,14 @@ function Profile() {
                             {success && <div className="alert alert-success">{success}</div>}
 
                             <div className="row profile-row">
-                                {/* Profile Picture Section */}
-                                <div className="col-12 col-md-4 col-lg-3">
-                                    <div className="profile-card profile-picture-section">
-                                        <div className="profile-image-section">
-                                            <div className="profile-image-container">
-                                                {userInfo.profileImage ? (
-                                                    <img src={userInfo.profileImage} alt="Profile" className="profile-image" />
-                                                ) : (
-                                                    <div className="profile-image-placeholder">
-                                                        <i className="fas fa-user"></i>
-                                                    </div>
-                                                )}
-                                            </div>
-                                            {isEditing && (
-                                                <div className="mt-3">
-                                                    <input
-                                                        type="file"
-                                                        id="profileImage"
-                                                        accept="image/*"
-                                                        // onChange={handleImageUpload}
-                                                        className="d-none"
-                                                    />
-                                                    <label htmlFor="profileImage" className="btn btn-outline-primary btn-sm">
-                                                        <i className="fas fa-camera me-2"></i>
-                                                        Change Photo
-                                                    </label>
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="profile-summary">
-                                            <h4 className="user-name">{userInfo.firstName} {userInfo.lastName}</h4>
-                                            <p className="user-email">{userInfo.address}</p>
-                                        </div>
-                                    </div>
-                                </div>
-
                                 {/* Profile Information Section */}
-                                <div className="col-12 col-md-8 col-lg-9 profile-info-section">
+                                <div className="col-12 profile-info-section">
                                     <div className="profile-card">
                                         <div className="card-header">
                                             <h5 className="card-title">Personal Information</h5>
                                             {!isEditing ? (
                                                 <button
-                                                    className="btn btn-primary btn-sm"
+                                                    className="odoo-btn odoo-btn-primary odoo-btn-sm"
                                                     onClick={() => setIsEditing(true)}
                                                 >
                                                     <i className="fas fa-edit me-2"></i>
@@ -284,7 +245,7 @@ function Profile() {
                                             ) : (
                                                 <div className="btn-group d-flex flex-column flex-sm-row gap-2">
                                                     <button
-                                                        className="btn btn-success btn-sm"
+                                                        className="odoo-btn odoo-btn-success odoo-btn-sm"
                                                         onClick={handleSave}
                                                         disabled={loading}
                                                     >
@@ -292,7 +253,7 @@ function Profile() {
                                                         {loading ? "Saving..." : "Save"}
                                                     </button>
                                                     <button
-                                                        className="btn btn-secondary btn-sm"
+                                                        className="odoo-btn odoo-btn-secondary odoo-btn-sm"
                                                         onClick={handleCancel}
                                                         disabled={loading}
                                                     >
@@ -311,7 +272,7 @@ function Profile() {
                                                             <label htmlFor="firstName" className="form-label">First Name</label>
                                                             <input
                                                                 type="text"
-                                                                className="form-control"
+                                                                className="form-control form-control-underline"
                                                                 id="firstName"
                                                                 name="firstName"
                                                                 value={userInfo.firstName}
@@ -325,7 +286,7 @@ function Profile() {
                                                             <label htmlFor="lastName" className="form-label">Last Name</label>
                                                             <input
                                                                 type="text"
-                                                                className="form-control"
+                                                                className="form-control form-control-underline"
                                                                 id="lastName"
                                                                 name="lastName"
                                                                 value={userInfo.lastName}
@@ -342,7 +303,7 @@ function Profile() {
                                                             <label htmlFor="email" className="form-label">Email Address</label>
                                                             <input
                                                                 type="email"
-                                                                className="form-control"
+                                                                className="form-control form-control-underline"
                                                                 id="email"
                                                                 name="email"
                                                                 value={userInfo.email}
@@ -356,7 +317,7 @@ function Profile() {
                                                             <label htmlFor="phone" className="form-label">Phone Number</label>
                                                             <input
                                                                 type="text"
-                                                                className="form-control"
+                                                                className="form-control form-control-underline"
                                                                 id="phone"
                                                                 name="phone"
                                                                 value={userInfo.phone}
@@ -371,7 +332,7 @@ function Profile() {
                                                     <label htmlFor="address" className="form-label">Address</label>
                                                     <input
                                                         type="text"
-                                                        className="form-control"
+                                                        className="form-control form-control-underline"
                                                         id="address"
                                                         name="address"
                                                         value={userInfo.address}
@@ -394,7 +355,7 @@ function Profile() {
                                             <div className="row">
                                                 <div className="col-12 col-sm-6 col-md-6">
                                                     <button 
-                                                        className="btn btn-outline-primary w-100 mb-3 btn-mobile-full"
+                                                        className="odoo-btn odoo-btn-outline-primary w-100 mb-3 btn-mobile-full"
                                                         onClick={handleChangePassword}
                                                         disabled={loading}
                                                     >
@@ -404,7 +365,7 @@ function Profile() {
                                                 </div>
                                                 <div className="col-12 col-sm-6 col-md-6">
                                                     <button 
-                                                        className="btn btn-outline-info w-100 mb-3 btn-mobile-full"
+                                                        className="odoo-btn odoo-btn-outline-info w-100 mb-3 btn-mobile-full"
                                                         // onClick={handleDownloadData}
                                                         disabled={loading}
                                                     >
@@ -463,7 +424,7 @@ function Profile() {
                                     placeholder="Enter your current password"
                                     required
                                     disabled={passwordLoading}
-                                    className="form-control"
+                                    className="form-control form-control-underline"
                                 />
                             </Form.Group>
                         </div>
@@ -479,7 +440,7 @@ function Profile() {
                                     placeholder="Enter new password (min. 8 characters)"
                                     required
                                     disabled={passwordLoading}
-                                    className="form-control"
+                                    className="form-control form-control-underline"
                                     minLength="8"
                                 />
                                 <Form.Text className="text-muted">
@@ -499,7 +460,7 @@ function Profile() {
                                     placeholder="Confirm your new password"
                                     required
                                     disabled={passwordLoading}
-                                    className="form-control"
+                                    className="form-control form-control-underline"
                                 />
                             </Form.Group>
                         </div>
@@ -510,7 +471,7 @@ function Profile() {
                             variant="secondary" 
                             onClick={handleClosePasswordModal}
                             disabled={passwordLoading}
-                            className="btn btn-secondary"
+                            className="odoo-btn odoo-btn-secondary"
                         >
                             <i className="bi bi-x-circle me-2"></i>
                             Cancel
@@ -519,7 +480,7 @@ function Profile() {
                             variant="primary" 
                             type="submit"
                             disabled={passwordLoading}
-                            className="btn btn-danger"
+                            className="odoo-btn odoo-btn-danger"
                         >
                             {passwordLoading ? (
                                 <>
