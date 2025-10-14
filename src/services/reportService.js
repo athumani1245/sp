@@ -1,5 +1,5 @@
 import * as XLSX from 'xlsx';
-import { getLeases } from './leaseService';
+import { getLeases, getLeaseReportData } from './leaseService';
 import { getProperties } from './propertyService';
 import { getTenants } from './tenantService';
 import api from '../utils/api';
@@ -16,7 +16,8 @@ export const REPORT_TYPES = {
   PENDING_PAYMENTS: 'pending_payments',
   PROPERTY_PERFORMANCE: 'property_performance',
   PROPERTY_SUMMARY: 'property_summary',
-  TENANT_PAYMENT_HISTORY: 'tenant_payment_history'
+  TENANT_PAYMENT_HISTORY: 'tenant_payment_history',
+  LEASE_AGREEMENTS: 'lease_agreements'
 };
 
 // Export Formats
@@ -243,6 +244,46 @@ export const fetchTenantPaymentHistory = async (filters = {}) => {
 };
 
 /**
+ * Fetch lease agreements data using leaseService
+ */
+export const fetchLeaseAgreements = async (filters = {}) => {
+  try {
+    console.log('fetchLeaseAgreements: Starting fetch with filters:', filters);
+    
+    // Use the leaseService function to fetch report data
+    const result = await getLeaseReportData(filters);
+    
+    console.log('fetchLeaseAgreements: leaseService result:', {
+      success: result.success,
+      dataLength: result.data?.length,
+      total: result.total,
+      error: result.error
+    });
+
+    if (!result.success) {
+      return {
+        success: false,
+        error: result.error || 'Failed to fetch lease agreements data',
+        data: []
+      };
+    }
+
+    return {
+      success: true,
+      data: result.data || [],
+      total: result.total || 0
+    };
+  } catch (error) {
+    console.error('fetchLeaseAgreements: Error:', error);
+    return {
+      success: false,
+      error: error.message || 'Failed to fetch lease agreements',
+      data: []
+    };
+  }
+};
+
+/**
  * Generic data fetching function
  */
 export const fetchReportData = async (reportType, filters = {}) => {
@@ -259,6 +300,9 @@ export const fetchReportData = async (reportType, filters = {}) => {
         break;
       case REPORT_TYPES.TENANT:
         result = await getTenants(filters);
+        break;
+      case REPORT_TYPES.LEASE_AGREEMENTS:
+        result = await fetchLeaseAgreements(filters);
         break;
       default:
         throw new Error(`Unsupported report type: ${reportType}`);
@@ -520,6 +564,32 @@ const processTenantPaymentHistoryData = (data) => {
   });
 };
 
+// Process lease agreements data for export
+const processLeaseAgreementsData = (data) => {
+  return data.map(row => {
+    const rentAmount = parseFloat(row.rent_amount_per_unit) || 0;
+    const startDate = row.start_date ? new Date(row.start_date).toLocaleDateString() : 'N/A';
+    const endDate = row.end_date ? new Date(row.end_date).toLocaleDateString() : 'N/A';
+    const duration = row.duration || 0;
+    const remainingDays = row.remaining_days || 0;
+    
+    return {
+      'Lease Number': row.lease_number || 'N/A',
+      'Tenant Name': row.tenant || 'N/A',
+      'Property': row.property || 'N/A',
+      'Unit': row.unit || 'N/A',
+      'Rent Amount (TSh)': rentAmount.toLocaleString(),
+      'Start Date': startDate,
+      'End Date': endDate,
+      'Duration (Days)': duration,
+      'Remaining Days': remainingDays,
+      'Lease Status': row.lease_status || 'Unknown',
+      'Payment Status': row.payment_status || 'N/A',
+      'Progress (%)': duration > 0 ? Math.round(((duration - remainingDays) / duration) * 100) : 0
+    };
+  });
+};
+
 /**
  * Excel column width configurations
  */
@@ -634,6 +704,21 @@ const getColumnWidths = (reportType) => {
         { wch: 15 }, // Payment Source
         { wch: 15 }  // Created Date
       ];
+    case REPORT_TYPES.LEASE_AGREEMENTS:
+      return [
+        { wch: 18 }, // Lease Number
+        { wch: 20 }, // Tenant Name
+        { wch: 25 }, // Property
+        { wch: 15 }, // Unit
+        { wch: 18 }, // Rent Amount
+        { wch: 12 }, // Start Date
+        { wch: 12 }, // End Date
+        { wch: 15 }, // Duration
+        { wch: 15 }, // Remaining Days
+        { wch: 12 }, // Lease Status
+        { wch: 15 }, // Payment Status
+        { wch: 12 }  // Progress
+      ];
     default:
       return [];
   }
@@ -718,6 +803,11 @@ const exportToExcel = async (reportType, data, options = {}) => {
         processedData = processTenantPaymentHistoryData(data);
         worksheetName = 'Tenant Payment History';
         baseFilename = 'tenant-payment-history-report';
+        break;
+      case REPORT_TYPES.LEASE_AGREEMENTS:
+        processedData = processLeaseAgreementsData(data);
+        worksheetName = 'Lease Agreements Report';
+        baseFilename = 'lease-agreements-report';
         break;
       default:
         throw new Error(`Unsupported report type: ${reportType}`);
@@ -850,6 +940,10 @@ const exportToCSV = async (reportType, data, options = {}) => {
       case REPORT_TYPES.TENANT_PAYMENT_HISTORY:
         processedData = processTenantPaymentHistoryData(data);
         baseFilename = 'tenant-payment-history-report';
+        break;
+      case REPORT_TYPES.LEASE_AGREEMENTS:
+        processedData = processLeaseAgreementsData(data);
+        baseFilename = 'lease-agreements-report';
         break;
       default:
         throw new Error(`Unsupported report type: ${reportType}`);
@@ -1063,6 +1157,28 @@ export const generateReportSummary = (reportType, data) => {
       summary.paymentsByCategory = paymentsByCategory;
       summary.averagePaymentAmount = totalPayments > 0 ? totalAmount / totalPayments : 0;
       break;
+
+    case REPORT_TYPES.LEASE_AGREEMENTS:
+      const totalLeaseAgreements = dataArray.length;
+      const activeLeaseAgreements = dataArray.filter(item => item.lease_status === 'Active').length;
+      const expiredLeaseAgreements = dataArray.filter(item => item.lease_status === 'Expired').length;
+      const totalRentValue = dataArray.reduce((sum, item) => sum + (parseFloat(item.rent_amount_per_unit) || 0), 0);
+      const averageRentAmount = totalLeaseAgreements > 0 ? totalRentValue / totalLeaseAgreements : 0;
+      const expiringSoon = dataArray.filter(item => (item.remaining_days || 0) <= 30 && item.lease_status === 'Active').length;
+      const propertiesCount = new Set(dataArray.map(item => item.property)).size;
+      const tenantsCount = new Set(dataArray.map(item => item.tenant)).size;
+      const averageDuration = dataArray.reduce((sum, item) => sum + (item.duration || 0), 0) / totalLeaseAgreements;
+      
+      summary.totalLeaseAgreements = totalLeaseAgreements;
+      summary.activeLeaseAgreements = activeLeaseAgreements;
+      summary.expiredLeaseAgreements = expiredLeaseAgreements;
+      summary.totalRentValue = totalRentValue;
+      summary.averageRentAmount = averageRentAmount;
+      summary.expiringSoon = expiringSoon;
+      summary.uniqueProperties = propertiesCount;
+      summary.uniqueTenants = tenantsCount;
+      summary.averageLeaseDuration = Math.round(averageDuration);
+      break;
   }
 
   return summary;
@@ -1217,6 +1333,57 @@ export const exportPendingPayments = async (filters = {}, format = EXPORT_FORMAT
   }
 };
 
+// Export lease agreements
+export const exportLeaseAgreements = async (filters = {}, format = EXPORT_FORMATS.EXCEL) => {
+  try {
+    console.log('exportLeaseAgreements: Starting export with format:', format, 'and filters:', filters);
+    
+    // First fetch the data
+    const result = await fetchLeaseAgreements(filters);
+    
+    console.log('exportLeaseAgreements: Fetch result:', { 
+      success: result.success, 
+      dataLength: result.data?.length,
+      error: result.error 
+    });
+    
+    if (!result.success) {
+      return {
+        success: false,
+        error: result.error || 'Failed to fetch lease agreements data'
+      };
+    }
+
+    if (!result.data || result.data.length === 0) {
+      return {
+        success: false,
+        error: 'No lease agreements data found for the selected criteria'
+      };
+    }
+
+    console.log('exportLeaseAgreements: Calling exportReportData with:', {
+      reportType: REPORT_TYPES.LEASE_AGREEMENTS,
+      dataLength: result.data.length,
+      format,
+      sampleData: result.data[0]
+    });
+
+    // Then export it
+    const exportResult = await exportReportData(REPORT_TYPES.LEASE_AGREEMENTS, result.data, format, { filters });
+    
+    console.log('exportLeaseAgreements: Export result:', exportResult);
+    
+    return exportResult;
+  } catch (error) {
+    console.error('Export lease agreements error:', error);
+    console.error('Export lease agreements error stack:', error.stack);
+    return {
+      success: false,
+      error: error.message || 'Failed to export lease agreements'
+    };
+  }
+};
+
 export default {
   REPORT_TYPES,
   EXPORT_FORMATS,
@@ -1225,11 +1392,13 @@ export default {
   fetchPropertyPerformance,
   fetchPropertySummary,
   fetchTenantPaymentHistory,
+  fetchLeaseAgreements,
   exportReportData,
   exportTenantPaymentHistory,
   exportPropertySummary,
   exportPropertyPerformance,
   exportPendingPayments,
+  exportLeaseAgreements,
   generateReportSummary,
   validateExportOptions
 };

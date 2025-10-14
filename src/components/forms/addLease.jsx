@@ -237,6 +237,7 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
         discount: '',
         amount_paid: '',
         total_amount: '',
+        payments: []
     });
 
     const [properties, setProperties] = useState([]);
@@ -246,6 +247,27 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
     const [submitLoading, setSubmitLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+
+    const formatDatePayment = (dateString) => {
+        if (!dateString) return "";
+        
+        try {
+            // Input format is YYYY-MM-DD, convert to DD-MM-YYYY
+            const [year, month, day] = dateString.split('-');
+            return `${day}-${month}-${year}`;
+        } catch (error) {
+            return dateString; // Return original if formatting fails
+        }
+    };
+    
+    // Payment form state
+    const [currentPayment, setCurrentPayment] = useState({
+        payment_date: new Date().toISOString().split('T')[0],
+        category: '',
+        payment_source: '',
+        amount_paid: ''
+    });
+    const [isAddingPayment, setIsAddingPayment] = useState(false);
 
     // Reset form when modal opens/closes
     useEffect(() => {
@@ -288,7 +310,15 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
             discount: '',
             amount_paid: '',
             total_amount: '',
+            payments: []
         });
+        setCurrentPayment({
+            payment_date: new Date().toISOString().split('T')[0],
+            category: '',
+            payment_source: '',
+            amount_paid: ''
+        });
+        setIsAddingPayment(false);
         setAvailableUnits([]);
         setError('');
         setSuccess('');
@@ -474,6 +504,69 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
         return true;
     };
 
+    // Payment management functions
+    const handlePaymentChange = (name, value) => {
+        setCurrentPayment(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    const addPayment = () => {
+        if (!currentPayment.payment_date || !currentPayment.category || !currentPayment.payment_source || !currentPayment.amount_paid) {
+            setError('Please fill in all payment fields');
+            return;
+        }
+
+        const amount = parseFloat(currentPayment.amount_paid);
+        if (isNaN(amount) || amount <= 0) {
+            setError('Please enter a valid payment amount');
+            return;
+        }
+
+        const newPayment = {
+            ...currentPayment,
+            amount_paid: amount,
+            id: Date.now() // Simple ID for frontend tracking
+        };
+
+        setFormData(prev => ({
+            ...prev,
+            payments: [...prev.payments, newPayment]
+        }));
+
+        // Reset current payment form
+        setCurrentPayment({
+            payment_date: new Date().toISOString().split('T')[0],
+            category: '',
+            payment_source: '',
+            amount_paid: ''
+        });
+
+        setError(''); // Clear any errors
+    };
+
+    const removePayment = (paymentId) => {
+        setFormData(prev => ({
+            ...prev,
+            payments: prev.payments.filter(payment => payment.id !== paymentId)
+        }));
+    };
+
+    const cancelPayment = () => {
+        setCurrentPayment({
+            payment_date: new Date().toISOString().split('T')[0],
+            category: '',
+            payment_source: '',
+            amount_paid: ''
+        });
+        setIsAddingPayment(false);
+    };
+
+    const startAddingPayment = () => {
+        setIsAddingPayment(true);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         
@@ -505,7 +598,13 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                 rent_amount_per_unit: formData.rent_amount_per_unit,
                 discount: formData.discount || "0",
                 amount_paid: formData.amount_paid || "0",
-                total_amount: formData.total_amount
+                total_amount: formData.total_amount,
+                payments: formData.payments.map(payment => ({
+                    payment_date: formatDatePayment(payment.payment_date),
+                    category: payment.category,
+                    payment_source: payment.payment_source,
+                    amount_paid: payment.amount_paid
+                }))
             };
 
             console.log('Submitting lease data:', leaseData);
@@ -651,34 +750,208 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                                 </Col>
                             </Row>
 
-                            {/* Display selected tenant info */}
-                            {formData.tenant_id && (
-                                <div className="mt-4 p-3 bg-light rounded">
-                                    <h6 className="text-primary mb-2">
-                                        <i className="bi bi-person-check me-2"></i>
-                                        Selected Tenant Information
-                                    </h6>
-                                    <div className="small text-muted">
-                                        <div><strong>Name:</strong> {formData.first_name} {formData.last_name}</div>
-                                        <div><strong>Contact:</strong> {formData.tenant_phone}</div>
-                                    </div>
+                          
+                            {/* Payments Section */}
+                            <div className="mt-4">
+                                <div className="form-section-header mb-3">
+                                    <i className="fas fa-credit-card text-success"></i>
+                                    Payment Information
                                 </div>
-                            )}
 
-                            {/* Display selected property/unit info */}
-                            {formData.property_id && formData.unit && (
-                                <div className="mt-3 p-3 bg-light rounded">
-                                    <h6 className="text-success mb-2">
-                                        <i className="bi bi-building-check me-2"></i>
-                                        Selected Property & Unit
-                                    </h6>
-                                    <div className="small text-muted">
-                                        <div><strong>Property:</strong> {properties.find(p => p.id === formData.property_id)?.property_name}</div>
-                                        <div><strong>Unit:</strong> {availableUnits.find(u => u.id.toString() === formData.unit)?.unit_name}</div>
-                                        <div><strong>Rent:</strong> TSh {formatNumberWithCommas(formData.rent_amount_per_unit)}/month</div>
+                                {/* Payments Table */}
+                                <div className="p-2">
+                                    <div className="mb-2">
+                                        <h6 className="text-success mb-0">
+                                            <i className="bi bi-table me-2"></i>
+                                            Payments ({formData.payments.length})
+                                        </h6>
                                     </div>
+                                    
+                                    <div className="table-responsive">
+                                        <table className="table table-sm table-bordered align-middle mb-2">
+                                            <thead className="table-light">
+                                                <tr>
+                                                    <th style={{ width: '20%', fontSize: '0.8rem' }}>Date</th>
+                                                    <th style={{ width: '20%', fontSize: '0.8rem' }}>Category</th>
+                                                    <th style={{ width: '20%', fontSize: '0.8rem' }}>Source</th>
+                                                    <th style={{ width: '20%', fontSize: '0.8rem' }}>Amount (TSh)</th>
+                                                    <th style={{ width: '20%', fontSize: '0.8rem' }}>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {/* New Payment Row - Only show when adding */}
+                                                {isAddingPayment && (
+                                                    <tr style={{ backgroundColor: '#f8f9fa' }}>
+                                                        <td>
+                                                            <Form.Control
+                                                                type="date"
+                                                                size="sm"
+                                                                value={currentPayment.payment_date}
+                                                                onChange={(e) => handlePaymentChange('payment_date', e.target.value)}
+                                                                style={{ fontSize: '0.8rem', border: 'none', backgroundColor: 'transparent' }}
+                                                            />
+                                                        </td>
+                                                        <td>
+                                                            <Form.Select
+                                                                size="sm"
+                                                                value={currentPayment.category}
+                                                                onChange={(e) => handlePaymentChange('category', e.target.value)}
+                                                                style={{ fontSize: '0.8rem', border: 'none', backgroundColor: 'transparent' }}
+                                                            >
+                                                                <option value="">Category</option>
+                                                                <option value="RENT">Rent</option>
+                                                                <option value="Security Deposit">Security Deposit</option>
+                                                                <option value="WATER">Water</option>
+                                                                <option value="SERVICE_CHARGE">Service Charge</option>
+                                                                <option value="OTHER">Other</option>
+                                                                <option value="ELECTRICITY">Electricity</option>
+                                                            </Form.Select>
+                                                        </td>
+                                                        <td>
+                                                            <Form.Select
+                                                                size="sm"
+                                                                value={currentPayment.payment_source}
+                                                                onChange={(e) => handlePaymentChange('payment_source', e.target.value)}
+                                                                style={{ fontSize: '0.8rem', border: 'none', backgroundColor: 'transparent' }}
+                                                            >
+                                                                <option value="">Method</option>
+                                                                <option value="CASH">Cash</option>
+                                                                <option value="BANK">Bank</option>
+                                                                <option value="MOBILE_MONEY">Mobile Money</option>
+                                                            </Form.Select>
+                                                        </td>
+                                                        <td>
+                                                            <Form.Control
+                                                                type="number"
+                                                                size="sm"
+                                                                placeholder="0.00"
+                                                                value={currentPayment.amount_paid}
+                                                                onChange={(e) => handlePaymentChange('amount_paid', e.target.value)}
+                                                                style={{ fontSize: '0.8rem', border: 'none', backgroundColor: 'transparent' }}
+                                                                min="0"
+                                                                step="0.01"
+                                                            />
+                                                        </td>
+                                                        <td className="text-center">
+                                                            <div className="d-flex justify-content-center gap-1">
+                                                                <Button
+                                                                    variant="success"
+                                                                    size="sm"
+                                                                    onClick={addPayment}
+                                                                    disabled={!currentPayment.payment_date || !currentPayment.category || !currentPayment.payment_source || !currentPayment.amount_paid}
+                                                                    className="btn-sm rounded-circle"
+                                                                    style={{ 
+                                                                        fontSize: '0.8rem', 
+                                                                        padding: '0.2rem 0.4rem',
+                                                                        minWidth: '28px',
+                                                                        height: '28px',
+                                                                        display: 'flex',
+                                                                        alignItems: 'center',
+                                                                        justifyContent: 'center'
+                                                                    }}
+                                                                >
+                                                                    <i className="bi bi-check-lg"></i>
+                                                                </Button>
+                                                                <Button
+                                                                    variant="outline-danger"
+                                                                    size="sm"
+                                                                    onClick={cancelPayment}
+                                                                    className="btn-sm rounded-circle"
+                                                                    style={{ 
+                                                                        fontSize: '0.8rem', 
+                                                                        padding: '0.2rem 0.4rem',
+                                                                        minWidth: '28px',
+                                                                        height: '28px',
+                                                                        display: 'flex',
+                                                                        alignItems: 'center',
+                                                                        justifyContent: 'center'
+                                                                    }}
+                                                                >
+                                                                    <i className="bi bi-x-lg"></i>
+                                                                </Button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                )}
+                                                
+                                                {/* Existing Payments */}
+                                                {formData.payments.map((payment) => (
+                                                    <tr key={payment.id}>
+                                                        <td style={{ fontSize: '0.8rem' }}>
+                                                            {new Date(payment.date).toLocaleDateString()}
+                                                        </td>
+                                                        <td style={{ fontSize: '0.8rem' }}>
+                                                            <span className="badge bg-primary">{payment.category}</span>
+                                                        </td>
+                                                        <td style={{ fontSize: '0.8rem' }}>
+                                                            <span className="badge bg-info">{payment.payment_source}</span>
+                                                        </td>
+                                                        <td style={{ fontSize: '0.8rem' }}>
+                                                            <strong>TSh {payment.amount_paid.toLocaleString()}</strong>
+                                                        </td>
+                                                        <td className="text-center">
+                                                            <Button
+                                                                className="btn-sm rounded-circle"
+                                                                variant="outline-danger"
+                                                                size="sm"
+                                                                onClick={() => removePayment(payment.id)}
+                                                                style={{ 
+                                                                        fontSize: '0.8rem', 
+                                                                        padding: '0.2rem 0.4rem',
+                                                                        minWidth: '28px',
+                                                                        height: '28px',
+                                                                        display: 'flex',
+                                                                        alignItems: 'center',
+                                                                        justifyContent: 'center'
+                                                                    }}
+                                                            >
+                                                                <i className="bi bi-trash"></i>
+                                                            </Button>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                                
+                                                {/* Empty state when no payments */}
+                                                {formData.payments.length === 0 && !isAddingPayment && (
+                                                    <tr>
+                                                        <td colSpan="5" className="text-center text-muted" style={{ fontSize: '0.8rem', padding: '1rem' }}>
+                                                            <i className="bi bi-info-circle me-2"></i>
+                                                            No payments added yet. Click "Add New Line" below to add payments.
+                                                        </td>
+                                                    </tr>
+                                                )}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    
+                                    {/* Add New Line Button */}
+                                    {!isAddingPayment && (
+                                        <div className="text-center mt-2 mb-2">
+                                            <button
+                                                type="button"
+                                                onClick={startAddingPayment}
+                                                className="odoo-btn odoo-btn-primary"
+                                                style={{fontSize: '0.8rem'}}
+                                            >
+                                                <i className="bi bi-plus-lg me-1"></i>
+                                                Add Payment
+                                            </button>
+                                        </div>
+                                    )}
+                                    
+                                    {/* Total Summary */}
+                                    {formData.payments.length > 0 ? (
+                                        <div className="d-flex justify-content-between align-items-center mt-2 pt-2 border-top">
+                                            <small className="text-muted">
+                                                {formData.payments.length} payment{formData.payments.length !== 1 ? 's' : ''} added
+                                            </small>
+                                            <strong className="text-success">
+                                                Total: TSh {formData.payments.reduce((sum, payment) => sum + payment.amount_paid, 0).toLocaleString()}
+                                            </strong>
+                                        </div>
+                                    ) : null}
                                 </div>
-                            )}
+                            </div>
                         </Col>
 
                         {/* Right Column - Lease Terms & Financial Information */}
@@ -802,7 +1075,7 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                             
                             {/* Paid amount and discount in one row */}
                             <Row className="mb-3">
-                                <Col xs={12} sm={6} className="mb-3">
+                                {/* <Col xs={12} sm={6} className="mb-3">
                                     <Form.Group>
                                         <Form.Label className="form-label">Paid Amount (TSh)</Form.Label>
                                         <Form.Control
@@ -817,7 +1090,7 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                                             onBlur={(e) => Object.assign(e.target.style, underlineInputStyles)}
                                         />
                                     </Form.Group>
-                                </Col>
+                                </Col> */}
                                 
                                 <Col xs={12} sm={6} className="mb-3">
                                     <Form.Group>
