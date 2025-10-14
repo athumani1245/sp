@@ -5,6 +5,7 @@ import 'react-phone-number-input/style.css';
 import "../assets/styles/register.css";
 import { useNavigate } from "react-router-dom";
 import { registerUser } from "../services/registrationService";
+import SEOHead from "../components/SEOHead";
 
 function Register() {
     const [firstName, setFirstName] = useState("");

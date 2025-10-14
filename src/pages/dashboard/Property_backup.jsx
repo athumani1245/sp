@@ -1,1 +1,0 @@
-// Backup of original Property.jsx before responsive transformation

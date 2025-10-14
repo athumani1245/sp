@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import SEOHead from "../components/SEOHead";
 import "../assets/styles/landing.css";
 
 function Landing() {
@@ -59,10 +60,53 @@ function Landing() {
         }
     ];
 
+    // Structured data for the landing page
+    const structuredData = {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "Tanaka Property Management - Professional Property Management System in Tanzania",
+        "description": "Transform your property management in Tanzania with Tanaka. Streamline rent collection, tenant management, lease tracking, and financial reporting. Start your free trial today!",
+        "url": "https://tanaka.co.tz",
+        "mainEntity": {
+            "@type": "SoftwareApplication",
+            "name": "Tanaka Property Management",
+            "applicationCategory": "BusinessApplication",
+            "operatingSystem": "Web",
+            "offers": {
+                "@type": "Offer",
+                "price": "15000",
+                "priceCurrency": "TZS",
+                "availability": "https://schema.org/InStock"
+            },
+            "aggregateRating": {
+                "@type": "AggregateRating",
+                "ratingValue": "4.8",
+                "ratingCount": "150"
+            }
+        },
+        "breadcrumb": {
+            "@type": "BreadcrumbList",
+            "itemListElement": [{
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://tanaka.co.tz"
+            }]
+        }
+    };
+
     return (
         <div className="landing-page">
+            <SEOHead 
+                title="Tanaka - Professional Property Management System in Tanzania | Rent Collection & Tenant Management"
+                description="Transform your property management in Tanzania with Tanaka. Streamline rent collection, tenant management, lease tracking, and financial reporting. Start your free trial today!"
+                keywords="property management Tanzania, rent collection software, tenant management system, lease tracking, property management dashboard, TZS payments, rental property management, real estate software Tanzania, property analytics, maintenance management, Dar es Salaam property management"
+                url="/"
+                structuredData={structuredData}
+            />
             {/* Navigation */}
-            <nav className="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+            <header>
+                <nav className="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top" role="navigation" aria-label="Main navigation">
                 <div className="container">
                     <a className="navbar-brand" href="#home">
                         <img src="/Logo.png" alt="Tanaka" width="40" height="40" className="me-2" />
@@ -107,15 +151,17 @@ function Landing() {
                         </ul>
                     </div>
                 </div>
-            </nav>
+                </nav>
+            </header>
 
             {/* Hero Section */}
-            <section id="home" className="hero-section">
+            <main id="main-content">
+                <section id="home" className="hero-section" aria-labelledby="hero-title">
                 <div className="container">
                     <div className="row align-items-center min-vh-100">
                         <div className="col-lg-6">
                             <div className="hero-content">
-                                <h1 className="hero-title">
+                                <h1 id="hero-title" className="hero-title">
                                     Rent & Manage with <span className="text-primary">Ease</span>
                                 </h1>
                                 <p className="hero-description">
@@ -181,13 +227,14 @@ function Landing() {
                         </div>
                     </div>
                 </div>
-            </section>
+                </section>
+            </main>
 
             {/* Features Section */}
-            <section id="features" className="features-section">
+            <section id="features" className="features-section" aria-labelledby="features-title">
                 <div className="container">
                     <div className="text-center mb-5">
-                        <h2 className="section-title">Powerful Features</h2>
+                        <h2 id="features-title" className="section-title">Powerful Features</h2>
                         <p className="section-description">
                             Everything you need to manage your properties efficiently
                         </p>
@@ -209,10 +256,10 @@ function Landing() {
             </section>
 
             {/* Pricing Section */}
-            <section id="pricing" className="pricing-section">
+            <section id="pricing" className="pricing-section" aria-labelledby="pricing-title">
                 <div className="container">
                     <div className="text-center mb-5">
-                        <h2 className="section-title">Choose Your Plan</h2>
+                        <h2 id="pricing-title" className="section-title">Choose Your Plan</h2>
                         <p className="section-description">
                             Select the perfect plan for your property management needs. 
                             Start with our free trial and upgrade as you grow.
@@ -312,12 +359,12 @@ function Landing() {
             </section>
 
             {/* About Section */}
-            <section id="about" className="about-section">
+            <section id="about" className="about-section" aria-labelledby="about-title">
                 <div className="container">
                     <div className="row align-items-center">
                         <div className="col-lg-6">
                             <div className="about-content">
-                                <h2 className="section-title">Why Choose Tanaka?</h2>
+                                <h2 id="about-title" className="section-title">Why Choose Tanaka?</h2>
                                 <p className="section-description">
                                     We understand the challenges of property management in Tanzania. 
                                     That's why we've built a platform specifically designed for local needs.
@@ -370,10 +417,10 @@ function Landing() {
             </section>
 
             {/* Testimonials Section */}
-            <section id="testimonials" className="testimonials-section">
+            <section id="testimonials" className="testimonials-section" aria-labelledby="testimonials-title">
                 <div className="container">
                     <div className="text-center mb-5">
-                        <h2 className="section-title">What Our Users Say</h2>
+                        <h2 id="testimonials-title" className="section-title">What Our Users Say</h2>
                         <p className="section-description">
                             Join thousands of satisfied property managers and owners
                         </p>
@@ -400,10 +447,10 @@ function Landing() {
             </section>
 
             {/* CTA Section */}
-            <section className="cta-section">
+            <section className="cta-section" aria-labelledby="cta-title">
                 <div className="container">
                     <div className="text-center">
-                        <h2 className="cta-title">Ready to Get Started?</h2>
+                        <h2 id="cta-title" className="cta-title">Ready to Get Started?</h2>
                         <p className="cta-description">
                             Join thousands of property managers who trust Tanaka for their business
                         </p>
@@ -426,12 +473,12 @@ function Landing() {
             </section>
 
             {/* Footer - Compact Version */}
-            <footer id="contact" className="footer">
+            <footer id="contact" className="footer" role="contentinfo">
                 <div className="container">
                     <div className="row">
                         <div className="col-lg-4 col-md-6">
                             <div className="footer-brand">
-                                <img src="/Logo.png" alt="Tanaka" width="40" height="40" className="me-2" />
+                                <img src="/Logo.png" alt="Tanaka Property Management Logo" width="40" height="40" className="me-2" />
                                 <span className="brand-name">Tanaka</span>
                             </div>
                             <p className="footer-description">
@@ -441,8 +488,8 @@ function Landing() {
                         <div className="col-lg-4 col-md-6">
                             <h6 className="footer-title">Contact</h6>
                             <div className="footer-contact">
-                                <p><i className="bi bi-envelope-fill me-2"></i><a href="mailto:info@tanaka.co.tz">info@tanaka.co.tz</a></p>
-                                <p><i className="bi bi-telephone-fill me-2"></i><a href="tel:+255762357820">+255 762 357 820</a></p>
+                                <p><i className="bi bi-envelope-fill me-2" aria-hidden="true"></i><a href="mailto:info@tanaka.co.tz" aria-label="Send email to Tanaka support">info@tanaka.co.tz</a></p>
+                                <p><i className="bi bi-telephone-fill me-2" aria-hidden="true"></i><a href="tel:+255762357820" aria-label="Call Tanaka support">+255 762 357 820</a></p>
                             </div>
                         </div>
                         <div className="col-lg-4 col-md-12">
@@ -472,14 +519,14 @@ function Landing() {
                         </div>
                         <div className="col-md-6">
                             <div className="footer-social">
-                                <a href="https://www.linkedin.com/company/tanakas" className="social-link">
-                                    <i className="bi bi-linkedin"></i>
+                                <a href="https://www.linkedin.com/company/tanakas" className="social-link" aria-label="Follow Tanaka on LinkedIn" target="_blank" rel="noopener noreferrer">
+                                    <i className="bi bi-linkedin" aria-hidden="true"></i>
                                 </a>
-                                <a href="https://www.instagram.com/tanakatanzania" className="social-link">
-                                    <i className="bi bi-instagram"></i>
+                                <a href="https://www.instagram.com/tanakatanzania" className="social-link" aria-label="Follow Tanaka on Instagram" target="_blank" rel="noopener noreferrer">
+                                    <i className="bi bi-instagram" aria-hidden="true"></i>
                                 </a>
-                                <a href="#" className="social-link">
-                                    <i className="bi bi-facebook"></i>
+                                <a href="https://www.facebook.com/tanakatanzania" className="social-link" aria-label="Follow Tanaka on Facebook" target="_blank" rel="noopener noreferrer">
+                                    <i className="bi bi-facebook" aria-hidden="true"></i>
                                 </a>
                             </div>
                         </div>

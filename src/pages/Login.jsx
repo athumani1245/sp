@@ -5,6 +5,7 @@ import 'react-phone-number-input/style.css';
 import "../assets/styles/login.css";
 import { login as loginService } from "../services/authService";
 import { useAuth } from "../context/AuthContext";
+import SEOHead from "../components/SEOHead";
 function Login() {
     const [phoneNumber, setPhoneNumber] = useState("");
     const [password, setPassword] = useState("");
@@ -47,8 +48,23 @@ function Login() {
     };
 
 
+    const structuredData = {
+        "@context": "https://schema.org",
+        "@type": "LoginPage",
+        "name": "Login to Tanaka Property Management",
+        "description": "Access your property management dashboard. Secure login for property owners and managers in Tanzania.",
+        "url": "https://tanaka.co.tz/login"
+    };
+
     return (
         <div className="min-vh-100 d-flex flex-column">
+            <SEOHead 
+                title="Login - Tanaka Property Management | Secure Access to Your Dashboard"
+                description="Login to your Tanaka property management account. Access your dashboard, manage properties, track rent payments, and monitor your real estate portfolio in Tanzania."
+                keywords="property management login, tenant management access, rent collection dashboard, property management Tanzania, secure login, property owner portal"
+                url="/login"
+                structuredData={structuredData}
+            />
             <header className="login-header">
                 <div className="container">
                     <div className="text-brand">Tanaka</div>

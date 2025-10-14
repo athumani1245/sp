@@ -6,7 +6,7 @@ import { generateLeaseAgreementPDF } from "../reports";
 import { getLeases } from "../services/leaseService";
 import { getProperties } from "../services/propertyService";
 import { getTenants } from "../services/tenantService";
-import { LeaseReportModal, PropertyReportModal, TenantReportModal } from "./reports/index";
+import { LeaseReportModal, PropertyReportModal, PropertySummaryReportModal, TenantReportModal, TenantPaymentHistoryModal } from "./reports/index";
 import "../assets/styles/reports.css";
 
 function Reports() {
@@ -21,7 +21,9 @@ function Reports() {
   const [selectedFormat, setSelectedFormat] = useState('pdf');
   const [showLeaseModal, setShowLeaseModal] = useState(false);
   const [showPropertyModal, setShowPropertyModal] = useState(false);
+  const [showPropertySummaryModal, setShowPropertySummaryModal] = useState(false);
   const [showTenantModal, setShowTenantModal] = useState(false);
+  const [showTenantPaymentHistoryModal, setShowTenantPaymentHistoryModal] = useState(false);
   const [dateFilter, setDateFilter] = useState({
     startDate: new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0], // Start of current year
     endDate: new Date().toISOString().split('T')[0] // Today
@@ -153,9 +155,13 @@ function Reports() {
     // Show appropriate modal based on report data source
     if (report.dataSource === 'leases' || report.id === 'lease_agreements' || report.id === 'lease_expiry' || report.id === 'lease_renewal_termination') {
       setShowLeaseModal(true);
-    } else if (report.dataSource === 'properties' || report.id === 'property_summary' || report.id === 'units_availability' || report.id === 'property_performance' || report.id === 'occupancy_report') {
+    } else if (report.id === 'property_summary') {
+      setShowPropertySummaryModal(true);
+    } else if (report.dataSource === 'properties' || report.id === 'units_availability' || report.id === 'property_performance' || report.id === 'occupancy_report') {
       setShowPropertyModal(true);
-    } else if (report.dataSource === 'tenants' || report.id === 'tenant_directory' || report.id === 'tenant_payment_history' || report.id === 'tenant_outstanding_balance') {
+    } else if (report.id === 'tenant_payment_history') {
+      setShowTenantPaymentHistoryModal(true);
+    } else if (report.dataSource === 'tenants' || report.id === 'tenant_directory' || report.id === 'tenant_outstanding_balance') {
       setShowTenantModal(true);
     } else {
       // Default to lease modal for other reports
@@ -603,11 +609,25 @@ function Reports() {
         selectedFormat={selectedFormat}
       />
       
+      <PropertySummaryReportModal
+        show={showPropertySummaryModal}
+        onHide={() => setShowPropertySummaryModal(false)}
+        reportConfig={selectedReport}
+        dateFilter={dateFilter}
+      />
+      
       <TenantReportModal
         show={showTenantModal}
         onHide={() => setShowTenantModal(false)}
         reportConfig={selectedReport}
         selectedFormat={selectedFormat}
+      />
+      
+      <TenantPaymentHistoryModal
+        show={showTenantPaymentHistoryModal}
+        onHide={() => setShowTenantPaymentHistoryModal(false)}
+        reportConfig={selectedReport}
+        dateFilter={dateFilter}
       />
     </Layout>
   );

@@ -23,13 +23,14 @@ function Leases() {
     outstandingPayments: 0,
     expiringSoon: 0
   });
-  const [allLeases, setAllLeases] = useState([]); // Store all leases for summary calculations
+  const [allLeases, setAllLeases] = useState([]);
+  const [totalsData, setTotalsData] = useState(null);
 
   // Debounce search input to avoid too many API calls
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(search);
-    }, 500); // 500ms delay
+    }, 500);
 
     return () => {
       clearTimeout(handler);
@@ -39,21 +40,33 @@ function Leases() {
   // Fetch all leases for summary statistics (without pagination)
   const fetchAllLeasesForSummary = useCallback(async () => {
     try {
-      // Use the dedicated getAllLeases function for summary statistics
       const result = await getAllLeases();
       
       if (result.success) {
         const allLeaseData = result.data?.items || result.data || [];
         setAllLeases(allLeaseData);
-        setSummaryStats(calculateSummaryStats(allLeaseData));
+        
+        // Check if API response includes totals data
+        if (result.data?.totals) {
+          setTotalsData(result.data.totals);
+          setSummaryStats({
+            totalLeases: result.data.totals.total_active_leases || 0,
+            activeLeases: result.data.totals.total_active_leases || 0,
+            outstandingPayments: result.data.totals.total_remaining_amount || 0,
+            expiringSoon: 0 // This might need to be calculated separately if not in API
+          });
+        } else {
+          // Fallback to manual calculation if totals not provided
+          setSummaryStats(calculateSummaryStats(allLeaseData));
+        }
+        
         console.log(`Fetched ${allLeaseData.length} leases for summary statistics`);
+        console.log('Totals data:', result.data?.totals);
       } else {
         console.error('Failed to fetch all leases for summary:', result.error);
-        // Keep existing summary stats if fetch fails
       }
     } catch (error) {
       console.error("Failed to fetch all leases for summary:", error);
-      // Keep existing summary stats if fetch fails
     }
   }, []);
 
@@ -62,10 +75,9 @@ function Leases() {
       setLoading(true);
       setError("");
       
-      // Prepare parameters for the API call
       const params = {
         page: pageNum,
-        limit: 10 // Number of leases per page
+        limit: 10
       };
       
       if (searchTerm) {
@@ -76,11 +88,11 @@ function Leases() {
         params.status = statusFilter;
       }
       
-      // Call the actual lease service
-      const result = await getLeases(params);      if (result.success) {
+      const result = await getLeases(params);
+      
+      if (result.success) {
         const leaseData = result.data?.items || [];
         setLeases(leaseData);
-        // Don't calculate summary stats from paginated data anymore
         setPagination({
           current_page: result.data?.current_page || 1,
           total_pages: result.data?.total_pages || 1,
@@ -88,6 +100,17 @@ function Leases() {
           next: result.data?.next,
           previous: result.data?.previous
         });
+        
+        // Update totals data if available in paginated response
+        if (result.data?.totals) {
+          setTotalsData(result.data.totals);
+          setSummaryStats({
+            totalLeases: result.data.totals.total_active_leases || 0,
+            activeLeases: result.data.totals.total_active_leases || 0,
+            outstandingPayments: result.data.totals.total_remaining_amount || 0,
+            expiringSoon: 0 // This might need to be calculated separately if not in API
+          });
+        }
       } else {
         console.error('Failed to fetch leases:', result.error);
         setError(result.error || "Failed to fetch leases");
@@ -107,15 +130,14 @@ function Leases() {
     fetchLeases();
   }, [fetchLeases]);
 
-  // Fetch all leases for summary on component mount and when leases are added
   useEffect(() => {
     fetchAllLeasesForSummary();
-  }, []); // Only run once on mount
+  }, []);
 
   const handleSearch = (e) => {
     const searchValue = e.target.value;
     setSearch(searchValue);
-    setPage(1); // Reset to first page when searching
+    setPage(1);
   };
 
   const handleStatusFilter = (e) => {
@@ -143,7 +165,6 @@ function Leases() {
     return `TSh ${numAmount.toLocaleString()}`;
   };
 
-  // Calculate summary statistics
   const calculateSummaryStats = (leaseData) => {
     const stats = {
       totalLeases: leaseData.length,
@@ -151,8 +172,6 @@ function Leases() {
       outstandingPayments: 0,
       expiringSoon: 0
     };
-
-    // Calculate outstanding payments (total amount - paid amount)
     stats.outstandingPayments = leaseData.reduce((sum, lease) => {
       const totalAmount = Number(lease.total_amount) || 0;
       const paidAmount = Number(lease.amount_paid) || 0;
@@ -160,42 +179,34 @@ function Leases() {
       return sum + (outstanding > 0 ? outstanding : 0);
     }, 0);
 
-    // Calculate expiring soon (within 30 days) - fixed logic
+    // Calculate expiring soon (within 30 days)
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Start of today
+    today.setHours(0, 0, 0, 0);
     
     const thirtyDaysFromNow = new Date(today);
     thirtyDaysFromNow.setDate(today.getDate() + 30);
-    thirtyDaysFromNow.setHours(23, 59, 59, 999); // End of that day
+    thirtyDaysFromNow.setHours(23, 59, 59, 999);
 
     console.log('Calculating expiring leases:');
     console.log('Today:', today.toISOString());
     console.log('30 days from now:', thirtyDaysFromNow.toISOString());
 
     stats.expiringSoon = leaseData.filter(lease => {
-      // Only check leases that have an end date
       if (!lease.end_date) {
         console.log(`Lease ${lease.lease_number || lease.id}: No end date`);
         return false;
       }
       
-      // Parse the end date - handle both YYYY-MM-DD and other formats
       const endDate = new Date(lease.end_date);
       
-      // Check if date is valid
       if (isNaN(endDate.getTime())) {
         console.log(`Lease ${lease.lease_number || lease.id}: Invalid end date ${lease.end_date}`);
         return false;
       }
       
-      // Set to start of day for the lease end date for consistent comparison
       endDate.setHours(0, 0, 0, 0);
       
-      // Check if lease expires within the next 30 days (including today)
-      // The lease is expiring soon if its end date is between today and 30 days from now
       const isExpiringSoon = endDate >= today && endDate <= thirtyDaysFromNow;
-      
-      // Only consider active leases for expiring soon (not terminated or draft)
       const isActiveOrRelevant = lease.status === 'active';
       
       const shouldCount = isExpiringSoon && isActiveOrRelevant;
@@ -217,10 +228,7 @@ function Leases() {
     return stats;
   };
 
-
-
   const getUnitInfo = (lease) => {
-    // Handle different possible field names for unit information
     if (lease.unit_number) {
       return `Unit ${lease.unit_number}`;
     } else if (lease.unit_name) {
@@ -239,7 +247,6 @@ function Leases() {
 
   const handleLeaseAdded = (newLease) => {
     setShowAddModal(false);
-    // Refresh both the paginated lease list and summary statistics
     fetchLeases();
     fetchAllLeasesForSummary();
   };
@@ -247,7 +254,7 @@ function Leases() {
   return (
     <Layout>
       <div className="main-content">
-        {/* Filters Section */}
+
         <div className="leases-filters-section">
           <div className="d-flex flex-column flex-md-row gap-3 align-items-md-center">
             <div className="flex-fill">
@@ -309,7 +316,7 @@ function Leases() {
           </div>
         </div>
 
-        {/* Summary Cards */}
+
         {!loading && leases.length > 0 && (
           <div className="summary-cards-section mb-4">
             <div className="row g-3">
@@ -317,21 +324,12 @@ function Leases() {
                 <div className="card border-0 bg-light h-100">
                   <div className="card-body p-3 text-center">
                     <div className="d-flex align-items-center justify-content-center mb-2">
-                      <i className="bi bi-file-earmark-text text-primary me-2" style={{ fontSize: '1.5rem' }}></i>
-                      <h6 className="card-title mb-0 small">Total Leases</h6>
-                    </div>
-                    <h4 className="text-primary mb-0 fs-4">{summaryStats.totalLeases}</h4>
-                  </div>
-                </div>
-              </div>
-              <div className="col-6 col-lg-3">
-                <div className="card border-0 bg-light h-100">
-                  <div className="card-body p-3 text-center">
-                    <div className="d-flex align-items-center justify-content-center mb-2">
                       <i className="bi bi-check-circle text-success me-2" style={{ fontSize: '1.5rem' }}></i>
                       <h6 className="card-title mb-0 small">Active Leases</h6>
                     </div>
-                    <h4 className="text-success mb-0 fs-4">{summaryStats.activeLeases}</h4>
+                    <h4 className="text-success mb-0 fs-4">
+                      {totalsData ? totalsData.total_active_leases || 0 : summaryStats.activeLeases}
+                    </h4>
                   </div>
                 </div>
               </div>
@@ -343,7 +341,7 @@ function Leases() {
                       <h6 className="card-title mb-0 small">Outstanding</h6>
                     </div>
                     <h4 className="text-danger mb-0 fs-6">
-                      TSh {summaryStats.outstandingPayments.toLocaleString()}
+                      TSh {totalsData ? (totalsData.total_remaining_amount || 0).toLocaleString() : summaryStats.outstandingPayments.toLocaleString()}
                     </h4>
                   </div>
                 </div>
@@ -352,10 +350,25 @@ function Leases() {
                 <div className="card border-0 bg-light h-100">
                   <div className="card-body p-3 text-center">
                     <div className="d-flex align-items-center justify-content-center mb-2">
-                      <i className="bi bi-exclamation-triangle text-warning me-2" style={{ fontSize: '1.5rem' }}></i>
-                      <h6 className="card-title mb-0 small">Expiring Soon</h6>
+                      <i className="bi bi-currency-dollar text-success me-2" style={{ fontSize: '1.5rem' }}></i>
+                      <h6 className="card-title mb-0 small">Total Paid</h6>
                     </div>
-                    <h4 className="text-warning mb-0 fs-4">{summaryStats.expiringSoon}</h4>
+                    <h4 className="text-success mb-0 fs-6">
+                      TSh {totalsData ? (totalsData.total_amount_paid || 0).toLocaleString() : 0}
+                    </h4>
+                  </div>
+                </div>
+              </div>
+              <div className="col-6 col-lg-3">
+                <div className="card border-0 bg-light h-100">
+                  <div className="card-body p-3 text-center">
+                    <div className="d-flex align-items-center justify-content-center mb-2">
+                      <i className="bi bi-plus-circle text-info me-2" style={{ fontSize: '1.5rem' }}></i>
+                      <h6 className="card-title mb-0 small">Over Paid</h6>
+                    </div>
+                    <h4 className="text-info mb-0 fs-6">
+                      TSh {totalsData ? (totalsData.total_over_paid || 0).toLocaleString() : 0}
+                    </h4>
                   </div>
                 </div>
               </div>
@@ -363,7 +376,7 @@ function Leases() {
           </div>
         )}
 
-        {/* Error Alert */}
+
         {error && (
           <div className="alert alert-danger" role="alert">
             <i className="bi bi-exclamation-triangle me-2"></i>
@@ -371,7 +384,7 @@ function Leases() {
           </div>
         )}
 
-        {/* Main Leases Section */}
+
         <div className="leases-full-width">
           <div className="leases-header-section">
             <h5 className="leases-title">
@@ -415,7 +428,7 @@ function Leases() {
 
           {!loading && leases.length > 0 && (
             <>
-              {/* Desktop Table View */}
+
               <div className="table-responsive d-none d-md-block">
                 <table className="table table-hover align-middle mb-0">
                   <thead className="table-light">
@@ -489,7 +502,7 @@ function Leases() {
                 </table>
               </div>
 
-              {/* Mobile Full-Width List View */}
+
               <div className="d-md-none">
                 <div className="lease-list-container">
                   {Array.isArray(leases) && leases.map((lease) => (
@@ -550,7 +563,7 @@ function Leases() {
             </>
           )}
 
-          {/* Pagination */}
+
           {pagination && pagination.total_pages > 1 && (
             <div className="leases-pagination-section">
               <nav aria-label="Leases pagination">
@@ -585,7 +598,7 @@ function Leases() {
         </div>
       </div>
 
-      {/* Add Lease Modal */}
+
       {showAddModal && (
         <AddLeaseModal
           isOpen={showAddModal}
