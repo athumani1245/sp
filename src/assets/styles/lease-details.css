@@ -205,3 +205,9 @@
   max-width: 400px;
   margin: 0 auto;
 }
+
+.lease-tab {
+    padding-left: 1.5rem;
+    font-size: 0.95rem;
+    background-color: #d70e0e;
+}

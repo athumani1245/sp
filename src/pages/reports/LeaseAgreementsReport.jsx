@@ -4,7 +4,7 @@ import DataTable from 'react-data-table-component';
 import Layout from '../../components/Layout';
 import Toast from '../../components/Toast';
 import { 
-  getLeases
+  getLeaseReportData
 } from '../../services/leaseService';
 import { 
   exportReportData, 
@@ -39,6 +39,8 @@ const LeaseAgreementsReport = () => {
     monthly_rent: true,
     status: true,
     duration: false,
+    remaining_days: true,
+    payment_status: false,
     security_deposit: false,
     created_date: false
   });
@@ -81,8 +83,10 @@ const LeaseAgreementsReport = () => {
       start_date: 'Start Date',
       end_date: 'End Date',
       monthly_rent: 'Monthly Rent',
-      status: 'Status',
-      duration: 'Duration (Months)',
+      status: 'Lease Status',
+      duration: 'Duration (Days)',
+      remaining_days: 'Remaining Days',
+      payment_status: 'Payment Status',
       security_deposit: 'Security Deposit',
       created_date: 'Created Date'
     };
@@ -107,11 +111,7 @@ const LeaseAgreementsReport = () => {
     tenant: {
       name: 'Tenant',
       selector: row => {
-        if (typeof row.tenant === 'object' && row.tenant !== null) {
-          const firstName = row.tenant.first_name || '';
-          const lastName = row.tenant.last_name || '';
-          return `${firstName} ${lastName}`.trim() || 'N/A';
-        }
+        // Backend sends tenant as a string directly
         return row.tenant || 'N/A';
       },
       sortable: true,
@@ -122,9 +122,7 @@ const LeaseAgreementsReport = () => {
     property: {
       name: 'Property',
       selector: row => {
-        if (typeof row.property === 'object' && row.property !== null) {
-          return row.property.property_name || row.property.name || 'N/A';
-        }
+        // Backend sends property as a string directly
         return row.property || 'N/A';
       },
       sortable: true,
@@ -135,9 +133,7 @@ const LeaseAgreementsReport = () => {
     unit: {
       name: 'Unit',
       selector: row => {
-        if (typeof row.unit === 'object' && row.unit !== null) {
-          return row.unit.unit_name || row.unit.id || 'N/A';
-        }
+        // Backend sends unit as a string directly
         return row.unit || 'N/A';
       },
       sortable: true,
@@ -149,12 +145,7 @@ const LeaseAgreementsReport = () => {
       name: 'Start Date',
       selector: row => {
         if (!row.start_date) return 'N/A';
-        // Handle DD-MM-YYYY format from API
-        const dateParts = row.start_date.split('-');
-        if (dateParts.length === 3) {
-          const date = new Date(dateParts[2], dateParts[1] - 1, dateParts[0]);
-          return date.toLocaleDateString();
-        }
+        // Backend sends dates in YYYY-MM-DD format
         return new Date(row.start_date).toLocaleDateString();
       },
       sortable: true,
@@ -166,12 +157,7 @@ const LeaseAgreementsReport = () => {
       name: 'End Date',
       selector: row => {
         if (!row.end_date) return 'N/A';
-        // Handle DD-MM-YYYY format from API
-        const dateParts = row.end_date.split('-');
-        if (dateParts.length === 3) {
-          const date = new Date(dateParts[2], dateParts[1] - 1, dateParts[0]);
-          return date.toLocaleDateString();
-        }
+        // Backend sends dates in YYYY-MM-DD format
         return new Date(row.end_date).toLocaleDateString();
       },
       sortable: true,
@@ -182,15 +168,9 @@ const LeaseAgreementsReport = () => {
     monthly_rent: {
       name: 'Monthly Rent',
       selector: row => {
-        let rent = 0;
-        if (row.rent_amount_per_unit) {
-          rent = Number(row.rent_amount_per_unit);
-        } else if (row.monthly_rent) {
-          rent = Number(row.monthly_rent);
-        } else if (typeof row.unit === 'object' && row.unit?.rent_per_month) {
-          rent = Number(row.unit.rent_per_month);
-        }
-        return isNaN(rent) ? 'TSh 0' : `TSh ${rent.toLocaleString()}`;
+        // Backend sends rent_amount_per_unit as string
+        const rent = parseFloat(row.rent_amount_per_unit) || 0;
+        return `TSh ${rent.toLocaleString()}`;
       },
       sortable: true,
       resizable: true,
@@ -199,13 +179,13 @@ const LeaseAgreementsReport = () => {
     },
     status: {
       name: 'Status',
-      selector: row => row.status || 'Unknown',
+      selector: row => row.lease_status || 'Unknown',
       sortable: true,
       resizable: true,
       minWidth: '100px',
       maxWidth: '130px',
       cell: row => {
-        const status = (row.status || 'unknown').toLowerCase();
+        const status = (row.lease_status || 'unknown').toLowerCase();
         let badgeClass = 'secondary';
         
         switch (status) {
@@ -236,22 +216,76 @@ const LeaseAgreementsReport = () => {
       },
     },
     duration: {
-      name: 'Duration',
+      name: 'Duration (Days)',
       selector: row => {
-        if (row.number_of_month) {
-          return `${row.number_of_month} months`;
-        } else if (row.start_date && row.end_date) {
-          const start = new Date(row.start_date);
-          const end = new Date(row.end_date);
-          const months = Math.round((end - start) / (1000 * 60 * 60 * 24 * 30.44));
-          return `${months} months`;
-        }
-        return 'N/A';
+        // Backend sends duration in days
+        const duration = row.duration || 0;
+        return `${duration} days`;
       },
       sortable: true,
       resizable: true,
       minWidth: '120px',
-      maxWidth: '180px',
+      maxWidth: '150px',
+    },
+    remaining_days: {
+      name: 'Remaining Days',
+      selector: row => {
+        const remaining = row.remaining_days || 0;
+        return `${remaining} days`;
+      },
+      sortable: true,
+      resizable: true,
+      minWidth: '130px',
+      maxWidth: '160px',
+      cell: row => {
+        const remaining = row.remaining_days || 0;
+        let badgeClass = 'success';
+        
+        if (remaining <= 0) {
+          badgeClass = 'danger';
+        } else if (remaining <= 30) {
+          badgeClass = 'warning';
+        } else if (remaining <= 90) {
+          badgeClass = 'info';
+        }
+        
+        return (
+          <span className={`badge bg-${badgeClass}`}>
+            {remaining} days
+          </span>
+        );
+      },
+    },
+    payment_status: {
+      name: 'Payment Status',
+      selector: row => row.payment_status || 'N/A',
+      sortable: true,
+      resizable: true,
+      minWidth: '120px',
+      maxWidth: '150px',
+      cell: row => {
+        const status = row.payment_status || 'N/A';
+        if (status === 'N/A' || status === '') {
+          return <span className="text-muted">N/A</span>;
+        }
+        
+        let badgeClass = 'secondary';
+        const statusLower = status.toLowerCase();
+        
+        if (statusLower.includes('paid')) {
+          badgeClass = 'success';
+        } else if (statusLower.includes('pending')) {
+          badgeClass = 'warning';
+        } else if (statusLower.includes('overdue')) {
+          badgeClass = 'danger';
+        }
+        
+        return (
+          <span className={`badge bg-${badgeClass}`}>
+            {status}
+          </span>
+        );
+      },
     },
     security_deposit: {
       name: 'Security Deposit',
@@ -346,14 +380,13 @@ const LeaseAgreementsReport = () => {
   
   const filteredItems = (Array.isArray(data) ? data : []).filter(
     item => {
-      // Text search filter
+      // Text search filter - updated for backend data format
       const searchFields = [
         item.lease_number || '',
-        typeof item.tenant === 'object' ? item.tenant?.first_name || '' : item.tenant || '',
-        typeof item.tenant === 'object' ? item.tenant?.last_name || '' : '',
-        typeof item.property === 'object' ? item.property?.property_name || item.property?.name || '' : item.property || '',
-        typeof item.unit === 'object' ? item.unit?.unit_name || item.unit?.id || '' : item.unit || '',
-        item.status || ''
+        item.tenant || '', // Backend sends tenant as string
+        item.property || '', // Backend sends property as string
+        item.unit || '', // Backend sends unit as string
+        item.lease_status || '' // Backend uses lease_status instead of status
       ].join(' ').toLowerCase();
       
       const matchesSearch = filterText === '' || searchFields.includes(filterText.toLowerCase());
@@ -430,7 +463,7 @@ const LeaseAgreementsReport = () => {
 
       // Add status filter if selected
       if (statusFilter) {
-        filters.status = statusFilter;
+        filters.lease_status = statusFilter; // Updated to match backend field
       }
 
       // Add property filter if selected
@@ -440,38 +473,33 @@ const LeaseAgreementsReport = () => {
 
       // Add date range filters if specified
       if (dateFilter.startDate && dateFilter.endDate) {
-        filters.start_date_from = dateFilter.startDate;
-        filters.start_date_to = dateFilter.endDate;
-        // Also include end date filtering for comprehensive coverage
-        filters.end_date_from = dateFilter.startDate;
-        filters.end_date_to = dateFilter.endDate;
+        filters.start_date = dateFilter.startDate;
+        filters.end_date = dateFilter.endDate;
       }
       
-      const result = await getLeases(filters);
-      console.log('API call completed:', result);
+      console.log('Calling getLeaseReportData with filters:', filters);
+      const result = await getLeaseReportData(filters);
+      console.log('getLeaseReportData result:', result);
 
       if (result && result.success) {
-        // Debug logging
-        console.log('API Response successful:', result);
+        // The backend returns data in format: { status: true, statusCode: 200, description: "success", data: [...] }
+        // The leaseService already extracts the data array, so result.data should be the array
+        const leaseData = result.data || [];
         
-        // Handle different response structures
-        let responseData = [];
-        if (Array.isArray(result.data)) {
-          responseData = result.data;
-        } else if (result.data && typeof result.data === 'object') {
-          // If it's a single lease object, wrap it in an array
-          responseData = [result.data];
-        }
+        console.log('Lease agreements data received:', {
+          totalRecords: leaseData.length,
+          sampleData: leaseData[0] || 'No data',
+          structure: typeof leaseData
+        });
         
-        console.log('Setting data to:', responseData);
         if (mounted.current) {
-          setData(responseData);
+          setData(leaseData);
         }
         
         // Generate report summary using the lease data
-        const summary = generateReportSummary(REPORT_TYPES.LEASE, responseData);
+        const summary = generateReportSummary(REPORT_TYPES.LEASE_AGREEMENTS, leaseData);
         console.log('Lease Agreements Report Summary:', summary);
-        console.log('Loaded lease data with filters:', { filters, dataCount: responseData.length });
+        console.log('Loaded lease data with filters:', { filters, dataCount: leaseData.length });
         
         // Show success message with filter info
         const filterInfo = [];
@@ -481,7 +509,7 @@ const LeaseAgreementsReport = () => {
         }
         
         if (filterInfo.length > 0) {
-          showToastMessage('Success', `Loaded ${responseData.length} lease agreements with filters: ${filterInfo.join(', ')}`, 'info');
+          showToastMessage('Success', `Loaded ${leaseData.length} lease agreements with filters: ${filterInfo.join(', ')}`, 'info');
         }
       } else {
         console.error('API Error or no result:', result);

@@ -79,7 +79,8 @@ const formatLeaseData = (leaseData) => {
         unit: leaseData.unit || "",
         number_of_month: parseInt(leaseData.number_of_month || 0).toString(),
         total_amount: parseFloat(leaseData.total_amount || 0).toString(),
-        amount_paid: parseFloat(leaseData.amount_paid || 0).toString()
+        amount_paid: parseFloat(leaseData.amount_paid || 0).toString(),
+        payments: leaseData.payments || [],
     };
 };
 
@@ -98,7 +99,7 @@ export const createLease = async (leaseData) => {
         const formattedData = formatLeaseData(leaseData);
         
         const response = await axios.post(
-            `${API_BASE}/leases/`,
+            `${API_BASE}/v1/leases/create`,
             formattedData,
             { headers: getAuthHeaders() }
         );
@@ -704,5 +705,33 @@ export const generateRentReceipt = async (paymentId) => {
         };
     } catch (err) {
         return handleApiError(err, "Failed to generate receipt.");
+    }
+};
+
+// Fetch lease report data
+export const getLeaseReportData = async (filters = {}) => {
+    try {
+        const queryParams = new URLSearchParams();
+        
+        // Add filters but no pagination parameters
+        if (filters.status) queryParams.append('status', filters.status);
+        if (filters.property_id) queryParams.append('property_id', filters.property_id);
+        if (filters.tenant_name) queryParams.append('tenant_name', filters.tenant_name);
+        if (filters.start_date) queryParams.append('start_date', filters.start_date);
+        if (filters.end_date) queryParams.append('end_date', filters.end_date);
+        
+
+        const response = await axios.get(
+            `${API_BASE}/reports/lease`,
+            { headers: getAuthHeaders() }
+        );
+
+        return {
+            success: true,
+            data: response.data.data,
+            count: response.data.pagination?.count || (response.data.data?.items || response.data.data || []).length
+        };
+    } catch (err) {
+        return handleApiError(err, "Failed to fetch all leases.");
     }
 };
