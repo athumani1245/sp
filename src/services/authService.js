@@ -18,13 +18,20 @@ export const login = async (username, password) => {
             }
 
         );
-        const { access, refresh } = response.data.data;
+        const { access, refresh, subscription } = response.data.data;
         localStorage.setItem("token", access);
         localStorage.setItem("refresh", refresh);
+        
+        // Store subscription data
+        if (subscription) {
+            localStorage.setItem("subscription", JSON.stringify(subscription));
+        }
+        
         return {
             success: true,
             token: access,
             refresh: refresh,
+            subscription: subscription,
             user: response.data.user || {} // adjust based on your API response
         };
     }
@@ -49,6 +56,7 @@ export const logout = async () => {
         );
         localStorage.removeItem("token");
         localStorage.removeItem("refresh");
+        localStorage.removeItem("subscription");
         // redirect
         window.location.href = '/';
         return { success: true };

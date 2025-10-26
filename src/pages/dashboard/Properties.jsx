@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "../../components/Layout";
 import AddPropertyModal from "../../components/forms/AddProperty";
+import SubscriptionGate from "../../components/SubscriptionGate";
 import { getProperties } from "../../services/propertyService";
 import "../../assets/styles/properties.css";
 
@@ -88,14 +89,16 @@ function Properties() {
               </div>
             </div>
             <div className="flex-shrink-0">
-              <button
-                className="odoo-btn odoo-btn-primary d-flex align-items-center"
-                onClick={() => setShowModal(true)}
-                type="button"
-                style={{ minWidth: '180px' }}
-              >
-                <i className="fa fa-cube me-2" /> Add New Property
-              </button>
+              <SubscriptionGate feature="adding new properties">
+                <button
+                  className="odoo-btn odoo-btn-primary d-flex align-items-center"
+                  onClick={() => setShowModal(true)}
+                  type="button"
+                  style={{ minWidth: '180px' }}
+                >
+                  <i className="fa fa-cube me-2" /> Add New Property
+                </button>
+              </SubscriptionGate>
             </div>
           </div>
           {tag && (
