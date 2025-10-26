@@ -1,5 +1,4 @@
 import { Routes, Route } from 'react-router-dom';
-import { HelmetProvider } from 'react-helmet-async';
 import ErrorBoundary from './components/ErrorBoundary';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
@@ -34,8 +33,7 @@ import './App.css';
 
 function App() {
   return (
-    <HelmetProvider>
-      <AuthProvider>
+    <AuthProvider>
       <ErrorBoundary>
         <div className="App">
           <Routes>
@@ -203,7 +201,6 @@ function App() {
       </div>
       </ErrorBoundary>
     </AuthProvider>
-    </HelmetProvider>
   );
 }
 

@@ -1,6 +1,5 @@
-import React from 'react';
+import { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Helmet } from 'react-helmet-async';
 
 const SEOHead = ({ 
   title = "Tanaka - Professional Property Management System in Tanzania",
@@ -19,43 +18,97 @@ const SEOHead = ({
   const fullImageUrl = image.startsWith('http') ? image : `${siteUrl}${image}`;
   const canonicalUrl = canonical || fullUrl;
 
-  return (
-    <Helmet>
-      {/* Primary Meta Tags */}
-      <title>{title}</title>
-      <meta name="title" content={title} />
-      <meta name="description" content={description} />
-      <meta name="keywords" content={keywords} />
-      <meta name="author" content={author} />
-      <link rel="canonical" href={canonicalUrl} />
+  useEffect(() => {
+    // Update document title
+    document.title = title;
+    
+    // Function to update or create meta tags
+    const updateMetaTag = (name, content, property = false) => {
+      if (!content) return;
       
-      {/* Robots */}
-      {noindex && <meta name="robots" content="noindex, nofollow" />}
+      const selector = property ? `meta[property="${name}"]` : `meta[name="${name}"]`;
+      let meta = document.querySelector(selector);
       
-      {/* Open Graph / Facebook */}
-      <meta property="og:type" content={type} />
-      <meta property="og:url" content={fullUrl} />
-      <meta property="og:title" content={title} />
-      <meta property="og:description" content={description} />
-      <meta property="og:image" content={fullImageUrl} />
-      <meta property="og:site_name" content="Tanaka Property Management" />
+      if (!meta) {
+        meta = document.createElement('meta');
+        if (property) {
+          meta.setAttribute('property', name);
+        } else {
+          meta.setAttribute('name', name);
+        }
+        document.head.appendChild(meta);
+      }
+      meta.setAttribute('content', content);
+    };
+    
+    // Function to update or create link tags
+    const updateLinkTag = (rel, href) => {
+      if (!href) return;
       
-      {/* Twitter */}
-      <meta property="twitter:card" content="summary_large_image" />
-      <meta property="twitter:url" content={fullUrl} />
-      <meta property="twitter:title" content={title} />
-      <meta property="twitter:description" content={description} />
-      <meta property="twitter:image" content={fullImageUrl} />
-      <meta name="twitter:creator" content="@TanakaTanzania" />
+      let link = document.querySelector(`link[rel="${rel}"]`);
+      if (!link) {
+        link = document.createElement('link');
+        link.setAttribute('rel', rel);
+        document.head.appendChild(link);
+      }
+      link.setAttribute('href', href);
+    };
+
+    // Update primary meta tags
+    updateMetaTag('title', title);
+    updateMetaTag('description', description);
+    updateMetaTag('keywords', keywords);
+    updateMetaTag('author', author);
+    
+    // Update robots meta tag
+    if (noindex) {
+      updateMetaTag('robots', 'noindex, nofollow');
+    } else {
+      // Remove noindex if it exists
+      const robotsMeta = document.querySelector('meta[name="robots"]');
+      if (robotsMeta && robotsMeta.content.includes('noindex')) {
+        robotsMeta.remove();
+      }
+    }
+    
+    // Update canonical link
+    updateLinkTag('canonical', canonicalUrl);
+    
+    // Update Open Graph tags
+    updateMetaTag('og:type', type, true);
+    updateMetaTag('og:url', fullUrl, true);
+    updateMetaTag('og:title', title, true);
+    updateMetaTag('og:description', description, true);
+    updateMetaTag('og:image', fullImageUrl, true);
+    updateMetaTag('og:site_name', 'Tanaka Property Management', true);
+    
+    // Update Twitter tags
+    updateMetaTag('twitter:card', 'summary_large_image', true);
+    updateMetaTag('twitter:url', fullUrl, true);
+    updateMetaTag('twitter:title', title, true);
+    updateMetaTag('twitter:description', description, true);
+    updateMetaTag('twitter:image', fullImageUrl, true);
+    updateMetaTag('twitter:creator', '@TanakaTanzania');
+    
+    // Update structured data
+    if (structuredData) {
+      // Remove existing structured data script
+      const existingScript = document.querySelector('script[type="application/ld+json"][data-seo-component]');
+      if (existingScript) {
+        existingScript.remove();
+      }
       
-      {/* Structured Data */}
-      {structuredData && (
-        <script type="application/ld+json">
-          {JSON.stringify(structuredData)}
-        </script>
-      )}
-    </Helmet>
-  );
+      // Add new structured data script
+      const script = document.createElement('script');
+      script.type = 'application/ld+json';
+      script.setAttribute('data-seo-component', 'true');
+      script.textContent = JSON.stringify(structuredData);
+      document.head.appendChild(script);
+    }
+  }, [title, description, keywords, author, canonical, noindex, type, fullUrl, fullImageUrl, canonicalUrl, structuredData]);
+
+  // This component doesn't render anything visible
+  return null;
 };
 
 SEOHead.propTypes = {
