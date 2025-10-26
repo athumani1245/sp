@@ -1,7 +1,7 @@
 {
   "short_name": "Tanaka",
   "name": "Tanaka Property Management - Professional Property Management System",
-  "description": "Streamline your property management in Tanzania with Tanaka's comprehensive platform. Manage properties, tenants, rent collection, and financial reporting.",
+  "description": "Streamline your property management in with Tanaka's comprehensive platform. Manage properties, tenants, rent collection, and financial reporting.",
   "version": "1.0.0",
   "manifest_version": 2,
   "icons": [
@@ -37,7 +37,7 @@
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "theme_color": "#0066cc",
+  "theme_color": "#eb1313",
   "background_color": "#ffffff",
   "categories": ["business", "productivity", "utilities"],
   "lang": "en",

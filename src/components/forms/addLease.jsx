@@ -506,10 +506,18 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
 
     // Payment management functions
     const handlePaymentChange = (name, value) => {
-        setCurrentPayment(prev => ({
-            ...prev,
-            [name]: value
-        }));
+        if (name === 'amount_paid') {
+            const rawValue = parseFormattedNumber(value);
+            setCurrentPayment(prev => ({
+                ...prev,
+                [name]: rawValue
+            }));
+        } else {
+            setCurrentPayment(prev => ({
+                ...prev,
+                [name]: value
+            }));
+        }
     };
 
     const addPayment = () => {
@@ -774,8 +782,8 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                                                     <th style={{ width: '20%', fontSize: '0.8rem' }}>Date</th>
                                                     <th style={{ width: '20%', fontSize: '0.8rem' }}>Category</th>
                                                     <th style={{ width: '20%', fontSize: '0.8rem' }}>Source</th>
-                                                    <th style={{ width: '20%', fontSize: '0.8rem' }}>Amount (TSh)</th>
-                                                    <th style={{ width: '20%', fontSize: '0.8rem' }}>Action</th>
+                                                    <th style={{ width: '30%', fontSize: '0.8rem' }}>Amount (TSh)</th>
+                                                    <th style={{ width: '10%', fontSize: '0.8rem' }}>Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -822,14 +830,12 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                                                         </td>
                                                         <td>
                                                             <Form.Control
-                                                                type="number"
+                                                                type="text"
                                                                 size="sm"
-                                                                placeholder="0.00"
-                                                                value={currentPayment.amount_paid}
+                                                                placeholder="0"
+                                                                value={formatNumberWithCommas(currentPayment.amount_paid)}
                                                                 onChange={(e) => handlePaymentChange('amount_paid', e.target.value)}
                                                                 style={{ fontSize: '0.8rem', border: 'none', backgroundColor: 'transparent' }}
-                                                                min="0"
-                                                                step="0.01"
                                                             />
                                                         </td>
                                                         <td className="text-center">
@@ -878,7 +884,7 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                                                 {formData.payments.map((payment) => (
                                                     <tr key={payment.id}>
                                                         <td style={{ fontSize: '0.8rem' }}>
-                                                            {new Date(payment.date).toLocaleDateString()}
+                                                            {new Date(payment.payment_date).toLocaleDateString()}
                                                         </td>
                                                         <td style={{ fontSize: '0.8rem' }}>
                                                             <span className="badge bg-primary">{payment.category}</span>
