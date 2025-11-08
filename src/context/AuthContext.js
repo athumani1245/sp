@@ -6,6 +6,8 @@ const AuthContext = createContext(null);
 export const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [subscription, setSubscription] = useState(null);
+    const [hasActiveSubscription, setHasActiveSubscription] = useState(false);
 
     // Function to verify token with the API
     const verifyToken = useCallback(async (token) => {
@@ -30,6 +32,7 @@ export const AuthProvider = ({ children }) => {
         // Check for token on initial load and verify it
         const checkAuthentication = async () => {
             const token = localStorage.getItem('token');
+            const subscriptionData = localStorage.getItem('subscription');
 
             if (token) {
                 // Verify the token with the API
@@ -37,14 +40,32 @@ export const AuthProvider = ({ children }) => {
                 
                 if (isValid) {
                     setIsAuthenticated(true);
+                    
+                    // Load subscription data
+                    if (subscriptionData) {
+                        try {
+                            const parsedSubscription = JSON.parse(subscriptionData);
+                            setSubscription(parsedSubscription);
+                            setHasActiveSubscription(parsedSubscription.status === 'active' && parsedSubscription.is_active === true);
+                        } catch (error) {
+                            console.error('Failed to parse subscription data:', error);
+                            setSubscription(null);
+                            setHasActiveSubscription(false);
+                        }
+                    }
                 } else {
                     // Token is invalid, remove it and set authenticated to false
                     localStorage.removeItem('token');
                     localStorage.removeItem('refresh');
+                    localStorage.removeItem('subscription');
                     setIsAuthenticated(false);
+                    setSubscription(null);
+                    setHasActiveSubscription(false);
                 }
             } else {
                 setIsAuthenticated(false);
+                setSubscription(null);
+                setHasActiveSubscription(false);
             }
             
             setLoading(false);
@@ -56,6 +77,13 @@ export const AuthProvider = ({ children }) => {
     const login = async (token, userData) => {
         localStorage.setItem('token', token);
         
+        // Store subscription data if provided
+        if (userData && userData.subscription) {
+            localStorage.setItem('subscription', JSON.stringify(userData.subscription));
+            setSubscription(userData.subscription);
+            setHasActiveSubscription(userData.subscription.status === 'active' && userData.subscription.is_active === true);
+        }
+        
         // Verify the token before setting authenticated
         const isValid = await verifyToken(token);
         
@@ -64,7 +92,10 @@ export const AuthProvider = ({ children }) => {
         } else {
             // Token is invalid, remove it
             localStorage.removeItem('token');
+            localStorage.removeItem('subscription');
             setIsAuthenticated(false);
+            setSubscription(null);
+            setHasActiveSubscription(false);
             throw new Error('Invalid token provided');
         }
     };
@@ -72,7 +103,10 @@ export const AuthProvider = ({ children }) => {
     const logout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('refresh');
+        localStorage.removeItem('subscription');
         setIsAuthenticated(false);
+        setSubscription(null);
+        setHasActiveSubscription(false);
     };
 
     // Method to check if current token is still valid
@@ -110,7 +144,9 @@ export const AuthProvider = ({ children }) => {
             login, 
             logout, 
             checkTokenValidity,
-            loading 
+            loading,
+            subscription,
+            hasActiveSubscription
         }}>
             {children}
         </AuthContext.Provider>

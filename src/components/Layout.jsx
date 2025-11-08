@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Header from "./layout/Header";
 import Sidenav from "./layout/Sidenav";
 import "../assets/styles/header.css";
 
 const Layout = ({ children }) => {
+    const location = useLocation();
     const [showSidenav, setShowSidenav] = useState(window.innerWidth >= 992);
 
     useEffect(() => {
@@ -25,12 +27,17 @@ const Layout = ({ children }) => {
         };
     }, []);
 
+    // Scroll to top on route change
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [location.pathname]);
+
     const toggleSidenav = () => {
         setShowSidenav(prev => !prev);
     };
 
     return (
-        <>
+        <div key={location.pathname}>
             <Header toggleSidenav={toggleSidenav} />
             <div className={"container-fluid"}>
                 <div className={"row"}>
@@ -40,7 +47,7 @@ const Layout = ({ children }) => {
                     </main>
                 </div>
             </div>
-        </>
+        </div>
     )
 }
 

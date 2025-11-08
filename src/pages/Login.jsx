@@ -32,8 +32,11 @@ function Login() {
         try {
             const result = await loginService(phoneNumber, password);
             if (result.success) {
-                // Update auth context
-                login(result.token, result.user);
+                // Update auth context with subscription data
+                await login(result.token, {
+                    user: result.user,
+                    subscription: result.subscription
+                });
                 
                 // Always navigate to dashboard
                 navigate("/dashboard", { replace: true });

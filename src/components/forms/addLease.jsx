@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Modal, Button, Form, Row, Col, Alert } from 'react-bootstrap';
 import { getProperties, getAvailableUnits } from '../../services/propertyService';
 import { createLease } from '../../services/leaseService';
@@ -7,8 +7,8 @@ import { formatNumberWithCommas, parseFormattedNumber } from '../../utils/format
 import '../../assets/styles/add-lease.css';
 import '../../assets/styles/forms-responsive.css';
 
-// Add custom styles for underlined inputs
-const underlineInputStyles = {
+// Custom styles for underlined inputs
+const UNDERLINE_INPUT_STYLES = {
     border: 'none',
     borderBottom: '2px solid #dee2e6',
     borderRadius: '0',
@@ -19,12 +19,53 @@ const underlineInputStyles = {
     boxShadow: 'none'
 };
 
-const underlineInputFocusStyles = {
+const UNDERLINE_FOCUS_STYLES = {
     border: 'none',
     borderBottom: '2px solid #CC5B4B',
     backgroundColor: 'transparent',
     boxShadow: 'none',
     outline: 'none'
+};
+
+const READONLY_INPUT_STYLES = {
+    ...UNDERLINE_INPUT_STYLES,
+    backgroundColor: 'transparent',
+    cursor: 'not-allowed',
+    color: '#6c757d',
+    borderBottomColor: '#e9ecef'
+};
+
+// Payment categories and sources
+const PAYMENT_CATEGORIES = [
+    { value: 'RENT', label: 'Rent' },
+    { value: 'Security Deposit', label: 'Security Deposit' },
+    { value: 'WATER', label: 'Water' },
+    { value: 'SERVICE_CHARGE', label: 'Service Charge' },
+    { value: 'ELECTRICITY', label: 'Electricity' },
+    { value: 'OTHER', label: 'Other' }
+];
+
+const PAYMENT_SOURCES = [
+    { value: 'CASH', label: 'Cash' },
+    { value: 'BANK', label: 'Bank' },
+    { value: 'MOBILE_MONEY', label: 'Mobile Money' }
+];
+
+// Common button styling for payment table actions
+const ACTION_BUTTON_STYLE = { 
+    fontSize: '0.8rem', 
+    padding: '0.2rem 0.4rem',
+    minWidth: '28px',
+    height: '28px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+};
+
+const TABLE_CELL_STYLE = {
+    fontSize: '0.8rem',
+    border: 'none',
+    backgroundColor: 'transparent'
 };
 
 // SearchableSelect Component
@@ -60,50 +101,50 @@ const SearchableSelect = ({
         }
     }, [searchTerm, options, getOptionLabel]);
 
+    const closeDropdown = useCallback(() => {
+        setIsOpen(false);
+        setSearchTerm('');
+    }, []);
+
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-                setIsOpen(false);
-                setSearchTerm('');
+                closeDropdown();
             }
         };
 
         const handleKeyDown = (event) => {
-            // Handle Escape key to close dropdown
             if (event.key === 'Escape' && isOpen) {
                 event.preventDefault();
                 event.stopPropagation();
-                setIsOpen(false);
-                setSearchTerm('');
+                closeDropdown();
             }
         };
 
         if (isOpen) {
             document.addEventListener('mousedown', handleClickOutside);
-            document.addEventListener('keydown', handleKeyDown, true); // Use capture phase
+            document.addEventListener('keydown', handleKeyDown, true);
         }
 
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
             document.removeEventListener('keydown', handleKeyDown, true);
         };
-    }, [isOpen]);
+    }, [isOpen, closeDropdown]);
 
-    const handleInputClick = () => {
+    const handleInputClick = useCallback(() => {
         if (!disabled) {
-            setIsOpen(!isOpen);
+            setIsOpen(prev => !prev);
             if (!isOpen) {
                 setTimeout(() => inputRef.current?.focus(), 100);
             }
         }
-    };
+    }, [disabled, isOpen]);
 
-    const handleOptionSelect = (option) => {
-        const optionValue = getOptionValue(option);
-        onChange({ target: { name, value: optionValue } });
-        setIsOpen(false);
-        setSearchTerm('');
-    };
+    const handleOptionSelect = useCallback((option) => {
+        onChange({ target: { name, value: getOptionValue(option) } });
+        closeDropdown();
+    }, [name, onChange, getOptionValue, closeDropdown]);
 
     const getDisplayValue = () => {
         if (!value) return '';
@@ -138,7 +179,7 @@ const SearchableSelect = ({
                 aria-expanded={isOpen}
                 aria-haspopup="listbox"
                 style={{ 
-                    ...underlineInputStyles,
+                    ...UNDERLINE_INPUT_STYLES,
                     cursor: disabled ? 'not-allowed' : 'pointer',
                     backgroundColor: 'transparent',
                     minHeight: '38px',
@@ -248,19 +289,6 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
-    const formatDatePayment = (dateString) => {
-        if (!dateString) return "";
-        
-        try {
-            // Input format is YYYY-MM-DD, convert to DD-MM-YYYY
-            const [year, month, day] = dateString.split('-');
-            return `${day}-${month}-${year}`;
-        } catch (error) {
-            return dateString; // Return original if formatting fails
-        }
-    };
-    
-    // Payment form state
     const [currentPayment, setCurrentPayment] = useState({
         payment_date: new Date().toISOString().split('T')[0],
         category: '',
@@ -269,31 +297,51 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
     });
     const [isAddingPayment, setIsAddingPayment] = useState(false);
 
-    // Reset form when modal opens/closes
+    // Helper function to format date for payment submission
+    const formatDatePayment = useCallback((dateString) => {
+        if (!dateString) return "";
+        try {
+            const [year, month, day] = dateString.split('-');
+            return `${day}-${month}-${year}`;
+        } catch (error) {
+            return dateString;
+        }
+    }, []);
+
+    // Generic data loading function to reduce duplication
+    const loadData = useCallback(async (fetchFunction, setDataFunction, errorMessage) => {
+        try {
+            setLoading(true);
+            const result = await fetchFunction();
+            if (result.success) {
+                setDataFunction(result.data || []);
+            } else {
+                setError(errorMessage);
+            }
+        } catch (error) {
+            console.error(errorMessage, error);
+            setError(errorMessage);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    const loadTenants = useCallback(() => {
+        return loadData(getTenants, setTenants, 'Failed to load tenants');
+    }, [loadData]);
+
+    const loadProperties = useCallback(() => {
+        return loadData(getProperties, setProperties, 'Failed to load properties');
+    }, [loadData]);
+
+    // Reset form when modal opens
     useEffect(() => {
         if (isOpen) {
             resetForm();
             loadProperties();
             loadTenants();
         }
-    }, [isOpen]);
-
-    const loadTenants = async () => {
-        try {
-            setLoading(true);
-            const result = await getTenants();
-            if (result.success) {
-                setTenants(result.data || []);
-            } else {
-                setError('Failed to load tenants');
-            }
-        } catch (error) {
-            console.error('Failed to load tenants:', error);
-            setError('Failed to load tenants');
-        } finally {
-            setLoading(false);
-        }
-    };
+    }, [isOpen, loadProperties, loadTenants]);
 
     const resetForm = () => {
         setFormData({
@@ -324,31 +372,13 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
         setSuccess('');
     };
 
-    const loadProperties = async () => {
-        try {
-            setLoading(true);
-            const result = await getProperties();
-            if (result.success) {
-                setProperties(result.data || []);
-            } else {
-                setError('Failed to load properties');
-            }
-        } catch (error) {
-            console.error('Failed to load properties:', error);
-            setError('Failed to load properties');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // Load available units for a property using the actual service
-    const loadAvailableUnits = async (propertyId) => {
+    // Load available units for a property
+    const loadAvailableUnits = useCallback(async (propertyId) => {
         try {
             setLoading(true);
             const result = await getAvailableUnits({ property: propertyId });
             
             if (result.success) {
-                // No need to filter since API already returns only available units
                 setAvailableUnits(result.data);
             } else {
                 setError(result.error || 'Failed to load available units');
@@ -361,117 +391,105 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
     // Calculate end date based on start date and number of months
-    const calculateEndDate = (startDate, months) => {
+    const calculateEndDate = useCallback((startDate, months) => {
         if (!startDate || !months || months <= 0) return '';
         
         const start = new Date(startDate);
         const end = new Date(start);
         end.setMonth(start.getMonth() + parseInt(months));
         
-        // Format to YYYY-MM-DD for input field
         return end.toISOString().split('T')[0];
-    };
+    }, []);
 
     // Calculate total amount based on monthly rent and lease duration
-    const calculateTotalAmount = (monthlyRent, months) => {
+    const calculateTotalAmount = useCallback((monthlyRent, months) => {
         if (!monthlyRent || !months || monthlyRent <= 0 || months <= 0) return '';
         
-        const total = parseFloat(monthlyRent) * parseInt(months);
-        return total.toString();
-    };
+        return (parseFloat(monthlyRent) * parseInt(months)).toString();
+    }, []);
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
+    // Helper functions for handling specific field changes
+    const handlePropertyChange = useCallback((value) => {
+        loadAvailableUnits(value);
+        setFormData(prev => ({ ...prev, unit: '', rent_amount_per_unit: '' }));
+    }, [loadAvailableUnits]);
+
+    const handleTenantChange = useCallback((value) => {
+        const selectedTenant = tenants.find(tenant => 
+            tenant.id === parseInt(value) || tenant.id === value
+        );
         
-        // Handle monetary fields with comma formatting
-        const monetaryFields = ['rent_amount_per_unit', 'amount_paid', 'discount'];
-        
-        if (monetaryFields.includes(name)) {
-            const rawValue = parseFormattedNumber(value);
+        if (selectedTenant) {
             setFormData(prev => ({
                 ...prev,
-                [name]: rawValue
-            }));
-        } else {
-            setFormData(prev => ({
-                ...prev,
-                [name]: value
+                first_name: selectedTenant.first_name,
+                last_name: selectedTenant.last_name,
+                tenant_phone: selectedTenant.phone || selectedTenant.username || ''
             }));
         }
+    }, [tenants]);
 
-        // Clear previous errors
-        setError('');
-        setSuccess('');
-
-        // Load units when property is selected
-        if (name === 'property_id' && value) {
-            loadAvailableUnits(value);
-            setFormData(prev => ({ ...prev, unit: '', rent_amount_per_unit: '' }));
+    const handleUnitChange = useCallback((value) => {
+        const selectedUnit = availableUnits.find(unit => unit.id.toString() === value);
+        if (selectedUnit) {
+            const rentAmount = selectedUnit.rent_per_month || selectedUnit.rent_amount || 0;
+            setFormData(prev => ({ 
+                ...prev, 
+                rent_amount_per_unit: rentAmount,
+                total_amount: prev.number_of_month ? calculateTotalAmount(rentAmount, prev.number_of_month) : ''
+            }));
         }
+    }, [availableUnits, calculateTotalAmount]);
 
-        // Auto-fill tenant details when tenant is selected
-        if (name === 'tenant_id' && value) {
-            console.log('Selected tenant ID:', value);
-            console.log('Available tenants:', tenants);
-            const selectedTenant = tenants.find(tenant => tenant.id === parseInt(value) || tenant.id === value);
-            console.log('Selected tenant:', selectedTenant);
-            if (selectedTenant) {
-                setFormData(prev => {
-                    console.log('Setting tenant data:', {
-                        first_name: selectedTenant.first_name,
-                        last_name: selectedTenant.last_name,
-                        tenant_phone: selectedTenant.phone || selectedTenant.username || ''
-                    });
-                    return {
-                        ...prev,
-                        first_name: selectedTenant.first_name,
-                        last_name: selectedTenant.last_name,
-                        tenant_phone: selectedTenant.phone || selectedTenant.username || ''
-                    };
-                });
-            }
-        }
-
-        // Auto-fill rent amount when unit is selected
-        if (name === 'unit' && value) {
-            const selectedUnit = availableUnits.find(unit => unit.id.toString() === value);
-            if (selectedUnit) {
-                const rentAmount = selectedUnit.rent_per_month || selectedUnit.rent_amount || 0;
-                setFormData(prev => ({ 
-                    ...prev, 
-                    rent_amount_per_unit: rentAmount,
-                    total_amount: formData.number_of_month ? calculateTotalAmount(rentAmount, formData.number_of_month) : ''
-                }));
-            }
-        }
-
-        // Calculate end date when start date or number of months change
-        if (name === 'start_date' || name === 'number_of_month') {
-            const startDate = name === 'start_date' ? value : formData.start_date;
-            const months = name === 'number_of_month' ? value : formData.number_of_month;
+    const handleDateOrMonthChange = useCallback((name, value) => {
+        setFormData(prev => {
+            const startDate = name === 'start_date' ? value : prev.start_date;
+            const months = name === 'number_of_month' ? value : prev.number_of_month;
             
             if (startDate && months) {
                 const endDate = calculateEndDate(startDate, months);
-                setFormData(prev => ({ 
-                    ...prev, 
-                    end_date: endDate,
-                    total_amount: formData.rent_amount_per_unit ? calculateTotalAmount(formData.rent_amount_per_unit, months) : ''
-                }));
+                const totalAmount = prev.rent_amount_per_unit 
+                    ? calculateTotalAmount(prev.rent_amount_per_unit, months) 
+                    : '';
+                
+                return { ...prev, end_date: endDate, total_amount: totalAmount };
             }
-        }
+            return prev;
+        });
+    }, [calculateEndDate, calculateTotalAmount]);
 
-        // Calculate total amount when monthly rent changes
-        if (name === 'rent_amount_per_unit') {
-            const rawValue = parseFormattedNumber(value);
-            if (rawValue && formData.number_of_month) {
-                const totalAmount = calculateTotalAmount(rawValue, formData.number_of_month);
-                setFormData(prev => ({ ...prev, total_amount: totalAmount }));
+    const handleRentAmountChange = useCallback((rawValue) => {
+        setFormData(prev => {
+            if (rawValue && prev.number_of_month) {
+                const totalAmount = calculateTotalAmount(rawValue, prev.number_of_month);
+                return { ...prev, total_amount: totalAmount };
             }
-        }
-    };
+            return prev;
+        });
+    }, [calculateTotalAmount]);
+
+    const handleInputChange = useCallback((e) => {
+        const { name, value } = e.target;
+        const monetaryFields = ['rent_amount_per_unit', 'amount_paid', 'discount'];
+        
+        // Update form data
+        const rawValue = monetaryFields.includes(name) ? parseFormattedNumber(value) : value;
+        setFormData(prev => ({ ...prev, [name]: rawValue }));
+        
+        // Clear errors
+        setError('');
+        setSuccess('');
+
+        // Handle specific field changes
+        if (name === 'property_id' && value) handlePropertyChange(value);
+        if (name === 'tenant_id' && value) handleTenantChange(value);
+        if (name === 'unit' && value) handleUnitChange(value);
+        if (name === 'start_date' || name === 'number_of_month') handleDateOrMonthChange(name, value);
+        if (name === 'rent_amount_per_unit') handleRentAmountChange(rawValue);
+    }, [handlePropertyChange, handleTenantChange, handleUnitChange, handleDateOrMonthChange, handleRentAmountChange]);
 
     const validateForm = () => {
         
@@ -505,37 +523,44 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
     };
 
     // Payment management functions
-    const handlePaymentChange = (name, value) => {
-        if (name === 'amount_paid') {
-            const rawValue = parseFormattedNumber(value);
-            setCurrentPayment(prev => ({
-                ...prev,
-                [name]: rawValue
-            }));
-        } else {
-            setCurrentPayment(prev => ({
-                ...prev,
-                [name]: value
-            }));
-        }
-    };
+    const handlePaymentChange = useCallback((name, value) => {
+        const rawValue = name === 'amount_paid' ? parseFormattedNumber(value) : value;
+        setCurrentPayment(prev => ({ ...prev, [name]: rawValue }));
+    }, []);
 
-    const addPayment = () => {
-        if (!currentPayment.payment_date || !currentPayment.category || !currentPayment.payment_source || !currentPayment.amount_paid) {
+    const validatePayment = useCallback(() => {
+        const { payment_date, category, payment_source, amount_paid } = currentPayment;
+        
+        if (!payment_date || !category || !payment_source || !amount_paid) {
             setError('Please fill in all payment fields');
-            return;
+            return false;
         }
 
-        const amount = parseFloat(currentPayment.amount_paid);
+        const amount = parseFloat(amount_paid);
         if (isNaN(amount) || amount <= 0) {
             setError('Please enter a valid payment amount');
-            return;
+            return false;
         }
+
+        return true;
+    }, [currentPayment]);
+
+    const resetPaymentForm = useCallback(() => {
+        setCurrentPayment({
+            payment_date: new Date().toISOString().split('T')[0],
+            category: '',
+            payment_source: '',
+            amount_paid: ''
+        });
+    }, []);
+
+    const addPayment = useCallback(() => {
+        if (!validatePayment()) return;
 
         const newPayment = {
             ...currentPayment,
-            amount_paid: amount,
-            id: Date.now() // Simple ID for frontend tracking
+            amount_paid: parseFloat(currentPayment.amount_paid),
+            id: Date.now()
         };
 
         setFormData(prev => ({
@@ -543,37 +568,25 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
             payments: [...prev.payments, newPayment]
         }));
 
-        // Reset current payment form
-        setCurrentPayment({
-            payment_date: new Date().toISOString().split('T')[0],
-            category: '',
-            payment_source: '',
-            amount_paid: ''
-        });
+        resetPaymentForm();
+        setError('');
+    }, [currentPayment, validatePayment, resetPaymentForm]);
 
-        setError(''); // Clear any errors
-    };
-
-    const removePayment = (paymentId) => {
+    const removePayment = useCallback((paymentId) => {
         setFormData(prev => ({
             ...prev,
             payments: prev.payments.filter(payment => payment.id !== paymentId)
         }));
-    };
+    }, []);
 
-    const cancelPayment = () => {
-        setCurrentPayment({
-            payment_date: new Date().toISOString().split('T')[0],
-            category: '',
-            payment_source: '',
-            amount_paid: ''
-        });
+    const cancelPayment = useCallback(() => {
+        resetPaymentForm();
         setIsAddingPayment(false);
-    };
+    }, [resetPaymentForm]);
 
-    const startAddingPayment = () => {
+    const startAddingPayment = useCallback(() => {
         setIsAddingPayment(true);
-    };
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -614,8 +627,6 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                     amount_paid: payment.amount_paid
                 }))
             };
-
-            console.log('Submitting lease data:', leaseData);
 
             // Call the actual lease service
             const result = await createLease(leaseData);
@@ -796,7 +807,7 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                                                                 size="sm"
                                                                 value={currentPayment.payment_date}
                                                                 onChange={(e) => handlePaymentChange('payment_date', e.target.value)}
-                                                                style={{ fontSize: '0.8rem', border: 'none', backgroundColor: 'transparent' }}
+                                                                style={TABLE_CELL_STYLE}
                                                             />
                                                         </td>
                                                         <td>
@@ -804,15 +815,12 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                                                                 size="sm"
                                                                 value={currentPayment.category}
                                                                 onChange={(e) => handlePaymentChange('category', e.target.value)}
-                                                                style={{ fontSize: '0.8rem', border: 'none', backgroundColor: 'transparent' }}
+                                                                style={TABLE_CELL_STYLE}
                                                             >
                                                                 <option value="">Category</option>
-                                                                <option value="RENT">Rent</option>
-                                                                <option value="Security Deposit">Security Deposit</option>
-                                                                <option value="WATER">Water</option>
-                                                                <option value="SERVICE_CHARGE">Service Charge</option>
-                                                                <option value="OTHER">Other</option>
-                                                                <option value="ELECTRICITY">Electricity</option>
+                                                                {PAYMENT_CATEGORIES.map(cat => (
+                                                                    <option key={cat.value} value={cat.value}>{cat.label}</option>
+                                                                ))}
                                                             </Form.Select>
                                                         </td>
                                                         <td>
@@ -820,12 +828,12 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                                                                 size="sm"
                                                                 value={currentPayment.payment_source}
                                                                 onChange={(e) => handlePaymentChange('payment_source', e.target.value)}
-                                                                style={{ fontSize: '0.8rem', border: 'none', backgroundColor: 'transparent' }}
+                                                                style={TABLE_CELL_STYLE}
                                                             >
                                                                 <option value="">Method</option>
-                                                                <option value="CASH">Cash</option>
-                                                                <option value="BANK">Bank</option>
-                                                                <option value="MOBILE_MONEY">Mobile Money</option>
+                                                                {PAYMENT_SOURCES.map(source => (
+                                                                    <option key={source.value} value={source.value}>{source.label}</option>
+                                                                ))}
                                                             </Form.Select>
                                                         </td>
                                                         <td>
@@ -835,7 +843,7 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                                                                 placeholder="0"
                                                                 value={formatNumberWithCommas(currentPayment.amount_paid)}
                                                                 onChange={(e) => handlePaymentChange('amount_paid', e.target.value)}
-                                                                style={{ fontSize: '0.8rem', border: 'none', backgroundColor: 'transparent' }}
+                                                                style={TABLE_CELL_STYLE}
                                                             />
                                                         </td>
                                                         <td className="text-center">
@@ -846,15 +854,7 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                                                                     onClick={addPayment}
                                                                     disabled={!currentPayment.payment_date || !currentPayment.category || !currentPayment.payment_source || !currentPayment.amount_paid}
                                                                     className="btn-sm rounded-circle"
-                                                                    style={{ 
-                                                                        fontSize: '0.8rem', 
-                                                                        padding: '0.2rem 0.4rem',
-                                                                        minWidth: '28px',
-                                                                        height: '28px',
-                                                                        display: 'flex',
-                                                                        alignItems: 'center',
-                                                                        justifyContent: 'center'
-                                                                    }}
+                                                                    style={ACTION_BUTTON_STYLE}
                                                                 >
                                                                     <i className="bi bi-check-lg"></i>
                                                                 </Button>
@@ -863,15 +863,7 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                                                                     size="sm"
                                                                     onClick={cancelPayment}
                                                                     className="btn-sm rounded-circle"
-                                                                    style={{ 
-                                                                        fontSize: '0.8rem', 
-                                                                        padding: '0.2rem 0.4rem',
-                                                                        minWidth: '28px',
-                                                                        height: '28px',
-                                                                        display: 'flex',
-                                                                        alignItems: 'center',
-                                                                        justifyContent: 'center'
-                                                                    }}
+                                                                    style={ACTION_BUTTON_STYLE}
                                                                 >
                                                                     <i className="bi bi-x-lg"></i>
                                                                 </Button>
@@ -901,15 +893,7 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                                                                 variant="outline-danger"
                                                                 size="sm"
                                                                 onClick={() => removePayment(payment.id)}
-                                                                style={{ 
-                                                                        fontSize: '0.8rem', 
-                                                                        padding: '0.2rem 0.4rem',
-                                                                        minWidth: '28px',
-                                                                        height: '28px',
-                                                                        display: 'flex',
-                                                                        alignItems: 'center',
-                                                                        justifyContent: 'center'
-                                                                    }}
+                                                                style={ACTION_BUTTON_STYLE}
                                                             >
                                                                 <i className="bi bi-trash"></i>
                                                             </Button>
@@ -979,9 +963,9 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                                             value={formData.start_date}
                                             onChange={handleInputChange}
                                             required
-                                            style={underlineInputStyles}
-                                            onFocus={(e) => Object.assign(e.target.style, underlineInputFocusStyles)}
-                                            onBlur={(e) => Object.assign(e.target.style, underlineInputStyles)}
+                                            style={UNDERLINE_INPUT_STYLES}
+                                            onFocus={(e) => Object.assign(e.target.style, UNDERLINE_FOCUS_STYLES)}
+                                            onBlur={(e) => Object.assign(e.target.style, UNDERLINE_INPUT_STYLES)}
                                         />
                                     </Form.Group>
                                 </Col>
@@ -998,9 +982,9 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                                             placeholder="Months"
                                             min="1"
                                             required
-                                            style={underlineInputStyles}
-                                            onFocus={(e) => Object.assign(e.target.style, underlineInputFocusStyles)}
-                                            onBlur={(e) => Object.assign(e.target.style, underlineInputStyles)}
+                                            style={UNDERLINE_INPUT_STYLES}
+                                            onFocus={(e) => Object.assign(e.target.style, UNDERLINE_FOCUS_STYLES)}
+                                            onBlur={(e) => Object.assign(e.target.style, UNDERLINE_INPUT_STYLES)}
                                         />
                                     </Form.Group>
                                 </Col>
@@ -1014,13 +998,7 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                                             name="end_date"
                                             value={formData.end_date}
                                             readOnly
-                                            style={{
-                                                ...underlineInputStyles,
-                                                backgroundColor: 'transparent',
-                                                cursor: 'not-allowed',
-                                                color: '#6c757d',
-                                                borderBottomColor: '#e9ecef'
-                                            }}
+                                            style={READONLY_INPUT_STYLES}
                                         />
                                         <Form.Text className="form-text small">
                                             Auto-calculated
@@ -1047,9 +1025,9 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                                             onChange={handleInputChange}
                                             placeholder="0"
                                             required
-                                            style={underlineInputStyles}
-                                            onFocus={(e) => Object.assign(e.target.style, underlineInputFocusStyles)}
-                                            onBlur={(e) => Object.assign(e.target.style, underlineInputStyles)}
+                                            style={UNDERLINE_INPUT_STYLES}
+                                            onFocus={(e) => Object.assign(e.target.style, UNDERLINE_FOCUS_STYLES)}
+                                            onBlur={(e) => Object.assign(e.target.style, UNDERLINE_INPUT_STYLES)}
                                         />
                                     </Form.Group>
                                 </Col>
@@ -1063,13 +1041,7 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                                             name="total_amount"
                                             value={formatNumberWithCommas(formData.total_amount)}
                                             readOnly
-                                            style={{
-                                                ...underlineInputStyles,
-                                                backgroundColor: 'transparent',
-                                                cursor: 'not-allowed',
-                                                color: '#6c757d',
-                                                borderBottomColor: '#e9ecef'
-                                            }}
+                                            style={READONLY_INPUT_STYLES}
                                         />
                                         <Form.Text className="form-text small">
                                             <i className="bi bi-calculator me-1"></i>
@@ -1079,25 +1051,8 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                                 </Col>
                             </Row>
                             
-                            {/* Paid amount and discount in one row */}
+                            {/* Discount field */}
                             <Row className="mb-3">
-                                {/* <Col xs={12} sm={6} className="mb-3">
-                                    <Form.Group>
-                                        <Form.Label className="form-label">Paid Amount (TSh)</Form.Label>
-                                        <Form.Control
-                                            className="form-control"
-                                            type="text"
-                                            name="amount_paid"
-                                            value={formatNumberWithCommas(formData.amount_paid)}
-                                            onChange={handleInputChange}
-                                            placeholder="0"
-                                            style={underlineInputStyles}
-                                            onFocus={(e) => Object.assign(e.target.style, underlineInputFocusStyles)}
-                                            onBlur={(e) => Object.assign(e.target.style, underlineInputStyles)}
-                                        />
-                                    </Form.Group>
-                                </Col> */}
-                                
                                 <Col xs={12} sm={6} className="mb-3">
                                     <Form.Group>
                                         <Form.Label className="form-label">Discount (TSh)</Form.Label>
@@ -1108,9 +1063,9 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                                             value={formatNumberWithCommas(formData.discount)}
                                             onChange={handleInputChange}
                                             placeholder="0"
-                                            style={underlineInputStyles}
-                                            onFocus={(e) => Object.assign(e.target.style, underlineInputFocusStyles)}
-                                            onBlur={(e) => Object.assign(e.target.style, underlineInputStyles)}
+                                            style={UNDERLINE_INPUT_STYLES}
+                                            onFocus={(e) => Object.assign(e.target.style, UNDERLINE_FOCUS_STYLES)}
+                                            onBlur={(e) => Object.assign(e.target.style, UNDERLINE_INPUT_STYLES)}
                                         />
                                         <Form.Text className="form-text small">
                                             Optional

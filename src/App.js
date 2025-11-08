@@ -19,6 +19,7 @@ import Profile from './pages/Profile';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import PrivateRoute from './components/PrivateRoute';
 import { AuthProvider } from './context/AuthContext';
+import { SubscriptionModalProvider } from './context/SubscriptionModalContext';
 
 // Report page components
 import PropertySummaryReport from './pages/reports/PropertySummaryReport';
@@ -34,29 +35,30 @@ import './App.css';
 function App() {
   return (
     <AuthProvider>
-      <ErrorBoundary>
-        <div className="App">
-          <Routes>
-            {/* Public routes */}
-            <Route path="/" element={<Landing />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-          <Route path="/otp-verify" element={<OtpVerify />} />
+      <SubscriptionModalProvider>
+        <ErrorBoundary>
+          <div className="App">
+            <Routes>
+              {/* Public routes */}
+              <Route path="/" element={<Landing />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/otp-verify" element={<OtpVerify />} />
 
-          {/* Protected routes */}
-          <Route path="/home" element={
-            <PrivateRoute>
-              <Home />
-            </PrivateRoute>
-          } />
-          <Route path="/dashboard" element={
-            <PrivateRoute>
-              <Dashboard />
-            </PrivateRoute>
-          } />
+            {/* Protected routes */}
+            <Route path="/home" element={
+              <PrivateRoute>
+                <Home />
+              </PrivateRoute>
+            } />
+            <Route path="/dashboard" element={
+              <PrivateRoute>
+                <Dashboard />
+              </PrivateRoute>
+            } />
           <Route path="/properties" element={
             <PrivateRoute>
               <Properties />
@@ -200,6 +202,7 @@ function App() {
         </Routes>
       </div>
       </ErrorBoundary>
+      </SubscriptionModalProvider>
     </AuthProvider>
   );
 }

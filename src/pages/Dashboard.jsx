@@ -6,6 +6,7 @@ import Properties from "../components/snippets/Properties";
 import Occupied from "../components/snippets/Occupied";
 import Income from "../components/snippets/Income";
 import Layout from "../components/Layout";
+import SubscriptionBanner from "../components/SubscriptionBanner";
 import { getDashboardInfo } from "../services/dashboardService";
 import { getLeases } from "../services/leaseService";
 import { getUserProfile } from "../services/profileService";
@@ -117,6 +118,9 @@ function Dashboard() {
     return(
         <Layout>
             <div className="main-content">
+                {/* Subscription Banner */}
+                <SubscriptionBanner />
+                
                 <div className="d-flex justify-content-between align-items-center mb-3">
                     <div>
                         <h2 className="fw-bold" style={{color:"#222"}}>
