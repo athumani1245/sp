@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DataTable from 'react-data-table-component';
 import Layout from '../../components/Layout';
@@ -15,7 +15,7 @@ const PropertyReport = () => {
   const [showToast, setShowToast] = useState(false);
   const [toastConfig, setToastConfig] = useState({});
   const [showColumnSelector, setShowColumnSelector] = useState(false);
-  const [dateFilter, setDateFilter] = useState({
+  const [dateFilter] = useState({
     startDate: new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0],
     endDate: new Date().toISOString().split('T')[0]
   });
@@ -41,10 +41,10 @@ const PropertyReport = () => {
   const [isResizing, setIsResizing] = useState(false);
   const [resizingColumn, setResizingColumn] = useState(null);
 
-  const showToastMessage = (title, message, variant = 'success') => {
+  const showToastMessage = useCallback((title, message, variant = 'success') => {
     setToastConfig({ title, message, variant });
     setShowToast(true);
-  };
+  }, []);
 
   // Handle select all/none columns
   const toggleAllColumns = (visible) => {
@@ -397,7 +397,7 @@ const PropertyReport = () => {
   };
 
   // Load property performance data
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setLoading(true);
     try {
       console.log('PropertyReport: Starting property performance data load with date filter:', dateFilter);
@@ -429,7 +429,7 @@ const PropertyReport = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [dateFilter, showToastMessage]);
 
   // Export functionality
   const handleExport = async (format) => {
@@ -498,7 +498,7 @@ const PropertyReport = () => {
   // Load data when component mounts
   useEffect(() => {
     loadData();
-  }, []);
+  }, [loadData]);
 
   // Close column selector when clicking outside
   useEffect(() => {

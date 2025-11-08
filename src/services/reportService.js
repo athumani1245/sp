@@ -1179,6 +1179,10 @@ export const generateReportSummary = (reportType, data) => {
       summary.uniqueTenants = tenantsCount;
       summary.averageLeaseDuration = Math.round(averageDuration);
       break;
+
+    default:
+      // For unknown report types, just return basic summary
+      break;
   }
 
   return summary;
@@ -1384,7 +1388,7 @@ export const exportLeaseAgreements = async (filters = {}, format = EXPORT_FORMAT
   }
 };
 
-export default {
+const reportService = {
   REPORT_TYPES,
   EXPORT_FORMATS,
   fetchReportData,
@@ -1402,3 +1406,5 @@ export default {
   generateReportSummary,
   validateExportOptions
 };
+
+export default reportService;
