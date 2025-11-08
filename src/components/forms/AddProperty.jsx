@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import '../../assets/styles/add-property.css';
 import '../../assets/styles/forms-responsive.css';
-import { addProperty, getRegions, getDistricts, getWards } from '../../services/propertyService';
+import { addProperty, getRegions, getDistricts, getWards, getAllPropertyManagers } from '../../services/propertyService';
 
 // SearchableSelect Component
 const SearchableSelect = ({ 
@@ -200,6 +200,7 @@ const AddPropertyModal = ({isOpen, onClose, onPropertyAdded})=>{
         district: '',
         ward: '',
         street: '',
+        manager_id: '',
         managers: [],
         autoGenerate: false,
         numFloors: '',
@@ -214,6 +215,7 @@ const AddPropertyModal = ({isOpen, onClose, onPropertyAdded})=>{
     const [regions, setRegions] = useState([]);
     const [districts, setDistricts] = useState([]);
     const [wards, setWards] = useState([]);
+    const [propertyManagers, setPropertyManagers] = useState([]);
     const [selectedRegionId, setSelectedRegionId] = useState('');
     const [selectedDistrictId, setSelectedDistrictId] = useState('');
     const [selectedWardId, setSelectedWardId] = useState('');
@@ -223,6 +225,7 @@ const AddPropertyModal = ({isOpen, onClose, onPropertyAdded})=>{
     useEffect(() => {
         if (isOpen) {
             loadRegions();
+            loadPropertyManagers();
         }
     }, [isOpen]);
 
@@ -242,6 +245,17 @@ const AddPropertyModal = ({isOpen, onClose, onPropertyAdded})=>{
             setRegions([]);
         } finally {
             setLocationLoading(false);
+        }
+    };
+
+    const loadPropertyManagers = async () => {
+        try {
+            const result = await getAllPropertyManagers();
+            if (result.success) {
+                setPropertyManagers(result.data || []);
+            }
+        } catch (error) {
+            console.error('Error loading property managers:', error);
         }
     };
 
@@ -464,6 +478,34 @@ const AddPropertyModal = ({isOpen, onClose, onPropertyAdded})=>{
                                         <option value="Apartment">Apartment</option>
                                         <option value="Commercial building">Commercial building</option>
                                     </select>
+                                </div>
+                            </div>
+
+                            {/* Property Manager Row */}
+                            <div className="row mb-3">
+                                <div className="col-12 mb-3">
+                                    <label htmlFor="manager_id" className="form-label">
+                                        Property Manager (Optional)
+                                    </label>
+                                    <SearchableSelect
+                                        options={propertyManagers}
+                                        value={formData.manager_id}
+                                        onChange={handleInputChange}
+                                        placeholder="Select Property Manager"
+                                        disabled={loading}
+                                        name="manager_id"
+                                        getOptionLabel={(manager) => {
+                                            if (manager.first_name && manager.last_name) {
+                                                return `${manager.first_name} ${manager.last_name} - ${manager.username}`;
+                                            }
+                                            return manager.username || 'Unknown Manager';
+                                        }}
+                                        getOptionValue={(manager) => manager.id}
+                                        noOptionsMessage="No property managers available. Add managers from the Property Managers page."
+                                    />
+                                    <small className="form-text text-muted">
+                                        Assign a property manager to oversee this property
+                                    </small>
                                 </div>
                             </div>
 

@@ -11,7 +11,8 @@ const AddPayment = ({ isOpen, onClose, leaseId, onPaymentAdded }) => {
     const [formData, setFormData] = useState({
         amount_paid: '',
         date_paid: new Date().toISOString().slice(0, 10), // Format: YYYY-MM-DD
-        category: 'RENT'
+        category: 'RENT',
+        payment_source: 'CASH'
     });
 
     // Reset form when modal opens/closes
@@ -25,7 +26,8 @@ const AddPayment = ({ isOpen, onClose, leaseId, onPaymentAdded }) => {
         setFormData({
             amount_paid: '',
             date_paid: new Date().toISOString().slice(0, 10),
-            category: 'RENT'
+            category: 'RENT',
+            payment_source: 'CASH'
         });
         setError('');
         setSuccess('');
@@ -182,7 +184,7 @@ const AddPayment = ({ isOpen, onClose, leaseId, onPaymentAdded }) => {
                     </Row>
 
                     <Row className="mb-3">
-                        <Col xs={12} className="mb-3">
+                        <Col xs={12} md={6} className="mb-3">
                             <Form.Group>
                                 <Form.Label className="form-label">Category *</Form.Label>
                                 <Form.Select
@@ -198,6 +200,22 @@ const AddPayment = ({ isOpen, onClose, leaseId, onPaymentAdded }) => {
                                     <option value="SERVICE_CHARGE">Service Charge</option>
                                     <option value="Security Deposit">Security Deposit</option>
                                     <option value="OTHER">Other</option>
+                                </Form.Select>
+                            </Form.Group>
+                        </Col>
+                        <Col xs={12} md={6} className="mb-3">
+                            <Form.Group>
+                                <Form.Label className="form-label">Payment Source *</Form.Label>
+                                <Form.Select
+                                    className="form-select"
+                                    name="payment_source"
+                                    value={formData.payment_source}
+                                    onChange={handleInputChange}
+                                    required
+                                >
+                                    <option value="CASH">Cash</option>
+                                    <option value="MB">Mobile Money</option>
+                                    <option value="BANK">Bank</option>
                                 </Form.Select>
                             </Form.Group>
                         </Col>

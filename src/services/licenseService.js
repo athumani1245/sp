@@ -341,14 +341,24 @@ export const checkPaymentStatus = async (transactionId) => {
             { headers: getAuthHeaders() }
         );
 
-        const statusData = response.data;
+        const responseData = response.data;
+        
+        // Backend response structure:
+        // status: true/false (boolean)
+        // statusCode: 200
+        // description: "success"
+        // data: { transaction_ref, transaction_id, status: "PAYMENT_ACCEPTED", amount, created_at, updated_at, narration }
         
         return {
-            success: true,
-            status: statusData.status, // pending, processing, completed, failed, cancelled
-            message: statusData.message || statusData.description,
-            data: statusData.data,
-            transactionId: transactionId
+            success: responseData.status === true,
+            statusCode: responseData.statusCode || response.status,
+            description: responseData.description,
+            paymentStatus: responseData.data?.status, // PAYMENT_ACCEPTED, PAYMENT_PENDING, PAYMENT_FAILED, etc.
+            message: responseData.description || responseData.data?.narration,
+            data: responseData.data,
+            transactionId: transactionId,
+            transactionRef: responseData.data?.transaction_ref,
+            amount: responseData.data?.amount
         };
     } catch (err) {
         return handleApiError(err, "Failed to check payment status.");
@@ -385,12 +395,16 @@ export const startPaymentStatusListener = (transactionId, callback, options = {}
         try {
             const result = await checkPaymentStatus(transactionId);
             
-            if (result.statusCode === 200 || result.status === true) {
+            if (result.success) {
                 // Call the callback with the status update
                 callback(result);
                 
-                // Stop polling if payment is completed or failed
-                if (result.description === 'success' || result.description === 'failed') {
+                // Stop polling if payment is accepted or failed
+                const paymentStatus = result.paymentStatus?.toUpperCase();
+                if (paymentStatus === 'PAYMENT_ACCEPTED' || 
+                    paymentStatus === 'PAYMENT_SUCCESS' || 
+                    paymentStatus === 'PAYMENT_FAILED' || 
+                    paymentStatus === 'PAYMENT_CANCELLED') {
                     stopPaymentStatusListener(transactionId);
                     return;
                 }

@@ -2,12 +2,14 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
 import Layout from "../../components/Layout";
-import { getPropertyById, getPropertyUnits, updateProperty, getRegions, getDistricts, getWards, addPropertyUnit, deletePropertyUnit, updatePropertyUnit } from "../../services/propertyService";
+import { getPropertyById, getPropertyUnits, updateProperty, getRegions, getDistricts, getWards, addPropertyUnit, deletePropertyUnit, updatePropertyUnit, getAllPropertyManagers } from "../../services/propertyService";
+import { useSubscription } from '../../hooks/useSubscription';
 import "../../assets/styles/leases.css";
 
 function Property() {
     const { propertyId } = useParams();
     const navigate = useNavigate();
+    const { hasActiveSubscription } = useSubscription();
     
     console.log('Property component rendering with propertyId:', propertyId);
     
@@ -30,7 +32,8 @@ function Property() {
         ward: "",
         street: "",
         numFloors: "",
-        unitsPerFloor: ""
+        unitsPerFloor: "",
+        manager_id: ""
     });
     const [updateLoading, setUpdateLoading] = useState(false);
     const [success, setSuccess] = useState("");
@@ -43,6 +46,10 @@ function Property() {
     const [selectedDistrictId, setSelectedDistrictId] = useState('');
     const [selectedWardId, setSelectedWardId] = useState('');
     const [locationLoading, setLocationLoading] = useState(false);
+    
+    // Property manager states
+    const [propertyManagers, setPropertyManagers] = useState([]);
+    const [selectedManagerId, setSelectedManagerId] = useState('');
     
     // Inline unit addition states
     const [isAddingUnit, setIsAddingUnit] = useState(false);
@@ -86,13 +93,48 @@ function Property() {
                     district: result.data.address?.district || "",
                     ward: result.data.address?.ward || "",
                     street: result.data.address?.street || "",
+                    manager_id: result.data.managers?.[0]?.id || ""
                 });
                 
                 // Set the selected location values
-                if (result.data.address) {
-                    setSelectedRegionId(result.data.address.region_code || "");
-                    setSelectedDistrictId(result.data.address.district_code || "");
-                    setSelectedWardId(result.data.address.ward_code || "");
+                const regionCode = result.data.address?.region_code || "";
+                const districtCode = result.data.address?.district_code || "";
+                const wardCode = result.data.address?.ward_code || "";
+                
+                setSelectedRegionId(regionCode);
+                setSelectedDistrictId(districtCode);
+                setSelectedWardId(wardCode);
+                
+                // Load location dropdowns immediately with property data
+                try {
+                    // Load regions
+                    const regionsResponse = await getRegions();
+                    if (regionsResponse.success) {
+                        setRegions(regionsResponse.data || []);
+                    }
+                    
+                    // Load districts if region is selected
+                    if (regionCode) {
+                        const districtsResponse = await getDistricts(regionCode);
+                        if (districtsResponse.success) {
+                            setDistricts(districtsResponse.data || []);
+                        }
+                    }
+                    
+                    // Load wards if district is selected
+                    if (districtCode) {
+                        const wardsResponse = await getWards(districtCode);
+                        if (wardsResponse.success) {
+                            setWards(wardsResponse.data || []);
+                        }
+                    }
+                } catch (locationError) {
+                    console.error('Error loading location data:', locationError);
+                }
+                
+                // Set the selected property manager (first manager from array)
+                if (result.data.managers && result.data.managers.length > 0) {
+                    setSelectedManagerId(result.data.managers[0].id || "");
                 }
             } else {
                 setError(result.error || "Failed to fetch property details");
@@ -195,17 +237,16 @@ function Property() {
         }
     }, [activeTab, currentPage, propertyId, fetchUnits]);
 
-    // Load location data when the component mounts or property changes
+    // Load location data when selection changes (for edit mode dropdown changes)
     useEffect(() => {
         const loadLocationData = async () => {
+            // Skip if we don't have regions loaded yet (initial load handled in fetchProperty)
+            if (regions.length === 0) return;
+            
             try {
                 setLocationLoading(true);
                 
-                // Load regions
-                const regionsResponse = await getRegions();
-                if (regionsResponse.success) {
-                    setRegions(regionsResponse.data || []);
-                }
+                // Load districts if region is selected and changed
                 if (selectedRegionId) {
                     const districtsResponse = await getDistricts(selectedRegionId);
                     if (districtsResponse.success) {
@@ -213,7 +254,7 @@ function Property() {
                     }
                 }
                 
-                // If we have a selected district, load wards
+                // Load wards if district is selected and changed
                 if (selectedDistrictId) {
                     const wardsResponse = await getWards(selectedDistrictId);
                     if (wardsResponse.success) {
@@ -228,35 +269,39 @@ function Property() {
         };
 
         loadLocationData();
-    }, [property, selectedRegionId, selectedDistrictId]);
+    }, [selectedRegionId, selectedDistrictId, regions.length]);
+    
+    // Load property managers when component mounts
+    useEffect(() => {
+        const loadPropertyManagers = async () => {
+            try {
+                const response = await getAllPropertyManagers();
+                if (response.success) {
+                    setPropertyManagers(response.data || []);
+                }
+            } catch (error) {
+                console.error('Error loading property managers:', error);
+            }
+        };
+        
+        loadPropertyManagers();
+    }, []);
 
     const handleRegionChange = async (e) => {
         const regionId = e.target.value;
         const regionName = regionId ? e.target.options[e.target.selectedIndex].text : '';
         
         setSelectedRegionId(regionId);
+        setSelectedDistrictId(''); // Reset district and ward when region changes
+        setSelectedWardId('');
+        setDistricts([]); // Clear districts
+        setWards([]); // Clear wards
         setEditData(prev => ({
             ...prev,
-            region: regionName
+            region: regionName,
+            district: '',
+            ward: ''
         }));
-        
-        if (regionId) {
-            try {
-                setLocationLoading(true);
-                const response = await getDistricts(regionId);
-                if (response.success) {
-                    setDistricts(response.data || []);
-                } else {
-                    console.error('Failed to load districts:', response.error);
-                    setDistricts([]);
-                }
-            } catch (error) {
-                console.error('Error loading districts:', error);
-                setDistricts([]);
-            } finally {
-                setLocationLoading(false);
-            }
-        }
     };
 
     const handleDistrictChange = async (e) => {
@@ -264,28 +309,13 @@ function Property() {
         const districtName = districtId ? e.target.options[e.target.selectedIndex].text : '';
         
         setSelectedDistrictId(districtId);
+        setSelectedWardId(''); // Reset ward when district changes
+        setWards([]); // Clear wards
         setEditData(prev => ({
             ...prev,
-            district: districtName
+            district: districtName,
+            ward: ''
         }));
-        
-        if (districtId) {
-            try {
-                setLocationLoading(true);
-                const response = await getWards(districtId);
-                if (response.success) {
-                    setWards(response.data || []);
-                } else {
-                    console.error('Failed to load wards:', response.error);
-                    setWards([]);
-                }
-            } catch (error) {
-                console.error('Error loading wards:', error);
-                setWards([]);
-            } finally {
-                setLocationLoading(false);
-            }
-        }
     };
 
     const handleWardChange = (e) => {
@@ -295,6 +325,15 @@ function Property() {
         setEditData(prev => ({
             ...prev,
             ward: wardCode  // Store ward_code instead of ward_name
+        }));
+    };
+    
+    const handleManagerChange = (e) => {
+        const managerId = e.target.value;
+        setSelectedManagerId(managerId);
+        setEditData(prev => ({
+            ...prev,
+            manager_id: managerId
         }));
     };    
 
@@ -357,6 +396,7 @@ function Property() {
                 district: selectedDistrict ? selectedDistrict.district_name : editData.district,
                 region: selectedRegion ? selectedRegion.region_name : editData.region,
                 street: editData.street,
+                manager_id: selectedManagerId === '' ? null : selectedManagerId,
             };
             
             const result = await updateProperty(propertyId, propertyData);
@@ -390,17 +430,24 @@ function Property() {
                 ward: property.address?.ward || "",
                 street: property.address?.street || "",
                 numFloors: property.num_floors || "",
-                unitsPerFloor: property.units_per_floor || ""
+                unitsPerFloor: property.units_per_floor || "",
+                manager_id: property.managers?.[0]?.id || ""
             });
+            
+            // Restore the original location IDs from property data
+            if (property.address) {
+                setSelectedRegionId(property.address.region_code || "");
+                setSelectedDistrictId(property.address.district_code || "");
+                setSelectedWardId(property.address.ward_code || "");
+            }
+            
+            // Restore the original manager
+            if (property.managers && property.managers.length > 0) {
+                setSelectedManagerId(property.managers[0].id || '');
+            } else {
+                setSelectedManagerId('');
+            }
         }
-        
-        // Reset location state
-        setSelectedRegionId('');
-        setSelectedDistrictId('');
-        setSelectedWardId('');
-        setRegions([]);
-        setDistricts([]);
-        setWards([]);
         
         setError("");
         setSuccess("");
@@ -829,6 +876,36 @@ function Property() {
                                             placeholder="Street address..."
                                         />
                                     </div>
+                                    <div className="compact-form-row">
+                                        <label className="compact-inline-label">Property Manager:</label>
+                                        {isEditing ? (
+                                            <select
+                                                className="underline-select"
+                                                name="manager_id"
+                                                value={selectedManagerId}
+                                                onChange={handleManagerChange}
+                                            >
+                                                <option value="">No Manager Assigned</option>
+                                                {propertyManagers.map(manager => (
+                                                    <option key={manager.id} value={manager.id}>
+                                                        {manager.first_name} {manager.last_name} - {manager.username}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        ) : (
+                                            <input
+                                                type="text"
+                                                className="underline-input"
+                                                value={property.managers && property.managers.length > 0
+                                                    ? `${property.managers[0].first_name} ${property.managers[0].last_name} - ${property.managers[0].username}` 
+                                                    : 'No Manager Assigned'
+                                                }
+                                                disabled
+                                                readOnly
+                                                placeholder="Property manager..."
+                                            />
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </form>
@@ -866,8 +943,9 @@ function Property() {
                                 <button 
                                     className="odoo-btn odoo-btn-primary"
                                     onClick={() => setIsAddingUnit(true)}
-                                    disabled={editingUnitId !== null}
+                                    disabled={editingUnitId !== null || !hasActiveSubscription}
                                     style={{ minWidth: '120px' }}
+                                    title={!hasActiveSubscription ? 'Subscription expired. Please renew to add units.' : ''}
                                 >
                                     <i className="bi bi-plus-circle me-2"></i>
                                     Add Unit

@@ -3,11 +3,13 @@ import { Modal, Button } from 'react-bootstrap';
 import Layout from "../components/Layout";
 import AddTenantModal from "../components/forms/AddTenant";
 import { getTenants, deleteTenant, updateTenant } from "../services/tenantService";
+import { useSubscription } from '../hooks/useSubscription';
 import "../assets/styles/profile.css";
 import "../assets/styles/leases.css";
 import "../assets/styles/tenants.css";
 
 function Tenants() {
+  const { hasActiveSubscription } = useSubscription();
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
   const [page, setPage] = useState(1);
@@ -290,7 +292,9 @@ function Tenants() {
               <button 
                 className="odoo-btn odoo-btn-primary"
                 onClick={() => setShowAddModal(true)}
+                disabled={!hasActiveSubscription}
                 style={{ minWidth: '160px' }}
+                title={!hasActiveSubscription ? 'Subscription expired. Please renew to add tenants.' : ''}
               >
                 <i className="bi bi-person-plus me-2"></i>
                 Add New Tenant
@@ -354,6 +358,8 @@ function Tenants() {
                 <button 
                   className="odoo-btn odoo-btn-primary odoo-btn-lg"
                   onClick={() => setShowAddModal(true)}
+                  disabled={!hasActiveSubscription}
+                  title={!hasActiveSubscription ? 'Subscription expired. Please renew to add tenants.' : ''}
                 >
                   <i className="bi bi-person-plus me-2"></i>
                   Add First Tenant

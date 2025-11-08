@@ -3,11 +3,13 @@ import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import AddLeaseModal from "../components/forms/addLease";
 import { getLeases, getAllLeases } from "../services/leaseService";
+import { useSubscription } from '../hooks/useSubscription';
 import "../assets/styles/profile.css";
 import "../assets/styles/leases.css";
 
 function Leases() {
   const navigate = useNavigate();
+  const { hasActiveSubscription } = useSubscription();
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [status, setStatus] = useState("");
@@ -307,7 +309,9 @@ function Leases() {
               <button 
                 className="odoo-btn odoo-btn-primary"
                 onClick={() => setShowAddModal(true)}
+                disabled={!hasActiveSubscription}
                 style={{ minWidth: '140px' }}
+                title={!hasActiveSubscription ? 'Subscription expired. Please renew to add leases.' : ''}
               >
                 <i className="bi bi-plus me-2"></i>
                 Add New Lease
@@ -418,6 +422,8 @@ function Leases() {
                 <button 
                   className="odoo-btn odoo-btn-primary odoo-btn-lg"
                   onClick={() => setShowAddModal(true)}
+                  disabled={!hasActiveSubscription}
+                  title={!hasActiveSubscription ? 'Subscription expired. Please renew to create leases.' : ''}
                 >
                   <i className="bi bi-plus me-2"></i>
                   Create First Lease

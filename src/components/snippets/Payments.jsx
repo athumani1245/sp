@@ -31,6 +31,16 @@ const Payments = ({ payments = [], onPaymentAdded, leaseId, refreshData }) => {
         return `TSh ${numAmount.toLocaleString()}`;
     };
 
+    const formatPaymentSource = (source) => {
+        if (!source) return 'N/A';
+        const sourceMap = {
+            'CASH': 'Cash',
+            'MB': 'Mobile Money',
+            'BANK': 'Bank'
+        };
+        return sourceMap[source] || source;
+    };
+
     const renderPaymentsList = () => {
         if (payments.length > 0) {
             return (
@@ -44,6 +54,7 @@ const Payments = ({ payments = [], onPaymentAdded, leaseId, refreshData }) => {
                                         <th>Date</th>
                                         <th>Amount</th>
                                         <th>Category</th>
+                                        <th>Source</th>
                                         <th>Status</th>
                                         <th>Actions</th>
                                     </tr>
@@ -58,6 +69,11 @@ const Payments = ({ payments = [], onPaymentAdded, leaseId, refreshData }) => {
                                             <td>
                                                 <span className="badge bg-secondary">
                                                     {payment.category || 'RENT'}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span className="badge bg-info">
+                                                    {formatPaymentSource(payment.payment_source)}
                                                 </span>
                                             </td>
                                             <td>
@@ -115,6 +131,15 @@ const Payments = ({ payments = [], onPaymentAdded, leaseId, refreshData }) => {
                                             </span>
                                             <span className="badge bg-secondary">
                                                 {payment.category || 'RENT'}
+                                            </span>
+                                        </div>
+                                        <div className="payment-card-row">
+                                            <span className="payment-card-label">
+                                                <i className="bi bi-wallet2 me-1"></i>
+                                                Source:
+                                            </span>
+                                            <span className="badge bg-info">
+                                                {formatPaymentSource(payment.payment_source)}
                                             </span>
                                         </div>
                                         <div className="payment-card-row">

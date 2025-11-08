@@ -93,14 +93,21 @@ const getWards = async (districtId) => {
 
 // Helper function to format property data for API
 const formatPropertyData = (propertyData) => {
-    return {
+    const formattedData = {
         property_name: propertyData.propertyName || propertyData.name,
         property_type: propertyData.propertyType || "Residential",
         address: {
-            ward: propertyData.ward || "",
+            ward: propertyData.ward || null,
             street: propertyData.street || ""
         },
     };
+    
+    // Include manager_id - send null to remove manager, or the actual ID to assign
+    if (propertyData.manager_id !== undefined) {
+        formattedData.manager_id = propertyData.manager_id || null;
+    }
+    
+    return formattedData;
 };
 
 
@@ -485,6 +492,75 @@ export const searchProperties = async (searchQuery, filters = {}) => {
         };
     } catch (err) {
         return handleApiError(err, "Failed to search properties.");
+    }
+};
+
+// Property Manager Management
+export const registerPropertyManager = async (managerData) => {
+    try {
+        const response = await axios.post(
+            `${API_BASE}/auth/register-property-manager/`,
+            managerData,
+            { headers: getAuthHeaders() }
+        );
+
+        return {
+            success: true,
+            message: response.data.description || "Property manager registered successfully",
+            data: response.data.data
+        };
+    } catch (err) {
+        return handleApiError(err, "Failed to register property manager.");
+    }
+};
+
+export const getAllPropertyManagers = async () => {
+    try {
+        const response = await axios.get(
+            `${API_BASE}/property-managers`,
+            { headers: getAuthHeaders() }
+        );
+
+        return {
+            success: true,
+            data: response.data.data || response.data || []
+        };
+    } catch (err) {
+        return handleApiError(err, "Failed to fetch property managers.");
+    }
+};
+
+export const updatePropertyManager = async (managerId, managerData) => {
+    try {
+        const response = await axios.patch(
+            `${API_BASE}/property-managers/${managerId}`,
+            managerData,
+            { headers: getAuthHeaders() }
+        );
+
+        return {
+            success: true,
+            message: response.data.description || "Property manager updated successfully",
+            data: response.data.data
+        };
+    } catch (err) {
+        return handleApiError(err, "Failed to update property manager.");
+    }
+};
+
+export const deletePropertyManager = async (managerId) => {
+    try {
+        const response = await axios.delete(
+            `${API_BASE}/property-managers/${managerId}/`,
+            { headers: getAuthHeaders() }
+        );
+
+        return {
+            success: true,
+            message: response.data.description || "Property manager deleted successfully"
+        };
+    } catch (err) {
+        return handleApiError(err, "Failed to delete property manager.");
     }
 };
 

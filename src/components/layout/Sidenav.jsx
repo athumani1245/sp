@@ -9,6 +9,7 @@ function Sidenav(){
         reports: false,
         leases: false,
         properties: false,
+        propertiesMain: false,
         tenants: false,
         finance: false
     });
@@ -59,7 +60,7 @@ function Sidenav(){
             
             // If clicking on main reports dropdown
             if (dropdownName === 'reports') {
-                newState.reports = !prev.reports;
+                    newState.reports = !prev.reports;
                 // Close all sub-dropdowns when closing main reports
                 if (!newState.reports) {
                     newState.leases = false;
@@ -67,12 +68,13 @@ function Sidenav(){
                     newState.tenants = false;
                     newState.finance = false;
                 }
+            } else if (dropdownName === 'propertiesMain') {
+                // Toggle main properties dropdown
+                newState.propertiesMain = !prev.propertiesMain;
             } else {
                 // Toggle specific sub-dropdown
                 newState[dropdownName] = !prev[dropdownName];
-            }
-            
-            return newState;
+            }            return newState;
         });
     };
 
@@ -86,11 +88,32 @@ function Sidenav(){
                     </NavLink>
                 </li>
                 <li className="nav-item">
-                    <NavLink className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
-                             to="/properties">
+                    <a className={`nav-link ${openDropdowns.propertiesMain ? 'active' : ''}`} 
+                       href="#" 
+                       onClick={(e) => toggleDropdown('propertiesMain', e)}>
                         <i className="bi bi-building"></i> Properties
-                    </NavLink>
+                        <i className={`bi bi-chevron-${openDropdowns.propertiesMain ? 'down' : 'right'} ms-auto`}></i>
+                    </a>
                 </li>
+                
+                {/* Properties Submenu */}
+                {openDropdowns.propertiesMain && (
+                    <>
+                        <li className="nav-item">
+                            <NavLink className={({ isActive }) => "nav-link submenu-item" + (isActive ? " active" : "")}
+                                     to="/properties">
+                                <i className="bi bi-buildings"></i> Properties
+                            </NavLink>
+                        </li>
+                        <li className="nav-item">
+                            <NavLink className={({ isActive }) => "nav-link submenu-item" + (isActive ? " active" : "")}
+                                     to="/property-managers">
+                                <i className="bi bi-people"></i> Property Managers
+                            </NavLink>
+                        </li>
+                    </>
+                )}
+                
                 <li className="nav-item">
                     <NavLink className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
                              to="/tenants">

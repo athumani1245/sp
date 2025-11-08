@@ -10,6 +10,7 @@ import OtpVerify from "./pages/VerifyOtp";
 import Home from "./pages/Home";
 import Properties from "./pages/dashboard/Properties";
 import Property from "./pages/dashboard/Property";
+import PropertyManagers from "./pages/PropertyManagers";
 import Leases from "./pages/Leases";
 import Lease from "./pages/Lease";
 import Tenants from "./pages/Tenants";
@@ -67,6 +68,11 @@ function App() {
           <Route path="/properties/:propertyId" element={
             <PrivateRoute>
               <Property />
+            </PrivateRoute>
+          } />
+          <Route path="/property-managers" element={
+            <PrivateRoute>
+              <PropertyManagers />
             </PrivateRoute>
           } />
           <Route path="/leases" element={

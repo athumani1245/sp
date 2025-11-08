@@ -127,23 +127,27 @@ const SubscriptionModal = ({ show, onHide, onSubscriptionSuccess }) => {
                             (statusUpdate) => {
                                 console.log('Payment status update:', statusUpdate);
                                 
-                                if (statusUpdate.status === 'completed') {
+                                const paymentStatus = statusUpdate.paymentStatus?.toUpperCase();
+                                
+                                // Handle PAYMENT_ACCEPTED or PAYMENT_SUCCESS
+                                if (paymentStatus === 'PAYMENT_ACCEPTED' || paymentStatus === 'PAYMENT_SUCCESS') {
                                     setPaymentStatus('success');
-                                    setApiResponseDescription('Payment completed successfully!');
+                                    setApiResponseDescription(statusUpdate.data?.narration || 'Payment completed successfully!');
                                     setSubscribing(false);
                                     
                                     setTimeout(() => {
                                         handleSuccessfulSubscription();
                                     }, 3000);
                                     
-                                } else if (statusUpdate.status === 'failed' || statusUpdate.status === 'cancelled') {
+                                } else if (paymentStatus === 'PAYMENT_FAILED' || paymentStatus === 'PAYMENT_CANCELLED') {
                                     setPaymentStatus('failed');
-                                    setSubscriptionError(statusUpdate.message || 'Payment failed');
+                                    setSubscriptionError(statusUpdate.message || statusUpdate.data?.narration || 'Payment failed');
                                     setSubscribing(false);
                                     
-                                } else if (statusUpdate.status === 'processing') {
-                                    if (statusUpdate.message) {
-                                        setApiResponseDescription(statusUpdate.message);
+                                } else if (paymentStatus === 'PAYMENT_PENDING' || paymentStatus === 'PAYMENT_PROCESSING') {
+                                    setPaymentStatus('processing');
+                                    if (statusUpdate.message || statusUpdate.data?.narration) {
+                                        setApiResponseDescription(statusUpdate.message || statusUpdate.data?.narration);
                                     }
                                 }
                             },
