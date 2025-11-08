@@ -20,6 +20,13 @@ const TenantReport = () => {
     endDate: new Date().toISOString().split('T')[0]
   });
 
+  // Selection filters
+  const [tenantFilter, setTenantFilter] = useState('');
+  const [propertyFilter, setPropertyFilter] = useState('');
+  const [unitFilter, setUnitFilter] = useState('');
+  const [paymentStatusFilter, setPaymentStatusFilter] = useState('');
+  const [leaseStatusFilter, setLeaseStatusFilter] = useState('');
+
   const [visibleColumns, setVisibleColumns] = useState({
     name: true,
     property: true,
@@ -377,9 +384,10 @@ const TenantReport = () => {
     },
   };
 
-  // Filter data based on search text
+  // Filter data based on search text and selection filters
   const filteredItems = data.filter(
     item => {
+      // Text search filter
       const searchFields = [
         item.tenant_full_name,
         item.property,
@@ -388,10 +396,36 @@ const TenantReport = () => {
         item.payment_status,
         item.lease_status
       ].join(' ').toLowerCase();
+      const matchesSearch = !filterText || searchFields.includes(filterText.toLowerCase());
       
-      return searchFields.includes(filterText.toLowerCase());
+      // Selection filters
+      const matchesTenant = !tenantFilter || item.tenant_full_name === tenantFilter;
+      const matchesProperty = !propertyFilter || item.property === propertyFilter;
+      const matchesUnit = !unitFilter || item.unit === unitFilter;
+      const matchesPaymentStatus = !paymentStatusFilter || item.payment_status === paymentStatusFilter;
+      const matchesLeaseStatus = !leaseStatusFilter || item.lease_status === leaseStatusFilter;
+      
+      return matchesSearch && matchesTenant && matchesProperty && matchesUnit && matchesPaymentStatus && matchesLeaseStatus;
     }
   );
+
+  // Get unique values for filter dropdowns
+  const uniqueTenants = [...new Set(data.map(item => item.tenant_full_name))].filter(Boolean).sort();
+  const uniqueProperties = [...new Set(data.map(item => item.property))].filter(Boolean).sort();
+  const uniqueUnits = [...new Set(data.map(item => item.unit))].filter(Boolean).sort();
+  const uniquePaymentStatuses = [...new Set(data.map(item => item.payment_status))].filter(Boolean).sort();
+  const uniqueLeaseStatuses = [...new Set(data.map(item => item.lease_status))].filter(Boolean).sort();
+
+  // Reset all filters
+  const handleResetAllFilters = () => {
+    setFilterText('');
+    setTenantFilter('');
+    setPropertyFilter('');
+    setUnitFilter('');
+    setPaymentStatusFilter('');
+    setLeaseStatusFilter('');
+    setResetPaginationToggle(!resetPaginationToggle);
+  };
 
   // Handle row selection
   const handleRowSelected = React.useCallback(state => {
@@ -683,23 +717,113 @@ const TenantReport = () => {
             <div className="col-auto">
               <button
                 className="odoo-btn odoo-btn-secondary odoo-btn-sm"
-                onClick={() => setFilterText('')}
+                onClick={handleResetAllFilters}
               >
                 <i className="bi bi-arrow-clockwise me-1"></i>
-                Reset Filter
+                Reset All Filters
               </button>
+            </div>
+          </div>
+
+          {/* Selection Filters Row */}
+          <div className="row g-2 mb-3 align-items-center">
+            {/* Tenant Filter */}
+            <div className="col-md-2 col-sm-6">
+              <label className="form-label mb-1" style={{ fontSize: '0.85rem', fontWeight: '500' }}>
+                <i className="bi bi-person me-1"></i>Tenant
+              </label>
+              <select
+                className="form-select form-select-sm"
+                value={tenantFilter}
+                onChange={(e) => setTenantFilter(e.target.value)}
+              >
+                <option value="">All Tenants</option>
+                {uniqueTenants.map(tenant => (
+                  <option key={tenant} value={tenant}>{tenant}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Property Filter */}
+            <div className="col-md-2 col-sm-6">
+              <label className="form-label mb-1" style={{ fontSize: '0.85rem', fontWeight: '500' }}>
+                <i className="bi bi-building me-1"></i>Property
+              </label>
+              <select
+                className="form-select form-select-sm"
+                value={propertyFilter}
+                onChange={(e) => setPropertyFilter(e.target.value)}
+              >
+                <option value="">All Properties</option>
+                {uniqueProperties.map(property => (
+                  <option key={property} value={property}>{property}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Unit Filter */}
+            <div className="col-md-2 col-sm-6">
+              <label className="form-label mb-1" style={{ fontSize: '0.85rem', fontWeight: '500' }}>
+                <i className="bi bi-door-open me-1"></i>Unit
+              </label>
+              <select
+                className="form-select form-select-sm"
+                value={unitFilter}
+                onChange={(e) => setUnitFilter(e.target.value)}
+              >
+                <option value="">All Units</option>
+                {uniqueUnits.map(unit => (
+                  <option key={unit} value={unit}>{unit}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Payment Status Filter */}
+            <div className="col-md-2 col-sm-6">
+              <label className="form-label mb-1" style={{ fontSize: '0.85rem', fontWeight: '500' }}>
+                <i className="bi bi-credit-card me-1"></i>Payment Status
+              </label>
+              <select
+                className="form-select form-select-sm"
+                value={paymentStatusFilter}
+                onChange={(e) => setPaymentStatusFilter(e.target.value)}
+              >
+                <option value="">All Statuses</option>
+                {uniquePaymentStatuses.map(status => (
+                  <option key={status} value={status}>{status}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Lease Status Filter */}
+            <div className="col-md-2 col-sm-6">
+              <label className="form-label mb-1" style={{ fontSize: '0.85rem', fontWeight: '500' }}>
+                <i className="bi bi-file-text me-1"></i>Lease Status
+              </label>
+              <select
+                className="form-select form-select-sm"
+                value={leaseStatusFilter}
+                onChange={(e) => setLeaseStatusFilter(e.target.value)}
+              >
+                <option value="">All Statuses</option>
+                {uniqueLeaseStatuses.map(status => (
+                  <option key={status} value={status}>{status}</option>
+                ))}
+              </select>
             </div>
 
             {/* Search box */}
-            <div className="col">
+            <div className="col-md-2 col-sm-12">
+              <label className="form-label mb-1" style={{ fontSize: '0.85rem', fontWeight: '500' }}>
+                <i className="bi bi-search me-1"></i>Search
+              </label>
               <div className="search-container">
                 <input
                   type="text"
-                  className="form-control"
-                  placeholder="Search outstanding payments..."
+                  className="form-control form-control-sm"
+                  placeholder="Search..."
                   value={filterText}
                   onChange={(e) => setFilterText(e.target.value)}
-                  style={{ maxWidth: '300px' }}
                 />
               </div>
             </div>
