@@ -195,20 +195,6 @@ const OutstandingPaymentsReportTemplate = ({ payments, reportMetadata, filters }
     }
   };
 
-  const getStatusStyle = (status) => {
-    const baseStyle = { ...styles.statusBadge };
-    switch (status) {
-      case 'FULLY PAID':
-        return { ...baseStyle, ...styles.statusFullyPaid };
-      case 'PARTIALLY PAID':
-        return { ...baseStyle, ...styles.statusPartialPaid };
-      case 'NOT PAID':
-        return { ...baseStyle, ...styles.statusNotPaid };
-      default:
-        return baseStyle;
-    }
-  };
-
   return (
     <Document>
       <Page size="A4" orientation="landscape" style={styles.page}>

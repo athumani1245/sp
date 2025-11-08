@@ -385,7 +385,7 @@ export const startPaymentStatusListener = (transactionId, callback, options = {}
         try {
             const result = await checkPaymentStatus(transactionId);
             
-            if (result.statusCode === 200 || result.status == true) {
+            if (result.statusCode === 200 || result.status === true) {
                 // Call the callback with the status update
                 callback(result);
                 
