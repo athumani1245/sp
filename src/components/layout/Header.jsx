@@ -6,6 +6,7 @@ import { logout } from "../../services/authService";
 import { useSubscriptionModal } from "../../context/SubscriptionModalContext";
 import { getLicenseStatus } from "../../services/licenseService";
 import SubscriptionModal from "../forms/SubscriptionModal";
+import LicenseInfoSkeleton from "../skeletons/LicenseInfoSkeleton";
 import "../../assets/styles/header.css";
 
 function Header() {
@@ -75,14 +76,7 @@ function Header() {
     // Extracted modal body content to avoid nested ternary
     let licenseModalBody;
     if (loading) {
-        licenseModalBody = (
-            <div className="text-center py-4">
-                <div className="spinner-border text-primary" role="status">
-                    <span className="visually-hidden">Loading...</span>
-                </div>
-                <p className="mt-2 text-muted">Loading license information...</p>
-            </div>
-        );
+        licenseModalBody = <LicenseInfoSkeleton />;
     } else if (licenseData) {
         licenseModalBody = (
             <div>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Badge, Form, Alert } from 'react-bootstrap';
+import PlanCardsSkeleton from '../skeletons/PlanCardsSkeleton';
 import { 
     getLicenseStatus, 
     getSubscriptionPlans, 
@@ -253,12 +254,7 @@ const SubscriptionModal = ({ show, onHide, onSubscriptionSuccess }) => {
                         </div>
 
                         {subscriptionPlans.length === 0 ? (
-                            <div className="text-center py-4">
-                                <div className="spinner-border text-primary" role="status">
-                                    <span className="visually-hidden">Loading plans...</span>
-                                </div>
-                                <p className="mt-2 text-muted">Loading available plans...</p>
-                            </div>
+                            <PlanCardsSkeleton count={3} />
                         ) : (
                             <div className="row g-3">
                                 {subscriptionPlans.map((plan) => (

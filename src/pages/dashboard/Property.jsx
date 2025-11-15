@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
 import Layout from "../../components/Layout";
+import DetailsSkeleton from "../../components/skeletons/DetailsSkeleton";
+import TableSkeleton from "../../components/skeletons/TableSkeleton";
 import { getPropertyById, getPropertyUnits, updateProperty, getRegions, getDistricts, getWards, addPropertyUnit, deletePropertyUnit, updatePropertyUnit, getAllPropertyManagers } from "../../services/propertyService";
 import { useSubscription } from '../../hooks/useSubscription';
 import "../../assets/styles/leases.css";
@@ -608,11 +610,7 @@ function Property() {
     if (loading) {
         return (
             <Layout>
-                <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '400px' }}>
-                    <div className="spinner-border text-primary" role="status">
-                        <span className="visually-hidden">Loading...</span>
-                    </div>
-                </div>
+                <DetailsSkeleton />
             </Layout>
         );
     }
@@ -955,12 +953,7 @@ function Property() {
                     </div>
 
                     {unitsLoading && (
-                        <div className="text-center py-4">
-                            <div className="spinner-border text-primary" role="status">
-                                <span className="visually-hidden">Loading units...</span>
-                            </div>
-                            <p className="text-muted mt-2">Loading units...</p>
-                        </div>
+                        <TableSkeleton rows={3} columns={5} showHeader={false} />
                     )}
 
                     {!unitsLoading && units.length === 0 && (

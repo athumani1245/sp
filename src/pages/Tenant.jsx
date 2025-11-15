@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
 import Layout from "../components/Layout";
+import DetailsSkeleton from "../components/skeletons/DetailsSkeleton";
+import TableSkeleton from "../components/skeletons/TableSkeleton";
 import { getTenantById, updateTenant, deleteTenant, getTenantLeases } from "../services/tenantService";
 import "../assets/styles/property-details.css";
 
@@ -211,16 +213,7 @@ function Tenant() {
     if (loading) {
         return (
             <Layout>
-                <div className="main-content">
-                    <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "60vh" }}>
-                        <div className="text-center">
-                            <div className="spinner-border text-primary mb-3" role="status">
-                                <span className="visually-hidden">Loading...</span>
-                            </div>
-                            <p className="text-muted">Loading tenant details...</p>
-                        </div>
-                    </div>
-                </div>
+                <DetailsSkeleton />
             </Layout>
         );
     }
@@ -528,11 +521,8 @@ function Tenant() {
                         </div>
                         <div className="card-body p-0">
                             {leasesLoading && (
-                                <div className="text-center py-4">
-                                    <div className="spinner-border text-primary" role="status">
-                                        <span className="visually-hidden">Loading...</span>
-                                    </div>
-                                    <p className="text-muted mt-2">Loading leases...</p>
+                                <div className="px-3 py-2">
+                                    <TableSkeleton rows={3} columns={5} showHeader={false} />
                                 </div>
                             )}
 

@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import Layout from '../components/Layout';
 import AddPropertyManagerModal from '../components/forms/AddPropertyManager';
+import TableSkeleton from '../components/skeletons/TableSkeleton';
+import CardSkeleton from '../components/skeletons/CardSkeleton';
 import { getAllPropertyManagers, deletePropertyManager } from '../services/propertyService';
 import { useSubscription } from '../hooks/useSubscription';
 import '../assets/styles/tenants.css';
@@ -230,12 +232,16 @@ const PropertyManagers = () => {
 
                 {/* Loading State */}
                 {loading && managers.length === 0 && (
-                    <div className="empty-state">
-                        <div className="spinner-border text-primary" role="status">
-                            <span className="visually-hidden">Loading...</span>
+                    <>
+                        {/* Desktop Table Skeleton */}
+                        <div className="d-none d-md-block">
+                            <TableSkeleton rows={5} columns={5} />
                         </div>
-                        <p className="mt-3">Loading property managers...</p>
-                    </div>
+                        {/* Mobile Card Skeleton */}
+                        <div className="d-md-none">
+                            <CardSkeleton count={4} />
+                        </div>
+                    </>
                 )}
 
                 {/* Empty State */}
