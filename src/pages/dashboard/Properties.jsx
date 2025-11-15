@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import Layout from "../../components/Layout";
 import AddPropertyModal from "../../components/forms/AddProperty";
 import SubscriptionGate from "../../components/SubscriptionGate";
+import TableSkeleton from "../../components/skeletons/TableSkeleton";
+import PropertyCardSkeleton from "../../components/skeletons/PropertyCardSkeleton";
 import { getProperties } from "../../services/propertyService";
 import "../../assets/styles/properties.css";
 
@@ -136,12 +138,16 @@ function Properties() {
           </div>
           
           {loading && (
-            <div className="text-center py-5">
-              <div className="spinner-border text-primary" role="status">
-                <span className="visually-hidden">Loading...</span>
+            <>
+              {/* Desktop Table Skeleton */}
+              <div className="d-none d-md-block">
+                <TableSkeleton rows={5} columns={4} />
               </div>
-              <p className="text-muted mt-2">Loading properties...</p>
-            </div>
+              {/* Mobile Card Skeleton */}
+              <div className="d-md-none">
+                <PropertyCardSkeleton count={3} />
+              </div>
+            </>
           )}
 
           {!loading && properties.length === 0 && !error && (

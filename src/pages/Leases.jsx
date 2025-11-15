@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import AddLeaseModal from "../components/forms/addLease";
+import TableSkeleton from "../components/skeletons/TableSkeleton";
+import CardSkeleton from "../components/skeletons/CardSkeleton";
 import { getLeases, getAllLeases } from "../services/leaseService";
 import { useSubscription } from '../hooks/useSubscription';
 import "../assets/styles/profile.css";
@@ -401,12 +403,16 @@ function Leases() {
           </div>
           
           {loading && (
-            <div className="text-center py-5">
-              <div className="spinner-border text-primary" role="status">
-                <span className="visually-hidden">Loading...</span>
+            <>
+              {/* Desktop Table Skeleton */}
+              <div className="d-none d-md-block">
+                <TableSkeleton rows={6} columns={6} />
               </div>
-              <p className="text-muted mt-2">Loading leases...</p>
-            </div>
+              {/* Mobile Card Skeleton */}
+              <div className="d-md-none">
+                <CardSkeleton count={4} />
+              </div>
+            </>
           )}
 
           {!loading && leases.length === 0 && !error && (

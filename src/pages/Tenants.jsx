@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Modal, Button } from 'react-bootstrap';
 import Layout from "../components/Layout";
 import AddTenantModal from "../components/forms/AddTenant";
+import TableSkeleton from "../components/skeletons/TableSkeleton";
+import CardSkeleton from "../components/skeletons/CardSkeleton";
 import { getTenants, deleteTenant, updateTenant } from "../services/tenantService";
 import { useSubscription } from '../hooks/useSubscription';
 import "../assets/styles/profile.css";
@@ -337,12 +339,16 @@ function Tenants() {
           </div>
           
           {loading && (
-            <div className="text-center py-5">
-              <div className="spinner-border text-primary" role="status">
-                <span className="visually-hidden">Loading...</span>
+            <>
+              {/* Desktop Table Skeleton */}
+              <div className="d-none d-md-block">
+                <TableSkeleton rows={5} columns={5} />
               </div>
-              <p className="text-muted mt-2">Loading tenants...</p>
-            </div>
+              {/* Mobile Card Skeleton */}
+              <div className="d-md-none">
+                <CardSkeleton count={4} />
+              </div>
+            </>
           )}
 
           {!loading && tenants.length === 0 && !error && (

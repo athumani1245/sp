@@ -7,6 +7,8 @@ import Occupied from "../components/snippets/Occupied";
 import Income from "../components/snippets/Income";
 import Layout from "../components/Layout";
 import SubscriptionBanner from "../components/SubscriptionBanner";
+import DashboardSkeleton from "../components/skeletons/DashboardSkeleton";
+import TableSkeleton from "../components/skeletons/TableSkeleton";
 import { getDashboardInfo } from "../services/dashboardService";
 import { getLeases } from "../services/leaseService";
 import { getUserProfile } from "../services/profileService";
@@ -130,12 +132,7 @@ function Dashboard() {
                 </div>
                 <div className="mb-4">
                     {loading ? (
-                        <div className="text-center p-4">
-                            <div className="spinner-border text-primary" role="status">
-                                <span className="visually-hidden">Loading dashboard...</span>
-                            </div>
-                            <div className="mt-2">Loading dashboard data...</div>
-                        </div>
+                        <DashboardSkeleton />
                     ) : error ? (
                         <div className="alert alert-danger">
                             <i className="bi bi-exclamation-triangle me-2"></i>
@@ -167,12 +164,7 @@ function Dashboard() {
                     </div>
                     <div className="table-responsive">
                         {leasesLoading ? (
-                            <div className="text-center p-4">
-                                <div className="spinner-border spinner-border-sm text-primary" role="status">
-                                    <span className="visually-hidden">Loading leases...</span>
-                                </div>
-                                <div className="mt-2">Loading recent leases...</div>
-                            </div>
+                            <TableSkeleton rows={3} columns={5} showHeader={false} />
                         ) : leasesError ? (
                             <div className="alert alert-danger m-3">
                                 <i className="bi bi-exclamation-triangle me-2"></i>

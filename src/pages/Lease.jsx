@@ -4,6 +4,7 @@ import { Button, Alert, Modal } from "react-bootstrap";
 import Layout from "../components/Layout";
 import Payments from "../components/snippets/Payments";
 import Toast from "../components/Toast";
+import DetailsSkeleton from "../components/skeletons/DetailsSkeleton";
 import { getLeaseById, getLeaseDocuments, /* terminateLease, */ cancelLease } from "../services/leaseService";
 import { generateLeaseAgreementPDF } from "../reports";
 import "../assets/styles/leases.css";
@@ -217,16 +218,7 @@ function Lease() {
   if (loading) {
     return (
       <Layout>
-        <div className="main-content">
-          <div className="leases-filters-section">
-            <div className="text-center">
-              <div className="spinner-border text-primary" role="status">
-                <span className="visually-hidden">Loading...</span>
-              </div>
-              <p className="mt-2">Loading lease details...</p>
-            </div>
-          </div>
-        </div>
+        <DetailsSkeleton />
       </Layout>
     );
   }
