@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import { createTenant } from '../../services/tenantService';
+import { InfoTooltip } from '../common/Tooltip';
 import '../../assets/styles/add-tenant.css';
 import '../../assets/styles/forms-responsive.css';
 
@@ -155,7 +156,10 @@ const AddTenantModal = ({ isOpen, onClose, onTenantAdded }) => {
                     <Row className="mb-3">
                         <Col xs={12} md={6} className="mb-3">
                             <Form.Group>
-                                <Form.Label className="form-label">First Name *</Form.Label>
+                                <Form.Label className="form-label">
+                                    First Name *
+                                    <InfoTooltip content="Tenant's legal first name as it appears on official documents" />
+                                </Form.Label>
                                 <Form.Control
                                     className="form-control"
                                     type="text"
@@ -169,7 +173,10 @@ const AddTenantModal = ({ isOpen, onClose, onTenantAdded }) => {
                         </Col>
                         <Col xs={12} md={6} className="mb-3">
                             <Form.Group>
-                                <Form.Label className="form-label">Last Name *</Form.Label>
+                                <Form.Label className="form-label">
+                                    Last Name *
+                                    <InfoTooltip content="Tenant's legal last name (surname/family name)" />
+                                </Form.Label>
                                 <Form.Control
                                     className="form-control"
                                     type="text"
@@ -185,7 +192,10 @@ const AddTenantModal = ({ isOpen, onClose, onTenantAdded }) => {
                     <Row className="mb-3">
                         <Col xs={12} md={6} className="mb-3">
                             <Form.Group>
-                                <Form.Label className="form-label">Phone Number *</Form.Label>
+                                <Form.Label className="form-label">
+                                    Phone Number *
+                                    <InfoTooltip content="Primary contact number. This will be used as the tenant's username for login and communications." />
+                                </Form.Label>
                                 <div className="phone-input-wrapper">
                                     <PhoneInput
                                         international

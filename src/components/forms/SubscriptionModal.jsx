@@ -20,6 +20,7 @@ import {
 const SubscriptionModal = ({ show, onHide, onSubscriptionSuccess }) => {
     const [subscribing, setSubscribing] = useState(false);
     const [subscriptionPlans, setSubscriptionPlans] = useState([]);
+    const [selectedPackage, setSelectedPackage] = useState(null);
     const [selectedPlan, setSelectedPlan] = useState(null);
     const [phoneNumber, setPhoneNumber] = useState('');
     const [subscriptionError, setSubscriptionError] = useState('');
@@ -30,6 +31,7 @@ const SubscriptionModal = ({ show, onHide, onSubscriptionSuccess }) => {
     const [apiResponseDescription, setApiResponseDescription] = useState('');
     const [currentTransactionId, setCurrentTransactionId] = useState(null);
     const [paymentListener, setPaymentListener] = useState(null);
+    const [showPlansModal, setShowPlansModal] = useState(false);
 
     // Load subscription plans when modal opens
     useEffect(() => {
@@ -46,28 +48,72 @@ const SubscriptionModal = ({ show, onHide, onSubscriptionSuccess }) => {
             const plansResult = await getSubscriptionPlans();
             if (plansResult.success) {
                 setSubscriptionPlans(plansResult.data);
-                console.log('Subscription plans loaded:', plansResult.data);
+                console.log('Subscription packages loaded:', plansResult.data);
             } else {
-                setSubscriptionError('Failed to load subscription plans');
+                setSubscriptionError('Failed to load subscription packages');
             }
         } catch (error) {
-            console.error('Error fetching subscription plans:', error);
-            setSubscriptionError('An error occurred while loading plans');
+            console.error('Error fetching subscription packages:', error);
+            setSubscriptionError('An error occurred while loading packages');
         }
+    };
+
+    // Get selected package details
+    const getSelectedPackage = () => {
+        return subscriptionPlans.find(pkg => pkg.id === selectedPackage);
+    };
+
+    // Get available plans for selected package
+    const getAvailablePlans = () => {
+        const pkg = getSelectedPackage();
+        return pkg?.plans || [];
+    };
+
+    // Handle package selection
+    const handlePackageSelect = (packageId) => {
+        const pkg = subscriptionPlans.find(p => p.id === packageId);
+        
+        // Don't allow selection of packages without plans
+        if (!pkg?.plans || pkg.plans.length === 0) {
+            return;
+        }
+        
+        setSelectedPackage(packageId);
+        setSelectedPlan(null); // Reset plan selection when package changes
+        
+        // Show plans modal since package has plans
+        setShowPlansModal(true);
     };
 
     const handleProceedToConfirmation = (e) => {
         e.preventDefault();
-        if (!selectedPlan) {
+        
+        if (!selectedPackage) {
+            setSubscriptionError('Please select a package');
+            return;
+        }
+        
+        const pkg = getSelectedPackage();
+        
+        // If package has plans, ensure one is selected
+        if (pkg?.plans && pkg.plans.length > 0 && !selectedPlan) {
             setSubscriptionError('Please select a plan');
             return;
         }
+        
         if (!phoneNumber || phoneNumber.length !== 9) {
             setSubscriptionError('Please enter a valid 9-digit phone number');
             return;
         }
 
-        const planDetails = subscriptionPlans.find(plan => plan.id === selectedPlan);
+        // Get plan details - either from package.plans or package itself
+        let planDetails;
+        if (pkg?.plans && pkg.plans.length > 0) {
+            planDetails = pkg.plans.find(plan => plan.id === selectedPlan);
+        } else {
+            planDetails = pkg;
+        }
+        
         setSelectedPlanDetails(planDetails);
         setShowConfirmModal(true);
     };
@@ -84,6 +130,7 @@ const SubscriptionModal = ({ show, onHide, onSubscriptionSuccess }) => {
         // Reset all states
         setShowConfirmModal(false);
         setShowPaymentModal(false);
+        setSelectedPackage(null);
         setSelectedPlan(null);
         setPhoneNumber('');
         setSubscriptionError('');
@@ -107,8 +154,18 @@ const SubscriptionModal = ({ show, onHide, onSubscriptionSuccess }) => {
         setApiResponseDescription('');
 
         try {
+            // Use the plan ID from selectedPlanDetails to ensure we send the correct plan ID
+            const planId = selectedPlanDetails?.id;
+            
+            if (!planId) {
+                setPaymentStatus('failed');
+                setSubscriptionError('Invalid plan selection. Please try again.');
+                setSubscribing(false);
+                return;
+            }
+            
             const result = await createSubscription({
-                plan: selectedPlan,
+                plan: planId,
                 phone_number: `255${phoneNumber}`,
                 auto_renew: true
             });
@@ -192,6 +249,7 @@ const SubscriptionModal = ({ show, onHide, onSubscriptionSuccess }) => {
 
     const handleSuccessfulSubscription = () => {
         setShowPaymentModal(false);
+        setSelectedPackage(null);
         setSelectedPlan(null);
         setPhoneNumber('');
         setSubscriptionError('');
@@ -226,7 +284,7 @@ const SubscriptionModal = ({ show, onHide, onSubscriptionSuccess }) => {
         <>
             {/* Main Subscription Modal */}
             <Modal 
-                show={show && !showConfirmModal && !showPaymentModal} 
+                show={show && !showConfirmModal && !showPaymentModal && !showPlansModal} 
                 onHide={subscribing ? undefined : onHide}
                 backdrop={subscribing ? "static" : true}
                 keyboard={!subscribing}
@@ -249,42 +307,90 @@ const SubscriptionModal = ({ show, onHide, onSubscriptionSuccess }) => {
                         )}
 
                         <div className="text-center">
-                            <h5>Choose Your Plan</h5>
-                            <p className="text-muted">Select the plan that best fits your needs</p>
+                            <h5>Choose Your Package</h5>
+                            <p className="text-muted">Select the package that best fits your needs</p>
                         </div>
 
                         {subscriptionPlans.length === 0 ? (
                             <PlanCardsSkeleton count={3} />
                         ) : (
-                            <div className="row g-3">
-                                {subscriptionPlans.map((plan) => (
-                                    <div key={plan.id} className="col-md-4">
-                                        <div 
-                                            className={`card h-100 ${selectedPlan === plan.id ? 'border-danger shadow-sm' : 'border'} ${plan.is_popular ? 'bg-light' : ''}`}
-                                            onClick={() => setSelectedPlan(plan.id)}
-                                            style={{ cursor: 'pointer' }}
-                                        >
-                                            <div className="card-body p-3">
-                                                <div className="d-flex justify-content-between align-items-center mb-2">
-                                                    <h6 className="card-title mb-0">{plan.name}</h6>
-                                                    {selectedPlan === plan.id && (
-                                                        <i className="bi bi-check-circle-fill text-danger"></i>
-                                                    )}
-                                                </div>
-                                                <div className="text-success mb-3">
-                                                    <strong className="h5">TSh {plan.price.toLocaleString()}</strong>
-                                                    <small className="text-muted">/{plan.duration_days} days</small>
-                                                </div>
-                                                <hr className="my-3" />
-                                                <div className="small">
-                                                    <strong>Features:</strong>
-                                                    <p className="mb-0">{plan.description}</p>
+                            <>
+                                {/* Package Selection */}
+                                <div className="row g-3 mb-4">
+                                    {subscriptionPlans.map((pkg) => {
+                                        const isPackageSelected = selectedPackage === pkg.id;
+                                        const isPlanFromThisPackage = pkg.plans?.some(p => p.id === selectedPlan);
+                                        const selectedPlanFromPackage = pkg.plans?.find(p => p.id === selectedPlan);
+                                        const hasPlans = pkg.plans && pkg.plans.length > 0;
+                                        const isDisabled = !hasPlans;
+                                        
+                                        return (
+                                            <div key={pkg.id} className="col-md-4">
+                                                <div 
+                                                    className={`card h-100 ${isDisabled ? 'opacity-50' : ''} ${isPackageSelected ? 'border-danger shadow-sm' : isPlanFromThisPackage ? 'border-success shadow-sm' : 'border'}`}
+                                                    onClick={() => !isDisabled && handlePackageSelect(pkg.id)}
+                                                    style={{ cursor: isDisabled ? 'not-allowed' : 'pointer' }}
+                                                >
+                                                    <div className="card-body p-3">
+                                                        {isDisabled && (
+                                                            <div className="position-absolute top-0 end-0 m-2">
+                                                                <span className="badge bg-secondary">
+                                                                    <i className="bi bi-lock-fill me-1"></i>
+                                                                    No plans
+                                                                </span>
+                                                            </div>
+                                                        )}
+                                                        <div className="d-flex justify-content-between align-items-center mb-2">
+                                                            <h6 className="card-title mb-0">{pkg.name}</h6>
+                                                            {isPackageSelected && (
+                                                                <i className="bi bi-check-circle-fill text-danger"></i>
+                                                            )}
+                                                            {!isPackageSelected && isPlanFromThisPackage && (
+                                                                <i className="bi bi-check-circle-fill text-success"></i>
+                                                            )}
+                                                        </div>
+                                                        {pkg.description && (
+                                                            <p className="small text-muted mb-2">{pkg.description}</p>
+                                                        )}
+                                                        <hr className="my-2" />
+                                                        <div className="small">
+                                                            <div className="mb-1">
+                                                                <i className="bi bi-building me-2"></i>
+                                                                {pkg.max_units} units max
+                                                            </div>
+                                                            <div className="mb-1">
+                                                                <i className="bi bi-people me-2"></i>
+                                                                {pkg.max_property_managers} manager{pkg.max_property_managers !== 1 ? 's' : ''}
+                                                            </div>
+                                                            {pkg.allow_sms_notifications && (
+                                                                <div className="mb-1">
+                                                                    <i className="bi bi-chat-dots me-2"></i>
+                                                                    {pkg.number_sms} SMS/month
+                                                                </div>
+                                                            )}
+                                                            {hasPlans && (
+                                                                <div className="mt-2">
+                                                                    <span className="badge bg-info">
+                                                                        {pkg.plans.length} plan{pkg.plans.length !== 1 ? 's' : ''} available
+                                                                    </span>
+                                                                </div>
+                                                            )}
+                                                            {isPlanFromThisPackage && selectedPlanFromPackage && (
+                                                                <div className="mt-2">
+                                                                    <span className="badge bg-success">
+                                                                        <i className="bi bi-check2 me-1"></i>
+                                                                        {selectedPlanFromPackage.name}
+                                                                    </span>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </>
                         )}
 
                         <div className="bg-light p-3 rounded mt-4">
@@ -376,7 +482,7 @@ const SubscriptionModal = ({ show, onHide, onSubscriptionSuccess }) => {
                         <Button 
                             variant="danger" 
                             onClick={handleProceedToConfirmation}
-                            disabled={!selectedPlan || !phoneNumber || phoneNumber.length !== 9}
+                            disabled={!selectedPackage || (getAvailablePlans().length > 0 && !selectedPlan) || !phoneNumber || phoneNumber.length !== 9}
                         >
                             <i className="bi bi-lock-fill me-2"></i>
                             Proceed to Payment
@@ -698,6 +804,120 @@ const SubscriptionModal = ({ show, onHide, onSubscriptionSuccess }) => {
                             Close
                         </Button>
                     )}
+                </Modal.Footer>
+            </Modal>
+
+            {/* Plans Selection Modal */}
+            <Modal 
+                show={showPlansModal} 
+                onHide={() => {
+                    setShowPlansModal(false);
+                    setSelectedPackage(null);
+                }} 
+                size="lg"
+                centered
+                style={{ zIndex: 1060 }}
+            >
+                <Modal.Header closeButton className="border-bottom">
+                    <Modal.Title>
+                        <div>
+                            <h5 className="mb-1">
+                                <i className="bi bi-calendar-check text-success me-2"></i>
+                                Select Subscription Duration
+                            </h5>
+                            <small className="text-muted">Package: {getSelectedPackage()?.name}</small>
+                        </div>
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body className="p-4">
+                    <div className="row g-3">
+                        {getAvailablePlans().map((plan, index) => {
+                            const isSelected = selectedPlan === plan.id;
+                            const pricePerDay = (parseFloat(plan.price) / plan.duration_days).toFixed(2);
+                            
+                            return (
+                                <div key={plan.id} className="col-md-6">
+                                    <div 
+                                        className={`card h-100 ${isSelected ? 'border-success border-2 shadow' : 'border hover-shadow'}`}
+                                        onClick={() => {
+                                            setSelectedPlan(plan.id);
+                                            setShowPlansModal(false);
+                                        }}
+                                        style={{ 
+                                            cursor: 'pointer',
+                                            transition: 'all 0.2s ease',
+                                            borderLeft: isSelected ? '4px solid #198754' : '4px solid transparent',
+                                            backgroundColor: isSelected ? '#f8f9fa' : 'white'
+                                        }}
+                                    >
+                                        <div className="card-body p-3">
+                                            <div className="d-flex align-items-start mb-3">
+                                                <div className={`rounded-circle d-flex align-items-center justify-content-center me-3 ${isSelected ? 'bg-success text-white' : 'bg-light'}`} 
+                                                     style={{ width: '48px', height: '48px', minWidth: '48px' }}>
+                                                    {isSelected ? (
+                                                        <i className="bi bi-check-circle-fill fs-4"></i>
+                                                    ) : (
+                                                        <i className="bi bi-calendar3 fs-4 text-muted"></i>
+                                                    )}
+                                                </div>
+                                                <div className="flex-grow-1">
+                                                    <h5 className="mb-1">
+                                                        {plan.name}
+                                                    </h5>
+                                                    {index === 0 && (
+                                                        <span className="badge bg-warning text-dark small">POPULAR</span>
+                                                    )}
+                                                </div>
+                                                {isSelected && (
+                                                    <div>
+                                                        <span className="badge bg-success">
+                                                            <i className="bi bi-check2"></i>
+                                                        </span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            
+                                            <div className="mb-3">
+                                                <div className="text-success mb-1">
+                                                    <strong className="h3 mb-0">
+                                                        TSh {parseFloat(plan.price).toLocaleString()}
+                                                    </strong>
+                                                </div>
+                                            </div>
+                                            
+                                            {plan.description && (
+                                                <p className="text-muted small mb-3">
+                                                    {plan.description}
+                                                </p>
+                                            )}
+                                                                                        
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                    
+                    <div className="mt-4 p-3 bg-light rounded">
+                        <div className="d-flex align-items-center">
+                            <i className="bi bi-info-circle text-primary me-2"></i>
+                            <small className="text-muted mb-0">
+                                All plans include full access to features. Select the duration that works best for you.
+                            </small>
+                        </div>
+                    </div>
+                </Modal.Body>
+                <Modal.Footer className="border-top">
+                    <Button 
+                        variant="outline-secondary" 
+                        onClick={() => {
+                            setShowPlansModal(false);
+                            setSelectedPackage(null);
+                        }}
+                    >
+                        <i className="bi bi-arrow-left me-2"></i>
+                        Back to Packages
+                    </Button>
                 </Modal.Footer>
             </Modal>
         </>

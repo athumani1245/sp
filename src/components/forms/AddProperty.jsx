@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import '../../assets/styles/add-property.css';
 import '../../assets/styles/forms-responsive.css';
 import { addProperty, getRegions, getDistricts, getWards, getAllPropertyManagers } from '../../services/propertyService';
+import { InfoTooltip } from '../common/Tooltip';
 
 // SearchableSelect Component
 const SearchableSelect = ({ 
@@ -453,7 +454,10 @@ const AddPropertyModal = ({isOpen, onClose, onPropertyAdded})=>{
                             {/* Property Name and Type Row */}
                             <div className="row mb-3">
                                 <div className="col-12 col-md-6 mb-3">
-                                    <label htmlFor="propertyName" className="form-label">Property Name *</label>
+                                    <label htmlFor="propertyName" className="form-label">
+                                        Property Name *
+                                        <InfoTooltip content="Give your property a unique, descriptive name (e.g., 'Sunset Apartments', 'Green Valley Plaza')" />
+                                    </label>
                                     <input
                                         type="text"
                                         className="form-control"
@@ -466,7 +470,10 @@ const AddPropertyModal = ({isOpen, onClose, onPropertyAdded})=>{
                                     />
                                 </div>
                                 <div className="col-12 col-md-6 mb-3">
-                                    <label htmlFor="propertyType" className="form-label">Property Type</label>
+                                    <label htmlFor="propertyType" className="form-label">
+                                        Property Type
+                                        <InfoTooltip content="<strong>Standalone:</strong> Single-family homes<br/><strong>Apartment:</strong> Multi-unit residential buildings<br/><strong>Commercial:</strong> Office, retail, or mixed-use" />
+                                    </label>
                                     <select
                                         className="form-select"
                                         id="propertyType"
@@ -486,6 +493,7 @@ const AddPropertyModal = ({isOpen, onClose, onPropertyAdded})=>{
                                 <div className="col-12 mb-3">
                                     <label htmlFor="manager_id" className="form-label">
                                         Property Manager (Optional)
+                                        <InfoTooltip content="Assign a dedicated manager who will oversee operations, maintenance, and tenant relations for this property" />
                                     </label>
                                     <SearchableSelect
                                         options={propertyManagers}
@@ -517,7 +525,10 @@ const AddPropertyModal = ({isOpen, onClose, onPropertyAdded})=>{
                             {/* Region and District Row */}
                             <div className="row mb-3">
                                 <div className="col-12 col-md-6 mb-3">
-                                    <label htmlFor="region" className="form-label">Region *</label>
+                                    <label htmlFor="region" className="form-label">
+                                        Region *
+                                        <InfoTooltip content="Select the administrative region where this property is located" />
+                                    </label>
                                     <SearchableSelect
                                         options={regions}
                                         value={selectedRegionId}
@@ -532,7 +543,10 @@ const AddPropertyModal = ({isOpen, onClose, onPropertyAdded})=>{
                                     {locationLoading && <small className="form-text text-muted">Loading regions...</small>}
                                 </div>
                                 <div className="col-12 col-md-6 mb-3">
-                                    <label htmlFor="district" className="form-label">District *</label>
+                                    <label htmlFor="district" className="form-label">
+                                        District *
+                                        <InfoTooltip content="Select the district within the chosen region. Districts will load after selecting a region." />
+                                    </label>
                                     <SearchableSelect
                                         options={districts}
                                         value={selectedDistrictId}
@@ -551,7 +565,10 @@ const AddPropertyModal = ({isOpen, onClose, onPropertyAdded})=>{
                             {/* Ward and Street Row */}
                             <div className="row mb-3">
                                 <div className="col-12 col-md-6 mb-3">
-                                    <label htmlFor="ward" className="form-label">Ward</label>
+                                    <label htmlFor="ward" className="form-label">
+                                        Ward
+                                        <InfoTooltip content="Optionally specify the ward/neighborhood for more precise location tracking" />
+                                    </label>
                                     <SearchableSelect
                                         options={wards}
                                         value={selectedWardId}
@@ -566,7 +583,10 @@ const AddPropertyModal = ({isOpen, onClose, onPropertyAdded})=>{
                                     {locationLoading && <small className="form-text text-muted">Loading wards...</small>}
                                 </div>
                                 <div className="col-12 col-md-6 mb-3">
-                                    <label htmlFor="street" className="form-label">Street Address *</label>
+                                    <label htmlFor="street" className="form-label">
+                                        Street Address *
+                                        <InfoTooltip content="Enter the complete street address including building/plot number (e.g., '123 Beach Road', 'Plot 456 Nyerere St')" />
+                                    </label>
                                     <input
                                         type="text"
                                         className="form-control"

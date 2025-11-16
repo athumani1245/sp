@@ -1,5 +1,6 @@
 import React from "react";
 import PropTypes from 'prop-types';
+import { InfoTooltip } from '../common/Tooltip';
 
 function Income({ data }) {
     // Format the income amount
@@ -27,7 +28,13 @@ function Income({ data }) {
         <div className="col-md-3 col-6">
             <div className="activity-card h-100">
                 <div className="icon"><i className="bi bi-cash-stack"></i></div>
-                <div className="stat-label">Total Revenue</div>
+                <div className="stat-label">
+                    Total Revenue
+                    <InfoTooltip 
+                        content={`<strong>Collection Rate: ${collectionRate}%</strong><br/>Collected: TSh ${parseFloat(rentCollected).toLocaleString()}<br/>Expected: TSh ${parseFloat(expectedRent).toLocaleString()}<br/><br/>Shows total rent collected vs. expected rent this period.`}
+                        theme={isGoodCollection ? 'success' : 'warning'}
+                    />
+                </div>
                 <div className="stat">
                     {formatAmount(rentCollected)} 
                     <span className={`stat-change ${isGoodCollection ? 'positive' : 'negative'}`}>

@@ -88,32 +88,17 @@ function Sidenav(){
                     </NavLink>
                 </li>
                 <li className="nav-item">
-                    <a className={`nav-link ${openDropdowns.propertiesMain ? 'active' : ''}`} 
-                       href="#" 
-                       onClick={(e) => toggleDropdown('propertiesMain', e)}>
+                    <NavLink className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
+                             to="/properties">
                         <i className="bi bi-building"></i> Properties
-                        <i className={`bi bi-chevron-${openDropdowns.propertiesMain ? 'down' : 'right'} ms-auto`}></i>
-                    </a>
+                    </NavLink>
                 </li>
-                
-                {/* Properties Submenu */}
-                {openDropdowns.propertiesMain && (
-                    <>
-                        <li className="nav-item">
-                            <NavLink className={({ isActive }) => "nav-link submenu-item" + (isActive ? " active" : "")}
-                                     to="/properties">
-                                <i className="bi bi-buildings"></i> Properties
-                            </NavLink>
-                        </li>
-                        <li className="nav-item">
-                            <NavLink className={({ isActive }) => "nav-link submenu-item" + (isActive ? " active" : "")}
-                                     to="/property-managers">
-                                <i className="bi bi-people"></i> Property Managers
-                            </NavLink>
-                        </li>
-                    </>
-                )}
-                
+                <li className="nav-item">
+                    <NavLink className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
+                             to="/property-managers">
+                        <i className="bi bi-people"></i> Property Managers
+                    </NavLink>
+                </li>
                 <li className="nav-item">
                     <NavLink className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
                              to="/tenants">
@@ -161,11 +146,6 @@ function Sidenav(){
                                 Lease Expiry
                             </a>
                         </li>
-                        {/* <li className="nav-item">
-                            <a className="nav-link sub-item" href="#" onClick={() => handleReportClick('lease_renewal_termination')}>
-                                Renewal/Termination
-                            </a>
-                        </li> */}
                     </>
                 )}
                 
@@ -188,11 +168,6 @@ function Sidenav(){
                                 Property Summarry
                             </a>
                         </li>
-                        {/* <li className="nav-item">
-                            <a className="nav-link sub-item" href="#" onClick={() => handleReportClick('units_availability')}>
-                                Units Availability
-                            </a>
-                        </li> */}
                         <li className="nav-item">
                             <a className="nav-link sub-item" href="#" onClick={() => handleReportClick('property_performance')}>
                                 Property Performance
@@ -215,11 +190,6 @@ function Sidenav(){
                 
                 {openDropdowns.reports && openDropdowns.tenants && (
                     <>
-                        {/* <li className="nav-item">
-                            <a className="nav-link sub-item" href="#" onClick={() => handleReportClick('tenant_directory')}>
-                                Tenant Directory
-                            </a>
-                        </li> */}
                         <li className="nav-item">
                             <a className="nav-link sub-item" href="#" onClick={() => handleReportClick('tenant_payment_history')}>
                                 Payment History

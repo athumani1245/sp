@@ -69,27 +69,44 @@ export const getLicenseStatus = async () => {
     }
 };
 
-// Get available subscription plans
+// Get available subscription plans (packages with optional plans)
 export const getSubscriptionPlans = async () => {
     try {
         const response = await axios.get(
-            `${API_BASE}/plans/`,
+            `${API_BASE}/packages/`,
             { headers: getAuthHeaders() }
         );
 
         // Transform the data to ensure consistent structure
-        const plans = response.data.data.map(plan => ({
-            id: plan.id,
-            name: plan.name,
-            description: plan.description,
-            price: parseFloat(plan.price),
-            duration_days: plan.duration_days || 30,
+        // Each package may contain nested plans array
+        const packages = response.data.data.map(pkg => ({
+            id: pkg.id,
+            name: pkg.name,
+            description: pkg.description || '',
+            price: pkg.price ? parseFloat(pkg.price) : null,
+            duration_days: pkg.duration_days || null,
+            max_units: pkg.max_units || null,
+            max_property_managers: pkg.max_property_managers || null,
+            allow_sms_notifications: pkg.allow_sms_notifications || false,
+            number_sms: pkg.number_sms || null,
+            // Preserve nested plans array if it exists
+            plans: pkg.plans ? pkg.plans.map(plan => ({
+                id: plan.id,
+                name: plan.name,
+                description: plan.description || '',
+                price: parseFloat(plan.price || 0),
+                duration_days: plan.duration_days || 30,
+                max_units: plan.max_units || null,
+                max_property_managers: plan.max_property_managers || null,
+                allow_sms_notifications: plan.allow_sms_notifications || false,
+                number_sms: plan.number_sms || null
+            })) : []
         }));
 
-        console.log("Processed Subscription Plans:", plans);
+        console.log("Processed Subscription Packages:", packages);
         return {
             success: true,
-            data: plans
+            data: packages
         };
     } catch (err) {
         console.error("Error fetching subscription plans:", err);
