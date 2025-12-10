@@ -372,10 +372,7 @@ const processLeaseData = (data) => {
       'Start Date': row.start_date ? new Date(row.start_date).toLocaleDateString() : 'N/A',
       'End Date': row.end_date ? new Date(row.end_date).toLocaleDateString() : 'N/A',
       'Monthly Rent (TSh)': isNaN(monthlyRent) ? 0 : monthlyRent,
-      'Status': row.status || 'Unknown',
-      'Created Date': row.created_at ? new Date(row.created_at).toLocaleDateString() : 'N/A',
-      'Contact Email': typeof row.tenant === 'object' ? row.tenant?.email || 'N/A' : 'N/A',
-      'Contact Phone': typeof row.tenant === 'object' ? row.tenant?.phone_number || 'N/A' : 'N/A',
+      'Status': row.lease_status || row.status || 'Unknown',
       'Lease Term (Months)': row.lease_term_months || 'N/A',
       'Security Deposit (TSh)': row.security_deposit || 0,
       'Late Fee (TSh)': row.late_fee || 0
@@ -605,9 +602,6 @@ const getColumnWidths = (reportType) => {
         { wch: 12 }, // End Date
         { wch: 15 }, // Monthly Rent
         { wch: 10 }, // Status
-        { wch: 12 }, // Created Date
-        { wch: 20 }, // Contact Email
-        { wch: 15 }, // Contact Phone
         { wch: 12 }, // Lease Term
         { wch: 15 }, // Security Deposit
         { wch: 12 }  // Late Fee
@@ -1018,7 +1012,7 @@ export const generateReportSummary = (reportType, data) => {
 
   switch (reportType) {
     case REPORT_TYPES.LEASE:
-      const activeLeases = dataArray.filter(item => item.status === 'active').length;
+      const activeLeases = dataArray.filter(item => (item.lease_status || item.status || '').toLowerCase() === 'active').length;
       const totalRent = dataArray.reduce((sum, item) => {
         const rent = item.monthly_rent || item.rent_amount_per_unit || 0;
         return sum + Number(rent);

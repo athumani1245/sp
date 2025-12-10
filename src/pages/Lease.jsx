@@ -5,6 +5,7 @@ import Layout from "../components/Layout";
 import Payments from "../components/snippets/Payments";
 import Toast from "../components/Toast";
 import DetailsSkeleton from "../components/skeletons/DetailsSkeleton";
+import RenewLeaseModal from "../components/forms/RenewLeaseModal";
 import { getLeaseById, getLeaseDocuments, /* terminateLease, */ cancelLease } from "../services/leaseService";
 import { generateLeaseAgreementPDF } from "../reports";
 import "../assets/styles/leases.css";
@@ -20,6 +21,7 @@ function Lease() {
   const [activeTab, setActiveTab] = useState("details");
   const [isCancelling, setIsCancelling] = useState(false);
   const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
+  const [showRenewModal, setShowRenewModal] = useState(false);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastConfig, setToastConfig] = useState({});
@@ -122,6 +124,21 @@ function Lease() {
 
   const handleCancelModalClose = () => {
     setShowCancelConfirmation(false);
+  };
+
+  const handleRenewClick = () => {
+    setShowRenewModal(true);
+  };
+
+  const handleRenewalSuccess = async (updatedLease) => {
+    setShowRenewModal(false);
+    showToastMessage(
+      'Lease Renewed Successfully',
+      'The lease has been renewed with the new terms.',
+      'success'
+    );
+    // Refresh lease data to show updated information
+    await fetchLeaseDetails();
   };
 
   // const handleTerminateModalClose = () => {
@@ -323,6 +340,16 @@ function Lease() {
                   {!isGeneratingPDF && <i className="bi bi-file-text"></i>}
                   {isGeneratingPDF ? 'Generating...' : 'Document'}
                 </button>
+                {/* Show Renew button for active or expiring leases */}
+                {(lease.status === 'active' || lease.status === 'expiring') && (
+                  <button
+                    className="odoo-button odoo-success"
+                    onClick={handleRenewClick}
+                  >
+                    <i className="bi bi-arrow-repeat"></i>
+                    Renew Lease
+                  </button>
+                )}
                 {/* Only show Cancel button if lease is not already cancelled, terminated, or expired */}
                 {lease.status !== 'cancelled' && lease.status !== 'terminated' && lease.status !== 'expired' && (
                   <button
@@ -358,6 +385,18 @@ function Lease() {
                       {isGeneratingPDF ? 'Generating...' : 'Document'}
                     </button>
                   </div>
+                  {/* Show Renew button for active or expiring leases */}
+                  {(lease.status === 'active' || lease.status === 'expiring') && (
+                    <div className="col-12 mt-1">
+                      <button
+                        className="odoo-button odoo-success w-100"
+                        onClick={handleRenewClick}
+                      >
+                        <i className="bi bi-arrow-repeat"></i>
+                        <span>Renew Lease</span>
+                      </button>
+                    </div>
+                  )}
                   {/* Only show Cancel button if lease is not already cancelled, terminated, or expired */}
                   {lease.status !== 'cancelled' && lease.status !== 'terminated' && lease.status !== 'expired' && (
                     <div className="col-12 mt-1">
@@ -659,6 +698,23 @@ function Lease() {
             )}
         </div>
       </div>
+
+      {/* Renewal Modal */}
+      <RenewLeaseModal
+        show={showRenewModal}
+        onHide={() => setShowRenewModal(false)}
+        lease={lease}
+        onRenewalSuccess={handleRenewalSuccess}
+      />
+
+      {/* Toast Notification */}
+      <Toast
+        show={showToast}
+        onClose={() => setShowToast(false)}
+        title={toastConfig.title}
+        message={toastConfig.message}
+        variant={toastConfig.variant}
+      />
     </Layout>
   );
 }
