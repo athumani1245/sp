@@ -22,7 +22,7 @@ export const exportLeasesToExcel = async (exportData, filters) => {
     const reportDate = currentDate.toLocaleDateString();
     const reportTime = currentDate.toLocaleTimeString();
     const totalLeases = exportData.length;
-    const activeLeases = exportData.filter(item => item.status === 'active').length;
+    const activeLeases = exportData.filter(item => (item.lease_status || item.status || '').toLowerCase() === 'active').length;
     const totalRent = exportData.reduce((sum, item) => {
       let rent = 0;
       if (item.monthly_rent) rent = Number(item.monthly_rent);
@@ -77,11 +77,7 @@ export const exportLeasesToExcel = async (exportData, filters) => {
         'Duration': duration,
         'Monthly Rent (TSh)': isNaN(monthlyRent) ? 0 : monthlyRent,
         'Security Deposit (TSh)': row.security_deposit || row.deposit_amount || 0,
-        'Status': (row.status || 'Unknown').toUpperCase(),
-        'Contact Phone': typeof row.tenant === 'object' ? row.tenant?.phone_number || row.tenant?.tenant_phone || 'N/A' : 'N/A',
-        'Contact Email': typeof row.tenant === 'object' ? row.tenant?.email || 'N/A' : 'N/A',
-        'Created Date': row.created_at || row.date_created ? 
-          new Date(row.created_at || row.date_created).toLocaleDateString() : 'N/A'
+        'Status': (row.lease_status || row.status || 'Unknown').toUpperCase()
       };
     });
 
@@ -102,10 +98,7 @@ export const exportLeasesToExcel = async (exportData, filters) => {
       { width: 12 }, // Duration
       { width: 15 }, // Monthly Rent
       { width: 15 }, // Security Deposit
-      { width: 10 }, // Status
-      { width: 15 }, // Contact Phone
-      { width: 25 }, // Contact Email
-      { width: 12 }  // Created Date
+      { width: 10 }  // Status
     ];
 
     // Add cell styling

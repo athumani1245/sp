@@ -1,5 +1,6 @@
 import React from "react";
 import PropTypes from 'prop-types';
+import { InfoTooltip } from '../common/Tooltip';
 
 function Properties({ data }) {
     const totalProperties = data?.total_number_of_properties || 0;
@@ -12,7 +13,13 @@ function Properties({ data }) {
         <div className="col-md-3 col-6">
             <div className="activity-card h-100">
                 <div className="icon"><i className="bi bi-buildings"></i></div>
-                <div className="stat-label">Total Properties</div>
+                <div className="stat-label">
+                    Total Properties
+                    <InfoTooltip 
+                        content={`<strong>Portfolio Summary</strong><br/>Properties: ${totalProperties}<br/>Total Units: ${totalUnits}<br/><br/>`}
+                        theme="info"
+                    />
+                </div>
                 <div className="stat">
                     {totalProperties} 
                     {showGrowth && (

@@ -35,7 +35,6 @@
 .nav-link {
     display: flex;
     align-items: center;
-    /* justify-content: space-between; */
 }
 
 .submenu-item {
@@ -65,8 +64,6 @@
     font-size: 0.8rem;
     transition: transform 0.2s ease;
 }
-
-
 
 /* Mobile styles */
 @media (max-width: 991.98px) {

@@ -306,20 +306,16 @@ export const cancelLease = async (leaseId) => {
 // Renew a lease
 export const renewLease = async (leaseId, renewalData) => {
     try {
-        const response = await axios.patch(
-            `${API_BASE}/leases/${leaseId}/renew/`,
-            {
-                new_end_date: renewalData.new_end_date,
-                new_monthly_rent: parseFloat(renewalData.new_monthly_rent) || null,
-                additional_terms: renewalData.additional_terms || ""
-            },
+        const response = await axios.post(
+            `${API_BASE}/leases/renew/`,
+            renewalData,
             { headers: getAuthHeaders() }
         );
 
         return {
             success: true,
-            data: response.data.data,
-            message: "Lease renewed successfully!"
+            data: response.data.data || response.data,
+            message: response.data.description || "Lease renewed successfully!"
         };
     } catch (err) {
         return handleApiError(err, "Failed to renew lease.");

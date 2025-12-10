@@ -4,6 +4,7 @@ import { getProperties, getAvailableUnits } from '../../services/propertyService
 import { createLease } from '../../services/leaseService';
 import { getTenants } from '../../services/tenantService';
 import { formatNumberWithCommas, parseFormattedNumber } from '../../utils/formatUtils';
+import { InfoTooltip } from '../common/Tooltip';
 import '../../assets/styles/add-lease.css';
 import '../../assets/styles/forms-responsive.css';
 
@@ -702,7 +703,10 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                             <Row className="mb-3">
                                 <Col xs={12} className="mb-3">
                                     <Form.Group>
-                                        <Form.Label className="form-label">Tenant *</Form.Label>
+                                        <Form.Label className="form-label">
+                                            Tenant *
+                                            <InfoTooltip content="Select the tenant who will occupy this unit. Search by name, username, or phone number." />
+                                        </Form.Label>
                                         <SearchableSelect
                                             options={tenants}
                                             value={formData.tenant_id}
@@ -730,7 +734,10 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                             <Row className="mb-3">
                                 <Col xs={12} sm={6} className="mb-3">
                                     <Form.Group>
-                                        <Form.Label className="form-label">Property *</Form.Label>
+                                        <Form.Label className="form-label">
+                                            Property *
+                                            <InfoTooltip content="Select the property where the lease will be established" />
+                                        </Form.Label>
                                         <SearchableSelect
                                             options={properties}
                                             value={formData.property_id}
@@ -747,7 +754,10 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                                 
                                 <Col xs={12} sm={6} className="mb-3">
                                     <Form.Group>
-                                        <Form.Label className="form-label">Available Unit *</Form.Label>
+                                        <Form.Label className="form-label">
+                                            Available Unit *
+                                            <InfoTooltip content="Choose from vacant units in the selected property. Unit rent is shown for reference." />
+                                        </Form.Label>
                                         <SearchableSelect
                                             options={availableUnits}
                                             value={formData.unit}
@@ -955,7 +965,10 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                             <Row className="mb-3">
                                 <Col xs={12} sm={4} className="mb-3">
                                     <Form.Group>
-                                        <Form.Label className="form-label">Start Date *</Form.Label>
+                                        <Form.Label className="form-label">
+                                            Start Date *
+                                            <InfoTooltip content="The date when the tenant officially moves in and rent begins" />
+                                        </Form.Label>
                                         <Form.Control
                                             className="form-control"
                                             type="date"
@@ -972,7 +985,10 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                                 
                                 <Col xs={12} sm={4} className="mb-3">
                                     <Form.Group>
-                                        <Form.Label className="form-label">Duration (Months) *</Form.Label>
+                                        <Form.Label className="form-label">
+                                            Duration (Months) *
+                                            <InfoTooltip content="Lease period in months. End date will be calculated automatically. Common durations: 6, 12, or 24 months." />
+                                        </Form.Label>
                                         <Form.Control
                                             className="form-control"
                                             type="number"
@@ -1016,7 +1032,10 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                             <Row className="mb-3">
                                 <Col xs={12} sm={6} className="mb-3">
                                     <Form.Group>
-                                        <Form.Label className="form-label">Monthly Rent (TSh) *</Form.Label>
+                                        <Form.Label className="form-label">
+                                            Monthly Rent (TSh) *
+                                            <InfoTooltip content="The amount tenant pays each month. This is pre-filled from the unit but can be adjusted if needed." />
+                                        </Form.Label>
                                         <Form.Control
                                             className="form-control"
                                             type="text"

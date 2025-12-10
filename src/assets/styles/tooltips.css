@@ -1,0 +1,165 @@
+/* Custom Tooltip Styles */
+
+/* Base tooltip styling */
+.custom-tooltip-content {
+    padding: 2px 4px;
+}
+
+.tooltip-text {
+    font-size: 0.875rem;
+    line-height: 1.4;
+}
+
+.tooltip-shortcut {
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    text-align: center;
+}
+
+.tooltip-shortcut kbd {
+    background-color: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+    padding: 2px 6px;
+    font-size: 0.75rem;
+    font-family: monospace;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
+}
+
+/* Success theme */
+.tippy-box[data-theme~='success-theme'] {
+    background-color: #28a745;
+    color: white;
+}
+
+.tippy-box[data-theme~='success-theme'][data-placement^='top'] > .tippy-arrow::before {
+    border-top-color: #28a745;
+}
+
+.tippy-box[data-theme~='success-theme'][data-placement^='bottom'] > .tippy-arrow::before {
+    border-bottom-color: #28a745;
+}
+
+.tippy-box[data-theme~='success-theme'][data-placement^='left'] > .tippy-arrow::before {
+    border-left-color: #28a745;
+}
+
+.tippy-box[data-theme~='success-theme'][data-placement^='right'] > .tippy-arrow::before {
+    border-right-color: #28a745;
+}
+
+/* Warning theme */
+.tippy-box[data-theme~='warning-theme'] {
+    background-color: #ffc107;
+    color: #000;
+}
+
+.tippy-box[data-theme~='warning-theme'][data-placement^='top'] > .tippy-arrow::before {
+    border-top-color: #ffc107;
+}
+
+.tippy-box[data-theme~='warning-theme'][data-placement^='bottom'] > .tippy-arrow::before {
+    border-bottom-color: #ffc107;
+}
+
+.tippy-box[data-theme~='warning-theme'][data-placement^='left'] > .tippy-arrow::before {
+    border-left-color: #ffc107;
+}
+
+.tippy-box[data-theme~='warning-theme'][data-placement^='right'] > .tippy-arrow::before {
+    border-right-color: #ffc107;
+}
+
+.tippy-box[data-theme~='warning-theme'] .tooltip-shortcut kbd {
+    background-color: rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+/* Danger theme */
+.tippy-box[data-theme~='danger-theme'] {
+    background-color: #dc3545;
+    color: white;
+}
+
+.tippy-box[data-theme~='danger-theme'][data-placement^='top'] > .tippy-arrow::before {
+    border-top-color: #dc3545;
+}
+
+.tippy-box[data-theme~='danger-theme'][data-placement^='bottom'] > .tippy-arrow::before {
+    border-bottom-color: #dc3545;
+}
+
+.tippy-box[data-theme~='danger-theme'][data-placement^='left'] > .tippy-arrow::before {
+    border-left-color: #dc3545;
+}
+
+.tippy-box[data-theme~='danger-theme'][data-placement^='right'] > .tippy-arrow::before {
+    border-right-color: #dc3545;
+}
+
+/* Info theme */
+.tippy-box[data-theme~='info-theme'] {
+    background-color: #17a2b8;
+    color: white;
+}
+
+.tippy-box[data-theme~='info-theme'][data-placement^='top'] > .tippy-arrow::before {
+    border-top-color: #17a2b8;
+}
+
+.tippy-box[data-theme~='info-theme'][data-placement^='bottom'] > .tippy-arrow::before {
+    border-bottom-color: #17a2b8;
+}
+
+.tippy-box[data-theme~='info-theme'][data-placement^='left'] > .tippy-arrow::before {
+    border-left-color: #17a2b8;
+}
+
+.tippy-box[data-theme~='info-theme'][data-placement^='right'] > .tippy-arrow::before {
+    border-right-color: #17a2b8;
+}
+
+/* Enhanced interactive tooltips */
+.tippy-box[data-interactive] {
+    pointer-events: auto;
+}
+
+/* Smooth animations */
+.tippy-box[data-animation='scale'][data-state='hidden'] {
+    transform: scale(0.9);
+    opacity: 0;
+}
+
+/* Rich content support */
+.custom-tooltip-content ul,
+.custom-tooltip-content ol {
+    margin: 4px 0;
+    padding-left: 20px;
+}
+
+.custom-tooltip-content li {
+    margin: 2px 0;
+}
+
+.custom-tooltip-content strong {
+    font-weight: 600;
+}
+
+.custom-tooltip-content code {
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 1px 4px;
+    border-radius: 2px;
+    font-family: monospace;
+    font-size: 0.85em;
+}
+
+/* Tooltip for disabled elements */
+.tooltip-wrapper {
+    display: inline-block;
+    cursor: not-allowed;
+}
+
+.tooltip-wrapper > * {
+    pointer-events: none;
+}

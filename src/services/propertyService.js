@@ -228,7 +228,7 @@ export const getAvailableUnits = async (params = {}) => {
         if (params.property) queryParams.append('property', params.property);
 
         const response = await axios.get(
-            `${API_BASE}/units/available/?${queryParams.toString()}`,
+            `${API_BASE}/units/?${queryParams.toString()}`,
             { headers: getAuthHeaders() }
         );
 

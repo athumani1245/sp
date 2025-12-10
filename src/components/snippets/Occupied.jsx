@@ -1,5 +1,6 @@
 import React from "react";
 import PropTypes from 'prop-types';
+import { InfoTooltip } from '../common/Tooltip';
 
 function Occupied({ data }) {
     const occupiedUnits = data?.occupied_units || 0;
@@ -17,7 +18,13 @@ function Occupied({ data }) {
         <div className="col-md-3 col-6">
             <div className="activity-card h-100">
                 <div className="icon"><i className="bi bi-door-open"></i></div>
-                <div className="stat-label">Occupied & Vacant</div>
+                <div className="stat-label">
+                    Occupied & Vacant
+                    <InfoTooltip 
+                        content={`<strong>Occupancy Rate: ${occupancyRate}%</strong><br/>Occupied: ${occupiedUnits} units<br/>Vacant: ${vacantUnits} units<br/>Total: ${totalUnits} units<br/><br/>Shows unit utilization across all properties.`}
+                        theme={isGoodOccupancy ? 'success' : 'warning'}
+                    />
+                </div>
                 <div className="stat">
                     {occupiedUnits} | {vacantUnits} 
                     <span className={`stat-change ${isGoodOccupancy ? 'positive' : 'negative'}`}>
