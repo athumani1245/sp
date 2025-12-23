@@ -1245,6 +1245,126 @@
     color: #6c757d;
 }
 
+/* Lease Status Bar */
+.lease-status-bar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 8px 0;
+    gap: 0;
+}
+
+.status-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+}
+
+.status-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #e9ecef;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+    margin-bottom: 4px;
+}
+
+.status-label {
+    font-size: 10px;
+    font-weight: 500;
+    color: #6c757d;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.status-line {
+    flex: 1;
+    height: 2px;
+    background-color: #e9ecef;
+    min-width: 30px;
+    max-width: 60px;
+    margin: 0 4px;
+    align-self: flex-start;
+    margin-top: 5px;
+    transition: all 0.3s ease;
+}
+
+/* Completed statuses */
+.status-item.completed .status-dot {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.status-item.completed .status-label {
+    color: #28a745;
+    font-weight: 600;
+}
+
+/* Active/Current status */
+.status-item.active .status-dot {
+    background-color: #007bff;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+    transform: scale(1.2);
+}
+
+.status-item.active .status-label {
+    color: #007bff;
+    font-weight: 700;
+}
+
+/* Cancelled status */
+.status-item.cancelled .status-dot {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.status-item.cancelled .status-label {
+    color: #dc3545;
+}
+
+.status-line.cancelled {
+    background-color: #dc3545;
+}
+
+/* Terminated status */
+.status-item.terminated .status-dot {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+.status-item.terminated .status-label {
+    color: #6c757d;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .lease-status-bar {
+        justify-content: center;
+        margin-top: 12px;
+        padding: 12px 0;
+    }
+    
+    .status-label {
+        font-size: 9px;
+    }
+    
+    .status-dot {
+        width: 10px;
+        height: 10px;
+    }
+    
+    .status-line {
+        min-width: 20px;
+        max-width: 40px;
+    }
+}
+
 /* Odoo-style Action Buttons */
 .odoo-button {
     position: relative;

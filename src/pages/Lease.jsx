@@ -304,7 +304,7 @@ function Lease() {
         <div className="leases-filters-section">
           {/* Top Row: Breadcrumb/Title and Status */}
           <div className="row align-items-center mb-3">
-            <div className="col-md-8">
+            <div className="col-md-6">
               <div className="d-flex align-items-center gap-2">
                 <Link to="/leases" className="text-decoration-none text-muted">
                   <i className="bi bi-arrow-left me-1"></i>
@@ -314,17 +314,38 @@ function Lease() {
                 <h5 className="mb-0 fw-bold">{lease.lease_number}</h5>
               </div>
             </div>
-            <div className="col-md-4 text-end">
-              <span className={`badge ${
-                lease.status === 'active' ? 'bg-success' :
-                lease.status === 'draft' ? 'bg-secondary' :
-                lease.status === 'expiring' ? 'bg-warning' :
-                lease.status === 'expired' ? 'bg-danger' :
-                lease.status === 'cancelled' ? 'bg-dark' :
-                'bg-info'
-              } text-uppercase px-3 py-2`} style={{ fontSize: '0.85rem' }}>
-                {lease.status}
-              </span>
+            <div className="col-md-6">
+              {/* Status Bar */}
+              <div className="lease-status-bar">
+                <div className={`status-item ${lease.status === 'draft' ? 'active' : ['active', 'expired', 'terminated', 'cancelled'].includes(lease.status) ? 'completed' : ''}`}>
+                  <div className="status-dot"></div>
+                  <span className="status-label">Draft</span>
+                </div>
+                <div className="status-line"></div>
+                <div className={`status-item ${lease.status === 'active' ? 'active' : ['expired', 'terminated', 'cancelled'].includes(lease.status) ? 'completed' : ''}`}>
+                  <div className="status-dot"></div>
+                  <span className="status-label">Active</span>
+                </div>
+                <div className="status-line"></div>
+                <div className={`status-item ${lease.status === 'expired' ? 'active' : ['terminated', 'cancelled'].includes(lease.status) ? 'completed' : ''}`}>
+                  <div className="status-dot"></div>
+                  <span className="status-label">Expired</span>
+                </div>
+                <div className="status-line"></div>
+                <div className={`status-item ${lease.status === 'terminated' ? 'active terminated' : ''}`}>
+                  <div className="status-dot"></div>
+                  <span className="status-label">Terminated</span>
+                </div>
+                {lease.status === 'cancelled' && (
+                  <>
+                    <div className="status-line cancelled"></div>
+                    <div className="status-item active cancelled">
+                      <div className="status-dot"></div>
+                      <span className="status-label">Cancelled</span>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           </div>
 
@@ -655,17 +676,17 @@ function Lease() {
                       <div className="bg-light p-3 rounded">
                         <h6 className="mb-3">
                           <i className="bi bi-link-45deg me-2"></i>
-                          Renewal Information
+                          Lease History
                         </h6>
                         <div className="d-flex align-items-center">
-                          <span className="me-2">This lease is a renewal of:</span>
+                          <span className="me-2"></span>
                           <Link 
                             to={`/leases/${typeof lease.original_lease === 'string' ? lease.original_lease : (lease.original_lease.id || lease.original_lease.lease_id)}`}
                             className="fw-bold text-primary"
                             style={{ textDecoration: 'none' }}
                           >
                             {typeof lease.original_lease === 'string' 
-                              ? 'View Original Lease' 
+                              ? 'View Previous Lease' 
                               : lease.original_lease.lease_number}
                             <i className="bi bi-box-arrow-up-right ms-1"></i>
                           </Link>
