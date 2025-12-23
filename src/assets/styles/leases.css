@@ -1251,16 +1251,16 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 10px 16px;
-    min-height: 40px;
-    font-size: 14px;
+    padding: 6px 12px;
+    min-height: 32px;
+    font-size: 13px;
     font-weight: 500;
     line-height: 1.2;
-    border: 1px solid transparent;
-    border-radius: 6px;
+    border: 1.5px solid transparent;
+    border-radius: 4px;
     cursor: pointer;
     text-decoration: none;
-    transition: all 0.15s ease-in-out;
+    transition: all 0.2s ease-in-out;
     white-space: nowrap;
     user-select: none;
     outline: none;
@@ -1272,8 +1272,8 @@
 }
 
 .odoo-button i {
-    margin-right: 6px;
-    font-size: 14px;
+    margin-right: 5px;
+    font-size: 13px;
 }
 
 .odoo-button:disabled {
@@ -1283,65 +1283,87 @@
     box-shadow: none !important;
 }
 
-/* Primary Odoo Button (Your red color) */
+/* Primary Odoo Button */
 .odoo-button.odoo-primary {
-    background: linear-gradient(135deg, var(--primary-color) 0%, #b84a3a 100%);
-    border: 1px solid var(--primary-color);
-    color: white;
-    box-shadow: 0 2px 4px rgba(204, 91, 75, 0.2);
+    background: white;
+    border-color: var(--primary-color);
+    color: var(--primary-color);
 }
 
 .odoo-button.odoo-primary:hover {
-    background: linear-gradient(135deg, var(--primary-hover) 0%, #a23e2e 100%);
-    border-color: var(--primary-hover);
-    box-shadow: 0 4px 12px rgba(204, 91, 75, 0.3);
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
     transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(204, 91, 75, 0.3);
 }
 
 .odoo-button.odoo-primary:active {
     transform: translateY(0);
-    box-shadow: 0 2px 6px rgba(204, 91, 75, 0.4);
+    box-shadow: 0 1px 3px rgba(204, 91, 75, 0.3);
 }
 
 /* Secondary Odoo Button */
 .odoo-button.odoo-secondary {
     background: white;
-    border: 1px solid #d0d0d0;
-    color: #333;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-color: #6c757d;
+    color: #6c757d;
 }
 
 .odoo-button.odoo-secondary:hover {
-    background: #f8f9fa;
-    border-color: var(--primary-color);
-    color: var(--primary-color);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    background: #6c757d;
+    border-color: #6c757d;
+    color: white;
     transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(108, 117, 125, 0.3);
 }
 
 .odoo-button.odoo-secondary:active {
     transform: translateY(0);
-    background: #e9ecef;
+    background: #5a6268;
+    border-color: #5a6268;
+}
+
+/* Success Odoo Button */
+.odoo-button.odoo-success {
+    background: white;
+    border-color: #28a745;
+    color: #28a745;
+}
+
+.odoo-button.odoo-success:hover {
+    background: #28a745;
+    border-color: #28a745;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(40, 167, 69, 0.3);
+}
+
+.odoo-button.odoo-success:active {
+    transform: translateY(0);
+    background: #218838;
+    border-color: #218838;
 }
 
 /* Danger Odoo Button */
 .odoo-button.odoo-danger {
-    background: linear-gradient(135deg, #dc3545 0%, #c02d3a 100%);
-    border: 1px solid #dc3545;
-    color: white;
-    box-shadow: 0 2px 4px rgba(220, 53, 69, 0.2);
+    background: white;
+    border-color: #dc3545;
+    color: #dc3545;
 }
 
 .odoo-button.odoo-danger:hover {
-    background: linear-gradient(135deg, #c02d3a 0%, #a52834 100%);
-    border-color: #c02d3a;
-    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+    background: #dc3545;
+    border-color: #dc3545;
+    color: white;
     transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(220, 53, 69, 0.3);
 }
 
 .odoo-button.odoo-danger:active {
     transform: translateY(0);
-    box-shadow: 0 2px 6px rgba(220, 53, 69, 0.4);
+    background: #c82333;
+    border-color: #c82333;
 }
 
 /* Odoo Button Group */

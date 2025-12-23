@@ -300,116 +300,119 @@ function Lease() {
       />
       
       <div className="main-content">
-        {/* Header */}
+        {/* Odoo-Style Header */}
         <div className="leases-filters-section">
-          <div className="row g-3 align-items-center">
-            <div className="col-md-6">
-              <nav aria-label="breadcrumb">
-                <ol className="breadcrumb mb-2">
-                  <li className="breadcrumb-item">
-                    <Link to="/leases">Leases Management</Link>
-                  </li>
-                  <li className="breadcrumb-item active" aria-current="page">
-                    Details
-                  </li>
-                </ol>
-              </nav>
-              {/* <h4 className="mb-1">
-                <i className="bi bi-file-earmark-text me-2"></i>
-                {lease.lease_number}
-              </h4> */}
-              <small className="text-muted">
-                Reference: {lease.lease_number} | Status: {lease.status}
-              </small>
+          {/* Top Row: Breadcrumb/Title and Status */}
+          <div className="row align-items-center mb-3">
+            <div className="col-md-8">
+              <div className="d-flex align-items-center gap-2">
+                <Link to="/leases" className="text-decoration-none text-muted">
+                  <i className="bi bi-arrow-left me-1"></i>
+                  Leases
+                </Link>
+                <span className="text-muted">/</span>
+                <h5 className="mb-0 fw-bold">{lease.lease_number}</h5>
+              </div>
             </div>
-            <div className="col-md-6">
-              {/* Desktop: action buttons on right */}
-              <div className="d-none d-md-flex justify-content-end">
-                <div className="odoo-button-group">
+            <div className="col-md-4 text-end">
+              <span className={`badge ${
+                lease.status === 'active' ? 'bg-success' :
+                lease.status === 'draft' ? 'bg-secondary' :
+                lease.status === 'expiring' ? 'bg-warning' :
+                lease.status === 'expired' ? 'bg-danger' :
+                lease.status === 'cancelled' ? 'bg-dark' :
+                'bg-info'
+              } text-uppercase px-3 py-2`} style={{ fontSize: '0.85rem' }}>
+                {lease.status}
+              </span>
+            </div>
+          </div>
+
+          {/* Action Buttons Row */}
+          <div className="d-none d-md-flex gap-2 align-items-center">
+            <button
+              className={`odoo-button odoo-primary ${isGeneratingPDF ? 'loading' : ''}`}
+              onClick={handlePreviewLeaseDocument}
+              disabled={isGeneratingPDF}
+              title="Download Lease Document"
+            >
+              {!isGeneratingPDF && (
+                <>
+                  <i className="bi bi-file-earmark-text"></i>
+                  <i className="bi bi-download"></i>
+                </>
+              )}
+              {isGeneratingPDF && 'Generating...'}
+            </button>
+
+            {/* Show Renew button for active or expiring leases */}
+            {(lease.status === 'active' || lease.status === 'expiring') && (
+              <button
+                className="odoo-button odoo-success"
+                onClick={handleRenewClick}
+              >
+                <i className="bi bi-arrow-repeat"></i>
+                Renew Lease
+              </button>
+            )}
+
+            {/* Only show Cancel button if lease is not already cancelled, terminated, or expired */}
+            {lease.status !== 'cancelled' && lease.status !== 'terminated' && lease.status !== 'expired' && (
+              <button
+                className={`odoo-button odoo-danger ${isCancelling ? 'loading' : ''}`}
+                onClick={handleCancelClick}
+                disabled={isCancelling}
+              >
+                {!isCancelling && <i className="bi bi-x-circle"></i>}
+                {isCancelling ? 'Cancelling...' : 'Cancel Lease'}
+              </button>
+            )}
+          </div>
+
+          {/* Mobile Action Buttons */}
+          <div className="d-md-none">
+            <div className="row g-2">
+              <div className="col-12">
+                <button
+                  className={`odoo-button odoo-primary w-100 ${isGeneratingPDF ? 'loading' : ''}`}
+                  onClick={handlePreviewLeaseDocument}
+                  disabled={isGeneratingPDF}
+                  title="Download Lease Document"
+                >
+                  {!isGeneratingPDF && (
+                    <>
+                      <i className="bi bi-file-earmark-text"></i>
+                      <i className="bi bi-download"></i>
+                    </>
+                  )}
+                  {isGeneratingPDF && 'Generating...'}
+                </button>
+              </div>
+              {/* Show Renew button for active or expiring leases */}
+              {(lease.status === 'active' || lease.status === 'expiring') && (
+                <div className="col-12">
                   <button
-                    className={`odoo-button odoo-primary ${isGeneratingPDF ? 'loading' : ''}`}
-                    onClick={handlePreviewLeaseDocument}
-                    disabled={isGeneratingPDF}
-                    title="Download Lease Document"
+                    className="odoo-button odoo-success w-100"
+                    onClick={handleRenewClick}
                   >
-                    {!isGeneratingPDF && (
-                      <>
-                        <i className="bi bi-file-earmark-text"></i>
-                        <i className="bi bi-download"></i>
-                      </>
-                    )}
-                    {isGeneratingPDF && 'Generating...'}
+                    <i className="bi bi-arrow-repeat"></i>
+                    <span>Renew Lease</span>
                   </button>
-                  {/* Show Renew button for active or expiring leases */}
-                  {(lease.status === 'active' || lease.status === 'expiring') && (
-                    <button
-                      className="odoo-button odoo-success"
-                      onClick={handleRenewClick}
-                    >
-                      <i className="bi bi-arrow-repeat"></i>
-                      Renew Lease
-                    </button>
-                  )}
-                  {/* Only show Cancel button if lease is not already cancelled, terminated, or expired */}
-                  {lease.status !== 'cancelled' && lease.status !== 'terminated' && lease.status !== 'expired' && (
-                    <button
-                      className={`odoo-button odoo-danger ${isCancelling ? 'loading' : ''}`}
-                      onClick={handleCancelClick}
-                      disabled={isCancelling}
-                    >
-                      {!isCancelling && <i className="bi bi-x-circle"></i>}
-                      {isCancelling ? 'Cancelling...' : 'Cancel Lease'}
-                    </button>
-                  )}
                 </div>
-              </div>
-              
-              {/* Mobile: full width buttons */}
-              <div className="d-md-none">
-                <div className="row g-2">
-                  <div className="col-12">
-                    <button
-                      className={`odoo-button odoo-primary w-100 ${isGeneratingPDF ? 'loading' : ''}`}
-                      onClick={handlePreviewLeaseDocument}
-                      disabled={isGeneratingPDF}
-                      title="Download Lease Document"
-                    >
-                      {!isGeneratingPDF && (
-                        <>
-                          <i className="bi bi-file-earmark-text"></i>
-                          <i className="bi bi-download"></i>
-                        </>
-                      )}
-                      {isGeneratingPDF && 'Generating...'}
-                    </button>
-                  </div>
-                  {/* Show Renew button for active or expiring leases */}
-                  {(lease.status === 'active' || lease.status === 'expiring') && (
-                    <div className="col-12">
-                      <button
-                        className="odoo-button odoo-success w-100"
-                        onClick={handleRenewClick}
-                      >
-                        <i className="bi bi-arrow-repeat"></i>
-                        <span>Renew Lease</span>
-                      </button>
-                    </div>
-                  )}
-                  {/* Only show Cancel button if lease is not already cancelled, terminated, or expired */}
-                  {lease.status !== 'cancelled' && lease.status !== 'terminated' && lease.status !== 'expired' && (
-                    <div className="col-12">
-                      <button
-                        className={`odoo-button odoo-danger w-100 ${isCancelling ? 'loading' : ''}`}
-                        onClick={handleCancelClick}
-                        disabled={isCancelling}
-                      >
-                        {!isCancelling && <i className="bi bi-x-circle"></i>}
-                        {isCancelling ? 'Cancelling...' : 'Cancel Lease'}
-                      </button>
-                    </div>
-                  )}
+              )}
+              {/* Only show Cancel button if lease is not already cancelled, terminated, or expired */}
+              {lease.status !== 'cancelled' && lease.status !== 'terminated' && lease.status !== 'expired' && (
+                <div className="col-12">
+                  <button
+                    className={`odoo-button odoo-danger w-100 ${isCancelling ? 'loading' : ''}`}
+                    onClick={handleCancelClick}
+                    disabled={isCancelling}
+                  >
+                    {!isCancelling && <i className="bi bi-x-circle"></i>}
+                    {isCancelling ? 'Cancelling...' : 'Cancel Lease'}
+                  </button>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
