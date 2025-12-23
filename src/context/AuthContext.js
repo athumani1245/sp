@@ -9,58 +9,58 @@ export const AuthProvider = ({ children }) => {
     const [subscription, setSubscription] = useState(null);
     const [hasActiveSubscription, setHasActiveSubscription] = useState(false);
 
-    // Function to verify token with the API
-    const verifyToken = useCallback(async (token) => {
+    // Function to refresh token with the API
+    const refreshToken = useCallback(async (refresh) => {
         try {
             const API_BASE = process.env.REACT_APP_API_BASE;
             const response = await axios.post(
-                `${API_BASE}/token/verify/`,
-                { token }
-                
+                `${API_BASE}/token/refresh/`,
+                { refresh }
             );
             
-            // If we get here, the token is valid
-            return response.status === 200;
+            // If successful, update the access token and refresh token
+            if (response.data && response.data.access) {
+                localStorage.setItem('token', response.data.access);
+                
+                // If a new refresh token is provided, update it as well
+                if (response.data.refresh) {
+                    localStorage.setItem('refresh', response.data.refresh);
+                }
+                
+                return { success: true, token: response.data.access };
+            }
+            
+            return { success: false };
         } catch (error) {
-            // Token is invalid or expired
-            console.error('Token verification failed:', error);
-            return false;
+            // Token refresh failed
+            console.error('Token refresh failed:', error);
+            return { success: false };
         }
     }, []);
 
     useEffect(() => {
-        // Check for token on initial load and verify it
+        // Check for token on initial load
         const checkAuthentication = async () => {
             const token = localStorage.getItem('token');
+            const refresh = localStorage.getItem('refresh');
             const subscriptionData = localStorage.getItem('subscription');
 
-            if (token) {
-                // Verify the token with the API
-                const isValid = await verifyToken(token);
+            if (token && refresh) {
+                // Token exists, assume it's valid and set authenticated
+                // The api interceptor will handle refresh if it's expired
+                setIsAuthenticated(true);
                 
-                if (isValid) {
-                    setIsAuthenticated(true);
-                    
-                    // Load subscription data
-                    if (subscriptionData) {
-                        try {
-                            const parsedSubscription = JSON.parse(subscriptionData);
-                            setSubscription(parsedSubscription);
-                            setHasActiveSubscription(parsedSubscription.status === 'active' && parsedSubscription.is_active === true);
-                        } catch (error) {
-                            console.error('Failed to parse subscription data:', error);
-                            setSubscription(null);
-                            setHasActiveSubscription(false);
-                        }
+                // Load subscription data
+                if (subscriptionData) {
+                    try {
+                        const parsedSubscription = JSON.parse(subscriptionData);
+                        setSubscription(parsedSubscription);
+                        setHasActiveSubscription(parsedSubscription.status === 'active' && parsedSubscription.is_active === true);
+                    } catch (error) {
+                        console.error('Failed to parse subscription data:', error);
+                        setSubscription(null);
+                        setHasActiveSubscription(false);
                     }
-                } else {
-                    // Token is invalid, remove it and set authenticated to false
-                    localStorage.removeItem('token');
-                    localStorage.removeItem('refresh');
-                    localStorage.removeItem('subscription');
-                    setIsAuthenticated(false);
-                    setSubscription(null);
-                    setHasActiveSubscription(false);
                 }
             } else {
                 setIsAuthenticated(false);
@@ -72,7 +72,7 @@ export const AuthProvider = ({ children }) => {
         };
 
         checkAuthentication();
-    }, [verifyToken]);
+    }, []);
 
     const login = async (token, userData) => {
         localStorage.setItem('token', token);
@@ -84,20 +84,8 @@ export const AuthProvider = ({ children }) => {
             setHasActiveSubscription(userData.subscription.status === 'active' && userData.subscription.is_active === true);
         }
         
-        // Verify the token before setting authenticated
-        const isValid = await verifyToken(token);
-        
-        if (isValid) {
-            setIsAuthenticated(true);
-        } else {
-            // Token is invalid, remove it
-            localStorage.removeItem('token');
-            localStorage.removeItem('subscription');
-            setIsAuthenticated(false);
-            setSubscription(null);
-            setHasActiveSubscription(false);
-            throw new Error('Invalid token provided');
-        }
+        // Set authenticated immediately on login
+        setIsAuthenticated(true);
     };
 
     const logout = () => {
@@ -109,18 +97,19 @@ export const AuthProvider = ({ children }) => {
         setHasActiveSubscription(false);
     };
 
-    // Method to check if current token is still valid
+    // Method to check if current token is still valid by refreshing it
     const checkTokenValidity = async () => {
         const token = localStorage.getItem('token');
+        const refresh = localStorage.getItem('refresh');
         
-        if (!token) {
+        if (!token || !refresh) {
             setIsAuthenticated(false);
             return false;
         }
 
-        const isValid = await verifyToken(token);
+        const result = await refreshToken(refresh);
         
-        if (!isValid) {
+        if (!result.success) {
             logout();
             return false;
         }
