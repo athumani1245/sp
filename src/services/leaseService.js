@@ -181,12 +181,10 @@ export const getAllLeases = async (filters = {}) => {
 // Get a single lease by ID
 export const getLeaseById = async (leaseId) => {
     try {
-        console.log("Fetching lease details for ID:", leaseId);
         const response = await axios.get(
             `${API_BASE}/leases/${leaseId}/`,
             { headers: getAuthHeaders() }
         );
-        console.log("Lease details response:", response.data);
 
         return {
             success: true,
@@ -205,8 +203,6 @@ export const getLeaseById = async (leaseId) => {
 export const updateLease = async (leaseId, leaseData) => {
     try {
         const formattedData = formatLeaseData(leaseData);
-        console.log("Formatted Lease Data:", formattedData);
-        console.log("Lease ID:", leaseId);
 
         const response = await axios.patch(
             `${API_BASE}/leases/${leaseId}/`,
@@ -253,7 +249,6 @@ export const deleteLease = async (leaseId) => {
 // Terminate a lease
 export const terminateLease = async (leaseId, terminationData = {}) => {
     try {
-        console.log('Termination data received:', terminationData);
         const formattedDate = formatDateForApi(terminationData.termination_date || new Date().toISOString().split('T')[0]);
         
         const response = await axios.post(
@@ -280,7 +275,6 @@ export const terminateLease = async (leaseId, terminationData = {}) => {
 // Cancel lease
 export const cancelLease = async (leaseId) => {
     try {
-        console.log("Lease ID for cancellation:", leaseId);
         const response = await axios.post(
             `${API_BASE}/leases/${leaseId}/cancel/`,
             {},
