@@ -115,10 +115,10 @@
 }
 
 .lease-tab.active {
-    color: #495057;
+    color: #CC5B4B;
     font-weight: 600;
-    border-bottom-color: #007bff;
-    background-color: transparent;
+    border-bottom-color: #CC5B4B;
+    background-color: rgba(204, 91, 75, 0.05);
 }
 
 .lease-tab.active::after {
@@ -127,8 +127,8 @@
     bottom: -2px;
     left: 0;
     right: 0;
-    height: 2px;
-    background-color: #007bff;
+    height: 3px;
+    background-color: #CC5B4B;
 }
 
 .lease-tab i {

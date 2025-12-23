@@ -37,13 +37,19 @@ api.interceptors.response.use(
                 }
 
                 // Call your refresh token endpoint
-                const response = await axios.post(`${process.env.REACT_APP_API_BASE}/auth/refresh/`, {
+                const response = await axios.post(`${process.env.REACT_APP_API_BASE}/token/refresh/`, {
                     refresh: refreshToken
                 });
 
-                if (response.data.token) {
-                    localStorage.setItem('token', response.data.token);
-                    api.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+                if (response.data.access) {
+                    localStorage.setItem('token', response.data.access);
+                    
+                    // If a new refresh token is provided, update it as well
+                    if (response.data.refresh) {
+                        localStorage.setItem('refresh', response.data.refresh);
+                    }
+                    
+                    api.defaults.headers.common['Authorization'] = `Bearer ${response.data.access}`;
                     return api(originalRequest);
                 }
             } catch (refreshError) {
