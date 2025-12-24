@@ -27,7 +27,7 @@ api.interceptors.response.use(
 
         // If the error status is 401 and there is no originalRequest._retry flag,
         // it means the token has expired and we need to refresh it
-        if (error.response.status === 401 && !originalRequest._retry) {
+        if (error.response?.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
 
             try {
@@ -53,12 +53,24 @@ api.interceptors.response.use(
                     return api(originalRequest);
                 }
             } catch (refreshError) {
-                // If refresh token fails, logout user and redirect to login
+                // If refresh token fails, logout user and redirect to login immediately
                 localStorage.removeItem('token');
                 localStorage.removeItem('refresh');
+                
+                // Redirect to login page without showing error
                 window.location.href = '/';
-                return Promise.reject(refreshError);
+                
+                // Return a rejected promise that won't be caught by components
+                return new Promise(() => {}); // Empty promise that never resolves
             }
+        }
+
+        // For any other 401 errors that might occur
+        if (error.response?.status === 401) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('refresh');
+            window.location.href = '/';
+            return new Promise(() => {}); // Empty promise that never resolves
         }
 
         return Promise.reject(error);

@@ -399,8 +399,20 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
         if (!startDate || !months || months <= 0) return '';
         
         const start = new Date(startDate);
+        const startDay = start.getDate();
+        
+        // Create end date by adding months
         const end = new Date(start);
         end.setMonth(start.getMonth() + parseInt(months));
+        
+        // Handle edge case: if start day doesn't exist in end month (e.g., Jan 31 -> Feb 31)
+        // Set to last day of the target month
+        if (end.getDate() !== startDay) {
+            end.setDate(0); // Sets to last day of previous month (which is our target month)
+        }
+        
+        // Subtract one day to get the actual lease end date
+        end.setDate(end.getDate() - 1);
         
         return end.toISOString().split('T')[0];
     }, []);
