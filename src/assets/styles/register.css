@@ -24,6 +24,187 @@
     text-decoration: underline;
 }
 
+/* Stage Indicator Styles */
+.registration-stages {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 2rem auto;
+    max-width: 400px;
+}
+
+.stage-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+}
+
+.stage-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #e9ecef;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+    border: 2px solid #e9ecef;
+}
+
+.stage-item.active .stage-circle {
+    background: #CC5B4B;
+    color: white;
+    border-color: #CC5B4B;
+    box-shadow: 0 0 0 4px rgba(204, 91, 75, 0.1);
+}
+
+.stage-item.completed .stage-circle {
+    background: #28a745;
+    color: white;
+    border-color: #28a745;
+}
+
+.stage-label {
+    font-size: 0.75rem;
+    color: #6c757d;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.stage-item.active .stage-label {
+    color: #CC5B4B;
+    font-weight: 600;
+}
+
+.stage-item.completed .stage-label {
+    color: #28a745;
+}
+
+.stage-line {
+    width: 80px;
+    height: 2px;
+    background: #e9ecef;
+    margin: 0 -10px;
+    margin-bottom: 30px;
+}
+
+.stage-item.completed + .stage-line {
+    background: #28a745;
+}
+
+/* OTP Input Styles */
+.otp-input-container {
+    display: flex;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.otp-input {
+    width: 60px;
+    height: 60px;
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-align: center;
+    border: 2px solid #ced4da;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.otp-input:focus {
+    border-color: #CC5B4B !important;
+    box-shadow: 0 0 0 0.25rem rgba(204, 91, 75, 0.25) !important;
+    outline: none !important;
+}
+
+.otp-input:disabled {
+    background-color: #f8f9fa;
+    cursor: not-allowed;
+}
+
+/* Countdown Timer */
+.countdown-text {
+    color: #6c757d;
+    font-size: 0.875rem;
+}
+
+.countdown-number {
+    color: #CC5B4B;
+    font-weight: 600;
+}
+
+/* Success Animation */
+.success-checkmark {
+    animation: scaleIn 0.5s ease-in-out;
+}
+
+@keyframes scaleIn {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Modal Customization */
+.modal-content {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+    border-bottom: 1px solid #e9ecef;
+    padding: 1.25rem 1.5rem;
+}
+
+.modal-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #212529;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+/* Button Styles */
+.odoo-btn {
+    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    border: none;
+    font-size: 1rem;
+}
+
+.odoo-btn-primary {
+    background: #CC5B4B;
+    color: white;
+}
+
+.odoo-btn-primary:hover:not(:disabled) {
+    background: #B84A3A;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(204, 91, 75, 0.3);
+}
+
+.odoo-btn-primary:disabled {
+    background: #e9ecef;
+    color: #6c757d;
+    cursor: not-allowed;
+}
+
 .auth-link {
     color: #CC5B4B;
     text-decoration: none;
@@ -222,13 +403,40 @@
         padding: 1.75rem 1.5rem;
     }
     
+    /* Stage Indicator Responsive */
+    .registration-stages {
+        max-width: 100%;
+        padding: 0 0.5rem;
+    }
+    
+    .stage-line {
+        width: 50px;
+    }
+    
+    .stage-label {
+        font-size: 0.7rem;
+    }
+    
+    .stage-circle {
+        width: 36px;
+        height: 36px;
+        font-size: 0.8rem;
+    }
+    
+    /* OTP Input Responsive */
+    .otp-input {
+        width: 50px;
+        height: 50px;
+        font-size: 1.25rem;
+    }
+    
     .form-control {
         font-size: 1rem;
         height: calc(2.75rem + 2px);
         padding: 0.75rem 1rem;
     }
     
-    .btn-submit {
+    .odoo-btn {
         font-size: 1rem;
         height: calc(2.75rem + 2px);
         padding: 0.75rem 1rem;
@@ -273,6 +481,26 @@
     
     .card-body {
         padding: 1.75rem 1.5rem;
+    }
+    
+    /* Extra small screens - stack stages vertically or make them tiny */
+    .registration-stages {
+        transform: scale(0.85);
+    }
+    
+    .stage-line {
+        width: 40px;
+    }
+    
+    .stage-label {
+        font-size: 0.65rem;
+    }
+    
+    /* OTP Input Extra Small */
+    .otp-input {
+        width: 45px;
+        height: 45px;
+        font-size: 1.1rem;
     }
 
     h4 {
