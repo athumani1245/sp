@@ -190,7 +190,7 @@ function Lease() {
       await generateLeaseAgreementPDF(lease, {
         download: false,
         preview: true,
-        filename: `lease-agreement-${lease.lease_number}-${lease.tenant.first_name}-${lease.tenant.last_name}.pdf`
+        filename: `lease-agreement-${lease.lease_number}-${lease.tenant?.first_name || 'tenant'}-${lease.tenant?.last_name || ''}.pdf`
       });
       
       showToastMessage(
@@ -457,8 +457,8 @@ function Lease() {
               <div className="mt-3 p-3 bg-light rounded">
                 <strong>Lease Details:</strong>
                 <ul className="mt-2 mb-0 text-start">
-                  <li>Tenant: {lease.tenant.first_name} {lease.tenant.last_name}</li>
-                  <li>Property: {lease.property.property_name}</li>
+                  <li>Tenant: {lease.tenant?.first_name || 'N/A'} {lease.tenant?.last_name || ''}</li>
+                  <li>Property: {lease.property?.property_name || 'N/A'}</li>
                   <li>Unit: {getUnitInfo(lease)}</li>
                   <li>Duration: {lease.number_of_month} months</li>
                 </ul>
@@ -596,7 +596,7 @@ function Lease() {
                       <input 
                         type="text" 
                         className="underline-input" 
-                        value={`${lease.tenant.first_name || ''} ${lease.tenant.last_name || ''}`}
+                        value={`${lease.tenant?.first_name || 'N/A'} ${lease.tenant?.last_name || ''}`}
                         readOnly 
                       />
                     </div>
@@ -605,7 +605,7 @@ function Lease() {
                       <input 
                         type="text" 
                         className="underline-input" 
-                        value={lease.property.property_name || ''} 
+                        value={lease.property?.property_name || 'N/A'} 
                         readOnly 
                       />
                     </div>
@@ -634,7 +634,7 @@ function Lease() {
                       <input 
                         type="text" 
                         className="underline-input" 
-                        value={(lease.tenant.username || '')} 
+                        value={(lease.tenant?.username || 'N/A')} 
                         readOnly 
                       />
                     </div>
