@@ -34,7 +34,92 @@ function Register() {
     const [resendLoading, setResendLoading] = useState(false);
     
     const inputRefs = [useRef(null), useRef(null), useRef(null), useRef(null)];
+    const phoneInputRef = useRef(null);
     const navigate = useNavigate();
+
+    // Block input when limit is reached
+    useEffect(() => {
+        const input = document.querySelector('.phone-input-custom input[type="tel"]');
+        if (input) {
+            const handleInput = (e) => {
+                const value = e.target.value;
+                const digitsOnly = value.replace(/\D/g, '');
+                
+                if (digitsOnly.startsWith('255')) {
+                    const localPart = digitsOnly.substring(3);
+                    
+                    // Block 0 as first digit
+                    if (localPart.length > 0 && localPart[0] === '0') {
+                        e.target.value = value.substring(0, value.length - 1);
+                        return;
+                    }
+                    
+                    // Block if exceeds 9 digits
+                    if (localPart.length > 9) {
+                        e.target.value = value.substring(0, value.length - 1);
+                        return;
+                    }
+                }
+            };
+            
+            const handleKeyDown = (e) => {
+                const value = e.target.value;
+                const digitsOnly = value.replace(/\D/g, '');
+                
+                if (digitsOnly.startsWith('255')) {
+                    const localPart = digitsOnly.substring(3);
+                    
+                    // Block 0 as first digit
+                    if (localPart.length === 0 && e.key === '0') {
+                        e.preventDefault();
+                        return;
+                    }
+                    
+                    // Block new digit input if at limit (allow backspace, delete, arrows)
+                    if (localPart.length >= 9 && !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key) && /\d/.test(e.key)) {
+                        e.preventDefault();
+                        return;
+                    }
+                }
+            };
+            
+            input.addEventListener('input', handleInput);
+            input.addEventListener('keydown', handleKeyDown);
+            
+            return () => {
+                input.removeEventListener('input', handleInput);
+                input.removeEventListener('keydown', handleKeyDown);
+            };
+        }
+    }, [stage]);
+
+    // Handle phone number change with validation
+    const handlePhoneNumberChange = (value) => {
+        if (!value) {
+            setPhoneNumber('');
+            return;
+        }
+        
+        // Extract only digits
+        const digitsOnly = value.replace(/\D/g, '');
+        
+        // Check for Tanzania numbers (starting with 255)
+        if (digitsOnly.startsWith('255')) {
+            const localPart = digitsOnly.substring(3);
+            
+            // Reject if first digit after 255 is 0
+            if (localPart.length > 0 && localPart[0] === '0') {
+                return;
+            }
+            
+            // Reject if more than 9 digits after 255
+            if (localPart.length > 9) {
+                return;
+            }
+        }
+        
+        setPhoneNumber(value);
+    };
 
     // Countdown timer effect for OTP resend
     useEffect(() => {
@@ -96,12 +181,43 @@ function Register() {
         }
     };
 
+    const validatePhoneNumber = (phone) => {
+        if (!phone) {
+            return { valid: false, message: "Please enter a phone number." };
+        }
+        
+        // Remove all non-digit characters except +
+        const cleanPhone = phone.replace(/[^+\d]/g, '');
+        
+        // Check if it starts with +255
+        if (!cleanPhone.startsWith('+255')) {
+            return { valid: false, message: "Phone number must start with +255." };
+        }
+        
+        // Extract the digits after +255
+        const digitsAfterCode = cleanPhone.substring(4);
+        
+        // Check if exactly 9 digits
+        if (digitsAfterCode.length !== 9) {
+            return { valid: false, message: "Phone number must have exactly 9 digits after +255." };
+        }
+        
+        // Check if first digit is 0
+        if (digitsAfterCode[0] === '0') {
+            return { valid: false, message: "Phone number cannot start with 0 after +255." };
+        }
+        
+        return { valid: true, message: "" };
+    };
+
     const handlePhoneSubmit = async (e) => {
         e.preventDefault();
         setError("");
         
-        if (!phoneNumber || phoneNumber.length < 10) {
-            setError("Please enter a valid phone number.");
+        // Validate phone number
+        const validation = validatePhoneNumber(phoneNumber);
+        if (!validation.valid) {
+            setError(validation.message);
             return;
         }
 
@@ -342,13 +458,12 @@ function Register() {
                                             countryCallingCodeEditable={false}
                                             defaultCountry="TZ"
                                             value={phoneNumber}
-                                            onChange={setPhoneNumber}
+                                            onChange={handlePhoneNumberChange}
                                             className="phone-input-custom"
-                                            placeholder="Enter phone number"
+                                            placeholder="Enter 9 digits (e.g., 712345678)"
                                             required
                                         />
                                     </div>
-                                    <small className="text-muted">We'll send a verification code to this number</small>
                                 </div>
                                 <button 
                                     type="submit" 
