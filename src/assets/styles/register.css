@@ -343,6 +343,7 @@
     border: 1px solid #ced4da;
     border-left: none;
     transition: all 0.2s ease;
+    max-width: 100%;
 }
 
 .phone-input-custom .PhoneInputInput:focus {
