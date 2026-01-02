@@ -27,7 +27,7 @@ export const registerUser = async (data) => {
 export const sendRegistrationOtp = async (phoneNumber) => {
     try {
         const response = await axios.post(
-            `${API_BASE}/get-otp/`,
+            `${API_BASE}/get-otp-register/`,
             { username: phoneNumber },
             {
                 headers: {
@@ -50,7 +50,7 @@ export const sendRegistrationOtp = async (phoneNumber) => {
 export const verifyRegistrationOtp = async (phoneNumber, otpCode) => {
     try {
         const response = await axios.post(
-            `${API_BASE}/otp/verify-otp/`,
+            `${API_BASE}/otp/verify-otp-register/`,
             {
                 username: phoneNumber,
                 otp_code: otpCode

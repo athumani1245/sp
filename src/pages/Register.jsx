@@ -460,7 +460,6 @@ function Register() {
                                             value={phoneNumber}
                                             onChange={handlePhoneNumberChange}
                                             className="phone-input-custom"
-                                            placeholder="Enter 9 digits (e.g., 712345678)"
                                             required
                                         />
                                     </div>
@@ -501,7 +500,6 @@ function Register() {
                                             type="text" 
                                             className="form-control" 
                                             id="first_name" 
-                                            placeholder="Enter your first name" 
                                             required 
                                             value={firstName} 
                                             onChange={e => setFirstName(e.target.value)} 
@@ -513,7 +511,6 @@ function Register() {
                                             type="text" 
                                             className="form-control" 
                                             id="last_name" 
-                                            placeholder="Enter your last name" 
                                             required 
                                             value={lastName} 
                                             onChange={e => setLastName(e.target.value)} 
@@ -525,7 +522,6 @@ function Register() {
                                             type="email" 
                                             className="form-control" 
                                             id="email" 
-                                            placeholder="Enter your email" 
                                             required 
                                             value={email} 
                                             onChange={e => setEmail(e.target.value)} 
@@ -537,7 +533,6 @@ function Register() {
                                             type="password" 
                                             className="form-control" 
                                             id="password" 
-                                            placeholder="Enter your password" 
                                             required 
                                             value={password} 
                                             onChange={e => setPassword(e.target.value)} 
@@ -549,7 +544,6 @@ function Register() {
                                             type="password" 
                                             className="form-control" 
                                             id="confirm_password" 
-                                            placeholder="Re-enter your password" 
                                             required 
                                             value={confirmPassword} 
                                             onChange={e => setConfirmPassword(e.target.value)} 
