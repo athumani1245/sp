@@ -112,6 +112,13 @@ function Sidenav(){
                     </NavLink>
                 </li>
                 
+                <li className="nav-item">
+                    <NavLink className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
+                             to="/subscription">
+                        <i className="bi bi-credit-card"></i> Subscription
+                    </NavLink>
+                </li>
+                
                 {/* Reports Collapsible Menu */}
                 <li className="nav-item">
                     <a className={`nav-link ${openDropdowns.reports ? 'active' : ''}`} 

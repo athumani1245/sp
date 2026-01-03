@@ -90,7 +90,7 @@ const Tooltip = ({
             allowHTML={true}
             {...rest}
         >
-            {children}
+            <span style={{ display: 'inline-block' }}>{children}</span>
         </Tippy>
     );
 };
