@@ -54,12 +54,30 @@ export const useSubscription = () => {
         return subscription.max_units || 0;
     };
 
+    const getPackageName = () => {
+        if (!subscription) return null;
+        return subscription.package_name || subscription.package?.name || null;
+    };
+
+    const getPlanName = () => {
+        if (!subscription) return null;
+        return subscription.plan_name || subscription.plan?.name || null;
+    };
+
+    const getDaysRemaining = () => {
+        if (!subscription) return 0;
+        return subscription.days_left || 0;
+    };
+
     return {
         subscription,
         hasActiveSubscription,
         isFeatureEnabled,
         getSubscriptionStatus,
         canAccessFeature,
-        getRemainingUnits
+        getRemainingUnits,
+        getPackageName,
+        getPlanName,
+        getDaysRemaining
     };
 };

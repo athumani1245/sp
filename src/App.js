@@ -17,6 +17,7 @@ import Tenants from "./pages/Tenants";
 import Tenant from "./pages/Tenant";
 import Reports from "./pages/Reports";
 import Profile from './pages/Profile';
+import Subscription from './pages/Subscription';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import PrivateRoute from './components/PrivateRoute';
 import { AuthProvider } from './context/AuthContext';
@@ -203,6 +204,12 @@ function App() {
           <Route path="/profile" element={
             <PrivateRoute>
               <Profile />
+            </PrivateRoute>
+          } />
+          
+          <Route path="/subscription" element={
+            <PrivateRoute>
+              <Subscription />
             </PrivateRoute>
           } />
         </Routes>
