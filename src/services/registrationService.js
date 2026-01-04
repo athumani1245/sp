@@ -4,7 +4,6 @@ const API_BASE = process.env.REACT_APP_API_BASE;
 
 export const registerUser = async (data) => {
     try {
-        console.log(data);
         const response = await axios.post(
             `${API_BASE}/auth/register/`,
             data,

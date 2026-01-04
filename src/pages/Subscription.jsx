@@ -4,15 +4,18 @@ import { Form, Modal } from "react-bootstrap";
 import "../assets/styles/profile.css";
 import Layout from "../components/Layout";
 import { useSubscription } from '../hooks/useSubscription';
+import { usePageTitle } from '../hooks/usePageTitle';
 import { 
     getSubscriptionPlans, 
     getCurrentSubscription,
     createSubscription,
     startPaymentStatusListener,
-    stopPaymentStatusListener
+    stopPaymentStatusListener,
+    getBillingHistory
 } from '../services/licenseService';
 
 function Subscription() {
+    usePageTitle('Subscription');
     const navigate = useNavigate();
     const { subscription, hasActiveSubscription } = useSubscription();
     const [loading, setLoading] = useState(true);
@@ -24,6 +27,7 @@ function Subscription() {
     const [selectedPackage, setSelectedPackage] = useState(null);
     const [selectedPlans, setSelectedPlans] = useState({});
     const [detailedSubscription, setDetailedSubscription] = useState(null);
+    const [billingHistory, setBillingHistory] = useState([]);
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [phoneNumber, setPhoneNumber] = useState('');
     const [paymentStatus, setPaymentStatus] = useState('pending');
@@ -53,7 +57,16 @@ function Subscription() {
                 setDetailedSubscription(response.data);
             }
         } catch (error) {
-            console.error('Failed to fetch current subscription:', error);
+        }
+        
+        // Fetch billing history
+        try {
+            const billingResponse = await getBillingHistory();
+            if (billingResponse.success && billingResponse.data) {
+                // Limit to last 5 records
+                setBillingHistory(billingResponse.data);
+            }
+        } catch (error) {
         }
     };
 
@@ -94,10 +107,8 @@ function Subscription() {
                 
                 setPlans(transformedPlans);
             } else {
-                console.error('Failed to fetch plans:', response.error);
             }
         } catch (error) {
-            console.error('Failed to fetch subscription plans:', error);
         } finally {
             setPlansLoading(false);
         }
@@ -123,7 +134,6 @@ function Subscription() {
             setShowPlansModal(true);
         } else {
             // If no nested plans, handle direct subscription
-            console.log('Direct subscription to package:', pkg);
             // TODO: Implement direct subscription logic
         }
     };
@@ -134,7 +144,6 @@ function Subscription() {
     };
 
     const handleSelectPlan = (plan) => {
-        console.log('Selected plan:', plan);
         // Store the selected plan for this package
         setSelectedPlans(prev => ({
             ...prev,
@@ -145,7 +154,6 @@ function Subscription() {
 
     const handleProceedToPayment = (packageId) => {
         const selectedPlan = selectedPlans[packageId];
-        console.log('Proceed to payment for plan:', selectedPlan);
         setSelectedPlanForPayment(selectedPlan);
         setShowPaymentModal(true);
         setPaymentStatus('input');
@@ -188,8 +196,6 @@ function Subscription() {
                 auto_renew: true
             });
 
-            console.log('API Response:', result);
-
             if (result.success) {
                 setApiResponseDescription(result.description || result.message || '');
                 setCurrentTransactionId(result.transactionId);
@@ -201,7 +207,6 @@ function Subscription() {
                         const listener = startPaymentStatusListener(
                             result.transactionId,
                             (statusUpdate) => {
-                                console.log('Payment status update:', statusUpdate);
                                 
                                 const paymentStatusValue = statusUpdate.paymentStatus?.toUpperCase();
                                 
@@ -230,13 +235,11 @@ function Subscription() {
                                 pollInterval: 3000,
                                 maxAttempts: 20,
                                 onTimeout: (timeoutInfo) => {
-                                    console.log('Payment status check timed out:', timeoutInfo);
                                     setPaymentStatus('failed');
                                     setSubscriptionError('Payment verification timed out. Please check your mobile money account.');
                                     setSubscribing(false);
                                 },
                                 onError: (errorInfo) => {
-                                    console.error('Payment status check error:', errorInfo);
                                 }
                             }
                         );
@@ -257,7 +260,6 @@ function Subscription() {
                 setSubscribing(false);
             }
         } catch (error) {
-            console.error('Error creating subscription:', error);
             setPaymentStatus('failed');
             setSubscriptionError('Failed to process subscription');
             setSubscribing(false);
@@ -378,7 +380,7 @@ function Subscription() {
                                                             </span>
                                                         </div>
                                                         <div>
-                                                            <span style={{ fontSize: '0.8rem', color: '#6c757d', fontWeight: 500 }}>Plan Name: </span>
+                                                            <span style={{ fontSize: '0.8rem', color: '#6c757d', fontWeight: 500 }}>Plan: </span>
                                                             <span style={{ fontSize: '0.9rem', color: '#222', fontWeight: 600 }}>
                                                                 {subscription.plan_name || 'N/A'}
                                                             </span>
@@ -490,32 +492,37 @@ function Subscription() {
                                             <h5 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '1rem' }}>Billing History</h5>
                                             
                                             <div className="table-responsive">
-                                                <table className="table table-sm" style={{ fontSize: '0.8rem' }}>
-                                                    <thead style={{ backgroundColor: '#f8f9fa' }}>
-                                                        <tr>
-                                                            <th style={{ fontWeight: 600, color: '#6c757d', border: 'none', padding: '0.5rem' }}>DATE</th>
-                                                            <th style={{ fontWeight: 600, color: '#6c757d', border: 'none', padding: '0.5rem' }}>DETAILS</th>
-                                                            <th style={{ fontWeight: 600, color: '#6c757d', border: 'none', padding: '0.5rem' }}>AMOUNT</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr>
-                                                            <td style={{ padding: '0.5rem', border: 'none', borderBottom: '1px solid #e3e6e8' }}>08/07/2021</td>
-                                                            <td style={{ padding: '0.5rem', border: 'none', borderBottom: '1px solid #e3e6e8' }}>Beginner plan, monthly</td>
-                                                            <td style={{ padding: '0.5rem', border: 'none', borderBottom: '1px solid #e3e6e8' }}>$30.00</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td style={{ padding: '0.5rem', border: 'none', borderBottom: '1px solid #e3e6e8' }}>07/06/2021</td>
-                                                            <td style={{ padding: '0.5rem', border: 'none', borderBottom: '1px solid #e3e6e8' }}>Beginner plan, monthly</td>
-                                                            <td style={{ padding: '0.5rem', border: 'none', borderBottom: '1px solid #e3e6e8' }}>$30.00</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td style={{ padding: '0.5rem', border: 'none', borderBottom: '1px solid #e3e6e8' }}>06/05/2021</td>
-                                                            <td style={{ padding: '0.5rem', border: 'none', borderBottom: '1px solid #e3e6e8' }}>Beginner plan, monthly</td>
-                                                            <td style={{ padding: '0.5rem', border: 'none', borderBottom: '1px solid #e3e6e8' }}>$30.00</td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
+                                                {billingHistory.length === 0 ? (
+                                                    <div className="text-center py-4 text-muted">
+                                                        <i className="bi bi-receipt" style={{ fontSize: '2rem', display: 'block', marginBottom: '0.5rem' }}></i>
+                                                        <p style={{ fontSize: '0.85rem', marginBottom: 0 }}>No billing history available</p>
+                                                    </div>
+                                                ) : (
+                                                    <table className="table table-sm" style={{ fontSize: '0.8rem' }}>
+                                                        <thead style={{ backgroundColor: '#f8f9fa' }}>
+                                                            <tr>
+                                                                <th style={{ fontWeight: 600, color: '#6c757d', border: 'none', padding: '0.5rem' }}>Date</th>
+                                                                <th style={{ fontWeight: 600, color: '#6c757d', border: 'none', padding: '0.5rem' }}>Package</th>
+                                                                <th style={{ fontWeight: 600, color: '#6c757d', border: 'none', padding: '0.5rem', textAlign: 'right' }}>Amount</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {billingHistory.slice(0, 5).map((billing, index) => (
+                                                                <tr key={billing.id || index}>
+                                                                    <td style={{ padding: '0.5rem', border: 'none', borderBottom: '1px solid #e3e6e8' }}>
+                                                                        {billing.payment_date || 'N/A'}
+                                                                    </td>
+                                                                    <td style={{ padding: '0.5rem', border: 'none', borderBottom: '1px solid #e3e6e8', fontSize: '0.75rem', color: '#6c757d' }}>
+                                                                        {billing.package_name} - {billing.plan_name || 'N/A'}
+                                                                    </td>
+                                                                    <td style={{ padding: '0.5rem', border: 'none', borderBottom: '1px solid #e3e6e8', fontWeight: 600, color: '#28a745', textAlign: 'right' }}>
+                                                                        TSH {parseFloat(billing.amount || 0).toLocaleString()}
+                                                                    </td>
+                                                                </tr>
+                                                            ))}
+                                                        </tbody>
+                                                    </table>
+                                                )}
                                             </div>
                                         </div>
                                     </div>

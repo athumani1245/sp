@@ -1,15 +1,22 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from "react-router-dom";
 import { Modal, Button, Form, Alert } from "react-bootstrap";
+import PhoneInput from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
 import "../assets/styles/profile.css";
 import Layout from "../components/Layout";
+import { usePageTitle } from "../hooks/usePageTitle";
 import { 
     getUserProfile, 
     updateUserProfile,
-    changePassword
+    changePassword,
+    sendOtpForPhoneChange,
+    verifyOtpAndChangePhone,
+    resendOtpForPhoneChange
 } from "../services/profileService";
 
 function Profile() {
+    usePageTitle('Profile');
     const [userInfo, setUserInfo] = useState({
         firstName: "",
         lastName: "",
@@ -32,6 +39,19 @@ function Profile() {
     const [passwordError, setPasswordError] = useState("");
     const [passwordSuccess, setPasswordSuccess] = useState("");
     const [passwordLoading, setPasswordLoading] = useState(false);
+    
+    // Change phone number modal states
+    const [showPhoneModal, setShowPhoneModal] = useState(false);
+    const [phoneStep, setPhoneStep] = useState('input'); // 'input', 'otp', 'success'
+    const [newPhone, setNewPhone] = useState("");
+    const [phoneOtp, setPhoneOtp] = useState(["", "", "", ""]);
+    const [phoneError, setPhoneError] = useState("");
+    const [phoneSuccess, setPhoneSuccess] = useState("");
+    const [phoneLoading, setPhoneLoading] = useState(false);
+    const [otpToken, setOtpToken] = useState("");
+    const [countdown, setCountdown] = useState(60);
+    const [canResendOtp, setCanResendOtp] = useState(false);
+    const otpInputRefs = [React.useRef(null), React.useRef(null), React.useRef(null), React.useRef(null)];
     
     const navigate = useNavigate();
 
@@ -72,6 +92,19 @@ function Profile() {
         // Load user profile data (this would typically come from an API)
         loadUserProfile();
     }, [navigate, loadUserProfile]);
+
+    // OTP countdown timer
+    useEffect(() => {
+        let interval = null;
+        if (phoneStep === 'otp' && countdown > 0 && !canResendOtp) {
+            interval = setInterval(() => {
+                setCountdown(countdown => countdown - 1);
+            }, 1000);
+        } else if (countdown === 0) {
+            setCanResendOtp(true);
+        }
+        return () => clearInterval(interval);
+    }, [phoneStep, countdown, canResendOtp]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -216,6 +249,129 @@ function Profile() {
         setShowPasswordModal(true);
     };
 
+    const handleChangePhoneNumber = () => {
+        setShowPhoneModal(true);
+        setPhoneStep('input');
+        setNewPhone("");
+        setPhoneOtp(["", "", "", ""]);
+        setPhoneError("");
+        setPhoneSuccess("");
+        setCountdown(60);
+        setCanResendOtp(false);
+    };
+
+    const handleSendOtp = async () => {
+        if (!newPhone || newPhone.length < 12) {
+            setPhoneError("Please enter a valid phone number");
+            return;
+        }
+
+        setPhoneLoading(true);
+        setPhoneError("");
+
+        try {
+            const result = await sendOtpForPhoneChange(newPhone);
+            
+            if (result.success) {
+                setPhoneStep('otp');
+                setPhoneSuccess(result.message || "OTP sent to your phone number");
+                setCountdown(60);
+                setCanResendOtp(false);
+                setTimeout(() => otpInputRefs[0].current?.focus(), 100);
+            } else {
+                setPhoneError(result.error);
+            }
+        } catch (err) {
+            setPhoneError("Failed to send OTP. Please try again.");
+        } finally {
+            setPhoneLoading(false);
+        }
+    };
+
+    const handleOtpChange = (index, value) => {
+        if (!/^\d*$/.test(value)) return;
+
+        const newOtp = [...phoneOtp];
+        newOtp[index] = value;
+        setPhoneOtp(newOtp);
+        setPhoneError("");
+
+        if (value && index < 3) {
+            otpInputRefs[index + 1].current?.focus();
+        }
+    };
+
+    const handleOtpKeyDown = (index, e) => {
+        if (e.key === 'Backspace' && !phoneOtp[index] && index > 0) {
+            otpInputRefs[index - 1].current?.focus();
+        }
+    };
+
+    const handleVerifyOtpAndChangePhone = async () => {
+        const otpCode = phoneOtp.join('');
+        if (otpCode.length !== 4) {
+            setPhoneError("Please enter the complete 4-digit OTP");
+            return;
+        }
+
+        setPhoneLoading(true);
+        setPhoneError("");
+
+        try {
+            const result = await verifyOtpAndChangePhone(newPhone, otpCode);
+            
+            if (result.success) {
+                setPhoneSuccess(result.message || "Phone number updated successfully!");
+                setPhoneStep('success');
+                await loadUserProfile();
+                setTimeout(() => {
+                    setShowPhoneModal(false);
+                    setPhoneSuccess("");
+                }, 2000);
+            } else {
+                setPhoneError(result.error);
+            }
+        } catch (err) {
+            setPhoneError("Failed to verify OTP. Please try again.");
+        } finally {
+            setPhoneLoading(false);
+        }
+    };
+
+    const handleResendOtp = async () => {
+        setPhoneOtp(["", "", "", ""]);
+        setCanResendOtp(false);
+        setCountdown(60);
+        setPhoneError("");
+        setPhoneLoading(true);
+
+        try {
+            const result = await resendOtpForPhoneChange(newPhone);
+            
+            if (result.success) {
+                setPhoneSuccess(result.message || "OTP resent to your phone number");
+                setTimeout(() => setPhoneSuccess(""), 3000);
+            } else {
+                setPhoneError(result.error);
+            }
+        } catch (err) {
+            setPhoneError("Failed to resend OTP. Please try again.");
+        } finally {
+            setPhoneLoading(false);
+        }
+    };
+
+    const handleClosePhoneModal = () => {
+        setShowPhoneModal(false);
+        setPhoneStep('input');
+        setNewPhone("");
+        setPhoneOtp(["", "", "", ""]);
+        setPhoneError("");
+        setPhoneSuccess("");
+        setCountdown(60);
+        setCanResendOtp(false);
+    };
+
     return (
         <Layout>
             <div className="main-content">
@@ -298,7 +454,7 @@ function Profile() {
                                                 </div>
 
                                                 <div className="row">
-                                                    <div className="col-md-6">
+                                                    <div className="col-md-12">
                                                         <div className="mb-3">
                                                             <label htmlFor="email" className="form-label">Email Address</label>
                                                             <input
@@ -307,20 +463,6 @@ function Profile() {
                                                                 id="email"
                                                                 name="email"
                                                                 value={userInfo.email}
-                                                                onChange={handleInputChange}
-                                                                disabled={!isEditing}
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-md-6">
-                                                        <div className="mb-3">
-                                                            <label htmlFor="phone" className="form-label">Phone Number</label>
-                                                            <input
-                                                                type="text"
-                                                                className="form-control form-control-underline"
-                                                                id="phone"
-                                                                name="phone"
-                                                                value={userInfo.phone}
                                                                 onChange={handleInputChange}
                                                                 disabled={!isEditing}
                                                             />
@@ -366,11 +508,11 @@ function Profile() {
                                                 <div className="col-12 col-sm-6 col-md-6">
                                                     <button 
                                                         className="odoo-btn odoo-btn-outline-info w-100 mb-3 btn-mobile-full"
-                                                        // onClick={handleDownloadData}
+                                                        onClick={handleChangePhoneNumber}
                                                         disabled={loading}
                                                     >
-                                                        <i className="fas fa-download me-2"></i>
-                                                        {loading ? "Downloading..." : "Download My Data"}
+                                                        <i className="fas fa-phone me-2"></i>
+                                                        Change Phone Number
                                                     </button>
                                                 </div>
                                             </div>
@@ -496,6 +638,186 @@ function Profile() {
                         </Button>
                     </Modal.Footer>
                 </Form>
+            </Modal>
+
+            {/* Change Phone Number Modal */}
+            <Modal 
+                show={showPhoneModal} 
+                onHide={handleClosePhoneModal}
+                backdrop="static"
+                keyboard={false}
+                centered
+                className="change-phone-modal"
+            >
+                <Modal.Header closeButton className="border-0">
+                    <Modal.Title className="text-center w-100 h5 fw-bold text-dark">
+                        <i className="fas fa-phone me-2 text-danger"></i>
+                        Change Phone Number
+                    </Modal.Title>
+                </Modal.Header>
+                
+                <Modal.Body>
+                    {phoneError && (
+                        <Alert variant="danger" className="alert alert-danger">
+                            <i className="bi bi-exclamation-triangle me-2" />
+                            {phoneError}
+                        </Alert>
+                    )}
+                    
+                    {phoneSuccess && (
+                        <Alert variant="success" className="alert alert-success">
+                            <i className="bi bi-check-circle me-2" />
+                            {phoneSuccess}
+                        </Alert>
+                    )}
+
+                    {phoneStep === 'input' && (
+                        <div className="mb-3">
+                            <Form.Group>
+                                <Form.Label className="form-label">New Phone Number *</Form.Label>
+                                <div className="phone-input-wrapper">
+                                    <PhoneInput
+                                        international
+                                        defaultCountry="TZ"
+                                        value={newPhone}
+                                        onChange={(value) => {
+                                            setNewPhone(value || "");
+                                            setPhoneError("");
+                                        }}
+                                        placeholder="Enter your new phone number"
+                                        disabled={phoneLoading}
+                                        countryCallingCodeEditable={false}
+                                        limitMaxLength={true}
+                                    />
+                                </div>
+                                <Form.Text className="text-muted small d-block mt-2">
+                                    Enter the phone number you want to use for your account.
+                                </Form.Text>
+                            </Form.Group>
+                        </div>
+                    )}
+
+                    {phoneStep === 'otp' && (
+                        <>
+                            <div className="text-center mb-4">
+                                <p className="text-muted mb-3" style={{ fontSize: '0.95rem' }}>
+                                    We've sent a 4-digit verification code to<br />
+                                    <strong style={{ color: '#CC5B4B' }}>{newPhone}</strong>
+                                </p>
+                            </div>
+                            
+                            <div className="d-flex justify-content-center gap-2 mb-4">
+                                {phoneOtp.map((digit, index) => (
+                                    <input
+                                        key={index}
+                                        ref={otpInputRefs[index]}
+                                        type="text"
+                                        maxLength="1"
+                                        value={digit}
+                                        onChange={(e) => handleOtpChange(index, e.target.value)}
+                                        onKeyDown={(e) => handleOtpKeyDown(index, e)}
+                                        disabled={phoneLoading}
+                                        className="otp-input"
+                                        style={{
+                                            width: '55px',
+                                            height: '55px',
+                                            fontSize: '1.5rem',
+                                            fontWeight: '600',
+                                            textAlign: 'center',
+                                            border: '2px solid #e3e6e8',
+                                            borderRadius: '8px',
+                                            transition: 'all 0.2s ease'
+                                        }}
+                                    />
+                                ))}
+                            </div>
+
+                            <div className="text-center">
+                                {!canResendOtp ? (
+                                    <p className="text-muted small mb-0">
+                                        <i className="bi bi-clock me-1"></i>
+                                        Resend OTP in <strong>{countdown}</strong> seconds
+                                    </p>
+                                ) : (
+                                    <button
+                                        type="button"
+                                        className="odoo-btn odoo-btn-sm odoo-btn-outline-primary"
+                                        onClick={handleResendOtp}
+                                        disabled={phoneLoading}
+                                        style={{ padding: '0.5rem 1.5rem' }}
+                                    >
+                                        <i className="bi bi-arrow-clockwise me-2"></i>
+                                        Resend OTP
+                                    </button>
+                                )}
+                            </div>
+                        </>
+                    )}
+
+                    {phoneStep === 'success' && (
+                        <div className="text-center py-4">
+                            <i className="bi bi-check-circle-fill text-success" style={{ fontSize: '4rem' }}></i>
+                            <h5 className="mt-3">Phone Number Updated!</h5>
+                            <p className="text-muted">Your phone number has been successfully updated.</p>
+                        </div>
+                    )}
+                </Modal.Body>
+                
+                <Modal.Footer className="border-0 pt-0">
+                    {phoneStep !== 'success' && (
+                        <>
+                            <Button 
+                                variant="secondary" 
+                                onClick={handleClosePhoneModal}
+                                disabled={phoneLoading}
+                                className="odoo-btn odoo-btn-secondary"
+                            >
+                                <i className="bi bi-x-circle me-2"></i>
+                                Cancel
+                            </Button>
+                            {phoneStep === 'input' && (
+                                <Button 
+                                    variant="primary" 
+                                    onClick={handleSendOtp}
+                                    disabled={phoneLoading}
+                                    className="odoo-btn odoo-btn-danger"
+                                >
+                                    {phoneLoading ? (
+                                        <>
+                                            <span className="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+                                            Sending OTP...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <i className="bi bi-send me-2"></i>
+                                            Send OTP
+                                        </>
+                                    )}
+                                </Button>
+                            )}
+                            {phoneStep === 'otp' && (
+                                <Button 
+                                    variant="primary" 
+                                    onClick={handleVerifyOtpAndChangePhone}
+                                    disabled={phoneLoading}
+                                    className="odoo-btn odoo-btn-danger"
+                                >
+                                    {phoneLoading ? (
+                                        <>
+                                            <span className="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+                                            Verifying...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <i className="bi bi-check-circle me-2"></i>
+                                            Verify & Update
+                                        </>
+                                    )}
+                                </Button>
+                            )}
+                        </>
+                    )}
+                </Modal.Footer>
             </Modal>
         </Layout>
     );

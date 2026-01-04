@@ -6,8 +6,10 @@ import "../assets/styles/register.css";
 import { useNavigate } from "react-router-dom";
 import { registerUser, sendRegistrationOtp, verifyRegistrationOtp } from "../services/registrationService";
 import { Modal } from 'react-bootstrap';
+import { usePageTitle } from "../hooks/usePageTitle";
 
 function Register() {
+    usePageTitle('Register');
     // Registration stages: 'phone' -> 'otp' -> 'form' -> 'success'
     const [stage, setStage] = useState('phone');
     const [isOtpVerified, setIsOtpVerified] = useState(false);
@@ -174,7 +176,6 @@ function Register() {
                 setOtpError(result.error || "Failed to resend OTP. Please try again.");
             }
         } catch (error) {
-            console.error('Error resending OTP:', error);
             setOtpError("Failed to resend OTP. Please try again.");
         } finally {
             setResendLoading(false);
@@ -238,7 +239,6 @@ function Register() {
                 setError(otpResult.error || "Failed to send verification code. Please try again.");
             }
         } catch (error) {
-            console.error('Error sending OTP:', error);
             setError("Failed to send verification code. Please try again.");
         } finally {
             setLoading(false);
@@ -281,7 +281,6 @@ function Register() {
                 setError(registerResult.error || "Registration failed. Please try again.");
             }
         } catch (error) {
-            console.error('Error registering:', error);
             setError("Registration failed. Please try again.");
         } finally {
             setLoading(false);
@@ -319,7 +318,6 @@ function Register() {
                 }
             }
         } catch (error) {
-            console.error('Error verifying OTP:', error);
             setOtpError("Verification failed. Please try again.");
         } finally {
             setLoading(false);

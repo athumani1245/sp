@@ -1,9 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { verifyOtp, sendOtp } from "../services/resetService";
+import { usePageTitle } from "../hooks/usePageTitle";
 import "../assets/styles/verify-otp.css";
 
 function OtpVerify() {
+    usePageTitle('Verify OTP');
     // Get phone number (or username) from previous page via location.state
     const location = useLocation();
     const { username } = location.state || {};
@@ -65,7 +67,6 @@ function OtpVerify() {
                 });
             }
         } catch (error) {
-            console.error('OTP verification error:', error);
         }
 
         setOtpLoading(false);
@@ -80,7 +81,6 @@ function OtpVerify() {
         try {
             await sendOtp(username, navigate, setOtpError, setResendLoading);
         } catch (error) {
-            console.error('Resend OTP error:', error);
         }
 
         setResendLoading(false);

@@ -210,7 +210,6 @@ export const exportLeasesToExcel = async (exportData, filters) => {
     };
     
   } catch (error) {
-    console.error('Excel export error:', error);
     return {
       success: false,
       error: 'Failed to export Excel file'
@@ -271,7 +270,6 @@ export const exportLeasesToPDF = async (exportData, filters) => {
     }
     
   } catch (error) {
-    console.error('PDF preview error:', error);
     return {
       success: false,
       error: 'Failed to open PDF file in browser'

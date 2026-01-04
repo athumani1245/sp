@@ -6,10 +6,12 @@ import TableSkeleton from '../components/skeletons/TableSkeleton';
 import CardSkeleton from '../components/skeletons/CardSkeleton';
 import { getAllPropertyManagers, deletePropertyManager } from '../services/propertyService';
 import { useSubscription } from '../hooks/useSubscription';
+import { usePageTitle } from '../hooks/usePageTitle';
 import '../assets/styles/tenants.css';
 import '../assets/styles/leases.css';
 
 const PropertyManagers = () => {
+    usePageTitle('Property Managers');
     const { hasActiveSubscription } = useSubscription();
     const [managers, setManagers] = useState([]);
     const [filteredManagers, setFilteredManagers] = useState([]);

@@ -27,7 +27,6 @@ const handleApiError = (err, defaultMessage) => {
         error_msg = err.message;
     }
     
-    console.error("API Error:", err);
     return {
         success: false,
         error: error_msg,
@@ -51,11 +50,8 @@ export const getTenants = async (params = {}) => {
         if (params.status) queryParams.append('status', params.status);
         
         const url = `${API_BASE}/tenants/?${queryParams.toString()}`;
-        console.log('Fetching tenants from:', url);
         
         const response = await axios.get(url, { headers: getAuthHeaders() });
-        
-        console.log('Tenants API response:', response.data);
         
         return {
             success: true,

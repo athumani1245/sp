@@ -320,7 +320,6 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                 setError(errorMessage);
             }
         } catch (error) {
-            console.error(errorMessage, error);
             setError(errorMessage);
         } finally {
             setLoading(false);
@@ -386,7 +385,6 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
                 setAvailableUnits([]);
             }
         } catch (error) {
-            console.error('Failed to load units:', error);
             setError('Failed to load available units');
             setAvailableUnits([]);
         } finally {
@@ -661,7 +659,6 @@ const AddLeaseModal = ({ isOpen, onClose, onLeaseAdded }) => {
             }
 
         } catch (error) {
-            console.error('Failed to create lease:', error);
             // Ensure error message is a string
             const errorMessage = error.message || 'Failed to create lease. Please try again.';
             setError(errorMessage);

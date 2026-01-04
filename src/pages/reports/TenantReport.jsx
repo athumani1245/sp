@@ -3,8 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import DataTable from 'react-data-table-component';
 import Layout from '../../components/Layout';
 import Toast from '../../components/Toast';
+import { usePageTitle } from '../../hooks/usePageTitle';
 
 const TenantReport = () => {
+  usePageTitle('Tenant Outstanding Balance Report');
   const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -459,11 +461,7 @@ const TenantReport = () => {
     try {
       const { fetchPendingPayments } = await import('../../services/reportService');
       
-      console.log('TenantReport: Calling fetchPendingPayments with filters:', filters);
-      
       const result = await fetchPendingPayments(filters);
-      
-      console.log('TenantReport: Full API response:', result);
       
       if (!result.success) {
         throw new Error(result.error || 'Failed to fetch pending payments data');
@@ -475,7 +473,6 @@ const TenantReport = () => {
         total: result.total || 0
       };
     } catch (error) {
-      console.error('Error fetching pending payments data:', error);
       return {
         success: false,
         error: error.response?.data?.detail || error.message || 'Failed to fetch pending payments data',
@@ -488,30 +485,21 @@ const TenantReport = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      console.log('TenantReport: Starting pending payments data load with date filter:', dateFilter);
-      
       const filters = {};
       if (dateFilter.startDate) filters.start_date = dateFilter.startDate;
       if (dateFilter.endDate) filters.end_date = dateFilter.endDate;
       // Note: No limit for pending payments to get all outstanding data
       
-      console.log('TenantReport: Filters being sent:', filters);
-      
       const result = await fetchPendingPaymentsData(filters);
       
-      console.log('TenantReport: Load result:', result);
-      
       if (result.success) {
-        console.log('TenantReport: Setting pending payments data:', result.data);
         setData(result.data);
         showToastMessage('Success', `Loaded ${result.data.length} outstanding payment records`, 'success');
       } else {
-        console.error('TenantReport Load Error:', result.error);
         showToastMessage('Error', result.error, 'danger');
         setData([]);
       }
     } catch (error) {
-      console.error('TenantReport: Load error:', error);
       showToastMessage('Error', 'Failed to load outstanding payments data', 'danger');
       setData([]);
     } finally {
@@ -528,10 +516,6 @@ const TenantReport = () => {
         showToastMessage('Warning', 'No data available to export', 'warning');
         return;
       }
-
-      console.log('TenantReport: Starting export for format:', format);
-      console.log('TenantReport: Export data sample:', exportData?.[0]);
-      console.log('TenantReport: Export data length:', exportData?.length);
 
       // Import the report service
       const { exportReportData, REPORT_TYPES, EXPORT_FORMATS } = await import('../../services/reportService');
@@ -552,8 +536,6 @@ const TenantReport = () => {
         }
       };
 
-      console.log('TenantReport: Export options:', exportOptions);
-
       // Call the export function for pending payments data
       const result = await exportReportData(
         REPORT_TYPES.PENDING_PAYMENTS,
@@ -562,15 +544,12 @@ const TenantReport = () => {
         exportOptions
       );
 
-      console.log('TenantReport: Export result:', result);
-
       if (result.success) {
         showToastMessage('Success', result.message, 'success');
       } else {
         showToastMessage('Error', result.error || 'Export failed', 'danger');
       }
     } catch (error) {
-      console.error('Export error:', error);
       showToastMessage('Error', 'Failed to export data', 'danger');
     }
   };

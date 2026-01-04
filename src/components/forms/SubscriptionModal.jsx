@@ -48,12 +48,10 @@ const SubscriptionModal = ({ show, onHide, onSubscriptionSuccess }) => {
             const plansResult = await getSubscriptionPlans();
             if (plansResult.success) {
                 setSubscriptionPlans(plansResult.data);
-                console.log('Subscription packages loaded:', plansResult.data);
             } else {
                 setSubscriptionError('Failed to load subscription packages');
             }
         } catch (error) {
-            console.error('Error fetching subscription packages:', error);
             setSubscriptionError('An error occurred while loading packages');
         }
     };
@@ -170,8 +168,6 @@ const SubscriptionModal = ({ show, onHide, onSubscriptionSuccess }) => {
                 auto_renew: true
             });
 
-            console.log('API Response:', result);
-
             if (result.success) {
                 setApiResponseDescription(result.description || result.message || '');
                 setCurrentTransactionId(result.transactionId);
@@ -183,8 +179,6 @@ const SubscriptionModal = ({ show, onHide, onSubscriptionSuccess }) => {
                         const listener = startPaymentStatusListener(
                             result.transactionId,
                             (statusUpdate) => {
-                                console.log('Payment status update:', statusUpdate);
-                                
                                 const paymentStatus = statusUpdate.paymentStatus?.toUpperCase();
                                 
                                 // Handle PAYMENT_ACCEPTED or PAYMENT_SUCCESS
@@ -213,13 +207,11 @@ const SubscriptionModal = ({ show, onHide, onSubscriptionSuccess }) => {
                                 pollInterval: 3000,
                                 maxAttempts: 20,
                                 onTimeout: (timeoutInfo) => {
-                                    console.log('Payment status check timed out:', timeoutInfo);
                                     setPaymentStatus('failed');
                                     setSubscriptionError('Payment verification timed out after 60 seconds. The transaction may still be processing. Please check your mobile money account or contact support for assistance.');
                                     setSubscribing(false);
                                 },
                                 onError: (errorInfo) => {
-                                    console.error('Payment status check error:', errorInfo);
                                 }
                             }
                         );
@@ -240,7 +232,6 @@ const SubscriptionModal = ({ show, onHide, onSubscriptionSuccess }) => {
                 setSubscribing(false);
             }
         } catch (error) {
-            console.error('Error creating subscription:', error);
             setPaymentStatus('failed');
             setSubscriptionError('Failed to process subscription');
             setSubscribing(false);

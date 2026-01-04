@@ -21,7 +21,6 @@ export const sendOtp = async (username, navigate, setError, setLoading) => {
                 }
             }
         )
-        console.log(response);
         navigate("/otp-verify", { state: { username } });
     }
     catch (err) {
@@ -56,7 +55,6 @@ export const verifyOtp = async (username, otp, setOtpError) => {
         return response.data;
     }
     catch (err) {
-        console.log(err);
         if (err.response?.data?.description) {
             setOtpError(err.response.data.description);
         }
@@ -92,7 +90,6 @@ export const resetPassword = async (newPassword, token) => {
             message: response.data.message || 'Password reset successfully'
         };
     } catch (err) {
-        console.error('Error resetting password:', err);
         return {
             success: false,
             error: err.response?.data?.error || err.response?.data?.description || 'Failed to reset password'

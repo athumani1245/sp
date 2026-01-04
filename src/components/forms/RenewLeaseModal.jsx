@@ -164,7 +164,6 @@ const RenewLeaseModal = ({ show, onHide, lease, onRenewalSuccess }) => {
                 setApiError(result.error || 'Failed to renew lease');
             }
         } catch (error) {
-            console.error('Error renewing lease:', error);
             setApiError('An error occurred while renewing the lease');
         } finally {
             setIsSubmitting(false);

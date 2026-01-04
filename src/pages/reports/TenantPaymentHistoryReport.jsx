@@ -3,8 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import DataTable from 'react-data-table-component';
 import Layout from '../../components/Layout';
 import Toast from '../../components/Toast';
+import { usePageTitle } from '../../hooks/usePageTitle';
 
 const TenantPaymentHistoryReport = () => {
+  usePageTitle('Tenant Payment History Report');
   const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -70,11 +72,7 @@ const TenantPaymentHistoryReport = () => {
     try {
       const { fetchTenantPaymentHistory } = await import('../../services/reportService');
       
-      console.log('TenantPaymentHistoryReport: Calling reportService with filters:', filters);
-      
       const result = await fetchTenantPaymentHistory(filters);
-      
-      console.log('TenantPaymentHistoryReport: Full API response:', result);
       
       if (!result.success) {
         throw new Error(result.error || 'Failed to fetch tenant payment history');
@@ -85,7 +83,6 @@ const TenantPaymentHistoryReport = () => {
         data: result.data || []
       };
     } catch (error) {
-      console.error('TenantPaymentHistoryReport: Error in fetchTenantPaymentHistoryData:', error);
       return {
         success: false,
         error: error.response?.data?.detail || error.message || 'Failed to fetch tenant payment history',
@@ -106,10 +103,6 @@ const TenantPaymentHistoryReport = () => {
       const result = await fetchTenantPaymentHistoryData(filters);
 
       if (result.success) {
-        console.log('TenantPaymentHistoryReport: Received data:', result.data);
-        console.log('TenantPaymentHistoryReport: Data length:', result.data?.length);
-        console.log('TenantPaymentHistoryReport: First item sample:', result.data?.[0]);
-        
         setData(result.data || []);
         
         // Generate summary stats
@@ -117,18 +110,10 @@ const TenantPaymentHistoryReport = () => {
         const totalAmount = result.data?.reduce((sum, payment) => sum + (payment.amount || 0), 0) || 0;
         const rentPayments = result.data?.filter(payment => payment.category === 'RENT').length || 0;
         const otherPayments = totalPayments - rentPayments;
-        
-        console.log('Payment History Stats:', {
-          totalPayments,
-          totalAmount,
-          rentPayments,
-          otherPayments
-        });
       } else {
         showToastMessage('Error', result.error || 'Failed to load tenant payment history', 'danger');
       }
     } catch (error) {
-      console.error('Error loading tenant payment history:', error);
       showToastMessage('Error', 'Failed to load tenant payment history', 'danger');
     } finally {
       setLoading(false);
@@ -138,8 +123,6 @@ const TenantPaymentHistoryReport = () => {
   // Handle export functionality
   const handleExport = async (format) => {
     try {
-      console.log('TenantPaymentHistoryReport: Starting export with format:', format);
-      
       const { exportTenantPaymentHistory } = await import('../../services/reportService');
       
       const filters = {
@@ -147,22 +130,14 @@ const TenantPaymentHistoryReport = () => {
         end_date: dateFilter.endDate
       };
 
-      console.log('TenantPaymentHistoryReport: Export filters:', filters);
-      console.log('TenantPaymentHistoryReport: Current data length:', data.length);
-
       const result = await exportTenantPaymentHistory(filters, format);
-      
-      console.log('TenantPaymentHistoryReport: Export result:', result);
       
       if (result.success) {
         showToastMessage('Success', `Tenant Payment History exported successfully as ${format.toUpperCase()}`, 'success');
       } else {
-        console.error('TenantPaymentHistoryReport: Export failed with error:', result.error);
         showToastMessage('Error', result.error || `Failed to export as ${format}`, 'danger');
       }
     } catch (error) {
-      console.error('TenantPaymentHistoryReport: Export error:', error);
-      console.error('TenantPaymentHistoryReport: Error stack:', error.stack);
       showToastMessage('Error', `Failed to export as ${format}: ${error.message}`, 'danger');
     }
   };

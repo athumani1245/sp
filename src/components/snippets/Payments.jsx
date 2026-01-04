@@ -261,7 +261,6 @@ const Payments = ({ payments = [], onPaymentAdded, leaseId, refreshData }) => {
                                     refreshData();
                                 }
                             } catch (error) {
-                                console.error("Error cancelling payment:", error);
                                 // You might want to show an error message here
                                 alert("Failed to cancel payment. Please try again.");
                             } finally {

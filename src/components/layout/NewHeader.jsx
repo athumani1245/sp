@@ -43,7 +43,6 @@ function Header({ toggleSidenav }) {
                 setLicenseData(result.data);
             }
         } catch (error) {
-            console.error('Error fetching license status:', error);
         } finally {
             setLoading(false);
         }
@@ -63,7 +62,6 @@ function Header({ toggleSidenav }) {
                 setSubscriptionError('Failed to load subscription plans');
             }
         } catch (error) {
-            console.error('Error fetching subscription plans:', error);
             setSubscriptionError('An error occurred while loading plans');
         }
     };
@@ -106,7 +104,6 @@ function Header({ toggleSidenav }) {
                 setSubscriptionError(result.error || 'Failed to create subscription');
             }
         } catch (error) {
-            console.error('Error creating subscription:', error);
             setSubscriptionError('Failed to process subscription');
         } finally {
             setSubscribing(false);

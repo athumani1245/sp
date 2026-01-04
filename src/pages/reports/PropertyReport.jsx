@@ -3,8 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import DataTable from 'react-data-table-component';
 import Layout from '../../components/Layout';
 import Toast from '../../components/Toast';
+import { usePageTitle } from '../../hooks/usePageTitle';
 
 const PropertyReport = () => {
+  usePageTitle('Property Performance Report');
   const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -367,11 +369,7 @@ const PropertyReport = () => {
     try {
       const { fetchPropertyPerformance } = await import('../../services/reportService');
       
-      console.log('PropertyReport: Calling fetchPropertyPerformance with filters:', filters);
-      
       const result = await fetchPropertyPerformance(filters);
-      
-      console.log('PropertyReport: Full API response:', result);
       
       if (!result.success) {
         throw new Error(result.error || 'Failed to fetch property performance data');
@@ -379,15 +377,12 @@ const PropertyReport = () => {
 
       const dataItems = result.data || [];
 
-      console.log('PropertyReport: Processing', dataItems.length, 'property performance items');
-
       return {
         success: true,
         data: dataItems,
         total: dataItems.length
       };
     } catch (error) {
-      console.error('Error fetching property performance data:', error);
       return {
         success: false,
         error: error.response?.data?.detail || error.message || 'Failed to fetch property performance data',
@@ -400,30 +395,21 @@ const PropertyReport = () => {
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      console.log('PropertyReport: Starting property performance data load with date filter:', dateFilter);
-      
       const filters = {};
       if (dateFilter.startDate) filters.start_date = dateFilter.startDate;
       if (dateFilter.endDate) filters.end_date = dateFilter.endDate;
       filters.limit = 1000; // Set reasonable limit
       
-      console.log('PropertyReport: Filters being sent:', filters);
-      
       const result = await fetchPropertyPerformanceData(filters);
       
-      console.log('PropertyReport: Load result:', result);
-      
       if (result.success) {
-        console.log('PropertyReport: Setting property performance data:', result.data);
         setData(result.data);
         showToastMessage('Success', `Loaded ${result.data.length} property performance records`, 'success');
       } else {
-        console.error('PropertyReport Load Error:', result.error);
         showToastMessage('Error', result.error, 'danger');
         setData([]);
       }
     } catch (error) {
-      console.error('PropertyReport: Load error:', error);
       showToastMessage('Error', 'Failed to load property performance data', 'danger');
       setData([]);
     } finally {
@@ -440,10 +426,6 @@ const PropertyReport = () => {
         showToastMessage('Warning', 'No data available to export', 'warning');
         return;
       }
-
-      console.log('PropertyReport: Starting export for format:', format);
-      console.log('PropertyReport: Export data sample:', exportData?.[0]);
-      console.log('PropertyReport: Export data length:', exportData?.length);
 
       // Import the report service
       const { exportReportData, REPORT_TYPES, EXPORT_FORMATS } = await import('../../services/reportService');
@@ -464,8 +446,6 @@ const PropertyReport = () => {
         }
       };
 
-      console.log('PropertyReport: Export options:', exportOptions);
-
       // Call the export function for property performance
       const result = await exportReportData(
         REPORT_TYPES.PROPERTY_PERFORMANCE,
@@ -474,15 +454,12 @@ const PropertyReport = () => {
         exportOptions
       );
 
-      console.log('PropertyReport: Export result:', result);
-
       if (result.success) {
         showToastMessage('Success', result.message, 'success');
       } else {
         showToastMessage('Error', result.error || 'Export failed', 'danger');
       }
     } catch (error) {
-      console.error('Export error:', error);
       showToastMessage('Error', 'Failed to export data', 'danger');
     }
   };

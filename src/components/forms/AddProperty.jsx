@@ -241,7 +241,6 @@ const AddPropertyModal = ({isOpen, onClose, onPropertyAdded})=>{
                 setRegions([]);
             }
         } catch (error) {
-            console.error('Error loading regions:', error);
             setError('Failed to load regions');
             setRegions([]);
         } finally {
@@ -256,7 +255,6 @@ const AddPropertyModal = ({isOpen, onClose, onPropertyAdded})=>{
                 setPropertyManagers(result.data || []);
             }
         } catch (error) {
-            console.error('Error loading property managers:', error);
         }
     };
 
@@ -290,7 +288,6 @@ const AddPropertyModal = ({isOpen, onClose, onPropertyAdded})=>{
                     setDistricts([]);
                 }
             } catch (error) {
-                console.error('Error loading districts:', error);
                 setError('Failed to load districts');
                 setDistricts([]);
             } finally {
@@ -318,7 +315,6 @@ const AddPropertyModal = ({isOpen, onClose, onPropertyAdded})=>{
         if (districtId) {
             try {
                 setLocationLoading(true);
-                console.log('Fetching wards for district:', districtId);
                 const response = await getWards(districtId);
                 if (response.success) {
                     setWards(response.data || []);
@@ -327,7 +323,6 @@ const AddPropertyModal = ({isOpen, onClose, onPropertyAdded})=>{
                     setWards([]);
                 }
             } catch (error) {
-                console.error('Error loading wards:', error);
                 setError('Failed to load wards');
                 setWards([]);
             } finally {
@@ -394,7 +389,6 @@ const AddPropertyModal = ({isOpen, onClose, onPropertyAdded})=>{
                 setError(result.error);
             }
         } catch (err) {
-            console.error('Error adding property:', err);
             setError('Failed to add property. Please try again.');
         } finally {
             setLoading(false);

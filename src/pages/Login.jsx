@@ -6,7 +6,9 @@ import "../assets/styles/login.css";
 import { login as loginService } from "../services/authService";
 import { useAuth } from "../context/AuthContext";
 import SEOHead from "../components/SEOHead";
+import { usePageTitle } from "../hooks/usePageTitle";
 function Login() {
+    usePageTitle('Login');
     const [phoneNumber, setPhoneNumber] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");

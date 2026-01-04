@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import DataTable from 'react-data-table-component';
 import Layout from '../../components/Layout';
 import Toast from '../../components/Toast';
+import { usePageTitle } from '../../hooks/usePageTitle';
 import { 
   getLeaseReportData
 } from '../../services/leaseService';
@@ -18,6 +19,7 @@ import {
 } from '../../services/leaseReportExportService';
 
 const LeaseAgreementsReport = () => {
+  usePageTitle('Lease Agreements Report');
   const navigate = useNavigate();
   const mounted = useRef(true);
   const [data, setData] = useState([]);
@@ -375,7 +377,6 @@ const LeaseAgreementsReport = () => {
   // Enhanced filter data based on search text and date filters
   // Debug logging
   if (!Array.isArray(data)) {
-    console.warn('Data is not an array:', data);
   }
   
   const filteredItems = (Array.isArray(data) ? data : []).filter(
@@ -458,7 +459,6 @@ const LeaseAgreementsReport = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      console.log('Starting to load lease data...');
       const filters = {};
 
       // Add status filter if selected
@@ -477,20 +477,12 @@ const LeaseAgreementsReport = () => {
         filters.end_date = dateFilter.endDate;
       }
       
-      console.log('Calling getLeaseReportData with filters:', filters);
       const result = await getLeaseReportData(filters);
-      console.log('getLeaseReportData result:', result);
 
       if (result && result.success) {
         // The backend returns data in format: { status: true, statusCode: 200, description: "success", data: [...] }
         // The leaseService already extracts the data array, so result.data should be the array
         const leaseData = result.data || [];
-        
-        console.log('Lease agreements data received:', {
-          totalRecords: leaseData.length,
-          sampleData: leaseData[0] || 'No data',
-          structure: typeof leaseData
-        });
         
         if (mounted.current) {
           setData(leaseData);
@@ -498,8 +490,6 @@ const LeaseAgreementsReport = () => {
         
         // Generate report summary using the lease data
         const summary = generateReportSummary(REPORT_TYPES.LEASE_AGREEMENTS, leaseData);
-        console.log('Lease Agreements Report Summary:', summary);
-        console.log('Loaded lease data with filters:', { filters, dataCount: leaseData.length });
         
         // Show success message with filter info
         const filterInfo = [];
@@ -512,7 +502,6 @@ const LeaseAgreementsReport = () => {
           showToastMessage('Success', `Loaded ${leaseData.length} lease agreements with filters: ${filterInfo.join(', ')}`, 'info');
         }
       } else {
-        console.error('API Error or no result:', result);
         if (mounted.current) {
           setData([]); // Ensure data is always an array
         }
@@ -520,7 +509,6 @@ const LeaseAgreementsReport = () => {
         showToastMessage('Error', errorMessage, 'danger');
       }
     } catch (error) {
-      console.error('Error loading lease agreements data:', error);
       if (mounted.current) {
         setData([]); // Ensure data is always an array on error
       }
@@ -658,7 +646,6 @@ const LeaseAgreementsReport = () => {
         showToastMessage('Error', result.error || `Failed to export ${format.toUpperCase()} file`, 'danger');
       }
     } catch (error) {
-      console.error('Export error:', error);
       showToastMessage('Error', `Failed to export ${format} file`, 'danger');
     }
   };

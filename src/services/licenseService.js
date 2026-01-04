@@ -58,7 +58,6 @@ export const getLicenseStatus = async () => {
             `${API_BASE}/subscriptions/active/`,
             { headers: getAuthHeaders() }
         );
-        console.log("License Status Response:", response.data);
 
         return {
             success: true,
@@ -103,13 +102,11 @@ export const getSubscriptionPlans = async () => {
             })) : []
         }));
 
-        console.log("Processed Subscription Packages:", packages);
         return {
             success: true,
             data: packages
         };
     } catch (err) {
-        console.error("Error fetching subscription plans:", err);
         return handleApiError(err, "Failed to fetch subscription plans.");
     }
 };
@@ -325,6 +322,23 @@ export const getBillingInfo = async () => {
     }
 };
 
+// Get billing history (last 5 records)
+export const getBillingHistory = async () => {
+    try {
+        const response = await axios.get(
+            `${API_BASE}/payments-history/`,
+            { headers: getAuthHeaders() }
+        );
+
+        return {
+            success: true,
+            data: response.data.data || []
+        };
+    } catch (err) {
+        return handleApiError(err, "Failed to fetch billing history.");
+    }
+};
+
 // Update billing information
 export const updateBillingInfo = async (billingData) => {
     try {
@@ -432,7 +446,6 @@ export const startPaymentStatusListener = (transactionId, callback, options = {}
                 }
             }
         } catch (error) {
-            console.error('Error polling payment status:', error);
             if (onError) {
                 onError({
                     success: false,
@@ -471,7 +484,6 @@ export const stopPaymentStatusListener = (transactionId) => {
     if (listener) {
         listener.stop();
         activePaymentListeners.delete(transactionId);
-        console.log(`Stopped payment listener for transaction: ${transactionId}`);
     }
 };
 
@@ -479,7 +491,6 @@ export const stopPaymentStatusListener = (transactionId) => {
 export const stopAllPaymentListeners = () => {
     activePaymentListeners.forEach((listener, transactionId) => {
         listener.stop();
-        console.log(`Stopped payment listener for transaction: ${transactionId}`);
     });
     activePaymentListeners.clear();
 };

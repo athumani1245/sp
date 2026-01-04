@@ -6,14 +6,14 @@ import DetailsSkeleton from "../../components/skeletons/DetailsSkeleton";
 import TableSkeleton from "../../components/skeletons/TableSkeleton";
 import { getPropertyById, getPropertyUnits, updateProperty, getRegions, getDistricts, getWards, addPropertyUnit, deletePropertyUnit, updatePropertyUnit, getAllPropertyManagers } from "../../services/propertyService";
 import { useSubscription } from '../../hooks/useSubscription';
+import { usePageTitle } from "../../hooks/usePageTitle";
 import "../../assets/styles/leases.css";
 
 function Property() {
+    usePageTitle('Property Details');
     const { propertyId } = useParams();
     const navigate = useNavigate();
     const { hasActiveSubscription } = useSubscription();
-    
-    console.log('Property component rendering with propertyId:', propertyId);
     
     const [property, setProperty] = useState(null);
     const [units, setUnits] = useState([]);
@@ -131,7 +131,6 @@ function Property() {
                         }
                     }
                 } catch (locationError) {
-                    console.error('Error loading location data:', locationError);
                 }
                 
                 // Set the selected property manager (first manager from array)
@@ -169,7 +168,6 @@ function Property() {
                 setShowErrorModal(true);
             }
         } catch (error) {
-            console.error("Error deleting unit:", error);
             setError("Failed to delete unit");
             setShowDeleteModal(false);
             setUnitToDelete(null);
@@ -190,7 +188,6 @@ function Property() {
 
     // Fetch property units
     const fetchUnits = useCallback(async (page = 1) => {
-        console.log('fetchUnits called with:', { propertyId, page });
         try {
             setUnitsLoading(true);
             const result = await getPropertyUnits({ 
@@ -198,10 +195,7 @@ function Property() {
                 page: page     
             });
             
-            console.log('getPropertyUnits result:', result);
-            
             if (result.success) {
-                console.log('Setting units:', result.data?.items);
                 setUnits(result.data?.items || []);
                 setPagination({
                     current_page: result.data?.current_page || 1,
@@ -211,7 +205,6 @@ function Property() {
                     previous: result.data?.previous
                 });
             } else {
-                console.error('fetchUnits failed:', result.error);
                 setUnits([]);
                 setPagination({});
             }
@@ -232,9 +225,7 @@ function Property() {
 
     // Handle units fetching when tab or page changes
     useEffect(() => {
-        console.log('Units useEffect triggered:', { activeTab, propertyId, currentPage });
         if (activeTab === "units" && propertyId) {
-            console.log('Calling fetchUnits with page:', currentPage);
             fetchUnits(currentPage);
         }
     }, [activeTab, currentPage, propertyId, fetchUnits]);
@@ -264,7 +255,6 @@ function Property() {
                     }
                 }
             } catch (error) {
-                console.error('Error loading location data:', error);
             } finally {
                 setLocationLoading(false);
             }
@@ -282,7 +272,6 @@ function Property() {
                     setPropertyManagers(response.data || []);
                 }
             } catch (error) {
-                console.error('Error loading property managers:', error);
             }
         };
         
@@ -582,7 +571,6 @@ function Property() {
             }
             
         } catch (err) {
-            console.error('Error updating unit:', err);
             setError('Failed to update unit. Please try again.');
         } finally {
             setUpdatingUnit(false);

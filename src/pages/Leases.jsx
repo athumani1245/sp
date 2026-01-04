@@ -6,10 +6,12 @@ import TableSkeleton from "../components/skeletons/TableSkeleton";
 import CardSkeleton from "../components/skeletons/CardSkeleton";
 import { getLeases, getAllLeases } from "../services/leaseService";
 import { useSubscription } from '../hooks/useSubscription';
+import { usePageTitle } from "../hooks/usePageTitle";
 import "../assets/styles/profile.css";
 import "../assets/styles/leases.css";
 
 function Leases() {
+  usePageTitle('Leases');
   const navigate = useNavigate();
   const { hasActiveSubscription } = useSubscription();
   const [search, setSearch] = useState("");
@@ -64,13 +66,8 @@ function Leases() {
           setSummaryStats(calculateSummaryStats(allLeaseData));
         }
         
-        console.log(`Fetched ${allLeaseData.length} leases for summary statistics`);
-        console.log('Totals data:', result.data?.totals);
-      } else {
-        console.error('Failed to fetch all leases for summary:', result.error);
       }
     } catch (error) {
-      console.error("Failed to fetch all leases for summary:", error);
     }
   }, []);
 
@@ -116,13 +113,11 @@ function Leases() {
           });
         }
       } else {
-        console.error('Failed to fetch leases:', result.error);
         setError(result.error || "Failed to fetch leases");
         setLeases([]);
       }
       
     } catch (error) {
-      console.error("Failed to fetch leases:", error);
       setError("Failed to fetch leases");
       setLeases([]);
     } finally {
@@ -191,20 +186,14 @@ function Leases() {
     thirtyDaysFromNow.setDate(today.getDate() + 30);
     thirtyDaysFromNow.setHours(23, 59, 59, 999);
 
-    console.log('Calculating expiring leases:');
-    console.log('Today:', today.toISOString());
-    console.log('30 days from now:', thirtyDaysFromNow.toISOString());
-
     stats.expiringSoon = leaseData.filter(lease => {
       if (!lease.end_date) {
-        console.log(`Lease ${lease.lease_number || lease.id}: No end date`);
         return false;
       }
       
       const endDate = new Date(lease.end_date);
       
       if (isNaN(endDate.getTime())) {
-        console.log(`Lease ${lease.lease_number || lease.id}: Invalid end date ${lease.end_date}`);
         return false;
       }
       
@@ -215,19 +204,8 @@ function Leases() {
       
       const shouldCount = isExpiringSoon && isActiveOrRelevant;
       
-      console.log(`Lease ${lease.lease_number || lease.id}:`, {
-        endDate: lease.end_date,
-        parsedEndDate: endDate.toISOString(),
-        status: lease.status,
-        isExpiringSoon,
-        isActiveOrRelevant,
-        shouldCount
-      });
-      
       return shouldCount;
     }).length;
-
-    console.log(`Total expiring soon: ${stats.expiringSoon}`);
 
     return stats;
   };

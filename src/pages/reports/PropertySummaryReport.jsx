@@ -3,8 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import DataTable from 'react-data-table-component';
 import Layout from '../../components/Layout';
 import Toast from '../../components/Toast';
+import { usePageTitle } from '../../hooks/usePageTitle';
 
 const PropertySummaryReport = () => {
+  usePageTitle('Property Summary Report');
   const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -52,11 +54,7 @@ const PropertySummaryReport = () => {
     try {
       const { fetchPropertySummary } = await import('../../services/reportService');
       
-      console.log('PropertySummaryReport: Calling reportService with filters:', filters);
-      
       const result = await fetchPropertySummary(filters);
-      
-      console.log('PropertySummaryReport: Full API response:', result);
       
       if (!result.success) {
         throw new Error(result.error || 'Failed to fetch property summary');
@@ -70,10 +68,6 @@ const PropertySummaryReport = () => {
         const occupiedUnits = parseInt(property.occupied_unit_count) || 0;
         const vacantUnits = parseInt(property.vacant_until_count) || 0;
         const occupancyRate = totalUnits > 0 ? Math.round((occupiedUnits / totalUnits) * 100) : 0;
-
-        console.log('Processing property:', property.property_name);
-        console.log('Units - Total:', totalUnits, 'Occupied:', occupiedUnits, 'Vacant:', vacantUnits);
-        console.log('Occupancy Rate:', occupancyRate + '%');
 
         return {
           ...property,
@@ -93,7 +87,6 @@ const PropertySummaryReport = () => {
         total: processedData.length
       };
     } catch (error) {
-      console.error('Error fetching property summary:', error);
       return {
         success: false,
         error: error.response?.data?.detail || error.message || 'Failed to fetch property summary',
@@ -114,10 +107,6 @@ const PropertySummaryReport = () => {
       const result = await fetchPropertySummaryData(filters);
 
       if (result.success) {
-        console.log('PropertySummaryReport: Received data:', result.data);
-        console.log('PropertySummaryReport: Data length:', result.data?.length);
-        console.log('PropertySummaryReport: First item sample:', result.data?.[0]);
-        
         setData(result.data || []);
         
         // Generate summary stats
@@ -126,19 +115,10 @@ const PropertySummaryReport = () => {
         const totalOccupied = result.data?.reduce((sum, prop) => sum + (prop.occupied_units || 0), 0) || 0;
         const totalVacant = result.data?.reduce((sum, prop) => sum + (prop.available_units || 0), 0) || 0;
         const overallOccupancyRate = totalUnits > 0 ? Math.round((totalOccupied / totalUnits) * 100) : 0;
-        
-        console.log('Property Summary Stats:', {
-          totalProperties,
-          totalUnits,
-          totalOccupied,
-          totalVacant,
-          overallOccupancyRate
-        });
       } else {
         showToastMessage('Error', result.error || 'Failed to load property summary data', 'danger');
       }
     } catch (error) {
-      console.error('Error loading property summary data:', error);
       showToastMessage('Error', 'Failed to load property summary data', 'danger');
     } finally {
       setLoading(false);
@@ -461,10 +441,6 @@ const PropertySummaryReport = () => {
         return;
       }
 
-      console.log('PropertySummaryReport: Starting export for format:', format);
-      console.log('PropertySummaryReport: Export data sample:', exportData?.[0]);
-      console.log('PropertySummaryReport: Export data length:', exportData?.length);
-
       // Import the report service
       const { exportReportData, REPORT_TYPES, EXPORT_FORMATS } = await import('../../services/reportService');
       
@@ -484,8 +460,6 @@ const PropertySummaryReport = () => {
         }
       };
 
-      console.log('PropertySummaryReport: Export options:', exportOptions);
-
       // Call the export function
       const result = await exportReportData(
         REPORT_TYPES.PROPERTY_SUMMARY,
@@ -494,15 +468,12 @@ const PropertySummaryReport = () => {
         exportOptions
       );
 
-      console.log('PropertySummaryReport: Export result:', result);
-
       if (result.success) {
         showToastMessage('Success', result.message, 'success');
       } else {
         showToastMessage('Error', result.error || 'Export failed', 'danger');
       }
     } catch (error) {
-      console.error('Export error:', error);
       showToastMessage('Error', 'Failed to export data', 'danger');
     }
   };

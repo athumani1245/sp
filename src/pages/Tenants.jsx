@@ -6,11 +6,13 @@ import TableSkeleton from "../components/skeletons/TableSkeleton";
 import CardSkeleton from "../components/skeletons/CardSkeleton";
 import { getTenants, deleteTenant, updateTenant } from "../services/tenantService";
 import { useSubscription } from '../hooks/useSubscription';
+import { usePageTitle } from "../hooks/usePageTitle";
 import "../assets/styles/profile.css";
 import "../assets/styles/leases.css";
 import "../assets/styles/tenants.css";
 
 function Tenants() {
+  usePageTitle('Tenants');
   const { hasActiveSubscription } = useSubscription();
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
@@ -70,13 +72,11 @@ function Tenants() {
           previous: result.data?.previous
         });
       } else {
-        console.error('Failed to fetch tenants:', result.error);
         setError(result.error || "Failed to fetch tenants");
         setTenants([]);
       }
       
     } catch (error) {
-      console.error("Failed to fetch tenants:", error);
       setError("Failed to fetch tenants");
       setTenants([]);
     } finally {
@@ -184,7 +184,6 @@ function Tenants() {
         setError(result.error || 'Failed to update tenant');
       }
     } catch (err) {
-      console.error('Error updating tenant:', err);
       setError('Failed to update tenant');
     } finally {
       setUpdatingTenant(false);
@@ -235,7 +234,6 @@ function Tenants() {
         setError(result.error || 'Failed to delete tenant');
       }
     } catch (error) {
-      console.error('Error deleting tenant:', error);
       setError('Failed to delete tenant');
     } finally {
       setDeletingTenant(false);
@@ -248,7 +246,6 @@ function Tenants() {
   };
 
   const handleTenantAdded = (newTenant) => {
-    console.log('New tenant added:', newTenant);
     setShowAddModal(false);
     // Refresh the tenant list to get the latest data from the server
     fetchTenants();
