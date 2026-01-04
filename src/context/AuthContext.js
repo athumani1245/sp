@@ -54,7 +54,10 @@ export const AuthProvider = ({ children }) => {
                     try {
                         const parsedSubscription = JSON.parse(subscriptionData);
                         setSubscription(parsedSubscription);
-                        setHasActiveSubscription(parsedSubscription.status === 'active' && parsedSubscription.is_active === true);
+                        // Check if subscription is active based on is_active boolean and days_left > 0
+                        const isActive = parsedSubscription.is_active === true && 
+                                        (parsedSubscription.days_left > 0 || parsedSubscription.days_remaining > 0);
+                        setHasActiveSubscription(isActive);
                     } catch (error) {
                         setSubscription(null);
                         setHasActiveSubscription(false);
@@ -79,7 +82,10 @@ export const AuthProvider = ({ children }) => {
         if (userData && userData.subscription) {
             localStorage.setItem('subscription', JSON.stringify(userData.subscription));
             setSubscription(userData.subscription);
-            setHasActiveSubscription(userData.subscription.status === 'active' && userData.subscription.is_active === true);
+            // Check if subscription is active based on is_active boolean and days_left > 0
+            const isActive = userData.subscription.is_active === true && 
+                            (userData.subscription.days_left > 0 || userData.subscription.days_remaining > 0);
+            setHasActiveSubscription(isActive);
         }
         
         // Set authenticated immediately on login
