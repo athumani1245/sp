@@ -3,8 +3,10 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Modal, Button } from 'react-bootstrap';
 import "../assets/styles/forgot-password.css"; // Reusing forgot password styles
 import { resetPassword } from "../services/resetService";
+import { usePageTitle } from "../hooks/usePageTitle";
 
 function ResetPassword() {
+    usePageTitle('Reset Password');
     const [formData, setFormData] = useState({
         newPassword: "",
         confirmPassword: ""

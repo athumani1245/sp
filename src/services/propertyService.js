@@ -45,7 +45,6 @@ const getRegions = async () => {
             `${API_BASE}/regions/`,
             { headers: getAuthHeaders() }
         );
-        console.log("Regions Response:", response.data.data);
 
         return {
             success: true,
@@ -59,7 +58,6 @@ const getRegions = async () => {
 // get all districts
 const getDistricts = async (regionId) => {
     try {
-        console.log("Fetching districts for region ID:", regionId);
         const response = await axios.get(
             `${API_BASE}/regions/districts/${regionId}/`,
             { headers: getAuthHeaders() }
@@ -115,7 +113,6 @@ const formatPropertyData = (propertyData) => {
 export const addProperty = async (propertyData) => {
     try {
         const formattedData = formatPropertyData(propertyData);
-        console.log("Formatted Property Data:", formattedData);
 
         const response = await axios.post(
             `${API_BASE}/properties/`,
@@ -162,7 +159,6 @@ export const getProperties = async (params = {}) => {
 // Get a single property by ID
 export const getPropertyById = async (propertyId) => {
     try {
-        console.log("Fetching property details for ID:", propertyId);
         const response = await axios.get(
             `${API_BASE}/properties/${propertyId}/`,
             { headers: getAuthHeaders() }
@@ -181,8 +177,6 @@ export const getPropertyById = async (propertyId) => {
 export const updateProperty = async (propertyId, propertyData) => {
     try {
         const formattedData = formatPropertyData(propertyData);
-        console.log("Formatted Data:", formattedData);
-        console.log("Property ID:", propertyId);
 
         const response = await axios.patch(
             `${API_BASE}/properties/${propertyId}/`,
@@ -256,8 +250,6 @@ export const getPropertyUnits = async (params = {}) => {
             `${API_BASE}/units/?${queryParams.toString()}`,
             { headers: getAuthHeaders() }
         );
-        console.log(response);
-
 
         return {
             success: true,
@@ -278,7 +270,6 @@ export const getPropertyUnits = async (params = {}) => {
 // Add unit to property
 export const addPropertyUnit = async (propertyId, unitData) => {
     try {
-        console.log("Adding property unit:", unitData);
         const response = await axios.post(
             `${API_BASE}/units/`,
             unitData,

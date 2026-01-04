@@ -53,7 +53,6 @@ export const generateLeaseAgreementPDF = async (leaseData, options = {}) => {
       );
     }
   } catch (error) {
-    console.error('Error generating lease agreement PDF:', error);
     throw error;
   }
 };

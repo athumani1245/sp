@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import Toast from "../components/Toast";
+import { usePageTitle } from "../hooks/usePageTitle";
 import { generateLeaseAgreementPDF } from "../reports";
 import { getLeases } from "../services/leaseService";
 import { getProperties } from "../services/propertyService";
@@ -10,6 +11,7 @@ import { LeaseReportModal, PropertyReportModal, PropertySummaryReportModal, Tena
 import "../assets/styles/reports.css";
 
 function Reports() {
+  usePageTitle('Reports');
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [showToast, setShowToast] = useState(false);
@@ -225,7 +227,6 @@ function Reports() {
         }
       }
     } catch (error) {
-      console.error('Error fetching leases:', error);
       showToastMessage('Error', 'Failed to fetch lease data. Please try again.', 'danger');
     } finally {
       setLoading(false);
@@ -248,7 +249,6 @@ function Reports() {
       );
       setShowPreviewModal(false);
     } catch (error) {
-      console.error('Error generating lease PDF:', error);
       showToastMessage('Error', 'Failed to generate lease document. Please try again.', 'danger');
     } finally {
       setLoading(false);

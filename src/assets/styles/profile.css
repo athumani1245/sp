@@ -323,6 +323,88 @@
     margin-top: 0.25rem;
 }
 
+/* Change Phone Number Modal Styles */
+.change-phone-modal .modal-content {
+    border-radius: 8px;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.change-phone-modal .modal-header {
+    background: #f8f9fa;
+    border-radius: 8px 8px 0 0;
+    padding: 1.5rem;
+}
+
+.change-phone-modal .modal-body {
+    padding: 2rem;
+}
+
+.change-phone-modal .modal-footer {
+    padding: 1rem 2rem 2rem 2rem;
+}
+
+/* OTP Input Styles */
+.otp-input:focus {
+    outline: none;
+    border-color: #CC5B4B !important;
+    box-shadow: 0 0 0 0.2rem rgba(204, 91, 75, 0.15);
+}
+
+.otp-input:disabled {
+    background: #f8f9fa;
+    cursor: not-allowed;
+}
+
+/* Phone Input Wrapper */
+.phone-input-wrapper {
+    margin-bottom: 0.5rem;
+}
+
+.phone-input-wrapper .PhoneInput {
+    border: 1px solid #e3e6e8;
+    border-radius: 6px;
+    padding: 0.5rem;
+    background: #fff;
+    transition: all 0.2s ease;
+}
+
+.phone-input-wrapper .PhoneInput:focus-within {
+    border-color: #CC5B4B;
+    box-shadow: 0 0 0 0.2rem rgba(204, 91, 75, 0.1);
+}
+
+.phone-input-wrapper .PhoneInputCountry {
+    margin-right: 0.75rem;
+    padding-right: 0.75rem;
+    border-right: 1px solid #e3e6e8;
+}
+
+.phone-input-wrapper .PhoneInputCountryIcon {
+    width: 24px;
+    height: 18px;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+.phone-input-wrapper .PhoneInputCountrySelectArrow {
+    display: none;
+}
+
+.phone-input-wrapper .PhoneInputInput {
+    border: none;
+    outline: none;
+    padding: 0.25rem 0.5rem;
+    font-size: 1rem;
+    flex: 1;
+    background: transparent;
+}
+
+.phone-input-wrapper .PhoneInputInput:disabled {
+    background: #f8f9fa;
+    color: #6c757d;
+    cursor: not-allowed;
+}
+
 /* Mobile responsiveness for change password modal */
 @media (max-width: 767.98px) {
     .change-password-modal .modal-body {
@@ -337,6 +419,28 @@
     
     .change-password-modal .modal-footer .btn {
         width: 100%;
+    }
+    
+    /* Change phone modal responsive */
+    .change-phone-modal .modal-body {
+        padding: 1.5rem 1rem;
+    }
+    
+    .change-phone-modal .modal-footer {
+        padding: 1rem;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .change-phone-modal .modal-footer .odoo-btn {
+        width: 100%;
+    }
+    
+    /* OTP inputs responsive */
+    .otp-input {
+        width: 45px !important;
+        height: 45px !important;
+        font-size: 1.25rem !important;
     }
 }
 

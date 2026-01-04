@@ -12,8 +12,10 @@ import TableSkeleton from "../components/skeletons/TableSkeleton";
 import { getDashboardInfo } from "../services/dashboardService";
 import { getLeases } from "../services/leaseService";
 import { getUserProfile } from "../services/profileService";
+import { usePageTitle } from "../hooks/usePageTitle";
 
 function Dashboard() {
+    usePageTitle('Dashboard');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [dashboardData, setDashboardData] = useState({
@@ -54,7 +56,6 @@ function Dashboard() {
                 setUserProfile(result.data);
             }
         } catch (err) {
-            console.error("Failed to fetch user profile:", err);
         }
     };
 

@@ -1,8 +1,10 @@
 import React from 'react';
 import Layout from '../../components/Layout';
 import { useNavigate } from 'react-router-dom';
+import { usePageTitle } from '../../hooks/usePageTitle';
 
 const GenericReport = ({ title, icon, description }) => {
+  usePageTitle(title);
   const navigate = useNavigate();
 
   return (

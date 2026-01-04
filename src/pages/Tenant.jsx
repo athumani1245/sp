@@ -5,9 +5,11 @@ import Layout from "../components/Layout";
 import DetailsSkeleton from "../components/skeletons/DetailsSkeleton";
 import TableSkeleton from "../components/skeletons/TableSkeleton";
 import { getTenantById, updateTenant, deleteTenant, getTenantLeases } from "../services/tenantService";
+import { usePageTitle } from "../hooks/usePageTitle";
 import "../assets/styles/property-details.css";
 
 function Tenant() {
+    usePageTitle('Tenant Details');
     const { tenantId } = useParams();
     const navigate = useNavigate();
     
@@ -157,7 +159,6 @@ function Tenant() {
                 setShowDeleteModal(false);
             }
         } catch (error) {
-            console.error('Error deleting tenant:', error);
             setError('Failed to delete tenant');
             setShowDeleteModal(false);
         } finally {

@@ -58,7 +58,6 @@ export const exportOutstandingPaymentsToPDF = async (exportData, filters) => {
     }
     
   } catch (error) {
-    console.error('Outstanding payments PDF preview error:', error);
     return {
       success: false,
       error: 'Failed to open PDF file in browser'
@@ -119,7 +118,6 @@ export const exportPropertyPerformanceToPDF = async (exportData, filters) => {
     }
     
   } catch (error) {
-    console.error('Property performance PDF preview error:', error);
     return {
       success: false,
       error: 'Failed to open PDF file in browser'
@@ -182,7 +180,6 @@ export const exportPropertySummaryToPDF = async (exportData, filters) => {
     }
     
   } catch (error) {
-    console.error('Property summary PDF preview error:', error);
     return {
       success: false,
       error: 'Failed to open PDF file in browser'
@@ -223,10 +220,6 @@ export const exportTenantPaymentHistoryToPDF = async (exportData, filters) => {
     // Generate filename with date and record count
     const formattedDate = currentDate.toISOString().split('T')[0];
     const filename = `tenant-payment-history-report-${formattedDate}-${exportData?.length || 0}-records.pdf`;
-
-    console.log('Generating tenant payment history PDF with template...');
-    console.log('Export data sample:', exportData?.[0]);
-    console.log('Report metadata:', reportMetadata);
     
     // Generate and preview PDF using the generic pdfGenerator
     const result = await previewPDF(
@@ -253,7 +246,6 @@ export const exportTenantPaymentHistoryToPDF = async (exportData, filters) => {
     }
     
   } catch (error) {
-    console.error('Tenant payment history PDF preview error:', error);
     return {
       success: false,
       error: 'Failed to open PDF file in browser'

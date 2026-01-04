@@ -8,9 +8,11 @@ import DetailsSkeleton from "../components/skeletons/DetailsSkeleton";
 import RenewLeaseModal from "../components/forms/RenewLeaseModal";
 import { getLeaseById, getLeaseDocuments, /* terminateLease, */ cancelLease } from "../services/leaseService";
 import { generateLeaseAgreementPDF } from "../reports";
+import { usePageTitle } from "../hooks/usePageTitle";
 import "../assets/styles/leases.css";
 
 function Lease() {
+  usePageTitle('Lease Details');
   const { leaseId } = useParams();
   const navigate = useNavigate();
   
@@ -80,7 +82,6 @@ function Lease() {
         setError(result.error || 'Failed to cancel lease');
       }
     } catch (error) {
-      console.error('Error cancelling lease:', error);
       setError('Failed to cancel lease');
     } finally {
       setIsCancelling(false);
@@ -199,7 +200,6 @@ function Lease() {
         'success'
       );
     } catch (error) {
-      console.error('Error generating PDF:', error);
       showToastMessage(
         'Error',
         'Failed to generate lease document. Please try again.',

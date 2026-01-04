@@ -119,6 +119,68 @@ export const changePassword = async (currentPassword, newPassword) => {
     }
 };
 
+// Send OTP for phone number change
+export const sendOtpForPhoneChange = async (newPhone) => {
+    try {
+        const response = await axios.post(
+            `${API_BASE}/get-otp-change-username/`,
+            { username: newPhone },
+            { headers: getAuthHeaders() }
+        );
+        return {
+            success: true,
+            message: "OTP sent to your phone number"
+        };
+    } catch (err) {
+        return handleApiError(err, "Failed to send OTP.");
+    }
+};
+
+// Verify OTP and change phone number
+export const verifyOtpAndChangePhone = async (newPhone, otpCode) => {
+    try {
+        const response = await axios.post(
+            `${API_BASE}/profile/change_username/`,
+            {
+                new_username: newPhone,
+                otp_code: otpCode
+            },
+            { headers: getAuthHeaders() }
+        );
+        
+        if (response.data.status) {
+            return {
+                success: true,
+                message: "Phone number updated successfully!"
+            };
+        } else {
+            return {
+                success: false,
+                error: response.data.description || "Failed to update phone number"
+            };
+        }
+    } catch (err) {
+        return handleApiError(err, "Failed to verify OTP and update phone number.");
+    }
+};
+
+// Resend OTP for phone number change
+export const resendOtpForPhoneChange = async (newPhone) => {
+    try {
+        const response = await axios.post(
+            `${API_BASE}/otp/resend/change_username`,
+            { new_username: newPhone },
+            { headers: getAuthHeaders() }
+        );
+        return {
+            success: true,
+            message: "OTP resent to your phone number"
+        };
+    } catch (err) {
+        return handleApiError(err, "Failed to resend OTP.");
+    }
+};
+
 // // Delete user account
 // export const deleteAccount = async (password) => {
 //     try {

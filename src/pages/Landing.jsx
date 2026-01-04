@@ -1,9 +1,11 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import SEOHead from "../components/SEOHead";
+import { usePageTitle } from "../hooks/usePageTitle";
 import "../assets/styles/landing.css";
 
 function Landing() {
+    usePageTitle('Home');
     const navigate = useNavigate();
 
     const features = [

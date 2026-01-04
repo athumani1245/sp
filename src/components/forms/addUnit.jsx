@@ -83,7 +83,6 @@ const AddUnitModal = ({ isOpen, onClose, onUnitAdded, propertyId }) => {
                 setError(result.error);
             }
         } catch (err) {
-            console.error('Failed to add unit:', err);
             setError('Failed to add unit. Please try again.');
         } finally {
             setLoading(false);

@@ -33,7 +33,6 @@ export const AuthProvider = ({ children }) => {
             return { success: false };
         } catch (error) {
             // Token refresh failed
-            console.error('Token refresh failed:', error);
             return { success: false };
         }
     }, []);
@@ -57,7 +56,6 @@ export const AuthProvider = ({ children }) => {
                         setSubscription(parsedSubscription);
                         setHasActiveSubscription(parsedSubscription.status === 'active' && parsedSubscription.is_active === true);
                     } catch (error) {
-                        console.error('Failed to parse subscription data:', error);
                         setSubscription(null);
                         setHasActiveSubscription(false);
                     }

@@ -20,7 +20,6 @@ export const generateAndDownloadPDF = async (DocumentComponent, data, filename) 
       message: 'PDF generated and download started successfully'
     };
   } catch (error) {
-    console.error('Error generating PDF:', error);
     return {
       success: false,
       error: error.message || 'Failed to generate PDF'
@@ -42,7 +41,6 @@ export const generatePDFBlob = async (DocumentComponent, data) => {
       blob: blob
     };
   } catch (error) {
-    console.error('Error generating PDF blob:', error);
     return {
       success: false,
       error: error.message || 'Failed to generate PDF blob'
@@ -64,7 +62,6 @@ export const generatePDFBuffer = async (DocumentComponent, data) => {
       buffer: buffer
     };
   } catch (error) {
-    console.error('Error generating PDF buffer:', error);
     return {
       success: false,
       error: error.message || 'Failed to generate PDF buffer'
@@ -93,7 +90,6 @@ export const previewPDF = async (DocumentComponent, data) => {
       message: 'PDF preview opened in new tab'
     };
   } catch (error) {
-    console.error('Error previewing PDF:', error);
     return {
       success: false,
       error: error.message || 'Failed to preview PDF'

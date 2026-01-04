@@ -6,9 +6,11 @@ import SubscriptionGate from "../../components/SubscriptionGate";
 import TableSkeleton from "../../components/skeletons/TableSkeleton";
 import PropertyCardSkeleton from "../../components/skeletons/PropertyCardSkeleton";
 import { getProperties } from "../../services/propertyService";
+import { usePageTitle } from "../../hooks/usePageTitle";
 import "../../assets/styles/properties.css";
 
 function Properties() {
+  usePageTitle('Properties');
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [tag, setTag] = useState(false);
@@ -21,7 +23,6 @@ function Properties() {
 
   // Handle successful property addition
   const handlePropertyAdded = (newProperty) => {
-    console.log("New property added:", newProperty);
     // Add the new property to the existing list
     setProperties((prev) => [...prev, newProperty]);
     setShowModal(false);
@@ -53,7 +54,6 @@ function Properties() {
         setProperties([]);
       }
     } catch (error) {
-      console.error("Failed to fetch properties:", error);
       setError("Failed to fetch properties");
       setProperties([]);
     } finally {

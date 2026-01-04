@@ -47,8 +47,6 @@ export const login = async (username, password) => {
 export const logout = async () => {
     try {
         const refresh = localStorage.getItem("refresh");
-        console.log("Logging out with refresh token:", refresh);
-        console.log("Logging out with access token:", localStorage.getItem("token"));
         await api.post(
             `${API_BASE}/logout/`,
             { refresh },
@@ -63,7 +61,6 @@ export const logout = async () => {
 
     }
     catch (err) {
-        console.error("Logout API error:", err);
         return { success: false, error: "Failed to logout properly" };
     }
 }

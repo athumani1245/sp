@@ -28,14 +28,11 @@ function Header() {
         try {
             const result = await getLicenseStatus();
             if (result.success) {
-                console.log('License data received:', result.data);
                 setLicenseData(result.data);
             } else {
-                console.error('Failed to fetch license status:', result.error);
                 setLicenseData(null);
             }
         } catch (error) {
-            console.error('Error fetching license status:', error);
             setLicenseData(null);
         } finally {
             setLoading(false);
@@ -60,7 +57,6 @@ function Header() {
                 setLicenseData(licenseResult.data);
             }
         } catch (error) {
-            console.error('Error refreshing license status:', error);
         }
     };
 

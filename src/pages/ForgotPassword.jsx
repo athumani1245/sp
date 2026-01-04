@@ -4,8 +4,10 @@ import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import "../assets/styles/forgot-password.css";
 import {sendOtp} from "../services/resetService";
+import { usePageTitle } from "../hooks/usePageTitle";
 
 function ForgotPassword() {
+    usePageTitle('Forgot Password');
     const [phoneNumber, setPhoneNumber] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");

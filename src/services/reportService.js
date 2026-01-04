@@ -51,33 +51,25 @@ export const fetchPendingPayments = async (filters = {}) => {
     const url = `/reports/pending-payments${params.toString() ? `?${params.toString()}` : ''}`;
     const response = await api.get(url);
 
-    console.log('fetchPendingPayments: Full API response:', response.data);
-
     // Extract data based on the actual API response structure
     let dataItems = [];
     
     // Check if response has the structure: { status, statusCode, description, data: [...] }
     if (response.data?.data && Array.isArray(response.data.data)) {
       dataItems = response.data.data;
-      console.log('fetchPendingPayments: Using response.data.data structure');
     } 
     // Check for nested structure with items
     else if (response.data?.data?.items && Array.isArray(response.data.data.items)) {
       dataItems = response.data.data.items;
-      console.log('fetchPendingPayments: Using response.data.data.items structure');
     } 
     // Check for direct items
     else if (response.data?.items && Array.isArray(response.data.items)) {
       dataItems = response.data.items;
-      console.log('fetchPendingPayments: Using response.data.items structure');
     } 
     // Check if data is directly an array
     else if (Array.isArray(response.data)) {
       dataItems = response.data;
-      console.log('fetchPendingPayments: Using direct array structure');
     }
-
-    console.log('fetchPendingPayments: Extracted data items:', dataItems.length, 'items');
 
     return {
       success: true,
@@ -85,7 +77,6 @@ export const fetchPendingPayments = async (filters = {}) => {
       total: response.data?.total || response.data?.count || dataItems.length
     };
   } catch (error) {
-    console.error('Error fetching pending payments:', error);
     return {
       success: false,
       error: error.response?.data?.detail || error.message || 'Failed to fetch pending payments',
@@ -123,7 +114,6 @@ export const fetchPropertyPerformance = async (filters = {}) => {
       total: response.data?.data?.length || 0
     };
   } catch (error) {
-    console.error('Error fetching property performance:', error);
     return {
       success: false,
       error: error.response?.data?.detail || error.message || 'Failed to fetch property performance data',
@@ -155,21 +145,15 @@ export const fetchPropertySummary = async (filters = {}) => {
     const url = `/reports/property-summary${params.toString() ? `?${params.toString()}` : ''}`;
     const response = await api.get(url);
 
-    console.log('fetchPropertySummary: Full API response:', response.data);
-
     // Extract data based on the API response structure
     let dataItems = [];
     
     if (response.data?.data && Array.isArray(response.data.data)) {
       dataItems = response.data.data;
-      console.log('fetchPropertySummary: Using response.data.data structure');
     } 
     else if (Array.isArray(response.data)) {
       dataItems = response.data;
-      console.log('fetchPropertySummary: Using direct array structure');
     }
-
-    console.log('fetchPropertySummary: Extracted data items:', dataItems.length, 'items');
 
     return {
       success: true,
@@ -177,7 +161,6 @@ export const fetchPropertySummary = async (filters = {}) => {
       total: dataItems.length
     };
   } catch (error) {
-    console.error('Error fetching property summary:', error);
     return {
       success: false,
       error: error.response?.data?.detail || error.message || 'Failed to fetch property summary data',
@@ -212,21 +195,15 @@ export const fetchTenantPaymentHistory = async (filters = {}) => {
     const url = `/reports/tenant-payment-history${params.toString() ? `?${params.toString()}` : ''}`;
     const response = await api.get(url);
 
-    console.log('fetchTenantPaymentHistory: Full API response:', response.data);
-
     // Extract data based on the API response structure
     let dataItems = [];
     
     if (response.data?.data && Array.isArray(response.data.data)) {
       dataItems = response.data.data;
-      console.log('fetchTenantPaymentHistory: Using response.data.data structure');
     } 
     else if (Array.isArray(response.data)) {
       dataItems = response.data;
-      console.log('fetchTenantPaymentHistory: Using direct array structure');
     }
-
-    console.log('fetchTenantPaymentHistory: Extracted data items:', dataItems.length, 'items');
 
     return {
       success: true,
@@ -234,7 +211,6 @@ export const fetchTenantPaymentHistory = async (filters = {}) => {
       total: dataItems.length
     };
   } catch (error) {
-    console.error('Error fetching tenant payment history:', error);
     return {
       success: false,
       error: error.response?.data?.detail || error.message || 'Failed to fetch tenant payment history',
@@ -248,18 +224,10 @@ export const fetchTenantPaymentHistory = async (filters = {}) => {
  */
 export const fetchLeaseAgreements = async (filters = {}) => {
   try {
-    console.log('fetchLeaseAgreements: Starting fetch with filters:', filters);
     
     // Use the leaseService function to fetch report data
     const result = await getLeaseReportData(filters);
     
-    console.log('fetchLeaseAgreements: leaseService result:', {
-      success: result.success,
-      dataLength: result.data?.length,
-      total: result.total,
-      error: result.error
-    });
-
     if (!result.success) {
       return {
         success: false,
@@ -274,7 +242,6 @@ export const fetchLeaseAgreements = async (filters = {}) => {
       total: result.total || 0
     };
   } catch (error) {
-    console.error('fetchLeaseAgreements: Error:', error);
     return {
       success: false,
       error: error.message || 'Failed to fetch lease agreements',
@@ -288,7 +255,6 @@ export const fetchLeaseAgreements = async (filters = {}) => {
  */
 export const fetchReportData = async (reportType, filters = {}) => {
   try {
-    console.log('fetchReportData: Fetching report type:', reportType, 'with filters:', filters);
     let result;
     
     switch (reportType) {
@@ -307,12 +273,9 @@ export const fetchReportData = async (reportType, filters = {}) => {
       default:
         throw new Error(`Unsupported report type: ${reportType}`);
     }
-
-    console.log('fetchReportData: API result:', result);
     
     if (result.success) {
       const extractedData = result.data?.items || result.data || [];
-      console.log('fetchReportData: Extracted data type:', typeof extractedData, 'Is array:', Array.isArray(extractedData), 'Length:', extractedData?.length);
       
       return {
         success: true,
@@ -327,7 +290,6 @@ export const fetchReportData = async (reportType, filters = {}) => {
       };
     }
   } catch (error) {
-    console.error('Error fetching report data:', error);
     return {
       success: false,
       error: error.message || 'Failed to fetch report data',
@@ -437,10 +399,8 @@ const processTenantData = (data) => {
 
 // Process pending payments data for export
 const processPendingPaymentsData = (data) => {
-  console.log('processPendingPaymentsData: Input data type:', typeof data, 'Is array:', Array.isArray(data), 'Length:', data?.length);
   
   if (!Array.isArray(data)) {
-    console.error('processPendingPaymentsData: Data is not an array!', data);
     return [];
   }
   
@@ -452,17 +412,6 @@ const processPendingPaymentsData = (data) => {
     const totalPaid = Number(row.total_amount_paid) || 0;
     const remainingAmount = Number(row.remaining_amount) || 0;
     const discount = Number(row.discount) || 0;
-    
-    console.log('processPendingPaymentsData: Processing row:', {
-      tenant: tenantName,
-      property: propertyName,
-      unit: unitName,
-      leaseNumber: row.lease_number,
-      totalRent,
-      totalPaid,
-      remainingAmount,
-      paymentStatus: row.payment_status
-    });
     
     return {
       'Tenant Name': tenantName,
@@ -744,7 +693,6 @@ export const exportReportData = async (reportType, data, format = EXPORT_FORMATS
         };
     }
   } catch (error) {
-    console.error('Export error:', error);
     return {
       success: false,
       error: error.message || 'Failed to export data'
@@ -834,7 +782,6 @@ const exportToExcel = async (reportType, data, options = {}) => {
       recordCount: data.length
     };
   } catch (error) {
-    console.error('Excel export error:', error);
     return {
       success: false,
       error: 'Failed to export Excel file'
@@ -889,7 +836,6 @@ const exportToPDF = async (reportType, data, options = {}) => {
         };
     }
   } catch (error) {
-    console.error('PDF export error:', error);
     return {
       success: false,
       error: error.message || 'Failed to export PDF file'
@@ -980,7 +926,6 @@ const exportToCSV = async (reportType, data, options = {}) => {
       recordCount: data.length
     };
   } catch (error) {
-    console.error('CSV export error:', error);
     return {
       success: false,
       error: 'Failed to export CSV file'
@@ -1211,16 +1156,9 @@ export const validateExportOptions = (reportType, format, data) => {
 // Export tenant payment history
 export const exportTenantPaymentHistory = async (filters = {}, format = EXPORT_FORMATS.EXCEL) => {
   try {
-    console.log('exportTenantPaymentHistory: Starting export with format:', format, 'and filters:', filters);
     
     // First fetch the data
     const result = await fetchTenantPaymentHistory(filters);
-    
-    console.log('exportTenantPaymentHistory: Fetch result:', { 
-      success: result.success, 
-      dataLength: result.data?.length,
-      error: result.error 
-    });
     
     if (!result.success) {
       return {
@@ -1236,22 +1174,11 @@ export const exportTenantPaymentHistory = async (filters = {}, format = EXPORT_F
       };
     }
 
-    console.log('exportTenantPaymentHistory: Calling exportReportData with:', {
-      reportType: REPORT_TYPES.TENANT_PAYMENT_HISTORY,
-      dataLength: result.data.length,
-      format,
-      sampleData: result.data[0]
-    });
-
     // Then export it
     const exportResult = await exportReportData(REPORT_TYPES.TENANT_PAYMENT_HISTORY, result.data, format, { filters });
     
-    console.log('exportTenantPaymentHistory: Export result:', exportResult);
-    
     return exportResult;
   } catch (error) {
-    console.error('Export tenant payment history error:', error);
-    console.error('Export tenant payment history error stack:', error.stack);
     return {
       success: false,
       error: error.message || 'Failed to export tenant payment history'
@@ -1275,7 +1202,6 @@ export const exportPropertySummary = async (filters = {}, format = EXPORT_FORMAT
     // Then export it
     return await exportReportData(REPORT_TYPES.PROPERTY_SUMMARY, result.data, format, { filters });
   } catch (error) {
-    console.error('Export property summary error:', error);
     return {
       success: false,
       error: error.message || 'Failed to export property summary'
@@ -1299,7 +1225,6 @@ export const exportPropertyPerformance = async (filters = {}, format = EXPORT_FO
     // Then export it
     return await exportReportData(REPORT_TYPES.PROPERTY_PERFORMANCE, result.data, format, { filters });
   } catch (error) {
-    console.error('Export property performance error:', error);
     return {
       success: false,
       error: error.message || 'Failed to export property performance'
@@ -1323,7 +1248,6 @@ export const exportPendingPayments = async (filters = {}, format = EXPORT_FORMAT
     // Then export it
     return await exportReportData(REPORT_TYPES.PENDING_PAYMENTS, result.data, format, { filters });
   } catch (error) {
-    console.error('Export pending payments error:', error);
     return {
       success: false,
       error: error.message || 'Failed to export pending payments'
@@ -1334,16 +1258,9 @@ export const exportPendingPayments = async (filters = {}, format = EXPORT_FORMAT
 // Export lease agreements
 export const exportLeaseAgreements = async (filters = {}, format = EXPORT_FORMATS.EXCEL) => {
   try {
-    console.log('exportLeaseAgreements: Starting export with format:', format, 'and filters:', filters);
     
     // First fetch the data
     const result = await fetchLeaseAgreements(filters);
-    
-    console.log('exportLeaseAgreements: Fetch result:', { 
-      success: result.success, 
-      dataLength: result.data?.length,
-      error: result.error 
-    });
     
     if (!result.success) {
       return {
@@ -1359,22 +1276,11 @@ export const exportLeaseAgreements = async (filters = {}, format = EXPORT_FORMAT
       };
     }
 
-    console.log('exportLeaseAgreements: Calling exportReportData with:', {
-      reportType: REPORT_TYPES.LEASE_AGREEMENTS,
-      dataLength: result.data.length,
-      format,
-      sampleData: result.data[0]
-    });
-
     // Then export it
     const exportResult = await exportReportData(REPORT_TYPES.LEASE_AGREEMENTS, result.data, format, { filters });
     
-    console.log('exportLeaseAgreements: Export result:', exportResult);
-    
     return exportResult;
   } catch (error) {
-    console.error('Export lease agreements error:', error);
-    console.error('Export lease agreements error stack:', error.stack);
     return {
       success: false,
       error: error.message || 'Failed to export lease agreements'

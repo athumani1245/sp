@@ -2,8 +2,10 @@ import React from 'react';
 import { Container, Row, Col, Card } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import '../assets/styles/privacy-policy.css';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 const PrivacyPolicy = () => {
+  usePageTitle('Privacy Policy');
   return (
     <div className="min-vh-100 d-flex flex-column">
       <header className="privacy-header">

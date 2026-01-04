@@ -42,7 +42,6 @@ function Sidenav(){
     const handleReportClick = (reportType) => {
         const route = reportRoutes[reportType];
         if (!route) {
-            console.error('Unknown report type:', reportType);
             showToastMessage('Error', 'Unknown report type selected.', 'danger');
             return;
         }
