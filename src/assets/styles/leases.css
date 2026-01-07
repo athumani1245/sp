@@ -1,3 +1,6 @@
+/* Odoo-Style Navigation Bar - Import from properties.css styles */
+@import './properties.css';
+
 /* Full Width Leases Layout */
 .leases-full-width {
     width: 100%;

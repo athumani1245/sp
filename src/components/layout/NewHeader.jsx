@@ -8,6 +8,7 @@ import {
     getSubscriptionPlans, 
     createSubscription 
 } from "../../services/licenseService";
+import TourHelpButton from "../TourHelpButton";
 import "../../assets/styles/header.css";
 
 function Header({ toggleSidenav }) {
@@ -140,9 +141,12 @@ function Header({ toggleSidenav }) {
                         </a>
 
                         {/* Right Section - Always right aligned */}
-                        <div className="ms-auto d-flex align-items-center">
+                        <div className="ms-auto d-flex align-items-center gap-2">
+                            {/* Tour Help Button */}
+                            <TourHelpButton />
+                            
                             {/* Bell icon - Hidden on mobile */}
-                            <button className="btn btn-link d-none d-lg-block p-1 text-dark me-2">
+                            <button className="btn btn-link d-none d-lg-block p-1 text-dark">
                                 <i className="bi bi-bell fs-5"></i>
                             </button>
                             

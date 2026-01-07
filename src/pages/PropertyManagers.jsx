@@ -161,55 +161,70 @@ const PropertyManagers = () => {
     return (
         <Layout>
             <div className="main-content">
-                {/* Header Section */}
-                <div className="leases-header">
-                    <div className="header-left">
-                        <h1 className="leases-title">
-                            <i className="bi bi-people-fill"></i>
+                {/* Odoo-Style Navigation Bar */}
+                <div className="odoo-navigation-bar">
+                    <div className="odoo-nav-left">
+                        <button
+                            className="odoo-btn odoo-btn-primary"
+                            onClick={handleAddManager}
+                            disabled={loading || !hasActiveSubscription}
+                            type="button"
+                            title={!hasActiveSubscription ? 'Subscription expired. Please renew to add property managers.' : ''}
+                        >
+                            New
+                        </button>
+                        <h5 className="odoo-page-title mb-0">
+                            <i className="bi bi-people-fill me-2"></i>
                             Property Managers
-                        </h1>
+                        </h5>
                     </div>
-                </div>
 
-                {/* Filters Section */}
-                <div className="tenants-filters-section">
-                    <div className="d-flex flex-column flex-md-row gap-3 align-items-md-center">
-                        <div className="flex-fill">
-                            <div className="input-group">
-                                <span className="input-group-text">
-                                    <i className="bi bi-search"></i>
-                                </span>
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    placeholder="Search by name or phone number..."
-                                    value={search}
-                                    onChange={handleSearch}
-                                />
-                            </div>
+                    <div className="odoo-nav-center">
+                        <div className="odoo-search-bar">
+                            <button className="odoo-search-icon" type="button">
+                                <i className="bi bi-search"></i>
+                            </button>
+                            <button className="odoo-filter-btn" type="button">
+                                <i className="bi bi-funnel"></i>
+                            </button>
+                            {status && (
+                                <div className="odoo-active-filter">
+                                    <span>{status.charAt(0).toUpperCase() + status.slice(1)}</span>
+                                    <button 
+                                        className="odoo-filter-remove"
+                                        onClick={() => setStatus("")}
+                                    >
+                                        <i className="bi bi-x"></i>
+                                    </button>
+                                </div>
+                            )}
+                            <input
+                                type="text"
+                                className="odoo-search-input"
+                                placeholder="Search..."
+                                value={search}
+                                onChange={handleSearch}
+                            />
+                            <button className="odoo-dropdown-toggle" type="button">
+                                <i className="bi bi-chevron-down"></i>
+                            </button>
                         </div>
-                        <div className="flex-shrink-0">
-                            <select
-                                className="form-select"
-                                value={status}
-                                onChange={handleStatusFilter}
-                                style={{ minWidth: '150px' }}
-                            >
-                                <option value="">All Statuses</option>
-                                <option value="active">Active</option>
-                                <option value="inactive">Inactive</option>
-                            </select>
-                        </div>
-                        <div className="flex-shrink-0">
-                            <button
-                                className="odoo-btn odoo-btn-primary"
-                                onClick={handleAddManager}
-                                disabled={loading || !hasActiveSubscription}
-                                style={{ minWidth: '180px' }}
-                                title={!hasActiveSubscription ? 'Subscription expired. Please renew to add property managers.' : ''}
-                            >
-                                <i className="bi bi-person-plus me-2"></i>
-                                Add Property Manager
+                    </div>
+
+                    <div className="odoo-nav-right">
+                        <span className="odoo-pagination-info">
+                            {filteredManagers.length > 0 && (
+                                <>
+                                    1-{filteredManagers.length} / {filteredManagers.length}
+                                </>
+                            )}
+                        </span>
+                        <div className="odoo-pagination-controls">
+                            <button className="odoo-nav-arrow" disabled>
+                                <i className="bi bi-chevron-left"></i>
+                            </button>
+                            <button className="odoo-nav-arrow" disabled>
+                                <i className="bi bi-chevron-right"></i>
                             </button>
                         </div>
                     </div>
@@ -259,17 +274,6 @@ const PropertyManagers = () => {
                 {/* Table View */}
                 {!loading && managers.length > 0 && (
                     <>
-                        {/* Header with count */}
-                        <div className="tenants-header-section mb-3">
-                            <h5 className="tenants-title">
-                                <i className="bi bi-people me-2"></i>
-                                Property Managers
-                                {filteredManagers.length > 0 && (
-                                    <span className="badge bg-primary ms-2">{filteredManagers.length}</span>
-                                )}
-                            </h5>
-                        </div>
-
                         {/* No results message */}
                         {filteredManagers.length === 0 && (
                             <div className="empty-state">

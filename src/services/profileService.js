@@ -1,47 +1,12 @@
-import axios from "axios";
+import api from "../utils/api";
+import { handleApiError } from "../utils/errorHandler";
 
 const API_BASE = process.env.REACT_APP_API_BASE;
-
-// Helper function to get auth headers
-const getAuthHeaders = () => {
-    const token = localStorage.getItem("token");
-    return {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-    };
-};
-
-// Helper function to handle errors consistently
-const handleApiError = (err, defaultMessage) => {
-    let error_msg = defaultMessage;
-    
-    if (err.response?.data?.description) {
-        error_msg = err.response.data.description;
-    } else if (err.response?.status === 401) {
-        error_msg = "Session expired. Please login again.";
-        localStorage.removeItem("token");
-        localStorage.removeItem("refresh");
-    } else if (err.response?.status === 404) {
-        error_msg = "Resource not found.";
-    } else if (err.response?.status === 400) {
-        error_msg = "Invalid data. Please check your input.";
-    } else if (err.response?.status === 413) {
-        error_msg = "File is too large. Please choose a smaller file.";
-    }
-    
-    return {
-        success: false,
-        error: error_msg
-    };
-};
 
 // Fetch user profile information
 export const getUserProfile = async () => {
     try {
-        const response = await axios.get(
-            `${API_BASE}/profile/retrieve/`,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.get(`${API_BASE}/profile/retrieve/`);
         return {
             success: true,
             data: response.data.data
@@ -54,11 +19,7 @@ export const getUserProfile = async () => {
 // Update user profile information
 export const updateUserProfile = async (profileData) => {
     try {
-        const response = await axios.patch(
-            `${API_BASE}/profile/update/`,
-            profileData,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.patch(`${API_BASE}/profile/update/`, profileData);
         return {
             success: true,
             data: response.data.data,
@@ -98,13 +59,12 @@ export const updateUserProfile = async (profileData) => {
 // Change user password
 export const changePassword = async (currentPassword, newPassword) => {
     try {
-        await axios.put(
+        await api.put(
             `${API_BASE}/profile/change-password/`,
             {
                 old_password: currentPassword,
                 new_password: newPassword
-            },
-            { headers: getAuthHeaders() }
+            }
         );
         return {
             success: true,
@@ -122,11 +82,7 @@ export const changePassword = async (currentPassword, newPassword) => {
 // Send OTP for phone number change
 export const sendOtpForPhoneChange = async (newPhone) => {
     try {
-        const response = await axios.post(
-            `${API_BASE}/get-otp-change-username/`,
-            { username: newPhone },
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.post(`${API_BASE}/get-otp-change-username/`, { username: newPhone });
         return {
             success: true,
             message: "OTP sent to your phone number"
@@ -139,13 +95,12 @@ export const sendOtpForPhoneChange = async (newPhone) => {
 // Verify OTP and change phone number
 export const verifyOtpAndChangePhone = async (newPhone, otpCode) => {
     try {
-        const response = await axios.post(
+        const response = await api.post(
             `${API_BASE}/profile/change_username/`,
             {
                 new_username: newPhone,
                 otp_code: otpCode
-            },
-            { headers: getAuthHeaders() }
+            }
         );
         
         if (response.data.status) {
@@ -167,11 +122,7 @@ export const verifyOtpAndChangePhone = async (newPhone, otpCode) => {
 // Resend OTP for phone number change
 export const resendOtpForPhoneChange = async (newPhone) => {
     try {
-        const response = await axios.post(
-            `${API_BASE}/otp/resend/change_username`,
-            { new_username: newPhone },
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.post(`${API_BASE}/otp/resend/change_username`, { new_username: newPhone });
         return {
             success: true,
             message: "OTP resent to your phone number"
@@ -301,3 +252,4 @@ export const resendOtpForPhoneChange = async (newPhone) => {
 //         };
 //     }
 // };
+

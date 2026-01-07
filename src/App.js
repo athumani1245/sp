@@ -22,6 +22,7 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import PrivateRoute from './components/PrivateRoute';
 import { AuthProvider } from './context/AuthContext';
 import { SubscriptionModalProvider } from './context/SubscriptionModalContext';
+import { TourProvider } from './context/TourContext';
 
 // Report page components
 import PropertySummaryReport from './pages/reports/PropertySummaryReport';
@@ -38,9 +39,10 @@ function App() {
   return (
     <AuthProvider>
       <SubscriptionModalProvider>
-        <ErrorBoundary>
-          <div className="App">
-            <Routes>
+        <TourProvider>
+          <ErrorBoundary>
+            <div className="App">
+              <Routes>
               {/* Public routes */}
               <Route path="/" element={<Landing />} />
               <Route path="/login" element={<Login />} />
@@ -215,6 +217,7 @@ function App() {
         </Routes>
       </div>
       </ErrorBoundary>
+      </TourProvider>
       </SubscriptionModalProvider>
     </AuthProvider>
   );

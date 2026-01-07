@@ -312,7 +312,7 @@ function Reports() {
         </div>
 
         {/* Reports Grid */}
-        <div className="leases-filters-section">
+        <div className="leases-filters-section reports-grid">
           {Object.entries(groupedReports).map(([category, reports]) => (
             <div key={category} className="mb-3">
               <h6 className="text-muted mb-2 fw-semibold">

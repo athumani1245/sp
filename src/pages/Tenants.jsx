@@ -255,48 +255,79 @@ function Tenants() {
   return (
     <Layout>
       <div className="main-content">
-        {/* Filters Section */}
-        <div className="tenants-filters-section">
-          <div className="d-flex flex-column flex-md-row gap-3 align-items-md-center">
-            <div className="flex-fill">
-              <div className="input-group">
-                <span className="input-group-text">
-                  <i className="bi bi-search"></i>
-                </span>
-                <input
-                  type="text"
-                  id="tenant-search"
-                  className="form-control"
-                  placeholder="Search by name, email, phone..."
-                  value={search}
-                  onChange={handleSearch}
-                />
-              </div>
+        {/* Odoo-Style Navigation Bar */}
+        <div className="odoo-navigation-bar">
+          <div className="odoo-nav-left">
+            <button
+              className="odoo-btn odoo-btn-primary add-tenant-btn"
+              onClick={() => setShowAddModal(true)}
+              disabled={!hasActiveSubscription}
+              type="button"
+              title={!hasActiveSubscription ? 'Subscription expired. Please renew to add tenants.' : ''}
+            >
+              New
+            </button>
+            <h5 className="odoo-page-title mb-0">
+              <i className="bi bi-people me-2"></i>
+              Tenants
+            </h5>
+          </div>
+
+          <div className="odoo-nav-center">
+            <div className="odoo-search-bar">
+              <button className="odoo-search-icon" type="button">
+                <i className="bi bi-search"></i>
+              </button>
+              <button className="odoo-filter-btn" type="button">
+                <i className="bi bi-funnel"></i>
+              </button>
+              {status && (
+                <div className="odoo-active-filter">
+                  <span>{status.charAt(0).toUpperCase() + status.slice(1)}</span>
+                  <button 
+                    className="odoo-filter-remove"
+                    onClick={() => setStatus("")}
+                  >
+                    <i className="bi bi-x"></i>
+                  </button>
+                </div>
+              )}
+              <input
+                type="text"
+                className="odoo-search-input"
+                placeholder="Search..."
+                value={search}
+                onChange={handleSearch}
+              />
+              <button className="odoo-dropdown-toggle" type="button">
+                <i className="bi bi-chevron-down"></i>
+              </button>
             </div>
-            <div className="flex-shrink-0">
-              <select
-                className="form-select"
-                value={status}
-                onChange={handleStatusFilter}
-                style={{ minWidth: '150px' }}
+          </div>
+
+          <div className="odoo-nav-right">
+            <span className="odoo-pagination-info">
+              {pagination.count > 0 && tenants.length > 0 && (
+                <>
+                  {((pagination.current_page - 1) * 10) + 1}-
+                  {((pagination.current_page - 1) * 10) + tenants.length} / {pagination.count}
+                </>
+              )}
+            </span>
+            <div className="odoo-pagination-controls">
+              <button
+                className="odoo-nav-arrow"
+                disabled={pagination.current_page <= 1}
+                onClick={() => handlePageChange(pagination.current_page - 1)}
               >
-                <option value="">All Statuses</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-                <option value="pending">Pending</option>
-                <option value="blacklisted">Blacklisted</option>
-              </select>
-            </div>
-            <div className="flex-shrink-0">
-              <button 
-                className="odoo-btn odoo-btn-primary"
-                onClick={() => setShowAddModal(true)}
-                disabled={!hasActiveSubscription}
-                style={{ minWidth: '160px' }}
-                title={!hasActiveSubscription ? 'Subscription expired. Please renew to add tenants.' : ''}
+                <i className="bi bi-chevron-left"></i>
+              </button>
+              <button
+                className="odoo-nav-arrow"
+                disabled={pagination.current_page >= pagination.total_pages}
+                onClick={() => handlePageChange(pagination.current_page + 1)}
               >
-                <i className="bi bi-person-plus me-2"></i>
-                Add New Tenant
+                <i className="bi bi-chevron-right"></i>
               </button>
             </div>
           </div>
@@ -325,16 +356,6 @@ function Tenants() {
 
         {/* Main Tenants Section */}
         <div className="tenants-full-width">
-          <div className="tenants-header-section">
-            <h5 className="tenants-title">
-              <i className="bi bi-people me-2"></i>
-              Tenants
-              {(tenants.length > 0 || pagination.count > 0) && (
-                <span className="badge bg-primary ms-2">{pagination.count || tenants.length}</span>
-              )}
-            </h5>
-          </div>
-          
           {loading && (
             <>
               {/* Desktop Table Skeleton */}

@@ -5,6 +5,8 @@ import AddLeaseModal from "../components/forms/addLease";
 import TableSkeleton from "../components/skeletons/TableSkeleton";
 import CardSkeleton from "../components/skeletons/CardSkeleton";
 import { getLeases, getAllLeases } from "../services/leaseService";
+import { getProperties } from "../services/propertyService";
+import { getTenants } from "../services/tenantService";
 import { useSubscription } from '../hooks/useSubscription';
 import { usePageTitle } from "../hooks/usePageTitle";
 import "../assets/styles/profile.css";
@@ -17,6 +19,9 @@ function Leases() {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [status, setStatus] = useState("");
+  const [propertyFilter, setPropertyFilter] = useState("");
+  const [unitFilter, setUnitFilter] = useState("");
+  const [tenantFilter, setTenantFilter] = useState("");
   const [page, setPage] = useState(1);
   const [leases, setLeases] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -31,6 +36,12 @@ function Leases() {
   });
   const [allLeases, setAllLeases] = useState([]);
   const [totalsData, setTotalsData] = useState(null);
+  
+  // Dropdown data for filters
+  const [properties, setProperties] = useState([]);
+  const [units, setUnits] = useState([]);
+  const [tenants, setTenants] = useState([]);
+  const [showFilters, setShowFilters] = useState(false);
 
   // Debounce search input to avoid too many API calls
   useEffect(() => {
@@ -71,7 +82,7 @@ function Leases() {
     }
   }, []);
 
-    const fetchLeases = useCallback(async (pageNum = page, searchTerm = debouncedSearch, statusFilter = status) => {
+    const fetchLeases = useCallback(async (pageNum = page, searchTerm = debouncedSearch, statusFilter = status, property = propertyFilter, unit = unitFilter, tenant = tenantFilter) => {
     try {
       setLoading(true);
       setError("");
@@ -87,6 +98,18 @@ function Leases() {
       
       if (statusFilter) {
         params.status = statusFilter;
+      }
+      
+      if (property) {
+        params.property_id = property;
+      }
+      
+      if (unit) {
+        params.unit_id = unit;
+      }
+      
+      if (tenant) {
+        params.tenant_id = tenant;
       }
       
       const result = await getLeases(params);
@@ -123,7 +146,7 @@ function Leases() {
     } finally {
       setLoading(false);
     }
-  }, [page, debouncedSearch, status]);
+  }, [page, debouncedSearch, status, propertyFilter, unitFilter, tenantFilter]);
 
   useEffect(() => {
     fetchLeases();
@@ -131,7 +154,37 @@ function Leases() {
 
   useEffect(() => {
     fetchAllLeasesForSummary();
+    fetchFilterData();
   }, []);
+
+  // Fetch data for filter dropdowns
+  const fetchFilterData = async () => {
+    try {
+      // Fetch all properties
+      const propertiesResult = await getProperties({ limit: 1000 });
+      if (propertiesResult.success) {
+        setProperties(propertiesResult.data?.items || []);
+      }
+
+      // Fetch all tenants
+      const tenantsResult = await getTenants({ limit: 1000 });
+      if (tenantsResult.success) {
+        setTenants(tenantsResult.data?.items || []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch filter data:', error);
+    }
+  };
+
+  // Update units when property filter changes
+  useEffect(() => {
+    if (propertyFilter) {
+      const selectedProperty = properties.find(p => p.id.toString() === propertyFilter);
+      setUnits(selectedProperty?.units || []);
+    } else {
+      setUnits([]);
+    }
+  }, [propertyFilter, properties]);
 
   const handleSearch = (e) => {
     const searchValue = e.target.value;
@@ -142,6 +195,40 @@ function Leases() {
   const handleStatusFilter = (e) => {
     setStatus(e.target.value);
     setPage(1);
+  };
+
+  const handlePropertyFilter = (value) => {
+    setPropertyFilter(value);
+    setUnitFilter(""); // Reset unit when property changes
+    setPage(1);
+  };
+
+  const handleUnitFilter = (value) => {
+    setUnitFilter(value);
+    setPage(1);
+  };
+
+  const handleTenantFilter = (value) => {
+    setTenantFilter(value);
+    setPage(1);
+  };
+
+  const clearAllFilters = () => {
+    setStatus("");
+    setPropertyFilter("");
+    setUnitFilter("");
+    setTenantFilter("");
+    setSearch("");
+    setPage(1);
+  };
+
+  const getActiveFiltersCount = () => {
+    let count = 0;
+    if (status) count++;
+    if (propertyFilter) count++;
+    if (unitFilter) count++;
+    if (tenantFilter) count++;
+    return count;
   };
 
   const handlePageChange = (newPage) => {
@@ -236,69 +323,205 @@ function Leases() {
   return (
     <Layout>
       <div className="main-content">
+        {/* Odoo-Style Navigation Bar */}
+        <div className="odoo-navigation-bar">
+          <div className="odoo-nav-left">
+            <button
+              className="odoo-btn odoo-btn-primary create-lease-btn"
+              onClick={() => setShowAddModal(true)}
+              disabled={!hasActiveSubscription}
+              type="button"
+              title={!hasActiveSubscription ? 'Subscription expired. Please renew to add leases.' : ''}
+            >
+              New
+            </button>
+            <h5 className="odoo-page-title mb-0">
+              <i className="bi bi-file-earmark-text me-2"></i>
+              Leases
+            </h5>
+          </div>
 
-        <div className="leases-filters-section">
-          <div className="d-flex flex-column flex-md-row gap-3 align-items-md-center">
-            <div className="flex-fill">
-              <div className="input-group">
-                <span className="input-group-text">
-                  {loading && debouncedSearch !== search ? (
-                    <div className="spinner-border spinner-border-sm" role="status">
-                      <span className="visually-hidden">Searching...</span>
-                    </div>
-                  ) : (
-                    <i className="bi bi-search"></i>
-                  )}
-                </span>
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Search by tenant, property, or unit..."
-                  value={search}
-                  onChange={handleSearch}
-                />
-                {search && (
-                  <button
-                    className="odoo-btn odoo-btn-secondary"
-                    type="button"
-                    onClick={() => {
-                      setSearch("");
-                      setPage(1);
-                    }}
-                    title="Clear search"
+          <div className="odoo-nav-center">
+            <div className="odoo-search-bar">
+              <button className="odoo-search-icon" type="button">
+                <i className="bi bi-search"></i>
+              </button>
+              <button 
+                className="odoo-filter-btn" 
+                type="button"
+                onClick={() => setShowFilters(!showFilters)}
+                style={{ backgroundColor: getActiveFiltersCount() > 0 ? '#e0f2fe' : 'transparent' }}
+              >
+                <i className="bi bi-funnel"></i>
+                {getActiveFiltersCount() > 0 && (
+                  <span style={{ 
+                    marginLeft: '4px', 
+                    fontSize: '11px', 
+                    backgroundColor: '#0369a1',
+                    color: 'white',
+                    borderRadius: '50%',
+                    padding: '2px 6px'
+                  }}>
+                    {getActiveFiltersCount()}
+                  </span>
+                )}
+              </button>
+              {status && (
+                <div className="odoo-active-filter">
+                  <span>{status.charAt(0).toUpperCase() + status.slice(1)}</span>
+                  <button 
+                    className="odoo-filter-remove"
+                    onClick={() => setStatus("")}
                   >
                     <i className="bi bi-x"></i>
                   </button>
-                )}
-              </div>
+                </div>
+              )}
+              {propertyFilter && (
+                <div className="odoo-active-filter">
+                  <span>{properties.find(p => p.id.toString() === propertyFilter)?.property_name || 'Property'}</span>
+                  <button 
+                    className="odoo-filter-remove"
+                    onClick={() => handlePropertyFilter("")}
+                  >
+                    <i className="bi bi-x"></i>
+                  </button>
+                </div>
+              )}
+              {tenantFilter && (
+                <div className="odoo-active-filter">
+                  <span>{tenants.find(t => t.id.toString() === tenantFilter)?.first_name || 'Tenant'}</span>
+                  <button 
+                    className="odoo-filter-remove"
+                    onClick={() => handleTenantFilter("")}
+                  >
+                    <i className="bi bi-x"></i>
+                  </button>
+                </div>
+              )}
+              <input
+                type="text"
+                className="odoo-search-input"
+                placeholder="Search..."
+                value={search}
+                onChange={handleSearch}
+              />
+              <button className="odoo-dropdown-toggle" type="button">
+                <i className="bi bi-chevron-down"></i>
+              </button>
             </div>
-            <div className="flex-shrink-0">
-              <select
-                className="form-select"
-                value={status}
-                onChange={handleStatusFilter}
-                style={{ minWidth: '150px' }}
+          </div>
+
+          <div className="odoo-nav-right">
+            <span className="odoo-pagination-info">
+              {pagination.count > 0 && leases.length > 0 && (
+                <>
+                  {((pagination.current_page - 1) * 10) + 1}-
+                  {((pagination.current_page - 1) * 10) + leases.length} / {pagination.count}
+                </>
+              )}
+            </span>
+            <div className="odoo-pagination-controls">
+              <button
+                className="odoo-nav-arrow"
+                disabled={pagination.current_page <= 1}
+                onClick={() => handlePageChange(pagination.current_page - 1)}
               >
-                <option value="">All Statuses</option>
-                <option value="active">Active</option>
-                <option value="draft">Draft</option>
-                <option value="terminated">Terminated</option>
-              </select>
-            </div>
-            <div className="flex-shrink-0">
-              <button 
-                className="odoo-btn odoo-btn-primary"
-                onClick={() => setShowAddModal(true)}
-                disabled={!hasActiveSubscription}
-                style={{ minWidth: '140px' }}
-                title={!hasActiveSubscription ? 'Subscription expired. Please renew to add leases.' : ''}
+                <i className="bi bi-chevron-left"></i>
+              </button>
+              <button
+                className="odoo-nav-arrow"
+                disabled={pagination.current_page >= pagination.total_pages}
+                onClick={() => handlePageChange(pagination.current_page + 1)}
               >
-                <i className="bi bi-plus me-2"></i>
-                Add New Lease
+                <i className="bi bi-chevron-right"></i>
               </button>
             </div>
           </div>
         </div>
+
+        {/* Advanced Filters Dropdown */}
+        {showFilters && (
+          <div className="odoo-filters-panel">
+            <div className="row g-3">
+              <div className="col-md-3">
+                <label className="form-label fw-semibold">Status</label>
+                <select
+                  className="form-select form-select-sm"
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value)}
+                >
+                  <option value="">All Statuses</option>
+                  <option value="active">Active</option>
+                  <option value="draft">Draft</option>
+                  <option value="terminated">Terminated</option>
+                </select>
+              </div>
+              <div className="col-md-3">
+                <label className="form-label fw-semibold">Property</label>
+                <select
+                  className="form-select form-select-sm"
+                  value={propertyFilter}
+                  onChange={(e) => handlePropertyFilter(e.target.value)}
+                >
+                  <option value="">All Properties</option>
+                  {properties.map(property => (
+                    <option key={property.id} value={property.id}>
+                      {property.property_name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="col-md-3">
+                <label className="form-label fw-semibold">Unit</label>
+                <select
+                  className="form-select form-select-sm"
+                  value={unitFilter}
+                  onChange={(e) => handleUnitFilter(e.target.value)}
+                  disabled={!propertyFilter || units.length === 0}
+                >
+                  <option value="">All Units</option>
+                  {units.map(unit => (
+                    <option key={unit.id} value={unit.id}>
+                      {unit.unit_name || `Unit ${unit.unit_number}`}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="col-md-3">
+                <label className="form-label fw-semibold">Tenant</label>
+                <select
+                  className="form-select form-select-sm"
+                  value={tenantFilter}
+                  onChange={(e) => handleTenantFilter(e.target.value)}
+                >
+                  <option value="">All Tenants</option>
+                  {tenants.map(tenant => (
+                    <option key={tenant.id} value={tenant.id}>
+                      {`${tenant.first_name || ''} ${tenant.last_name || ''}`.trim() || tenant.username}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className="mt-3 d-flex justify-content-end gap-2">
+              <button
+                className="odoo-btn odoo-btn-secondary odoo-btn-sm"
+                onClick={clearAllFilters}
+              >
+                <i className="bi bi-x-circle me-1"></i>
+                Clear All
+              </button>
+              <button
+                className="odoo-btn odoo-btn-primary odoo-btn-sm"
+                onClick={() => setShowFilters(false)}
+              >
+                <i className="bi bi-check2 me-1"></i>
+                Apply
+              </button>
+            </div>
+          </div>
+        )}
 
 
         {!loading && leases.length > 0 && (
@@ -370,16 +593,6 @@ function Leases() {
 
 
         <div className="leases-full-width">
-          <div className="leases-header-section">
-            <h5 className="leases-title">
-              <i className="bi bi-file-earmark-text me-2"></i>
-              Lease Agreements
-              {(leases.length > 0 || pagination.count > 0) && (
-                <span className="badge bg-primary ms-2">{pagination.count || leases.length}</span>
-              )}
-            </h5>
-          </div>
-          
           {loading && (
             <>
               {/* Desktop Table Skeleton */}
@@ -420,7 +633,7 @@ function Leases() {
             <>
 
               <div className="table-responsive d-none d-md-block">
-                <table className="table table-hover align-middle mb-0">
+                <table className="table table-hover align-middle mb-0 leases-table">
                   <thead className="table-light">
                     <tr>
                       <th style={{ width: '20%' }}>Reference</th>

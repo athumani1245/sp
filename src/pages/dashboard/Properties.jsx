@@ -37,7 +37,7 @@ function Properties() {
       const result = await getProperties({
         search: search || undefined,
         page,
-        limit: 50,
+        limit: 10,
       });
 
       if (result.success) {
@@ -72,51 +72,82 @@ function Properties() {
   return (
     <Layout>
       <div className="main-content">
-        {/* Filters Section */}
-        <div className="properties-filters-section mb-3">
-          <div className="d-flex flex-column flex-md-row gap-3 align-items-md-center">
-            <div className="flex-fill">
-              <div className="input-group" style={{ maxWidth: '100%' }}>
-                <span className="input-group-text bg-white" tabIndex="-1" style={{ outline: 'none' }}>
-                  <i className="bi bi-search" />
-                </span>
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Search properties..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  style={{ outline: 'none' }}
-                />
-              </div>
-            </div>
-            <div className="flex-shrink-0">
-              <SubscriptionGate feature="adding new properties">
-                <button
-                  className="odoo-btn odoo-btn-primary d-flex align-items-center"
-                  onClick={() => setShowModal(true)}
-                  type="button"
-                  style={{ minWidth: '180px' }}
-                >
-                  <i className="fa fa-cube me-2" /> Add New Property
-                </button>
-              </SubscriptionGate>
+        {/* Odoo-Style Navigation Bar */}
+        <div className="odoo-navigation-bar">
+          <div className="odoo-nav-left">
+            <SubscriptionGate feature="adding new properties">
+              <button
+                className="odoo-btn odoo-btn-primary add-property-btn"
+                onClick={() => setShowModal(true)}
+                type="button"
+              >
+                New
+              </button>
+            </SubscriptionGate>
+            <h5 className="odoo-page-title mb-0">
+              <i className="bi bi-building me-2"></i>
+              Properties
+            </h5>
+          </div>
+
+          <div className="odoo-nav-center">
+            <div className="odoo-search-bar">
+              <button className="odoo-search-icon" type="button">
+                <i className="bi bi-search"></i>
+              </button>
+              <button className="odoo-filter-btn" type="button">
+                <i className="bi bi-funnel"></i>
+              </button>
+              {tag && (
+                <div className="odoo-active-filter">
+                  <span>Tag</span>
+                  <button 
+                    className="odoo-filter-remove"
+                    onClick={() => setTag(false)}
+                  >
+                    <i className="bi bi-x"></i>
+                  </button>
+                </div>
+              )}
+              <input
+                type="text"
+                className="odoo-search-input"
+                placeholder="Search..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+              <button className="odoo-dropdown-toggle" type="button">
+                <i className="bi bi-chevron-down"></i>
+              </button>
             </div>
           </div>
-          {tag && (
-            <div className="mt-2">
-              <span className="badge bg-light text-dark border me-2">
-                Tag{" "}
-                <span
-                  style={{ cursor: "pointer" }}
-                  onClick={() => setTag(false)}
-                >
-                  ×
-                </span>
-              </span>
+
+          <div className="odoo-nav-right">
+            <span className="odoo-pagination-info">
+              {pagination.count > 0 && properties.length > 0 && (
+                <>
+                  {((pagination.current_page - 1) * 10) + 1}-
+                  {((pagination.current_page - 1) * 10) + properties.length} / {pagination.count}
+                </>
+              )}
+            </span>
+            <div className="odoo-pagination-controls">
+              <button
+                className="odoo-nav-arrow"
+                disabled={(pagination.current_page || page) <= 1}
+                onClick={() => handlePageChange((pagination.current_page || page) - 1)}
+              >
+                <i className="bi bi-chevron-left"></i>
+              </button>
+              <button
+                className="odoo-nav-arrow"
+                disabled={(pagination.current_page || page) >= (pagination.total_pages || 1)}
+                onClick={() => handlePageChange((pagination.current_page || page) + 1)}
+              >
+                <i className="bi bi-chevron-right"></i>
+              </button>
             </div>
-          )}
-         
+          </div>
         </div>
         {error && (
           <div className="alert alert-danger" role="alert">
@@ -127,16 +158,6 @@ function Properties() {
 
         {/* Main Properties Section */}
         <div className="properties-full-width">
-          <div className="properties-header-section">
-            <h5 className="properties-title">
-              <i className="bi bi-building me-2"></i>
-              Properties
-              {(properties.length > 0 || pagination.count > 0) && (
-                <span className="badge bg-primary ms-2">{pagination.count || properties.length}</span>
-              )}
-            </h5>
-          </div>
-          
           {loading && (
             <>
               {/* Desktop Table Skeleton */}
@@ -174,7 +195,7 @@ function Properties() {
           {!loading && properties.length > 0 && (
             <>
               {/* Desktop Table View */}
-              <div className="table-responsive d-none d-md-block">
+              <div className="table-responsive d-none d-md-block properties-list">
                 <table className="table table-hover align-middle mb-0">
                   <thead className="table-light">
                     <tr>
@@ -290,9 +311,9 @@ function Properties() {
 
           {/* Pagination */}
           {pagination && pagination.total_pages > 1 && (
-            <div className="properties-pagination-section">
+            <div className="properties-pagination-section mt-3">
               <nav aria-label="Properties pagination">
-                <div className="d-flex justify-content-between align-items-center">
+                <div className="d-flex justify-content-center align-items-center">
                   <button
                     className="odoo-btn odoo-btn-secondary"
                     disabled={(pagination.current_page || page) <= 1}
@@ -302,7 +323,7 @@ function Properties() {
                     Prev
                   </button>
 
-                  <div className="pagination-info">
+                  <div className="pagination-info mx-3">
                     <span className="text-muted">
                       Page {pagination.current_page || page} of {pagination.total_pages || 1}
                     </span>

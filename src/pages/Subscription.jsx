@@ -432,28 +432,6 @@ function Subscription() {
                                             
                                             {subscription && (
                                                 <div className="d-flex gap-2">
-                                                    {hasActiveSubscription && (
-                                                        <button 
-                                                            className="odoo-btn"
-                                                            style={{ 
-                                                                flex: 1,
-                                                                border: '2px solid #CC5B4B',
-                                                                backgroundColor: 'transparent',
-                                                                color: '#CC5B4B',
-                                                                transition: 'all 0.3s ease'
-                                                            }}
-                                                            onMouseEnter={(e) => {
-                                                                e.currentTarget.style.backgroundColor = '#CC5B4B';
-                                                                e.currentTarget.style.color = 'white';
-                                                            }}
-                                                            onMouseLeave={(e) => {
-                                                                e.currentTarget.style.backgroundColor = 'transparent';
-                                                                e.currentTarget.style.color = '#CC5B4B';
-                                                            }}
-                                                        >
-                                                            Cancel
-                                                        </button>
-                                                    )}
                                                     <button 
                                                         className="odoo-btn"
                                                         style={{ 

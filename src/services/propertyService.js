@@ -1,50 +1,14 @@
 import axios from "axios";
+import api from "../utils/api";
+import { handleApiError } from "../utils/errorHandler";
 
 const API_BASE = process.env.REACT_APP_API_BASE;
-
-// Helper function to get auth headers
-const getAuthHeaders = () => {
-    const token = localStorage.getItem("token");
-    return {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-    };
-};
-
-// Helper function to handle errors consistently
-const handleApiError = (err, defaultMessage) => {
-    let error_msg = defaultMessage;
-    
-    if (err.response?.data?.description) {
-        error_msg = err.response.data.description;
-    } else if (err.response?.status === 401) {
-        error_msg = "Session expired. Please login again.";
-        localStorage.removeItem("token");
-        localStorage.removeItem("refresh");
-    } else if (err.response?.status === 404) {
-        error_msg = "Resource not found.";
-    } else if (err.response?.status === 400) {
-        error_msg = "Invalid data. Please check your input.";
-    } else if (err.response?.status === 403) {
-        error_msg = "You don't have permission to perform this action.";
-    } else if (err.response?.status === 409) {
-        error_msg = "Property with this name already exists.";
-    }
-    
-    return {
-        success: false,
-        error: error_msg
-    };
-};
 
 
 // get all regions
 const getRegions = async () => {
     try {
-        const response = await axios.get(
-            `${API_BASE}/regions/`,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.get(`${API_BASE}/regions/`);
 
         return {
             success: true,
@@ -58,10 +22,7 @@ const getRegions = async () => {
 // get all districts
 const getDistricts = async (regionId) => {
     try {
-        const response = await axios.get(
-            `${API_BASE}/regions/districts/${regionId}/`,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.get(`${API_BASE}/regions/districts/${regionId}/`);
 
         return {
             success: true,
@@ -75,10 +36,7 @@ const getDistricts = async (regionId) => {
 // get all wards
 const getWards = async (districtId) => {
     try {
-        const response = await axios.get(
-            `${API_BASE}/districts/wards/${districtId}/`,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.get(`${API_BASE}/districts/wards/${districtId}/`);
 
         return {
             success: true,
@@ -114,11 +72,7 @@ export const addProperty = async (propertyData) => {
     try {
         const formattedData = formatPropertyData(propertyData);
 
-        const response = await axios.post(
-            `${API_BASE}/properties/`,
-            formattedData,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.post(`${API_BASE}/properties/`, formattedData);
 
         return {
             success: true,
@@ -141,10 +95,7 @@ export const getProperties = async (params = {}) => {
         if (params.status) queryParams.append('status', params.status);
         if (params.property_type) queryParams.append('property_type', params.property_type);
 
-        const response = await axios.get(
-            `${API_BASE}/properties/?${queryParams.toString()}`,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.get(`${API_BASE}/properties/?${queryParams.toString()}`);
 
         return {
             success: true,
@@ -159,10 +110,7 @@ export const getProperties = async (params = {}) => {
 // Get a single property by ID
 export const getPropertyById = async (propertyId) => {
     try {
-        const response = await axios.get(
-            `${API_BASE}/properties/${propertyId}/`,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.get(`${API_BASE}/properties/${propertyId}/`);
 
         return {
             success: true,
@@ -178,13 +126,7 @@ export const updateProperty = async (propertyId, propertyData) => {
     try {
         const formattedData = formatPropertyData(propertyData);
 
-        const response = await axios.patch(
-            `${API_BASE}/properties/${propertyId}/`,
-            formattedData,
-            { 
-                headers: { ...getAuthHeaders() } 
-            }
-        );
+        const response = await api.patch(`${API_BASE}/properties/${propertyId}/`, formattedData);
 
         return {
             success: true,
@@ -199,10 +141,7 @@ export const updateProperty = async (propertyId, propertyData) => {
 // Delete a property
 export const deleteProperty = async (propertyId) => {
     try {
-        await axios.delete(
-            `${API_BASE}/properties/${propertyId}/`,
-            { headers: getAuthHeaders() }
-        );
+        await api.delete(`${API_BASE}/properties/${propertyId}/`);
 
         return {
             success: true,
@@ -221,10 +160,7 @@ export const getAvailableUnits = async (params = {}) => {
 
         if (params.property) queryParams.append('property', params.property);
 
-        const response = await axios.get(
-            `${API_BASE}/units/?${queryParams.toString()}`,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.get(`${API_BASE}/units/?${queryParams.toString()}`);
 
         return {
             success: true,
@@ -246,10 +182,7 @@ export const getPropertyUnits = async (params = {}) => {
         if (params.page) queryParams.append('page', params.page);
         
 
-        const response = await axios.get(
-            `${API_BASE}/units/?${queryParams.toString()}`,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.get(`${API_BASE}/units/?${queryParams.toString()}`);
 
         return {
             success: true,
@@ -270,11 +203,7 @@ export const getPropertyUnits = async (params = {}) => {
 // Add unit to property
 export const addPropertyUnit = async (propertyId, unitData) => {
     try {
-        const response = await axios.post(
-            `${API_BASE}/units/`,
-            unitData,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.post(`${API_BASE}/units/`, unitData);
 
         return {
             success: true,
@@ -291,11 +220,7 @@ export const addPropertyUnit = async (propertyId, unitData) => {
 // Update a property unit
 export const updatePropertyUnit = async (unitId, unitData) => {
     try {
-        const response = await axios.patch(
-            `${API_BASE}/units/${unitId}/`,
-            unitData,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.patch(`${API_BASE}/units/${unitId}/`, unitData);
 
         return {
             success: true,
@@ -310,10 +235,7 @@ export const updatePropertyUnit = async (unitId, unitData) => {
 // Delete a property unit
 export const deletePropertyUnit = async (unitId) => {
     try {
-        await axios.delete(
-            `${API_BASE}/units/${unitId}/`,
-            { headers: getAuthHeaders() }
-        );
+        await api.delete(`${API_BASE}/units/${unitId}/`);
 
         return {
             success: true,
@@ -327,10 +249,7 @@ export const deletePropertyUnit = async (unitId) => {
 // Get property managers
 export const getPropertyManagers = async (propertyId) => {
     try {
-        const response = await axios.get(
-            `${API_BASE}/properties/${propertyId}/managers/`,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.get(`${API_BASE}/properties/${propertyId}/managers/`);
 
         return {
             success: true,
@@ -344,11 +263,7 @@ export const getPropertyManagers = async (propertyId) => {
 // Add manager to property
 export const addPropertyManager = async (propertyId, managerId) => {
     try {
-        const response = await axios.post(
-            `${API_BASE}/properties/${propertyId}/managers/`,
-            { manager_id: managerId },
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.post(`${API_BASE}/properties/${propertyId}/managers/`, { manager_id: managerId });
 
         return {
             success: true,
@@ -363,10 +278,7 @@ export const addPropertyManager = async (propertyId, managerId) => {
 // Remove manager from property
 export const removePropertyManager = async (propertyId, managerId) => {
     try {
-        await axios.delete(
-            `${API_BASE}/properties/${propertyId}/managers/${managerId}/`,
-            { headers: getAuthHeaders() }
-        );
+        await api.delete(`${API_BASE}/properties/${propertyId}/managers/${managerId}/`);
 
         return {
             success: true,
@@ -380,10 +292,7 @@ export const removePropertyManager = async (propertyId, managerId) => {
 // Get property statistics
 export const getPropertyStats = async (propertyId) => {
     try {
-        const response = await axios.get(
-            `${API_BASE}/properties/${propertyId}/stats/`,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.get(`${API_BASE}/properties/${propertyId}/stats/`);
 
         return {
             success: true,
@@ -397,10 +306,7 @@ export const getPropertyStats = async (propertyId) => {
 // Get available managers for property assignment
 export const getAvailableManagers = async () => {
     try {
-        const response = await axios.get(
-            `${API_BASE}/users/managers/`,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.get(`${API_BASE}/users/managers/`);
 
         return {
             success: true,
@@ -414,11 +320,7 @@ export const getAvailableManagers = async () => {
 // Bulk operations
 export const bulkDeleteProperties = async (propertyIds) => {
     try {
-        await axios.post(
-            `${API_BASE}/properties/bulk-delete/`,
-            { property_ids: propertyIds },
-            { headers: getAuthHeaders() }
-        );
+        await api.post(`${API_BASE}/properties/bulk-delete/`, { property_ids: propertyIds });
 
         return {
             success: true,
@@ -432,10 +334,9 @@ export const bulkDeleteProperties = async (propertyIds) => {
 // Export properties data
 export const exportProperties = async (format = 'csv') => {
     try {
-        const response = await axios.get(
+        const response = await api.get(
             `${API_BASE}/properties/export/?format=${format}`,
             {
-                headers: getAuthHeaders(),
                 responseType: 'blob'
             }
         );
@@ -471,10 +372,7 @@ export const searchProperties = async (searchQuery, filters = {}) => {
         if (filters.min_units) queryParams.append('min_units', filters.min_units);
         if (filters.max_units) queryParams.append('max_units', filters.max_units);
 
-        const response = await axios.get(
-            `${API_BASE}/properties/search/?${queryParams.toString()}`,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.get(`${API_BASE}/properties/search/?${queryParams.toString()}`);
 
         return {
             success: true,
@@ -489,11 +387,7 @@ export const searchProperties = async (searchQuery, filters = {}) => {
 // Property Manager Management
 export const registerPropertyManager = async (managerData) => {
     try {
-        const response = await axios.post(
-            `${API_BASE}/auth/register-property-manager/`,
-            managerData,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.post(`${API_BASE}/auth/register-property-manager/`, managerData);
 
         return {
             success: true,
@@ -507,10 +401,7 @@ export const registerPropertyManager = async (managerData) => {
 
 export const getAllPropertyManagers = async () => {
     try {
-        const response = await axios.get(
-            `${API_BASE}/property-managers`,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.get(`${API_BASE}/property-managers`);
 
         return {
             success: true,
@@ -523,11 +414,7 @@ export const getAllPropertyManagers = async () => {
 
 export const updatePropertyManager = async (managerId, managerData) => {
     try {
-        const response = await axios.patch(
-            `${API_BASE}/property-managers/${managerId}`,
-            managerData,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.patch(`${API_BASE}/property-managers/${managerId}`, managerData);
 
         return {
             success: true,
@@ -541,10 +428,7 @@ export const updatePropertyManager = async (managerId, managerData) => {
 
 export const deletePropertyManager = async (managerId) => {
     try {
-        const response = await axios.delete(
-            `${API_BASE}/property-managers/${managerId}/`,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.delete(`${API_BASE}/property-managers/${managerId}/`);
 
         return {
             success: true,
@@ -557,3 +441,4 @@ export const deletePropertyManager = async (managerId) => {
 
 // Export location functions
 export { getRegions, getDistricts, getWards };
+
