@@ -99,7 +99,7 @@ export const addTenantTourSteps = [
     {
         popover: {
             title: '📋 Tenant Information Required',
-            description: 'You\'ll need to provide:<br/>• First and last name<br/>• Phone number<br/>• Email address<br/>• ID number (optional)<br/>• Emergency contact (optional)',
+            description: 'You\'ll need to provide:<br/>• First and last name<br/>• Phone number<br/>',
             side: 'center'
         }
     },
