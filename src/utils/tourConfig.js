@@ -160,14 +160,14 @@ export const addPaymentTourSteps = [
     {
         popover: {
             title: '📊 Lease Details Page',
-            description: 'Inside the lease details, you\'ll find:<br/>• Tenant information<br/>• Payment schedule<br/>• Payment history<br/>• Option to add new payments',
+            description: 'Inside the lease details, you\'ll find:<br/>• Lease Details Tab<br/>• Payment Details Tab<br/>',
             side: 'center'
         }
     },
     {
         popover: {
             title: 'Step 2: Record Payment',
-            description: 'Click "Add Payment" button and enter:<br/>• Payment amount<br/>• Payment date<br/>• Payment method<br/>• Reference number (optional)',
+            description: 'On Payments Tab, Click "Add Payment" button and enter:<br/>• Payment amount<br/>• Payment date<br/>• Payment Category<br/>• Payment Source',
             side: 'center'
         }
     },
