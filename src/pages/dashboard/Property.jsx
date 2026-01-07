@@ -447,10 +447,20 @@ function Property() {
     // Handle inline unit input changes
     const handleNewUnitChange = (e) => {
         const { name, value } = e.target;
-        setNewUnitData(prev => ({
-            ...prev,
-            [name]: value
-        }));
+        
+        if (name === 'rent_per_month') {
+            // Remove commas and non-numeric characters except decimal point
+            const numericValue = value.replace(/[^\d]/g, '');
+            setNewUnitData(prev => ({
+                ...prev,
+                [name]: numericValue
+            }));
+        } else {
+            setNewUnitData(prev => ({
+                ...prev,
+                [name]: value
+            }));
+        }
     };
 
     // Handle inline unit save
@@ -975,10 +985,10 @@ function Property() {
                                 </div>
                                 <div className="col-md-6">
                                     <input
-                                        type="number"
+                                        type="text"
                                         className="form-control"
                                         name="rent_per_month"
-                                        value={newUnitData.rent_per_month}
+                                        value={newUnitData.rent_per_month ? parseInt(newUnitData.rent_per_month).toLocaleString() : ''}
                                         onChange={handleNewUnitChange}
                                         onKeyPress={handleUnitKeyPress}
                                         placeholder="Rent per month *"
@@ -1140,10 +1150,10 @@ function Property() {
                                                 </div>
                                                 <div className="mb-3">
                                                     <input
-                                                        type="number"
+                                                        type="text"
                                                         className="form-control form-control-sm"
                                                         name="rent_per_month"
-                                                        value={newUnitData.rent_per_month}
+                                                        value={newUnitData.rent_per_month ? parseInt(newUnitData.rent_per_month).toLocaleString() : ''}
                                                         onChange={handleNewUnitChange}
                                                         onKeyPress={handleUnitKeyPress}
                                                         placeholder="Rent per month *"
@@ -1299,10 +1309,10 @@ function Property() {
                                                     </td>
                                                     <td>
                                                         <input
-                                                            type="number"
+                                                            type="text"
                                                             className="form-control form-control-sm"
                                                             name="rent_per_month"
-                                                            value={newUnitData.rent_per_month}
+                                                            value={newUnitData.rent_per_month ? parseInt(newUnitData.rent_per_month).toLocaleString() : ''}
                                                             onChange={handleNewUnitChange}
                                                             onKeyPress={handleUnitKeyPress}
                                                             placeholder="Rent per month *"
