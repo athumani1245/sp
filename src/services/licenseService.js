@@ -1,40 +1,7 @@
-import axios from "axios";
+import api from "../utils/api";
+import { handleApiError } from "../utils/errorHandler";
 
 const API_BASE = process.env.REACT_APP_API_BASE;
-const getAuthHeaders = () => {
-    const token = localStorage.getItem("token");
-    return {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-    };
-};
-
-/////////////////////////////////////////////////////////// Error Handling //////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// Helper function to handle errors consistently
-const handleApiError = (err, defaultMessage) => {
-    let error_msg = defaultMessage;
-    
-    if (err.response?.data?.description) {
-        error_msg = err.response.data.description;
-    } else if (err.response?.status === 401) {
-        error_msg = "Session expired. Please login again.";
-        localStorage.removeItem("token");
-        localStorage.removeItem("refresh");
-    } else if (err.response?.status === 404) {
-        error_msg = "Resource not found.";
-    } else if (err.response?.status === 400) {
-        error_msg = "Invalid data. Please check your input.";
-    } else if (err.response?.status === 403) {
-        error_msg = "You don't have permission to perform this action.";
-    }
-    
-    return {
-        success: false,
-        error: error_msg
-    };
-};
 
 ////////////////////////////////////////////// Data Validation and Handling /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -54,10 +21,7 @@ const formatSubscriptionData = (subscriptionData) => {
 // Get license status
 export const getLicenseStatus = async () => {
     try {
-        const response = await axios.get(
-            `${API_BASE}/subscriptions/active/`,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.get(`${API_BASE}/subscriptions/active/`);
 
         return {
             success: true,
@@ -71,10 +35,7 @@ export const getLicenseStatus = async () => {
 // Get available subscription plans (packages with optional plans)
 export const getSubscriptionPlans = async () => {
     try {
-        const response = await axios.get(
-            `${API_BASE}/packages/`,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.get(`${API_BASE}/packages/`);
 
         // Transform the data to ensure consistent structure
         // Each package may contain nested plans array
@@ -114,10 +75,7 @@ export const getSubscriptionPlans = async () => {
 // Get current subscription
 export const getCurrentSubscription = async () => {
     try {
-        const response = await axios.get(
-            `${API_BASE}/subscriptions/current/`,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.get(`${API_BASE}/subscriptions/active/`);
 
         return {
             success: true,
@@ -133,11 +91,7 @@ export const createSubscription = async (subscriptionData) => {
     try {
         const formattedData = formatSubscriptionData(subscriptionData);
         
-        const response = await axios.post(
-            `${API_BASE}/subscribe/initiate/`,
-            formattedData,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.post(`${API_BASE}/subscribe/initiate/`, formattedData);
 
         // Handle different response scenarios
         // If status is 200, check if it requires user action (phone prompt)
@@ -162,11 +116,7 @@ export const updateSubscription = async (subscriptionId, subscriptionData) => {
     try {
         const formattedData = formatSubscriptionData(subscriptionData);
 
-        const response = await axios.patch(
-            `${API_BASE}/subscriptions/${subscriptionId}/`,
-            formattedData,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.patch(`${API_BASE}/subscriptions/${subscriptionId}/`, formattedData);
 
         return {
             success: true,
@@ -181,11 +131,7 @@ export const updateSubscription = async (subscriptionId, subscriptionData) => {
 // Cancel subscription
 export const cancelSubscription = async (subscriptionId, reason = '') => {
     try {
-        const response = await axios.post(
-            `${API_BASE}/subscriptions/${subscriptionId}/cancel/`,
-            { reason },
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.post(`${API_BASE}/subscriptions/${subscriptionId}/cancel/`, { reason });
 
         return {
             success: true,
@@ -200,11 +146,7 @@ export const cancelSubscription = async (subscriptionId, reason = '') => {
 // Renew subscription
 export const renewSubscription = async (subscriptionId, renewalData) => {
     try {
-        const response = await axios.post(
-            `${API_BASE}/subscriptions/${subscriptionId}/renew/`,
-            renewalData,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.post(`${API_BASE}/subscriptions/${subscriptionId}/renew/`, renewalData);
 
         return {
             success: true,
@@ -219,10 +161,7 @@ export const renewSubscription = async (subscriptionId, renewalData) => {
 // Get subscription history
 export const getSubscriptionHistory = async () => {
     try {
-        const response = await axios.get(
-            `${API_BASE}/subscriptions/history/`,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.get(`${API_BASE}/subscriptions/history/`);
 
         return {
             success: true,
@@ -236,11 +175,7 @@ export const getSubscriptionHistory = async () => {
 // Validate coupon code
 export const validateCouponCode = async (couponCode) => {
     try {
-        const response = await axios.post(
-            `${API_BASE}/subscriptions/validate-coupon/`,
-            { coupon_code: couponCode },
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.post(`${API_BASE}/subscriptions/validate-coupon/`, { coupon_code: couponCode });
 
         return {
             success: true,
@@ -255,10 +190,7 @@ export const validateCouponCode = async (couponCode) => {
 // Get subscription invoices
 export const getSubscriptionInvoices = async () => {
     try {
-        const response = await axios.get(
-            `${API_BASE}/subscriptions/invoices/`,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.get(`${API_BASE}/subscriptions/invoices/`);
 
         return {
             success: true,
@@ -278,10 +210,9 @@ export const getSubscriptionUrl = () => {
 // Download invoice
 export const downloadInvoice = async (invoiceId) => {
     try {
-        const response = await axios.get(
+        const response = await api.get(
             `${API_BASE}/subscriptions/invoices/${invoiceId}/download/`,
             {
-                headers: getAuthHeaders(),
                 responseType: 'blob'
             }
         );
@@ -308,10 +239,7 @@ export const downloadInvoice = async (invoiceId) => {
 // Get billing information
 export const getBillingInfo = async () => {
     try {
-        const response = await axios.get(
-            `${API_BASE}/subscriptions/billing-info/`,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.get(`${API_BASE}/subscriptions/billing-info/`);
 
         return {
             success: true,
@@ -325,10 +253,7 @@ export const getBillingInfo = async () => {
 // Get billing history (last 5 records)
 export const getBillingHistory = async () => {
     try {
-        const response = await axios.get(
-            `${API_BASE}/payments-history/`,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.get(`${API_BASE}/payments-history/`);
 
         return {
             success: true,
@@ -342,11 +267,7 @@ export const getBillingHistory = async () => {
 // Update billing information
 export const updateBillingInfo = async (billingData) => {
     try {
-        const response = await axios.patch(
-            `${API_BASE}/subscriptions/billing-info/`,
-            billingData,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.patch(`${API_BASE}/subscriptions/billing-info/`, billingData);
 
         return {
             success: true,
@@ -367,10 +288,7 @@ const activePaymentListeners = new Map();
 // Check payment status for a specific transaction
 export const checkPaymentStatus = async (transactionId) => {
     try {
-        const response = await axios.get(
-            `${API_BASE}/subscribe/status/${transactionId}/`,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.get(`${API_BASE}/subscribe/status/${transactionId}/`);
 
         const responseData = response.data;
         
@@ -498,10 +416,7 @@ export const stopAllPaymentListeners = () => {
 // Get payment transaction details
 export const getPaymentTransaction = async (transactionId) => {
     try {
-        const response = await axios.get(
-            `${API_BASE}/payments/transaction/${transactionId}/`,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.get(`${API_BASE}/payments/transaction/${transactionId}/`);
 
         return {
             success: true,
@@ -515,11 +430,7 @@ export const getPaymentTransaction = async (transactionId) => {
 // Cancel a pending payment transaction
 export const cancelPaymentTransaction = async (transactionId) => {
     try {
-        const response = await axios.post(
-            `${API_BASE}/payments/cancel/${transactionId}/`,
-            {},
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.post(`${API_BASE}/payments/cancel/${transactionId}/`, {});
 
         return {
             success: true,
@@ -530,3 +441,4 @@ export const cancelPaymentTransaction = async (transactionId) => {
         return handleApiError(err, "Failed to cancel payment transaction.");
     }
 };
+

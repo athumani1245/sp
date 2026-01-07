@@ -5,6 +5,23 @@ const api = axios.create({
     baseURL: process.env.REACT_APP_API_BASE
 });
 
+// Flag to prevent multiple simultaneous logouts
+let isLoggingOut = false;
+
+// Function to handle logout and redirect
+const handleLogout = () => {
+    if (isLoggingOut) return;
+    isLoggingOut = true;
+    
+    // Clear all authentication data
+    localStorage.removeItem('token');
+    localStorage.removeItem('refresh');
+    localStorage.removeItem('subscription');
+    
+    // Redirect to login page
+    window.location.href = '/login';
+};
+
 // Add a request interceptor
 api.interceptors.request.use(
     (config) => {
@@ -54,22 +71,16 @@ api.interceptors.response.use(
                 }
             } catch (refreshError) {
                 // If refresh token fails, logout user and redirect to login immediately
-                localStorage.removeItem('token');
-                localStorage.removeItem('refresh');
-                
-                // Redirect to login page without showing error
-                window.location.href = '/';
+                handleLogout();
                 
                 // Return a rejected promise that won't be caught by components
                 return new Promise(() => {}); // Empty promise that never resolves
             }
         }
 
-        // For any other 401 errors that might occur
+        // For any other 401 errors that might occur (after retry or invalid token)
         if (error.response?.status === 401) {
-            localStorage.removeItem('token');
-            localStorage.removeItem('refresh');
-            window.location.href = '/';
+            handleLogout();
             return new Promise(() => {}); // Empty promise that never resolves
         }
 

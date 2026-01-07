@@ -1,5 +1,314 @@
 /* Properties Page Styles */
 
+/* Odoo-Style Navigation Bar */
+.odoo-navigation-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    background: #fff;
+    border-bottom: 1px solid #e5e7eb;
+    gap: 16px;
+    font-family: 'Host Grotesk', sans-serif;
+}
+
+.odoo-nav-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-shrink: 0;
+}
+
+.odoo-page-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.odoo-nav-center {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    min-width: 0;
+}
+
+.odoo-search-bar {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    padding: 0;
+    max-width: 600px;
+    width: 100%;
+    height: 38px;
+    overflow: hidden;
+}
+
+.odoo-search-icon,
+.odoo-filter-btn {
+    background: transparent;
+    border: none;
+    padding: 8px 12px;
+    color: #6b7280;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    flex-shrink: 0;
+    border-right: 1px solid #e5e7eb;
+}
+
+.odoo-search-icon:hover,
+.odoo-filter-btn:hover {
+    background: #f9fafb;
+    color: #1f2937;
+}
+
+.odoo-active-filter {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #e0f2fe;
+    padding: 4px 8px;
+    border-radius: 3px;
+    font-size: 13px;
+    color: #0369a1;
+    margin-left: 8px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.odoo-filter-remove {
+    background: transparent;
+    border: none;
+    padding: 0;
+    color: #0369a1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    line-height: 1;
+}
+
+.odoo-filter-remove:hover {
+    color: #075985;
+}
+
+.odoo-search-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    padding: 8px 12px;
+    font-size: 14px;
+    color: #1f2937;
+    background: transparent;
+    min-width: 0;
+}
+
+.odoo-search-input::placeholder {
+    color: #9ca3af;
+}
+
+.odoo-dropdown-toggle {
+    background: transparent;
+    border: none;
+    border-left: 1px solid #e5e7eb;
+    padding: 8px 12px;
+    color: #6b7280;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    flex-shrink: 0;
+}
+
+.odoo-dropdown-toggle:hover {
+    background: #f9fafb;
+    color: #1f2937;
+}
+
+.odoo-nav-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.odoo-pagination-info {
+    font-size: 14px;
+    color: #6b7280;
+    white-space: nowrap;
+}
+
+.odoo-pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.odoo-nav-arrow {
+    background: transparent;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.odoo-nav-arrow:hover:not(:disabled) {
+    background: #f9fafb;
+    border-color: #9ca3af;
+    color: #1f2937;
+}
+
+.odoo-nav-arrow:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* Mobile Responsive */
+@media (max-width: 1024px) {
+    .odoo-navigation-bar {
+        padding: 10px 16px;
+    }
+    
+    .odoo-search-bar {
+        max-width: 400px;
+    }
+}
+
+@media (max-width: 768px) {
+    .odoo-navigation-bar {
+        flex-wrap: wrap;
+        padding: 12px;
+    }
+    
+    .odoo-nav-left {
+        order: 1;
+        width: 100%;
+        justify-content: space-between;
+        margin-bottom: 12px;
+    }
+    
+    .odoo-page-title {
+        font-size: 16px;
+    }
+    
+    .odoo-nav-center {
+        order: 3;
+        width: 100%;
+    }
+    
+    .odoo-search-bar {
+        max-width: 100%;
+    }
+    
+    .odoo-nav-right {
+        order: 2;
+        margin-left: auto;
+    }
+    
+    .odoo-pagination-info {
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 480px) {
+    .odoo-navigation-bar {
+        padding: 10px;
+    }
+    
+    .odoo-nav-left {
+        gap: 12px;
+    }
+    
+    .odoo-page-title {
+        font-size: 15px;
+    }
+    
+    .odoo-page-title i {
+        font-size: 16px;
+    }
+    
+    .odoo-search-icon,
+    .odoo-filter-btn,
+    .odoo-dropdown-toggle {
+        padding: 6px 10px;
+    }
+    
+    .odoo-search-input {
+        font-size: 13px;
+        padding: 6px 10px;
+    }
+    
+    .odoo-pagination-info {
+        font-size: 12px;
+    }
+    
+    .odoo-nav-arrow {
+        width: 28px;
+        height: 28px;
+    }
+}
+
+/* Odoo Filters Panel */
+.odoo-filters-panel {
+    background: #fff;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 16px 20px;
+    animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.odoo-filters-panel .form-label {
+    font-size: 13px;
+    color: #4b5563;
+    margin-bottom: 6px;
+}
+
+.odoo-filters-panel .form-select {
+    font-size: 14px;
+    border-color: #d1d5db;
+    height: 36px;
+}
+
+.odoo-filters-panel .form-select:focus {
+    border-color: #CC5B4B;
+    box-shadow: 0 0 0 3px rgba(204, 91, 75, 0.1);
+}
+
+@media (max-width: 768px) {
+    .odoo-filters-panel {
+        padding: 12px;
+    }
+    
+    .odoo-filters-panel .row {
+        gap: 12px;
+    }
+}
+
 .table-row-hover:hover {
     background-color: #f8f9fa !important;
     transition: background-color 0.2s ease;

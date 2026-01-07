@@ -1,52 +1,7 @@
-import axios from "axios";
+import api from "../utils/api";
+import { handleApiError } from "../utils/errorHandler";
 
 const API_BASE = process.env.REACT_APP_API_BASE;
-
-// Helper function to get auth headers
-const getAuthHeaders = () => {
-    const token = localStorage.getItem("token");
-    return {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-    };
-};
-
-
-
-
-
-
-
-
-
-/////////////////////////////////////////////////////////// Error Handling //////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// Helper function to handle errors consistently
-const handleApiError = (err, defaultMessage) => {
-    let error_msg = defaultMessage;
-    
-    if (err.response?.data?.description) {
-        error_msg = err.response.data.description;
-    } else if (err.response?.status === 401) {
-        error_msg = "Session expired. Please login again.";
-        localStorage.removeItem("token");
-        localStorage.removeItem("refresh");
-    } else if (err.response?.status === 404) {
-        error_msg = "Resource not found.";
-    } else if (err.response?.status === 400) {
-        error_msg = "Invalid data. Please check your input.";
-    } else if (err.response?.status === 403) {
-        error_msg = "You don't have permission to perform this action.";
-    } else if (err.response?.status === 409) {
-        error_msg = "Lease already exists for this unit.";
-    }
-    
-    return {
-        success: false,
-        error: error_msg
-    };
-};
 
 
 
@@ -98,11 +53,7 @@ export const createLease = async (leaseData) => {
         // Format lease data
         const formattedData = formatLeaseData(leaseData);
         
-        const response = await axios.post(
-            `${API_BASE}/v1/leases/create`,
-            formattedData,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.post(`${API_BASE}/v1/leases/create`, formattedData);
 
         return {
             success: true,
@@ -130,10 +81,7 @@ export const getLeases = async (params = {}) => {
         if (params.start_date) queryParams.append('start_date', params.start_date);
         if (params.end_date) queryParams.append('end_date', params.end_date);
 
-        const response = await axios.get(
-            `${API_BASE}/leases/?${queryParams.toString()}`,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.get(`${API_BASE}/leases/?${queryParams.toString()}`);
 
         return {
             success: true,
@@ -160,10 +108,7 @@ export const getAllLeases = async (filters = {}) => {
         // Use a very high limit to get all records, or don't include limit at all
         queryParams.append('limit', '10000'); // High limit to ensure we get all records
 
-        const response = await axios.get(
-            `${API_BASE}/leases/?${queryParams.toString()}`,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.get(`${API_BASE}/leases/?${queryParams.toString()}`);
 
         return {
             success: true,
@@ -181,10 +126,7 @@ export const getAllLeases = async (filters = {}) => {
 // Get a single lease by ID
 export const getLeaseById = async (leaseId) => {
     try {
-        const response = await axios.get(
-            `${API_BASE}/leases/${leaseId}/`,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.get(`${API_BASE}/leases/${leaseId}/`);
 
         return {
             success: true,
@@ -204,11 +146,7 @@ export const updateLease = async (leaseId, leaseData) => {
     try {
         const formattedData = formatLeaseData(leaseData);
 
-        const response = await axios.patch(
-            `${API_BASE}/leases/${leaseId}/`,
-            formattedData,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.patch(`${API_BASE}/leases/${leaseId}/`, formattedData);
 
         return {
             success: true,
@@ -227,10 +165,7 @@ export const updateLease = async (leaseId, leaseData) => {
 // Delete a lease
 export const deleteLease = async (leaseId) => {
     try {
-        await axios.delete(
-            `${API_BASE}/leases/${leaseId}/`,
-            { headers: getAuthHeaders() }
-        );
+        await api.delete(`${API_BASE}/leases/${leaseId}/`);
 
         return {
             success: true,
@@ -251,14 +186,13 @@ export const terminateLease = async (leaseId, terminationData = {}) => {
     try {
         const formattedDate = formatDateForApi(terminationData.termination_date || new Date().toISOString().split('T')[0]);
         
-        const response = await axios.post(
+        const response = await api.post(
             `${API_BASE}/leases/terminate/`,
             {
                 termination_date: formattedDate,
                 reason: terminationData.reason || "",
                 lease: leaseId || 0
-            },
-            { headers: getAuthHeaders() }
+            }
         );
 
         return {
@@ -275,11 +209,7 @@ export const terminateLease = async (leaseId, terminationData = {}) => {
 // Cancel lease
 export const cancelLease = async (leaseId) => {
     try {
-        const response = await axios.post(
-            `${API_BASE}/leases/${leaseId}/cancel/`,
-            {},
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.post(`${API_BASE}/leases/${leaseId}/cancel/`, {});
 
         return {
             success: true,
@@ -300,11 +230,7 @@ export const cancelLease = async (leaseId) => {
 // Renew a lease
 export const renewLease = async (leaseId, renewalData) => {
     try {
-        const response = await axios.post(
-            `${API_BASE}/leases/renew/`,
-            renewalData,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.post(`${API_BASE}/leases/renew/`, renewalData);
 
         return {
             success: true,
@@ -322,10 +248,7 @@ export const renewLease = async (leaseId, renewalData) => {
 // Get lease payments
 export const getLeasePayments = async (leaseId) => {
     try {
-        const response = await axios.get(
-            `${API_BASE}/leases/${leaseId}/payments/`,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.get(`${API_BASE}/leases/${leaseId}/payments/`);
 
         return {
             success: true,
@@ -341,7 +264,7 @@ export const getLeasePayments = async (leaseId) => {
 // Record a lease payment
 export const recordLeasePayment = async (leaseId, paymentData) => {
     try {
-        const response = await axios.post(
+        const response = await api.post(
             `${API_BASE}/leases/${leaseId}/payments/`,
             {
                 amount: parseFloat(paymentData.amount),
@@ -349,8 +272,7 @@ export const recordLeasePayment = async (leaseId, paymentData) => {
                 payment_method: paymentData.payment_method || 'cash',
                 reference_number: paymentData.reference_number || "",
                 notes: paymentData.notes || ""
-            },
-            { headers: getAuthHeaders() }
+            }
         );
 
         return {
@@ -368,10 +290,7 @@ export const recordLeasePayment = async (leaseId, paymentData) => {
 // Get lease documents
 export const getLeaseDocuments = async (leaseId) => {
     try {
-        const response = await axios.get(
-            `${API_BASE}/leases/${leaseId}/documents/`,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.get(`${API_BASE}/leases/${leaseId}/documents/`);
 
         return {
             success: true,
@@ -393,12 +312,11 @@ export const uploadLeaseDocument = async (leaseId, documentData) => {
         formData.append('document_type', documentData.document_type);
         formData.append('description', documentData.description || '');
 
-        const response = await axios.post(
+        const response = await api.post(
             `${API_BASE}/leases/${leaseId}/documents/`,
             formData,
             {
                 headers: {
-                    ...getAuthHeaders(),
                     'Content-Type': 'multipart/form-data'
                 }
             }
@@ -419,10 +337,7 @@ export const uploadLeaseDocument = async (leaseId, documentData) => {
 // Delete lease document
 export const deleteLeaseDocument = async (leaseId, documentId) => {
     try {
-        await axios.delete(
-            `${API_BASE}/leases/${leaseId}/documents/${documentId}/`,
-            { headers: getAuthHeaders() }
-        );
+        await api.delete(`${API_BASE}/leases/${leaseId}/documents/${documentId}/`);
 
         return {
             success: true,
@@ -440,10 +355,9 @@ export const deleteLeaseDocument = async (leaseId, documentId) => {
 // Generate lease agreement document
 export const generateLeaseAgreement = async (leaseId) => {
     try {
-        const response = await axios.get(
+        const response = await api.get(
             `${API_BASE}/leases/${leaseId}/generate-agreement/`,
             {
-                headers: getAuthHeaders(),
                 responseType: 'blob'
             }
         );
@@ -475,10 +389,7 @@ export const getLeaseStats = async (params = {}) => {
         if (params.start_date) queryParams.append('start_date', params.start_date);
         if (params.end_date) queryParams.append('end_date', params.end_date);
 
-        const response = await axios.get(
-            `${API_BASE}/leases/stats/?${queryParams.toString()}`,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.get(`${API_BASE}/leases/stats/?${queryParams.toString()}`);
 
         return {
             success: true,
@@ -492,10 +403,7 @@ export const getLeaseStats = async (params = {}) => {
 // Get expiring leases
 export const getExpiringLeases = async (days = 30) => {
     try {
-        const response = await axios.get(
-            `${API_BASE}/leases/expiring/?days=${days}`,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.get(`${API_BASE}/leases/expiring/?days=${days}`);
 
         return {
             success: true,
@@ -509,10 +417,7 @@ export const getExpiringLeases = async (days = 30) => {
 // Get overdue payments
 export const getOverduePayments = async () => {
     try {
-        const response = await axios.get(
-            `${API_BASE}/leases/overdue-payments/`,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.get(`${API_BASE}/leases/overdue-payments/`);
 
         return {
             success: true,
@@ -537,10 +442,7 @@ export const searchLeases = async (searchQuery, filters = {}) => {
         if (filters.min_rent) queryParams.append('min_rent', filters.min_rent);
         if (filters.max_rent) queryParams.append('max_rent', filters.max_rent);
 
-        const response = await axios.get(
-            `${API_BASE}/leases/search/?${queryParams.toString()}`,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.get(`${API_BASE}/leases/search/?${queryParams.toString()}`);
 
         return {
             success: true,
@@ -555,13 +457,12 @@ export const searchLeases = async (searchQuery, filters = {}) => {
 // Bulk operations
 export const bulkUpdateLeaseStatus = async (leaseIds, status) => {
     try {
-        await axios.post(
+        await api.post(
             `${API_BASE}/leases/bulk-update-status/`,
             { 
                 lease_ids: leaseIds,
                 status: status
-            },
-            { headers: getAuthHeaders() }
+            }
         );
 
         return {
@@ -575,11 +476,7 @@ export const bulkUpdateLeaseStatus = async (leaseIds, status) => {
 
 export const bulkDeleteLeases = async (leaseIds) => {
     try {
-        await axios.post(
-            `${API_BASE}/leases/bulk-delete/`,
-            { lease_ids: leaseIds },
-            { headers: getAuthHeaders() }
-        );
+        await api.post(`${API_BASE}/leases/bulk-delete/`, { lease_ids: leaseIds });
 
         return {
             success: true,
@@ -601,10 +498,9 @@ export const exportLeases = async (format = 'csv', filters = {}) => {
         if (filters.start_date) queryParams.append('start_date', filters.start_date);
         if (filters.end_date) queryParams.append('end_date', filters.end_date);
 
-        const response = await axios.get(
+        const response = await api.get(
             `${API_BASE}/leases/export/?${queryParams.toString()}`,
             {
-                headers: getAuthHeaders(),
                 responseType: 'blob'
             }
         );
@@ -631,14 +527,13 @@ export const exportLeases = async (format = 'csv', filters = {}) => {
 // Send lease notification
 export const sendLeaseNotification = async (leaseId, notificationData) => {
     try {
-        const response = await axios.post(
+        const response = await api.post(
             `${API_BASE}/leases/${leaseId}/notifications/`,
             {
                 notification_type: notificationData.notification_type,
                 message: notificationData.message,
                 send_via: notificationData.send_via || ['email'] // email, sms, both
-            },
-            { headers: getAuthHeaders() }
+            }
         );
 
         return {
@@ -654,10 +549,7 @@ export const sendLeaseNotification = async (leaseId, notificationData) => {
 // Get tenant lease history
 export const getTenantLeaseHistory = async (tenantId) => {
     try {
-        const response = await axios.get(
-            `${API_BASE}/tenants/${tenantId}/lease-history/`,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.get(`${API_BASE}/tenants/${tenantId}/lease-history/`);
 
         return {
             success: true,
@@ -671,10 +563,9 @@ export const getTenantLeaseHistory = async (tenantId) => {
 // Generate rent receipt
 export const generateRentReceipt = async (paymentId) => {
     try {
-        const response = await axios.get(
+        const response = await api.get(
             `${API_BASE}/payments/${paymentId}/receipt/`,
             {
-                headers: getAuthHeaders(),
                 responseType: 'blob'
             }
         );
@@ -711,10 +602,7 @@ export const getLeaseReportData = async (filters = {}) => {
         if (filters.end_date) queryParams.append('end_date', filters.end_date);
         
 
-        const response = await axios.get(
-            `${API_BASE}/reports/lease`,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.get(`${API_BASE}/reports/lease`);
 
         return {
             success: true,
@@ -725,3 +613,4 @@ export const getLeaseReportData = async (filters = {}) => {
         return handleApiError(err, "Failed to fetch all leases.");
     }
 };
+

@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext(null);
 
@@ -92,14 +93,15 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated(true);
     };
 
-    const logout = () => {
+    const logout = useCallback(() => {
         localStorage.removeItem('token');
         localStorage.removeItem('refresh');
         localStorage.removeItem('subscription');
         setIsAuthenticated(false);
         setSubscription(null);
         setHasActiveSubscription(false);
-    };
+        // Note: Redirect is handled by the API interceptor
+    }, []);
 
     // Method to check if current token is still valid by refreshing it
     const checkTokenValidity = async () => {
@@ -120,6 +122,24 @@ export const AuthProvider = ({ children }) => {
 
         return true;
     };
+
+    // Listen to storage events to sync logout across tabs
+    useEffect(() => {
+        const handleStorageChange = (e) => {
+            if (e.key === 'token' && !e.newValue) {
+                // Token was removed, user logged out in another tab
+                setIsAuthenticated(false);
+                setSubscription(null);
+                setHasActiveSubscription(false);
+            } else if (e.key === 'token' && e.newValue) {
+                // Token was added, user logged in another tab
+                setIsAuthenticated(true);
+            }
+        };
+
+        window.addEventListener('storage', handleStorageChange);
+        return () => window.removeEventListener('storage', handleStorageChange);
+    }, []);
 
     if (loading) {
         return (

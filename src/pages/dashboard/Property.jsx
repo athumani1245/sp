@@ -679,7 +679,7 @@ function Property() {
 
                 {/* Property Details Tab */}
                 {activeTab === "details" && (
-                    <div className="property-details-tab-content">
+                    <div className="property-details-tab-content property-info">
                         {/* Property Information Form */}
                         <div className="leases-filters-section">
                             {error && <div className="alert alert-danger">{error}</div>}
@@ -902,7 +902,7 @@ function Property() {
 
         {/* Units Tab */}
         {activeTab === "units" && (
-            <div className="units-tab-content">
+            <div className="units-tab-content units-section">
                 {/* Units Section */}
                 <div className="leases-filters-section">
                     <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
@@ -927,7 +927,7 @@ function Property() {
                             {/* Add Unit Button */}
                             {!isAddingUnit && (
                                 <button 
-                                    className="odoo-btn odoo-btn-primary"
+                                    className="odoo-btn odoo-btn-primary add-unit-btn"
                                     onClick={() => setIsAddingUnit(true)}
                                     disabled={editingUnitId !== null || !hasActiveSubscription}
                                     style={{ minWidth: '120px' }}

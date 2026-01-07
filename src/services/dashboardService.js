@@ -1,31 +1,18 @@
-import axios from "axios";
+import api from "../utils/api";
+import { handleApiError } from "../utils/errorHandler";
 
 const API_BASE = process.env.REACT_APP_API_BASE;
-
-// Helper function to get auth headers
-const getAuthHeaders = () => {
-    const token = localStorage.getItem("token");
-    return {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-    };
-};
-
 
 // Retrieve dashboard summary info
 export const getDashboardInfo = async () => {
     try {
-        const response = await axios.get(`${API_BASE}/dashboard/properties-rent-summary/`, {
-            headers: getAuthHeaders()
-        });
+        const response = await api.get(`${API_BASE}/dashboard/properties-rent-summary/`);
         return {
             success: true,
             data: response.data.data
         };
     } catch (err) {
-        return {
-            success: false,
-            error: err.response?.data?.description || 'Failed to fetch dashboard info.'
-        };
+        return handleApiError(err, 'Failed to fetch dashboard info.');
     }
 };
+

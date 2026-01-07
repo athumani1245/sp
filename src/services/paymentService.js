@@ -1,42 +1,7 @@
-import axios from "axios";
+import api from "../utils/api";
+import { handleApiError } from "../utils/errorHandler";
 
 const API_BASE = process.env.REACT_APP_API_BASE;
-
-// Helper function to get auth headers
-const getAuthHeaders = () => {
-    const token = localStorage.getItem("token");
-    return {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-    };
-};
-
-/////////////////////////////////////////////////////////// Error Handling //////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// Helper function to handle errors consistently
-const handleApiError = (err, defaultMessage) => {
-    let error_msg = defaultMessage;
-    
-    if (err.response?.data?.description) {
-        error_msg = err.response.data.description;
-    } else if (err.response?.status === 401) {
-        error_msg = "Session expired. Please login again.";
-        localStorage.removeItem("token");
-        localStorage.removeItem("refresh");
-    } else if (err.response?.status === 404) {
-        error_msg = "Resource not found.";
-    } else if (err.response?.status === 400) {
-        error_msg = "Invalid data. Please check your input.";
-    } else if (err.response?.status === 403) {
-        error_msg = "You don't have permission to perform this action.";
-    }
-    
-    return {
-        success: false,
-        error: error_msg
-    };
-};
 
 ////////////////////////////////////////////// Data Validation and Handling /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -69,11 +34,7 @@ export const createPayment = async (paymentData) => {
     try {
         const formattedData = formatPaymentData(paymentData);
         
-        const response = await axios.post(
-            `${API_BASE}/payments/`,
-            formattedData,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.post(`${API_BASE}/payments/`, formattedData);
 
         return {
             success: true,
@@ -100,10 +61,7 @@ export const getPayments = async (params = {}) => {
         if (params.start_date) queryParams.append('start_date', params.start_date);
         if (params.end_date) queryParams.append('end_date', params.end_date);
 
-        const response = await axios.get(
-            `${API_BASE}/payments/?${queryParams.toString()}`,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.get(`${API_BASE}/payments/?${queryParams.toString()}`);
 
         return {
             success: true,
@@ -118,10 +76,7 @@ export const getPayments = async (params = {}) => {
 // Get a single payment by ID
 export const getPaymentById = async (paymentId) => {
     try {
-        const response = await axios.get(
-            `${API_BASE}/payments/${paymentId}/`,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.get(`${API_BASE}/payments/${paymentId}/`);
 
         return {
             success: true,
@@ -137,11 +92,7 @@ export const updatePayment = async (paymentId, paymentData) => {
     try {
         const formattedData = formatPaymentData(paymentData);
 
-        const response = await axios.patch(
-            `${API_BASE}/payments/${paymentId}/`,
-            formattedData,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.patch(`${API_BASE}/payments/${paymentId}/`, formattedData);
 
         return {
             success: true,
@@ -156,10 +107,9 @@ export const updatePayment = async (paymentId, paymentData) => {
 // Delete a payment
 export const cancelPayment = async (paymentId) => {
     try {
-        await axios.post(
+        await api.post(
             `${API_BASE}/payments/${paymentId}/cancel/`,
-            {},  // empty body
-            { headers: getAuthHeaders() }
+            {}  // empty body
         );
 
         return {
@@ -174,10 +124,9 @@ export const cancelPayment = async (paymentId) => {
 // Generate payment receipt
 export const generatePaymentReceipt = async (paymentId) => {
     try {
-        const response = await axios.get(
+        const response = await api.get(
             `${API_BASE}/payments/${paymentId}/receipt/`,
             {
-                headers: getAuthHeaders(),
                 responseType: 'blob'
             }
         );
@@ -209,10 +158,7 @@ export const getPaymentStats = async (params = {}) => {
         if (params.start_date) queryParams.append('start_date', params.start_date);
         if (params.end_date) queryParams.append('end_date', params.end_date);
 
-        const response = await axios.get(
-            `${API_BASE}/payments/stats/?${queryParams.toString()}`,
-            { headers: getAuthHeaders() }
-        );
+        const response = await api.get(`${API_BASE}/payments/stats/?${queryParams.toString()}`);
 
         return {
             success: true,
@@ -222,6 +168,7 @@ export const getPaymentStats = async (params = {}) => {
         return handleApiError(err, "Failed to fetch payment statistics.");
     }
 };
+
 
 
 
