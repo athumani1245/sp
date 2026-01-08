@@ -56,3 +56,24 @@ export const handleMonetaryInputChange = (event, setFormData, fieldName) => {
         [fieldName]: rawValue
     }));
 };
+
+/**
+ * Format date string to readable format
+ * @param {string} dateString - ISO date string or date object
+ * @returns {string} - Formatted date (e.g., 'Jan 8, 2026')
+ */
+export const formatDate = (dateString) => {
+    if (!dateString) return '';
+    
+    const date = new Date(dateString);
+    
+    // Check if date is valid
+    if (isNaN(date.getTime())) return dateString;
+    
+    // Format: Month Day, Year (e.g., 'Jan 8, 2026')
+    return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
+};

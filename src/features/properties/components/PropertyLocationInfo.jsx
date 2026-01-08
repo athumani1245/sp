@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { InfoTooltip } from '../../../components/common/Tooltip';
-import SearchableSelect from '../../../components/common/SearchableSelect';
+import { SearchableSelect } from '../../../components/common/SearchableSelect';
 
 const PropertyLocationInfo = ({
     formData,
