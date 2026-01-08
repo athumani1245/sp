@@ -1,263 +1,54 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import '../../assets/styles/add-property.css';
 import '../../assets/styles/forms-responsive.css';
-import { addProperty, getRegions, getDistricts, getWards, getAllPropertyManagers } from '../../services/propertyService';
-import { InfoTooltip } from '../common/Tooltip';
-
-// SearchableSelect Component
-const SearchableSelect = ({ 
-    options, 
-    value, 
-    onChange, 
-    placeholder, 
-    disabled, 
-    name,
-    getOptionLabel,
-    getOptionValue,
-    noOptionsMessage = "No options available"
-}) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [filteredOptions, setFilteredOptions] = useState(options);
-    const dropdownRef = useRef(null);
-    const inputRef = useRef(null);
-
-    useEffect(() => {
-        setFilteredOptions(options);
-    }, [options]);
-
-    useEffect(() => {
-        if (searchTerm === '') {
-            setFilteredOptions(options);
-        } else {
-            const filtered = options.filter(option => 
-                getOptionLabel(option).toLowerCase().includes(searchTerm.toLowerCase())
-            );
-            setFilteredOptions(filtered);
-        }
-    }, [searchTerm, options, getOptionLabel]);
-
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-                setIsOpen(false);
-                setSearchTerm('');
-            }
-        };
-
-        const handleKeyDown = (event) => {
-            // Handle Escape key to close dropdown
-            if (event.key === 'Escape' && isOpen) {
-                event.preventDefault();
-                event.stopPropagation();
-                setIsOpen(false);
-                setSearchTerm('');
-            }
-        };
-
-        if (isOpen) {
-            document.addEventListener('mousedown', handleClickOutside);
-            document.addEventListener('keydown', handleKeyDown, true); // Use capture phase
-        }
-
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-            document.removeEventListener('keydown', handleKeyDown, true);
-        };
-    }, [isOpen]);
-
-    const handleInputClick = () => {
-        if (!disabled) {
-            setIsOpen(!isOpen);
-            if (!isOpen) {
-                setTimeout(() => inputRef.current?.focus(), 100);
-            }
-        }
-    };
-
-    const handleOptionSelect = (option) => {
-        const optionValue = getOptionValue(option);
-        onChange({ target: { name, value: optionValue } });
-        setIsOpen(false);
-        setSearchTerm('');
-    };
-
-    const getDisplayValue = () => {
-        if (!value) return '';
-        const selectedOption = options.find(option => getOptionValue(option) === value);
-        return selectedOption ? getOptionLabel(selectedOption) : '';
-    };
-
-    return (
-        <div className="searchable-select position-relative" ref={dropdownRef}>
-            <div 
-                className={`form-select d-flex align-items-center justify-content-between ${disabled ? 'disabled' : ''}`}
-                onClick={handleInputClick}
-                onKeyDown={(e) => {
-                    // Prevent Bootstrap dropdown handlers
-                    if (e.key === 'Escape' || e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-                        e.preventDefault();
-                        e.stopPropagation();
-                    }
-                    if (e.key === 'Escape' && isOpen) {
-                        setIsOpen(false);
-                        setSearchTerm('');
-                    }
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        if (!disabled) {
-                            setIsOpen(!isOpen);
-                        }
-                    }
-                }}
-                tabIndex={disabled ? -1 : 0}
-                role="combobox"
-                aria-expanded={isOpen}
-                aria-haspopup="listbox"
-                style={{ 
-                    cursor: disabled ? 'not-allowed' : 'pointer',
-                    backgroundColor: disabled ? '#e9ecef' : 'white'
-                }}
-            >
-                <span className={!value ? 'text-muted' : ''}>
-                    {!value ? placeholder : getDisplayValue()}
-                </span>
-                <i className={`bi bi-chevron-${isOpen ? 'up' : 'down'}`}></i>
-            </div>
-            
-            {isOpen && (
-                <div 
-                    className="dropdown-menu show w-100 position-absolute"
-                    role="listbox"
-                    aria-label="Options"
-                    style={{ 
-                        zIndex: 1050, 
-                        maxHeight: '200px', 
-                        overflowY: 'auto',
-                        top: '100%',
-                        left: 0
-                    }}
-                    onKeyDown={(e) => {
-                        // Prevent Bootstrap interference at dropdown level
-                        if (e.key === 'Escape') {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            setIsOpen(false);
-                            setSearchTerm('');
-                        }
-                    }}
-                >
-                    <div className="p-2 border-bottom">
-                        <input
-                            ref={inputRef}
-                            type="text"
-                            className="form-control form-control-sm"
-                            placeholder="Type to search..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            onClick={(e) => e.stopPropagation()}
-                            onKeyDown={(e) => {
-                                // Prevent Bootstrap dropdown handlers from interfering
-                                if (e.key === 'Escape') {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    setIsOpen(false);
-                                    setSearchTerm('');
-                                }
-                            }}
-                        />
-                    </div>
-                    
-                    <div className="dropdown-items">
-                        {filteredOptions.length > 0 ? (
-                            filteredOptions.map((option, index) => (
-                                <div
-                                    key={getOptionValue(option)}
-                                    className={`dropdown-item ${getOptionValue(option) === value ? 'active' : ''}`}
-                                    onClick={() => handleOptionSelect(option)}
-                                    style={{ cursor: 'pointer' }}
-                                >
-                                    {getOptionLabel(option)}
-                                </div>
-                            ))
-                        ) : (
-                            <div className="dropdown-item-text text-muted">
-                                {noOptionsMessage}
-                            </div>
-                        )}
-                    </div>
-                </div>
-            )}
-        </div>
-    );
-};
+import { usePropertyForm } from '../../features/properties/hooks/usePropertyForm';
+import { useLocationData } from '../../features/properties/hooks/useLocationData';
+import { usePropertySubmit } from '../../features/properties/hooks/usePropertySubmit';
+import PropertyBasicInfo from '../../features/properties/components/PropertyBasicInfo';
+import PropertyLocationInfo from '../../features/properties/components/PropertyLocationInfo';
 
 
-const AddPropertyModal = ({isOpen, onClose, onPropertyAdded})=>{
-    const [formData, setFormData] = useState({
-        propertyName: '',
-        propertyType: 'Apartment',
-        region: '',
-        district: '',
-        ward: '',
-        street: '',
-        manager_id: '',
-        managers: [],
-        autoGenerate: false,
-        numFloors: '',
-        unitsPerFloor: ''
-    });
-    
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
-    
-    // Location data states
-    const [regions, setRegions] = useState([]);
-    const [districts, setDistricts] = useState([]);
-    const [wards, setWards] = useState([]);
-    const [propertyManagers, setPropertyManagers] = useState([]);
-    const [selectedRegionId, setSelectedRegionId] = useState('');
-    const [selectedDistrictId, setSelectedDistrictId] = useState('');
-    const [selectedWardId, setSelectedWardId] = useState('');
-    const [locationLoading, setLocationLoading] = useState(false);
+const AddPropertyModal = ({ isOpen, onClose, onPropertyAdded }) => {
+    // Form state management
+    const {
+        formData,
+        setFormData,
+        selectedRegionId,
+        setSelectedRegionId,
+        selectedDistrictId,
+        setSelectedDistrictId,
+        selectedWardId,
+        setSelectedWardId,
+        handleInputChange,
+        resetForm
+    } = usePropertyForm();
 
-    // Load regions when component mounts
-    useEffect(() => {
-        if (isOpen) {
-            loadRegions();
-            loadPropertyManagers();
-        }
-    }, [isOpen]);
+    // Location data loading
+    const {
+        regions,
+        districts,
+        wards,
+        propertyManagers,
+        locationLoading,
+        error: locationError,
+        setError: setLocationError,
+        loadDistricts,
+        loadWards,
+        resetLocationData
+    } = useLocationData(isOpen);
 
-    const loadRegions = async () => {
-        try {
-            setLocationLoading(true);
-            const response = await getRegions();
-            if (response.success) {
-                setRegions(response.data || []);
-            } else {
-                setError(response.error || 'Failed to load regions');
-                setRegions([]);
-            }
-        } catch (error) {
-            setError('Failed to load regions');
-            setRegions([]);
-        } finally {
-            setLocationLoading(false);
-        }
-    };
+    // Form submission
+    const {
+        loading,
+        error,
+        success,
+        setError,
+        setSuccess,
+        handleSubmit
+    } = usePropertySubmit(formData, resetForm, resetLocationData, onPropertyAdded, onClose);
 
-    const loadPropertyManagers = async () => {
-        try {
-            const result = await getAllPropertyManagers();
-            if (result.success) {
-                setPropertyManagers(result.data || []);
-            }
-        } catch (error) {
-        }
-    };
-
+    // Location handlers
     const handleRegionChange = async (e) => {
         const regionId = e.target.value;
         const selectedRegion = regions.find(region => region.region_code === regionId);
@@ -271,28 +62,12 @@ const AddPropertyModal = ({isOpen, onClose, onPropertyAdded})=>{
             ward: ''
         }));
         
-        // Reset dependent dropdowns
-        setDistricts([]);
-        setWards([]);
         setSelectedDistrictId('');
         setSelectedWardId('');
+        resetLocationData();
         
         if (regionId) {
-            try {
-                setLocationLoading(true);
-                const response = await getDistricts(regionId);
-                if (response.success) {
-                    setDistricts(response.data || []);
-                } else {
-                    setError(response.error || 'Failed to load districts');
-                    setDistricts([]);
-                }
-            } catch (error) {
-                setError('Failed to load districts');
-                setDistricts([]);
-            } finally {
-                setLocationLoading(false);
-            }
+            await loadDistricts(regionId);
         }
     };
 
@@ -308,104 +83,28 @@ const AddPropertyModal = ({isOpen, onClose, onPropertyAdded})=>{
             ward: ''
         }));
         
-        // Reset wards
-        setWards([]);
         setSelectedWardId('');
         
         if (districtId) {
-            try {
-                setLocationLoading(true);
-                const response = await getWards(districtId);
-                if (response.success) {
-                    setWards(response.data || []);
-                } else {
-                    setError(response.error || 'Failed to load wards');
-                    setWards([]);
-                }
-            } catch (error) {
-                setError('Failed to load wards');
-                setWards([]);
-            } finally {
-                setLocationLoading(false);
-            }
+            await loadWards(districtId);
         }
     };
 
     const handleWardChange = (e) => {
         const wardCode = e.target.value;
-        
         setSelectedWardId(wardCode);
         setFormData(prev => ({
             ...prev,
-            ward: wardCode  // Store ward_code instead of ward_name
+            ward: wardCode
         }));
-    };
-
-
-
-
-    const handleInputChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : value
-        }));
-    };
-
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        setError('');
-        setSuccess('');
-
-        try {
-            const result = await addProperty(formData);
-            if (result.success) {
-                setSuccess(result.message || 'Property added successfully!');
-                // Reset form
-                setFormData({
-                    propertyName: '',
-                    propertyType: 'Residential',
-                    ward: '',
-                    street: '',
-                });
-                
-                // Reset location state
-                setSelectedRegionId('');
-                setSelectedDistrictId('');
-                setSelectedWardId('');
-                setDistricts([]);
-                setWards([]);
-                // Notify parent component
-                if (onPropertyAdded) {
-                    onPropertyAdded(result.data);
-                }
-                // Close modal after a short delay
-                setTimeout(() => {
-                    onClose();
-                }, 1500);
-            } else {
-                setError(result.error);
-            }
-        } catch (err) {
-            setError('Failed to add property. Please try again.');
-        } finally {
-            setLoading(false);
-        }
     };
 
     const handleClose = () => {
         setError('');
         setSuccess('');
-        
-        // Reset location state
-        setSelectedRegionId('');
-        setSelectedDistrictId('');
-        setSelectedWardId('');
-        setDistricts([]);
-        setWards([]);
-        
+        setLocationError('');
+        resetForm();
+        resetLocationData();
         onClose();
     };
 
@@ -554,83 +253,38 @@ const AddPropertyModal = ({isOpen, onClose, onPropertyAdded})=>{
                                     />
                                     {locationLoading && <small className="form-text text-muted">Loading districts...</small>}
                                 </div>
-                            </div>
-
-                            {/* Ward and Street Row */}
-                            <div className="row mb-3">
-                                <div className="col-12 col-md-6 mb-3">
-                                    <label htmlFor="ward" className="form-label">
-                                        Ward
-                                        <InfoTooltip content="Optionally specify the ward/neighborhood for more precise location tracking" />
-                                    </label>
-                                    <SearchableSelect
-                                        options={wards}
-                                        value={selectedWardId}
-                                        onChange={handleWardChange}
-                                        placeholder="Select Ward"
-                                        disabled={!selectedDistrictId || locationLoading}
-                                        name="ward"
-                                        getOptionLabel={(ward) => ward.ward_name}
-                                        getOptionValue={(ward) => ward.ward_code}
-                                        noOptionsMessage={!selectedDistrictId ? "Please select a district first" : "No wards available"}
-                                    />
-                                    {locationLoading && <small className="form-text text-muted">Loading wards...</small>}
-                                </div>
-                                <div className="col-12 col-md-6 mb-3">
-                                    <label htmlFor="street" className="form-label">
-                                        Street Address *
-                                        <InfoTooltip content="Enter the complete street address including building/plot number (e.g., '123 Beach Road', 'Plot 456 Nyerere St')" />
-                                    </label>
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        id="street"
-                                        name="street"
-                                        value={formData.street}
-                                        onChange={handleInputChange}
-                                        placeholder="e.g., 123 Beach Road"
-                                        required
-                                    />
-                                </div>
-                            </div>
-
+                            <(error || locationError) && (
+                                <div className="alert alert-danger">{error || locationError}</div>
+                            )}
+                            {success && <div className="alert alert-success">{success}</div>}
                             
-                            
-                        </div>
-                        
-                        <div className="modal-footer border-0 pt-0">
-                            <button 
-                                type="button" 
-                                className="odoo-btn odoo-btn-secondary"
-                                onClick={handleClose}
-                                disabled={loading}
-                            >
-                                <i className="bi bi-x-circle me-2"></i>
-                                Cancel
-                            </button>
-                            <button 
-                                type="submit" 
-                                className="odoo-btn odoo-btn-primary"
-                                disabled={loading}
-                            >
-                                {loading ? (
-                                    <>
-                                        <span className="spinner-border spinner-border-sm me-2" role="status"></span>
-                                        Adding Property...
-                                    </>
-                                ) : (
-                                    <>
-                                        <i className="bi bi-plus-circle me-2"></i>
-                                        Add Property
-                                    </>
-                                )}
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    );
+                            <PropertyBasicInfo
+                                formData={formData}
+                                handleInputChange={handleInputChange}
+                                propertyManagers={propertyManagers}
+                                loading={loading}
+                            />
+
+                            <PropertyLocationInfo
+                                formData={formData}
+                                handleInputChange={handleInputChange}
+                                regions={regions}
+                                districts={districts}
+                                wards={wards}
+                                selectedRegionId={selectedRegionId}
+                                selectedDistrictId={selectedDistrictId}
+                                selectedWardId={selectedWardId}
+                                handleRegionChange={handleRegionChange}
+                                handleDistrictChange={handleDistrictChange}
+                                handleWardChange={handleWardChange}
+                                locationLoading={locationLoading}
+                            />AddPropertyModal.propTypes = {
+    isOpen: PropTypes.bool.isRequired,
+    onClose: PropTypes.func.isRequired,
+    onPropertyAdded: PropTypes.func
 };
 
-export default AddPropertyModal;
+AddPropertyModal.defaultProps = {
+    onPropertyAdded: null
+};
+

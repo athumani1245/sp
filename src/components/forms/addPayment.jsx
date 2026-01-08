@@ -1,115 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Modal, Button, Form, Row, Col, Alert } from 'react-bootstrap';
+import PropTypes from 'prop-types';
 import '../../assets/styles/forms-responsive.css';
-import { createPayment } from '../../services/paymentService';
-import { formatNumberWithCommas, parseFormattedNumber } from '../../utils/formatUtils';
+import { usePaymentForm } from '../../features/leases/hooks/usePaymentForm';
+import { usePaymentSubmit } from '../../features/leases/hooks/usePaymentSubmit';
 
 const AddPayment = ({ isOpen, onClose, leaseId, onPaymentAdded }) => {
-    const [submitLoading, setSubmitLoading] = useState(false);
-    const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
-    const [formData, setFormData] = useState({
-        amount_paid: '',
-        date_paid: new Date().toISOString().slice(0, 10), // Format: YYYY-MM-DD
-        category: 'RENT',
-        payment_source: 'CASH'
-    });
+    const {
+        formData,
+        handleInputChange,
+        validateForm,
+        formatNumberWithCommas
+    } = usePaymentForm(isOpen);
 
-    // Reset form when modal opens/closes
-    useEffect(() => {
-        if (isOpen) {
-            resetForm();
-        }
-    }, [isOpen]);
-
-    const resetForm = () => {
-        setFormData({
-            amount_paid: '',
-            date_paid: new Date().toISOString().slice(0, 10),
-            category: 'RENT',
-            payment_source: 'CASH'
-        });
-        setError('');
-        setSuccess('');
-    };
-
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        
-        if (name === 'amount_paid') {
-            // Handle monetary input with comma formatting
-            const rawValue = parseFormattedNumber(value);
-            setFormData(prevState => ({
-                ...prevState,
-                [name]: rawValue
-            }));
-        } else {
-            setFormData(prevState => ({
-                ...prevState,
-                [name]: value
-            }));
-        }
-        
-        setError('');
-        setSuccess('');
-    };
-
-    const validateForm = () => {
-        if (!formData.amount_paid) {
-            setError('Please enter the payment amount');
-            return false;
-        }
-        if (!formData.date_paid) {
-            setError('Please select the payment date');
-            return false;
-        }
-        if (parseFloat(formData.amount_paid) <= 0) {
-            setError('Payment amount must be greater than 0');
-            return false;
-        }
-        return true;
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        
-        if (!validateForm()) {
-            return;
-        }
-
-        setSubmitLoading(true);
-        setError('');
-        
-        try {
-            const paymentData = {
-                ...formData,
-                lease: leaseId
-            };
-
-            const response = await createPayment(paymentData);
-
-            if (response.success) {
-                setSuccess('Payment added successfully!');
-                setFormData({
-                    amount_paid: '',
-                    date_paid: new Date(),
-                    category: 'RENT'
-                });
-                if (onPaymentAdded) {
-                    onPaymentAdded(response.data);
-                }
-                setTimeout(() => {
-                    onClose();
-                }, 2000);
-            } else {
-                setError(response.error || 'Failed to add payment');
-            }
-        } catch (err) {
-            setError('An error occurred while adding the payment');
-        } finally {
-            setSubmitLoading(false);
-        }
-    };
+    const {
+        submitLoading,
+        error,
+        success,
+        setError,
+        setSuccess,
+        handleSubmit
+    } = usePaymentSubmit(formData, leaseId, onPaymentAdded, onClose);
 
     if (!isOpen) return null;
 
@@ -129,7 +40,7 @@ const AddPayment = ({ isOpen, onClose, leaseId, onPaymentAdded }) => {
                 </Modal.Title>
             </Modal.Header>
             
-            <Form onSubmit={handleSubmit}>
+            <Form onSubmit={(e) => handleSubmit(e, validateForm)}>
                 <Modal.Body>
                     {error && (
                         <Alert variant="danger" className="alert alert-danger">
@@ -254,6 +165,17 @@ const AddPayment = ({ isOpen, onClose, leaseId, onPaymentAdded }) => {
             </Form>
         </Modal>
     );
+};
+
+AddPayment.propTypes = {
+    isOpen: PropTypes.bool.isRequired,
+    onClose: PropTypes.func.isRequired,
+    leaseId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    onPaymentAdded: PropTypes.func
+};
+
+AddPayment.defaultProps = {
+    onPaymentAdded: null
 };
 
 export default AddPayment;

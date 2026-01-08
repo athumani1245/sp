@@ -1,108 +1,31 @@
-import React, { useState } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import '../../assets/styles/add-unit.css';
-import { addPropertyUnit } from '../../services/propertyService';
-import { formatNumberWithCommas, parseFormattedNumber } from '../../utils/formatUtils';
+import { useUnitForm } from '../../features/properties/hooks/useUnitForm';
+import { useUnitSubmit } from '../../features/properties/hooks/useUnitSubmit';
 
 const AddUnitModal = ({ isOpen, onClose, onUnitAdded, propertyId }) => {
-    const [formData, setFormData] = useState({
-        unitNumber: '',
-        floor: '',
-        unitType: 'Standard',
-        bedrooms: '',
-        bathrooms: '',
-        squareFootage: '',
-        rentAmount: '',
-        description: ''
-    });
-    
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
+    const {
+        formData,
+        handleInputChange,
+        resetForm,
+        formatFormData,
+        formatNumberWithCommas
+    } = useUnitForm();
 
-    const handleInputChange = (e) => {
-        const { name, value, type } = e.target;
-        
-        if (name === 'rentAmount') {
-            // Handle monetary input with comma formatting
-            const rawValue = parseFormattedNumber(value);
-            setFormData(prev => ({
-                ...prev,
-                [name]: rawValue
-            }));
-        } else {
-            setFormData(prev => ({
-                ...prev,
-                [name]: type === 'number' ? (value === '' ? '' : Number(value)) : value
-            }));
-        }
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        setError('');
-        setSuccess('');
-
-        try {
-            // Format data for API
-            const unitData = {
-                unit_number: formData.unitNumber,
-                floor: formData.floor ? Number(formData.floor) : null,
-                unit_type: formData.unitType,
-                bedrooms: formData.bedrooms ? Number(formData.bedrooms) : null,
-                bathrooms: formData.bathrooms ? Number(formData.bathrooms) : null,
-                square_footage: formData.squareFootage ? Number(formData.squareFootage) : null,
-                rent_amount: formData.rentAmount ? Number(formData.rentAmount) : null,
-                description: formData.description || null,
-                status: 'available' // Default status
-            };
-
-            const result = await addPropertyUnit(propertyId, unitData);
-            if (result.success) {
-                setSuccess(result.message || 'Unit added successfully!');
-                // Reset form
-                setFormData({
-                    unitNumber: '',
-                    floor: '',
-                    unitType: 'Standard',
-                    bedrooms: '',
-                    bathrooms: '',
-                    squareFootage: '',
-                    rentAmount: '',
-                    description: ''
-                });
-                // Notify parent component
-                if (onUnitAdded) {
-                    onUnitAdded(result.data);
-                }
-                // Close modal after a short delay
-                setTimeout(() => {
-                    onClose();
-                }, 1500);
-            } else {
-                setError(result.error);
-            }
-        } catch (err) {
-            setError('Failed to add unit. Please try again.');
-        } finally {
-            setLoading(false);
-        }
-    };
+    const {
+        loading,
+        error,
+        success,
+        setError,
+        setSuccess,
+        handleSubmit
+    } = useUnitSubmit(propertyId, formatFormData, resetForm, onUnitAdded, onClose);
 
     const handleClose = () => {
         setError('');
         setSuccess('');
-        // Reset form data when closing
-        setFormData({
-            unitNumber: '',
-            floor: '',
-            unitType: 'Standard',
-            bedrooms: '',
-            bathrooms: '',
-            squareFootage: '',
-            rentAmount: '',
-            description: ''
-        });
+        resetForm();
         onClose();
     };
 
@@ -294,6 +217,17 @@ const AddUnitModal = ({ isOpen, onClose, onUnitAdded, propertyId }) => {
             </div>
         </div>
     );
+};
+
+AddUnitModal.propTypes = {
+    isOpen: PropTypes.bool.isRequired,
+    onClose: PropTypes.func.isRequired,
+    onUnitAdded: PropTypes.func,
+    propertyId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired
+};
+
+AddUnitModal.defaultProps = {
+    onUnitAdded: null
 };
 
 export default AddUnitModal;
