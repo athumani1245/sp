@@ -8,7 +8,6 @@ import { usePropertySubmit } from '../../features/properties/hooks/usePropertySu
 import PropertyBasicInfo from '../../features/properties/components/PropertyBasicInfo';
 import PropertyLocationInfo from '../../features/properties/components/PropertyLocationInfo';
 
-
 const AddPropertyModal = ({ isOpen, onClose, onPropertyAdded }) => {
     // Form state management
     const {
@@ -135,125 +134,9 @@ const AddPropertyModal = ({ isOpen, onClose, onPropertyAdded }) => {
                                 aria-label="Close modal"
                             ></button>
                         </div>
+                        
                         <div className="modal-body">
-                            {error && <div className="alert alert-danger">{error}</div>}
-                            {success && <div className="alert alert-success">{success}</div>}
-                            
-                            <div className="form-section-header mb-form-section">
-                                <i className="fas fa-info-circle text-danger"></i>
-                                Basic Information
-                            </div>
-                            
-                            {/* Property Name and Type Row */}
-                            <div className="row mb-3">
-                                <div className="col-12 col-md-6 mb-3">
-                                    <label htmlFor="propertyName" className="form-label">
-                                        Property Name *
-                                        <InfoTooltip content="Give your property a unique, descriptive name (e.g., 'Sunset Apartments', 'Green Valley Plaza')" />
-                                    </label>
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        id="propertyName"
-                                        name="propertyName"
-                                        value={formData.propertyName}
-                                        onChange={handleInputChange}
-                                        placeholder="Enter property name"
-                                        required
-                                    />
-                                </div>
-                                <div className="col-12 col-md-6 mb-3">
-                                    <label htmlFor="propertyType" className="form-label">
-                                        Property Type
-                                        <InfoTooltip content="<strong>Standalone:</strong> Single-family homes<br/><strong>Apartment:</strong> Multi-unit residential buildings<br/><strong>Commercial:</strong> Office, retail, or mixed-use" />
-                                    </label>
-                                    <select
-                                        className="form-select"
-                                        id="propertyType"
-                                        name="propertyType"
-                                        value={formData.propertyType}
-                                        onChange={handleInputChange}
-                                    >
-                                        <option value="Standalone">Standalone</option>
-                                        <option value="Apartment">Apartment</option>
-                                        <option value="Commercial building">Commercial building</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            {/* Property Manager Row */}
-                            <div className="row mb-3">
-                                <div className="col-12 mb-3">
-                                    <label htmlFor="manager_id" className="form-label">
-                                        Property Manager (Optional)
-                                        <InfoTooltip content="Assign a dedicated manager who will oversee operations, maintenance, and tenant relations for this property" />
-                                    </label>
-                                    <SearchableSelect
-                                        options={propertyManagers}
-                                        value={formData.manager_id}
-                                        onChange={handleInputChange}
-                                        placeholder="Select Property Manager"
-                                        disabled={loading}
-                                        name="manager_id"
-                                        getOptionLabel={(manager) => {
-                                            if (manager.first_name && manager.last_name) {
-                                                return `${manager.first_name} ${manager.last_name} - ${manager.username}`;
-                                            }
-                                            return manager.username || 'Unknown Manager';
-                                        }}
-                                        getOptionValue={(manager) => manager.id}
-                                        noOptionsMessage="No property managers available. Add managers from the Property Managers page."
-                                    />
-                                    <small className="form-text text-muted">
-                                        Assign a property manager to oversee this property
-                                    </small>
-                                </div>
-                            </div>
-
-                            <div className="form-section-header mb-form-section">
-                                <i className="fas fa-map-marker-alt text-danger"></i>
-                                Location Information
-                            </div>
-                            
-                            {/* Region and District Row */}
-                            <div className="row mb-3">
-                                <div className="col-12 col-md-6 mb-3">
-                                    <label htmlFor="region" className="form-label">
-                                        Region *
-                                        <InfoTooltip content="Select the administrative region where this property is located" />
-                                    </label>
-                                    <SearchableSelect
-                                        options={regions}
-                                        value={selectedRegionId}
-                                        onChange={handleRegionChange}
-                                        placeholder="Select Region"
-                                        disabled={locationLoading}
-                                        name="region"
-                                        getOptionLabel={(region) => region.region_name}
-                                        getOptionValue={(region) => region.region_code}
-                                        noOptionsMessage="No regions available"
-                                    />
-                                    {locationLoading && <small className="form-text text-muted">Loading regions...</small>}
-                                </div>
-                                <div className="col-12 col-md-6 mb-3">
-                                    <label htmlFor="district" className="form-label">
-                                        District *
-                                        <InfoTooltip content="Select the district within the chosen region. Districts will load after selecting a region." />
-                                    </label>
-                                    <SearchableSelect
-                                        options={districts}
-                                        value={selectedDistrictId}
-                                        onChange={handleDistrictChange}
-                                        placeholder="Select District"
-                                        disabled={!selectedRegionId || locationLoading}
-                                        name="district"
-                                        getOptionLabel={(district) => district.district_name}
-                                        getOptionValue={(district) => district.district_code}
-                                        noOptionsMessage={!selectedRegionId ? "Please select a region first" : "No districts available"}
-                                    />
-                                    {locationLoading && <small className="form-text text-muted">Loading districts...</small>}
-                                </div>
-                            <(error || locationError) && (
+                            {(error || locationError) && (
                                 <div className="alert alert-danger">{error || locationError}</div>
                             )}
                             {success && <div className="alert alert-success">{success}</div>}
@@ -278,7 +161,45 @@ const AddPropertyModal = ({ isOpen, onClose, onPropertyAdded }) => {
                                 handleDistrictChange={handleDistrictChange}
                                 handleWardChange={handleWardChange}
                                 locationLoading={locationLoading}
-                            />AddPropertyModal.propTypes = {
+                            />
+                        </div>
+                        
+                        <div className="modal-footer border-0 pt-0">
+                            <button 
+                                type="button" 
+                                className="odoo-btn odoo-btn-secondary"
+                                onClick={handleClose}
+                                disabled={loading}
+                            >
+                                <i className="bi bi-x-circle me-2"></i>
+                                Cancel
+                            </button>
+                            <button 
+                                type="submit" 
+                                className="odoo-btn odoo-btn-primary"
+                                disabled={loading}
+                            >
+                                {loading ? (
+                                    <>
+                                        <span className="spinner-border spinner-border-sm me-2" role="status"></span>
+                                        Adding Property...
+                                    </>
+                                ) : (
+                                    <>
+                                        <i className="bi bi-plus-circle me-2"></i>
+                                        Add Property
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+AddPropertyModal.propTypes = {
     isOpen: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired,
     onPropertyAdded: PropTypes.func
@@ -287,4 +208,6 @@ const AddPropertyModal = ({ isOpen, onClose, onPropertyAdded }) => {
 AddPropertyModal.defaultProps = {
     onPropertyAdded: null
 };
+
+export default AddPropertyModal;
 
