@@ -1,29 +1,21 @@
-/**
- * Dashboard Page - Refactored Version
- * Uses constants and improved structure
- */
-
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import Layout from "../components/Layout";
-import SubscriptionBanner from "../components/SubscriptionBanner";
-import DashboardSkeleton from "../components/skeletons/DashboardSkeleton";
-import TableSkeleton from "../components/skeletons/TableSkeleton";
+import { useNavigate, Link } from "react-router-dom";
+import "../assets/styles/dashboard.css";
 import Outstanding from "../components/snippets/Outstanding";
 import Properties from "../components/snippets/Properties";
 import Occupied from "../components/snippets/Occupied";
 import Income from "../components/snippets/Income";
+import Layout from "../components/Layout";
+import SubscriptionBanner from "../components/SubscriptionBanner";
+import DashboardSkeleton from "../components/skeletons/DashboardSkeleton";
+import TableSkeleton from "../components/skeletons/TableSkeleton";
 import { getDashboardInfo } from "../services/dashboardService";
 import { getLeases } from "../services/leaseService";
 import { getUserProfile } from "../services/profileService";
 import { usePageTitle } from "../hooks/usePageTitle";
-import { LEASE_STATUS, ROUTES } from "../config/constants";
-import "../assets/styles/dashboard.css";
 
 function Dashboard() {
     usePageTitle('Dashboard');
-    const navigate = useNavigate();
-    
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [dashboardData, setDashboardData] = useState({
@@ -42,12 +34,13 @@ function Dashboard() {
     const [leases, setLeases] = useState([]);
     const [leasesLoading, setLeasesLoading] = useState(false);
     const [leasesError, setLeasesError] = useState("");
+    const navigate = useNavigate();
 
     useEffect(() => {
         // Redirect to login if not authenticated
         const access = localStorage.getItem("token");
         if (!access) {
-            navigate(ROUTES.LOGIN);
+            navigate("/");
             return;
         }
 
@@ -63,7 +56,6 @@ function Dashboard() {
                 setUserProfile(result.data);
             }
         } catch (err) {
-            console.error('Failed to fetch user profile:', err);
         }
     };
 
@@ -74,20 +66,24 @@ function Dashboard() {
             const response = await getLeases({ limit: 10 });
             
             if (response.success || response.status) {
+                // Based on the provided JSON structure, leases are directly in response.data array
                 const leasesData = Array.isArray(response.data) ? response.data : [];
                 
-                // Filter out terminated/ended/expired leases
+                // Filter out leases with terminated/ended status
                 const activeLeases = leasesData.filter(lease => 
-                    lease.status !== LEASE_STATUS.TERMINATED && 
-                    lease.status !== LEASE_STATUS.EXPIRED &&
-                    lease.status !== 'ended'
+                    lease.status !== 'terminated' && 
+                    lease.status !== 'ended' &&
+                    lease.status !== 'expired'
                 );
                 
-                // Sort by end date - closest to expiring first
+                // Sort leases by end date - closest to expiring first
                 const sortedLeases = activeLeases.sort((a, b) => {
+                    // Convert date strings to Date objects for comparison
+                    // Assuming dates are in DD-MM-YYYY format like "01-01-2026"
                     const dateA = a.end_date ? new Date(a.end_date.split('-').reverse().join('-')) : new Date('9999-12-31');
                     const dateB = b.end_date ? new Date(b.end_date.split('-').reverse().join('-')) : new Date('9999-12-31');
-                    return dateA - dateB;
+                    
+                    return dateA - dateB; // Ascending order (earliest dates first)
                 });
                 
                 setLeases(sortedLeases);
@@ -120,35 +116,14 @@ function Dashboard() {
         }
     };
 
-    const getStatusBadgeClass = (status) => {
-        switch (status) {
-            case LEASE_STATUS.ACTIVE:
-                return 'bg-success';
-            case LEASE_STATUS.TERMINATED:
-                return 'bg-danger';
-            case LEASE_STATUS.EXPIRED:
-                return 'bg-warning text-dark';
-            case LEASE_STATUS.DRAFT:
-                return 'bg-secondary';
-            default:
-                return 'bg-secondary';
-        }
-    };
+    
 
-    const formatCurrency = (amount) => {
-        if (!amount && amount !== 0) return 'TSh 0';
-        const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
-        if (isNaN(numAmount)) return 'TSh 0';
-        return `TSh ${numAmount.toLocaleString()}`;
-    };
-
-    return (
+    return(
         <Layout>
             <div className="main-content">
                 {/* Subscription Banner */}
                 <SubscriptionBanner />
                 
-                {/* Welcome Header */}
                 <div className="d-flex justify-content-between align-items-center mb-3">
                     <div>
                         <h2 className="fw-bold" style={{color:"#222"}}>
@@ -156,8 +131,6 @@ function Dashboard() {
                         </h2>
                     </div>
                 </div>
-
-                {/* Stats Cards */}
                 <div className="mb-4">
                     {loading ? (
                         <DashboardSkeleton />
@@ -247,12 +220,17 @@ function Dashboard() {
                                             </td>
                                             <td>
                                                 <div className="fw-medium text-success">
-                                                    {formatCurrency(lease.rent_amount_per_unit)}
+                                                    TSh {(lease.rent_amount_per_unit || 0).toLocaleString()}
                                                 </div>
                                             </td>
                                             <td>
-                                                <span className={`badge ${getStatusBadgeClass(lease.status)}`}>
-                                                    {lease.status || LEASE_STATUS.DRAFT}
+                                                <span className={`badge ${
+                                                    lease.status === 'active' ? 'bg-success' :
+                                                    lease.status === 'terminated' ? 'bg-danger' :
+                                                    lease.status === 'expired' ? 'bg-warning text-dark' :
+                                                    'bg-secondary'
+                                                }`}>
+                                                    {lease.status || 'draft'}
                                                 </span>
                                             </td>
                                             <td>
@@ -280,5 +258,4 @@ function Dashboard() {
         </Layout>
     );
 }
-
 export default Dashboard;

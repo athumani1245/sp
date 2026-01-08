@@ -6,7 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
-import AddLeaseModal from '../components/forms/AddLeaseModal';
+import AddLeaseModal from '../components/forms/addLease';
 import { TableSkeleton, CardSkeleton } from '../components/skeletons';
 import { useSubscription } from '../hooks/useSubscription';
 import { useModal } from '../shared/hooks';
