@@ -102,17 +102,31 @@ export const useLeasesList = () => {
     return fetchLeases();
   }, [fetchLeases]);
 
+  // Calculate active filter count
+  const activeFilterCount = Object.entries(filters).filter(([key, value]) => {
+    return value && value !== '';
+  }).length;
+
   return {
     leases,
     loading,
     error,
     filters,
+    handleFilterChange,
+    handleClearFilters,
     setFilter: handleFilterChange,
     clearFilter,
     resetFilters: handleClearFilters,
     hasActiveFilters,
     getActiveFilters,
-    pagination,
+    activeFilterCount,
+    pagination: {
+      current_page: pagination.currentPage,
+      page_size: pagination.pageSize,
+      count: pagination.totalItems,
+      total_pages: pagination.totalPages,
+    },
+    handlePageChange: pagination.goToPage,
     refreshLeases,
     setError,
   };
