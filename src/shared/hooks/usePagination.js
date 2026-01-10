@@ -18,10 +18,11 @@ export const usePagination = (options = {}) => {
   const [totalPages, setTotalPages] = useState(0);
 
   const goToPage = useCallback((page) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
+    const pageNum = Number(page);
+    if (pageNum >= 1 && (totalPages === 0 || pageNum <= totalPages)) {
+      setCurrentPage(pageNum);
       if (onPageChange) {
-        onPageChange(page, pageSize);
+        onPageChange(pageNum, pageSize);
       }
     }
   }, [totalPages, pageSize, onPageChange]);

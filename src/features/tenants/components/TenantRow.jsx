@@ -108,26 +108,24 @@ const TenantRow = ({
                 </button>
               </>
             ) : (
-              <>
+              <div className="action-buttons">
                 <button
-                  className="odoo-btn odoo-btn-primary odoo-btn-sm flex-fill"
+                  className="odoo-btn odoo-btn-outline-primary odoo-btn-sm"
                   onClick={onEdit}
                   disabled={!hasActiveSubscription}
-                  title={!hasActiveSubscription ? 'Subscription expired' : ''}
+                  title={!hasActiveSubscription ? 'Subscription expired' : 'Edit Tenant'}
                 >
-                  <i className="bi bi-pencil me-1"></i>
-                  Edit
+                  <i className="bi bi-pencil"></i>
                 </button>
                 <button
-                  className="odoo-btn odoo-btn-danger odoo-btn-sm flex-fill"
+                  className="odoo-btn odoo-btn-outline-primary odoo-btn-sm"
                   onClick={onDelete}
                   disabled={!hasActiveSubscription}
-                  title={!hasActiveSubscription ? 'Subscription expired' : ''}
+                  title={!hasActiveSubscription ? 'Subscription expired' : 'Delete Tenant'}
                 >
-                  <i className="bi bi-trash me-1"></i>
-                  Delete
+                  <i className="bi bi-trash"></i>
                 </button>
-              </>
+              </div>
             )}
           </div>
         </div>
@@ -208,24 +206,22 @@ const TenantRow = ({
             </button>
           </div>
         ) : (
-          <div className="d-flex justify-content-end gap-2">
+          <div className="action-buttons">
             <button
-              className="odoo-btn odoo-btn-primary odoo-btn-sm"
+              className="odoo-btn odoo-btn-outline-primary odoo-btn-sm me-1"
               onClick={onEdit}
               disabled={!hasActiveSubscription}
-              title={!hasActiveSubscription ? 'Subscription expired. Please renew to edit tenants.' : ''}
+              title={!hasActiveSubscription ? 'Subscription expired. Please renew to edit tenants.' : 'Edit Tenant'}
             >
-              <i className="bi bi-pencil me-1"></i>
-              Edit
+              <i className="bi bi-pencil"></i>
             </button>
             <button
-              className="odoo-btn odoo-btn-danger odoo-btn-sm"
+              className="odoo-btn odoo-btn-outline-primary odoo-btn-sm"
               onClick={onDelete}
               disabled={!hasActiveSubscription}
-              title={!hasActiveSubscription ? 'Subscription expired. Please renew to delete tenants.' : ''}
+              title={!hasActiveSubscription ? 'Subscription expired. Please renew to delete tenants.' : 'Delete Tenant'}
             >
-              <i className="bi bi-trash me-1"></i>
-              Delete
+              <i className="bi bi-trash"></i>
             </button>
           </div>
         )}

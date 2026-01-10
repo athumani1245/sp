@@ -31,9 +31,6 @@ export const useLeasesList = () => {
   // Initialize pagination
   const pagination = usePagination({
     initialPageSize: PAGINATION.DEFAULT_PAGE_SIZE,
-    onPageChange: (page, pageSize) => {
-      fetchLeases({ page, page_size: pageSize });
-    },
   });
 
   // Debounce search
@@ -51,9 +48,8 @@ export const useLeasesList = () => {
         property_id: filters.propertyFilter,
         unit_id: filters.unitFilter,
         tenant_id: filters.tenantFilter,
-        page: pagination.currentPage,
-        limit: pagination.pageSize,
-        ...customParams,
+        page: customParams.page || pagination.currentPage,
+        limit: customParams.limit || pagination.pageSize,
       };
 
       // Remove empty params
@@ -64,10 +60,14 @@ export const useLeasesList = () => {
       const result = await getLeases(params);
 
       if (result.success) {
-        const leasesData = result.data?.items || result.data || [];
-        setLeases(Array.isArray(leasesData) ? leasesData : []);
-        pagination.setPaginationData(result.data?.pagination || result.pagination);
-        return { success: true, data: leasesData };
+        setLeases(result.data || []);
+        
+        // Set pagination data from the response
+        if (result.pagination) {
+          pagination.setPaginationData(result.pagination);
+        }
+        
+        return { success: true, data: result.data };
       } else {
         setError(result.error || 'Failed to load leases');
         return { success: false, error: result.error };
@@ -79,24 +79,29 @@ export const useLeasesList = () => {
     } finally {
       setLoading(false);
     }
-  }, [debouncedSearch, filters, pagination]);
+  }, [debouncedSearch, filters.status, filters.propertyFilter, filters.unitFilter, filters.tenantFilter]);
 
   // Initial fetch and refetch on filter changes
   useEffect(() => {
-    fetchLeases();
+    pagination.goToPage(1); // Reset to page 1 on filter change
+    fetchLeases({ page: 1 });
   }, [debouncedSearch, filters.status, filters.propertyFilter, filters.unitFilter, filters.tenantFilter]);
+
+  // Handle page changes
+  const handlePageChange = useCallback((page) => {
+    pagination.goToPage(page);
+    fetchLeases({ page });
+  }, [pagination.goToPage, fetchLeases]);
 
   // Handle filter changes
   const handleFilterChange = useCallback((key, value) => {
     setFilter(key, value);
-    pagination.goToPage(1); // Reset to first page on filter change
-  }, [setFilter, pagination]);
+  }, [setFilter]);
 
   // Clear all filters
   const handleClearFilters = useCallback(() => {
     resetFilters();
-    pagination.goToPage(1);
-  }, [resetFilters, pagination]);
+  }, [resetFilters]);
 
   const refreshLeases = useCallback(() => {
     return fetchLeases();
@@ -126,7 +131,7 @@ export const useLeasesList = () => {
       count: pagination.totalItems,
       total_pages: pagination.totalPages,
     },
-    handlePageChange: pagination.goToPage,
+    handlePageChange,
     refreshLeases,
     setError,
   };
