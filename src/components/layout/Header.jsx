@@ -167,13 +167,13 @@ function Header() {
                         >
                             <i className="bi bi-credit-card me-2"></i> Subscription
                         </NavLink>
-                        <NavLink 
+                        {/* <NavLink 
                             to="/reports" 
                             className={({isActive}) => `list-group-item list-group-item-action ${isActive ? 'active' : ''}`}
                             onClick={handleMobileNavToggle}
                         >
                             <i className="bi bi-file-earmark-bar-graph me-2"></i> Reports
-                        </NavLink>
+                        </NavLink> */}
                     </div>
                 </nav>
             </div>
