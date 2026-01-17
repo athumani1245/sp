@@ -59,13 +59,29 @@ export const handleMonetaryInputChange = (event, setFormData, fieldName) => {
 
 /**
  * Format date string to readable format
- * @param {string} dateString - ISO date string or date object
+ * @param {string} dateString - Date string in DD-MM-YYYY format or ISO format
  * @returns {string} - Formatted date (e.g., 'Jan 8, 2026')
  */
 export const formatDate = (dateString) => {
     if (!dateString) return '';
     
-    const date = new Date(dateString);
+    let date;
+    
+    // Try to parse DD-MM-YYYY format first (e.g., "05-01-2026")
+    if (typeof dateString === 'string' && dateString.includes('-')) {
+        const parts = dateString.split('-');
+        // Check if it looks like DD-MM-YYYY (day is first, year is last and 4 digits)
+        if (parts.length === 3 && parts[2].length === 4 && parseInt(parts[0]) <= 31) {
+            // Parse as DD-MM-YYYY
+            const [day, month, year] = parts;
+            date = new Date(year, month - 1, day);
+        } else {
+            // Try as ISO format
+            date = new Date(dateString);
+        }
+    } else {
+        date = new Date(dateString);
+    }
     
     // Check if date is valid
     if (isNaN(date.getTime())) return dateString;

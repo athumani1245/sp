@@ -26,7 +26,8 @@ export const SearchableSelect = ({
   name,
   getOptionLabel,
   getOptionValue,
-  noOptionsMessage = 'No options available'
+  noOptionsMessage = 'No options available',
+  inputStyle = {}
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -42,12 +43,13 @@ export const SearchableSelect = ({
     if (searchTerm === '') {
       setFilteredOptions(options);
     } else {
-      const filtered = options.filter(option =>
-        getOptionLabel(option).toLowerCase().includes(searchTerm.toLowerCase())
-      );
+      const filtered = options.filter(option => {
+        const label = getOptionLabel(option);
+        return label && label.toLowerCase().includes(searchTerm.toLowerCase());
+      });
       setFilteredOptions(filtered);
     }
-  }, [searchTerm, options, getOptionLabel]);
+  }, [searchTerm, options]);
 
   const closeDropdown = useCallback(() => {
     setIsOpen(false);
@@ -96,7 +98,11 @@ export const SearchableSelect = ({
 
   const getDisplayValue = () => {
     if (!value) return '';
-    const selectedOption = options.find(option => getOptionValue(option) === value);
+    const selectedOption = options.find(option => {
+      const optionValue = getOptionValue(option);
+      // Handle both string and number comparisons
+      return optionValue == value || optionValue === value;
+    });
     return selectedOption ? getOptionLabel(selectedOption) : '';
   };
 
@@ -127,13 +133,14 @@ export const SearchableSelect = ({
         aria-haspopup="listbox"
         style={{
           ...UNDERLINE_INPUT_STYLES,
+          ...inputStyle,
           cursor: disabled ? 'not-allowed' : 'pointer',
           backgroundColor: 'transparent',
           minHeight: '38px',
           borderBottomColor: disabled ? '#e9ecef' : (isOpen ? '#CC5B4B' : '#dee2e6')
         }}
       >
-        <span className={!value ? 'text-muted' : ''}>
+        <span className={!value ? 'text-muted' : ''} style={{ fontSize: inputStyle.fontSize || '0.95rem' }}>
           {!value ? placeholder : getDisplayValue()}
         </span>
       </div>
@@ -148,7 +155,10 @@ export const SearchableSelect = ({
             maxHeight: '200px',
             overflowY: 'auto',
             top: '100%',
-            left: 0
+            left: 0,
+            backgroundColor: 'white',
+            border: '1px solid #ced4da',
+            display: 'block'
           }}
           onKeyDown={(e) => {
             if (e.key === 'Escape') {
@@ -181,18 +191,29 @@ export const SearchableSelect = ({
 
           <div className="dropdown-items">
             {filteredOptions.length > 0 ? (
-              filteredOptions.map((option) => (
-                <div
-                  key={getOptionValue(option)}
-                  className={`dropdown-item ${getOptionValue(option) === value ? 'active' : ''}`}
-                  onClick={() => handleOptionSelect(option)}
-                  style={{ cursor: 'pointer' }}
-                >
-                  {getOptionLabel(option)}
-                </div>
-              ))
+              filteredOptions.map((option) => {
+                const label = getOptionLabel(option);
+                const optionValue = getOptionValue(option);
+                if (!label) return null;
+                
+                return (
+                  <div
+                    key={optionValue}
+                    className={`dropdown-item ${optionValue == value ? 'active' : ''}`}
+                    onClick={() => handleOptionSelect(option)}
+                    style={{ 
+                      cursor: 'pointer',
+                      padding: '0.5rem 1rem',
+                      color: '#212529',
+                      backgroundColor: optionValue == value ? '#0d6efd' : 'transparent'
+                    }}
+                  >
+                    {label}
+                  </div>
+                );
+              })
             ) : (
-              <div className="dropdown-item-text text-muted">
+              <div className="dropdown-item-text text-muted" style={{ padding: '0.5rem 1rem' }}>
                 {noOptionsMessage}
               </div>
             )}
@@ -213,4 +234,5 @@ SearchableSelect.propTypes = {
   getOptionLabel: PropTypes.func.isRequired,
   getOptionValue: PropTypes.func.isRequired,
   noOptionsMessage: PropTypes.string,
+  inputStyle: PropTypes.object,
 };

@@ -144,7 +144,7 @@ const UnitRow = ({
   // Desktop Table Row View
   return (
     <tr className={isEditing ? 'table-active' : ''}>
-      <td>
+      <td style={{ padding: '0.5rem', fontSize: '0.85rem' }}>
         {isEditing ? (
           <input
             type="text"
@@ -155,12 +155,13 @@ const UnitRow = ({
             onKeyPress={handleKeyPress}
             disabled={updatingUnit}
             autoFocus
+            style={{ fontSize: '0.8rem' }}
           />
         ) : (
           <span className="fw-semibold">{unit.unit_name || 'N/A'}</span>
         )}
       </td>
-      <td>
+      <td style={{ padding: '0.5rem', fontSize: '0.85rem' }}>
         {isEditing ? (
           <input
             type="text"
@@ -171,43 +172,49 @@ const UnitRow = ({
             onKeyPress={handleKeyPress}
             disabled={updatingUnit}
             placeholder="0"
+            style={{ fontSize: '0.8rem' }}
           />
         ) : (
           <span className="text-primary fw-semibold">{formatCurrency(unit.rent_per_month)}</span>
         )}
       </td>
-      <td>
-        {getStatusBadge(unit)}
+      <td style={{ padding: '0.5rem', fontSize: '0.85rem' }}>
+        <span className="badge" style={{ fontSize: '0.7rem', padding: '0.25rem 0.5rem', backgroundColor: unit.has_active_lease ? '#28a745' : '#6c757d' }}>
+          {unit.has_active_lease ? 'Occupied' : 'Vacant'}
+        </span>
       </td>
-      <td className="text-end">
+      <td className="text-end" style={{ padding: '0.5rem' }}>
         {isEditing ? (
-          <div className="d-flex justify-content-end gap-2">
+          <div className="d-flex justify-content-end gap-1">
             <button
               className="odoo-btn odoo-btn-success odoo-btn-sm"
               onClick={onSaveEdit}
               disabled={updatingUnit}
+              style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem', minWidth: '60px' }}
             >
-              <i className="bi bi-check me-1"></i>
+              <i className="bi bi-check me-1" style={{ fontSize: '0.7rem' }}></i>
               {updatingUnit ? 'Saving...' : 'Save'}
             </button>
             <button
               className="odoo-btn odoo-btn-secondary odoo-btn-sm"
               onClick={onCancelEdit}
               disabled={updatingUnit}
+              style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem', minWidth: '60px' }}
             >
-              <i className="bi bi-x me-1"></i>
+              <i className="bi bi-x me-1" style={{ fontSize: '0.7rem' }}></i>
               Cancel
             </button>
           </div>
         ) : (
-          <div className="d-flex justify-content-end gap-2">
+          <div className="d-flex justify-content-end gap-1">
             <button
               className="odoo-btn odoo-btn-primary odoo-btn-sm"
               onClick={onEdit}
               disabled={!hasActiveSubscription}
               title={!hasActiveSubscription ? 'Subscription expired. Please renew to edit units.' : ''}
+              style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem', minWidth: '50px' }}
             >
-              <i className="bi bi-pencil me-1"></i>
+              <i className="bi bi-pencil me-1" style={{ fontSize: '0.7rem' }}></i>
               Edit
             </button>
             <button
@@ -215,8 +222,9 @@ const UnitRow = ({
               onClick={onDelete}
               disabled={!hasActiveSubscription}
               title={!hasActiveSubscription ? 'Subscription expired. Please renew to delete units.' : ''}
+              style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem', minWidth: '50px' }}
             >
-              <i className="bi bi-trash me-1"></i>
+              <i className="bi bi-trash me-1" style={{ fontSize: '0.7rem' }}></i>
               Delete
             </button>
           </div>

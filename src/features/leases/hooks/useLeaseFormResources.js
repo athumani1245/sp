@@ -59,12 +59,46 @@ export const useLeaseFormResources = (isOpen) => {
 
   useEffect(() => {
     if (isOpen) {
-      loadProperties();
-      loadTenants();
+      // Load properties
+      const fetchProperties = async () => {
+        try {
+          setLoading(true);
+          const result = await getProperties();
+          if (result.success) {
+            setProperties(result.data || []);
+          } else {
+            setError('Failed to load properties');
+          }
+        } catch (error) {
+          setError('Failed to load properties');
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      // Load tenants
+      const fetchTenants = async () => {
+        try {
+          setLoading(true);
+          const result = await getTenants();
+          if (result.success) {
+            setTenants(result.data || []);
+          } else {
+            setError('Failed to load tenants');
+          }
+        } catch (error) {
+          setError('Failed to load tenants');
+        } finally {
+          setLoading(false);
+        }
+      };
+
       setAvailableUnits([]);
       setError('');
+      fetchProperties();
+      fetchTenants();
     }
-  }, [isOpen, loadProperties, loadTenants]);
+  }, [isOpen]);
 
   return {
     properties,
