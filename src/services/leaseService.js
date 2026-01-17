@@ -82,11 +82,20 @@ export const getLeases = async (params = {}) => {
         if (params.end_date) queryParams.append('end_date', params.end_date);
 
         const response = await api.get(`${API_BASE}/leases/?${queryParams.toString()}`);
+        
+        const responseData = response.data.data || {};
 
         return {
             success: true,
-            data: response.data.data,
-            pagination: response.data.pagination || {}
+            data: responseData.items || [],
+            pagination: {
+                count: responseData.count || 0,
+                total_pages: responseData.total_pages || 0,
+                current_page: responseData.current_page || 1,
+                next: responseData.next,
+                previous: responseData.previous
+            },
+            totals: responseData.totals || null
         };
     } catch (err) {
         return handleApiError(err, "Failed to fetch leases.");
