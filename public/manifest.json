@@ -6,21 +6,6 @@
   "manifest_version": 2,
   "icons": [
     {
-      "src": "favicon-16x16.png",
-      "sizes": "16x16",
-      "type": "image/png"
-    },
-    {
-      "src": "favicon-32x32.png",
-      "sizes": "32x32",
-      "type": "image/png"
-    },
-    {
-      "src": "apple-touch-icon.png",
-      "sizes": "180x180",
-      "type": "image/png"
-    },
-    {
       "src": "Logo.png",
       "type": "image/png",
       "sizes": "192x192",
@@ -37,7 +22,7 @@
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "theme_color": "#eb1313",
+  "theme_color": "#CC5B4B",
   "background_color": "#ffffff",
   "categories": ["business", "productivity", "utilities"],
   "lang": "en",
