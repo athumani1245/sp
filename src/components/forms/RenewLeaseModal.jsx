@@ -3,12 +3,20 @@ import { Modal, Form, Row, Col, Alert } from 'react-bootstrap';
 import { formatNumberWithCommas, parseFormattedNumber } from '../../utils/formatUtils';
 import { renewLease } from '../../services/leaseService';
 
+// Helper function to parse DD-MM-YYYY format dates
+const parseDateFromDDMMYYYY = (dateString) => {
+    if (!dateString || typeof dateString !== 'string') return null;
+    const parts = dateString.split('-');
+    if (parts.length !== 3) return null;
+    const [day, month, year] = parts;
+    return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+};
+
 const RenewLeaseModal = ({ show, onHide, lease, onRenewalSuccess }) => {
     const [formData, setFormData] = useState({
         start_date: '',
         duration_months: '',
-        monthly_rent: '',
-        additional_terms: ''
+        monthly_rent: ''
     });
     const [endDate, setEndDate] = useState('');
     const [errors, setErrors] = useState({});
@@ -18,20 +26,25 @@ const RenewLeaseModal = ({ show, onHide, lease, onRenewalSuccess }) => {
 
     useEffect(() => {
         if (lease && show) {
-            // Calculate new start date (day after current end date)
-            const currentEndDate = new Date(lease.end_date);
+            // Parse the end date (DD-MM-YYYY format)
+            const currentEndDate = parseDateFromDDMMYYYY(lease.end_date) || new Date(lease.end_date);
             const newStartDate = new Date(currentEndDate);
             newStartDate.setDate(newStartDate.getDate() + 1);
             
+            // Format date as YYYY-MM-DD without timezone conversion
+            const year = newStartDate.getFullYear();
+            const month = String(newStartDate.getMonth() + 1).padStart(2, '0');
+            const day = String(newStartDate.getDate()).padStart(2, '0');
+            const formattedStartDate = `${year}-${month}-${day}`;
+            
             setFormData({
-                start_date: newStartDate.toISOString().split('T')[0],
-                duration_months: lease.duration_months || '12',
-                monthly_rent: formatNumberWithCommas(lease.monthly_rent || '0'),
-                additional_terms: ''
+                start_date: formattedStartDate,
+                duration_months: lease.duration_months || '6',
+                monthly_rent: formatNumberWithCommas(lease.rent_amount_per_unit || lease.monthly_rent || '0')
             });
             
             // Calculate initial end date
-            calculateEndDate(newStartDate.toISOString().split('T')[0], lease.duration_months || '12');
+            calculateEndDate(formattedStartDate, lease.duration_months || '6');
         }
     }, [lease, show]);
 
@@ -174,8 +187,7 @@ const RenewLeaseModal = ({ show, onHide, lease, onRenewalSuccess }) => {
         setFormData({
             start_date: '',
             duration_months: '',
-            monthly_rent: '',
-            additional_terms: ''
+            monthly_rent: ''
         });
         setEndDate('');
         setErrors({});
@@ -189,13 +201,22 @@ const RenewLeaseModal = ({ show, onHide, lease, onRenewalSuccess }) => {
             id: Date.now(),
             category: 'RENT',
             amount: '',
-            source: 'CASH'
+            source: 'CASH',
+            confirmed: false
         };
         setPayments([...payments, newPayment]);
     };
 
     const handleRemovePayment = (paymentId) => {
         setPayments(payments.filter(p => p.id !== paymentId));
+    };
+
+    const handleConfirmPayment = (paymentId) => {
+        setPayments(payments.map(payment => 
+            payment.id === paymentId 
+                ? { ...payment, confirmed: true }
+                : payment
+        ));
     };
 
     const handlePaymentChange = (paymentId, field, value) => {
@@ -282,7 +303,7 @@ const RenewLeaseModal = ({ show, onHide, lease, onRenewalSuccess }) => {
                                 <div className="mb-2">
                                     <small className="text-muted d-block">Current End Date</small>
                                     <strong className="text-danger">
-                                        {new Date(lease.end_date).toLocaleDateString()}
+                                        {lease.end_date}
                                     </strong>
                                 </div>
                             </Col>
@@ -347,7 +368,7 @@ const RenewLeaseModal = ({ show, onHide, lease, onRenewalSuccess }) => {
                     </Row>
 
                     <Row className="mb-3">
-                        <Col md={6}>
+                        <Col md={12}>
                             <Form.Group>
                                 <Form.Label>
                                     New Monthly Rent (TSh) <span className="text-danger">*</span>
@@ -365,23 +386,8 @@ const RenewLeaseModal = ({ show, onHide, lease, onRenewalSuccess }) => {
                                     {errors.monthly_rent}
                                 </Form.Control.Feedback>
                                 <Form.Text className="text-muted">
-                                    Current rent: TSh {formatNumberWithCommas(lease.monthly_rent || '0')}
+                                    Current rent: TSh {formatNumberWithCommas(lease.rent_amount_per_unit || lease.monthly_rent || '0')}
                                 </Form.Text>
-                            </Form.Group>
-                        </Col>
-                        
-                        <Col md={6}>
-                            <Form.Group>
-                                <Form.Label>Additional Terms (Optional)</Form.Label>
-                                <Form.Control
-                                    as="textarea"
-                                    rows={2}
-                                    name="additional_terms"
-                                    value={formData.additional_terms}
-                                    onChange={handleChange}
-                                    placeholder="Special terms or conditions..."
-                                    disabled={isSubmitting}
-                                />
                             </Form.Group>
                         </Col>
                     </Row>
@@ -420,7 +426,7 @@ const RenewLeaseModal = ({ show, onHide, lease, onRenewalSuccess }) => {
                                                         size="sm"
                                                         value={payment.category}
                                                         onChange={(e) => handlePaymentChange(payment.id, 'category', e.target.value)}
-                                                        disabled={isSubmitting}
+                                                        disabled={isSubmitting || payment.confirmed}
                                                     >
                                                         <option value="RENT">Rent</option>
                                                         <option value="Security Deposit">Security Deposit</option>
@@ -442,7 +448,7 @@ const RenewLeaseModal = ({ show, onHide, lease, onRenewalSuccess }) => {
                                                             handlePaymentChange(payment.id, 'amount', formatted);
                                                         }}
                                                         placeholder="0"
-                                                        disabled={isSubmitting}
+                                                        disabled={isSubmitting || payment.confirmed}
                                                     />
                                                 </td>
                                                 <td style={{ border: 'none', paddingTop: '0.5rem', paddingBottom: '0.5rem' }}>
@@ -450,7 +456,7 @@ const RenewLeaseModal = ({ show, onHide, lease, onRenewalSuccess }) => {
                                                         size="sm"
                                                         value={payment.source}
                                                         onChange={(e) => handlePaymentChange(payment.id, 'source', e.target.value)}
-                                                        disabled={isSubmitting}
+                                                        disabled={isSubmitting || payment.confirmed}
                                                     >
                                                         <option value="CASH">Cash</option>
                                                         <option value="BANK">Bank</option>
@@ -458,15 +464,40 @@ const RenewLeaseModal = ({ show, onHide, lease, onRenewalSuccess }) => {
                                                     </Form.Select>
                                                 </td>
                                                 <td className="text-center" style={{ border: 'none', paddingTop: '0.5rem', paddingBottom: '0.5rem' }}>
-                                                    <button
-                                                        type="button"
-                                                        className="btn btn-sm btn-link text-danger p-0"
-                                                        onClick={() => handleRemovePayment(payment.id)}
-                                                        disabled={isSubmitting}
-                                                        title="Remove payment"
-                                                    >
-                                                        <i className="bi bi-trash"></i>
-                                                    </button>
+                                                    {!payment.confirmed ? (
+                                                        <div className="d-flex gap-1 justify-content-center">
+                                                            <button
+                                                                type="button"
+                                                                className="btn btn-sm btn-success p-1"
+                                                                onClick={() => handleConfirmPayment(payment.id)}
+                                                                disabled={isSubmitting || !payment.amount}
+                                                                title="Confirm payment"
+                                                                style={{ width: '28px', height: '28px' }}
+                                                            >
+                                                                <i className="bi bi-check"></i>
+                                                            </button>
+                                                            <button
+                                                                type="button"
+                                                                className="btn btn-sm btn-danger p-1"
+                                                                onClick={() => handleRemovePayment(payment.id)}
+                                                                disabled={isSubmitting}
+                                                                title="Cancel payment"
+                                                                style={{ width: '28px', height: '28px' }}
+                                                            >
+                                                                <i className="bi bi-x"></i>
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <button
+                                                            type="button"
+                                                            className="btn btn-sm btn-link text-danger p-0"
+                                                            onClick={() => handleRemovePayment(payment.id)}
+                                                            disabled={isSubmitting}
+                                                            title="Remove payment"
+                                                        >
+                                                            <i className="bi bi-trash"></i>
+                                                        </button>
+                                                    )}
                                                 </td>
                                             </tr>
                                         ))}

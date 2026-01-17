@@ -19,7 +19,6 @@ import CostBreakdownChart from "../components/dashboard/CostBreakdownChart";
 import LastTransactions from "../components/dashboard/LastTransactions";
 import MaintenanceRequests from "../components/dashboard/MaintenanceRequests";
 import "../assets/styles/dashboard.css";
-import "../assets/styles/dashboard-redesign.css";
 
 function Dashboard() {
     usePageTitle('Dashboard');
@@ -104,7 +103,7 @@ function Dashboard() {
                 <div className="row g-3 mb-3">
                     {/* Report Sales Chart */}
                     <div className="col-12 col-lg-7">
-                        <ReportSalesChart data={dashboardData} loading={dashboardLoading} />
+                        <ReportSalesChart />
                     </div>
 
                     {/* Cost Breakdown Chart */}
@@ -116,19 +115,19 @@ function Dashboard() {
                 {/* Bottom Row - Transactions and Maintenance */}
                 <div className="row g-3">
                     {/* Last Transactions */}
-                    {/* <div className="col-12 col-lg-6">
+                    <div className="col-12 col-lg-6">
                         <LastTransactions 
                             leases={leases}
                             loading={leasesLoading}
                             error={leasesError}
                             onRetry={refetchLeases}
                         />
-                    </div> */}
+                    </div>
 
                     {/* Maintenance Requests */}
-                    {/* <div className="col-12 col-lg-6">
+                    <div className="col-12 col-lg-6">
                         <MaintenanceRequests />
-                    </div> */}
+                    </div>
                 </div>
             </div>
         </Layout>

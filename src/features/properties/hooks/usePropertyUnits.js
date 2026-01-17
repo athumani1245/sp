@@ -15,16 +15,27 @@ export const usePropertyUnits = (propertyId) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [pagination, setPagination] = useState({});
+  const [currentPage, setCurrentPage] = useState(1);
+  
+  // Form state
+  const [isAddingUnit, setIsAddingUnit] = useState(false);
+  const [editingUnitId, setEditingUnitId] = useState(null);
+  const [newUnitData, setNewUnitData] = useState({ unit_name: '', rent_amount_per_unit: '' });
+  const [editUnitData, setEditUnitData] = useState({ unit_name: '', rent_amount_per_unit: '' });
+  const [addingUnitLoading, setAddingUnitLoading] = useState(false);
+  const [updatingUnit, setUpdatingUnit] = useState(false);
 
   const fetchUnits = useCallback(async (page = 1) => {
     try {
       setLoading(true);
       setError('');
+      setCurrentPage(page);
       
-      const result = await getPropertyUnits(propertyId, page);
+      const result = await getPropertyUnits({ property: propertyId, page });
 
       if (result.success) {
-        setUnits(result.data);
+        // Data is already the items array from service
+        setUnits(result.data || []);
         setPagination(result.pagination || {});
         return { success: true, data: result.data };
       } else {
@@ -42,13 +53,17 @@ export const usePropertyUnits = (propertyId) => {
 
   const addUnit = useCallback(async (unitData) => {
     try {
-      setLoading(true);
+      setAddingUnitLoading(true);
       setError('');
 
-      const result = await addPropertyUnit(propertyId, unitData);
+      // Add property ID to unit data
+      const dataWithProperty = { ...unitData, property: propertyId };
+      const result = await addPropertyUnit(propertyId, dataWithProperty);
 
       if (result.success) {
-        setUnits(prev => [...prev, result.data]);
+        await fetchUnits(currentPage);
+        setIsAddingUnit(false);
+        setNewUnitData({ unit_name: '', rent_amount_per_unit: '' });
         return { success: true, data: result.data };
       } else {
         setError(result.error || 'Failed to add unit');
@@ -59,21 +74,21 @@ export const usePropertyUnits = (propertyId) => {
       setError(errorMsg);
       return { success: false, error: errorMsg };
     } finally {
-      setLoading(false);
+      setAddingUnitLoading(false);
     }
-  }, [propertyId]);
+  }, [propertyId, fetchUnits, currentPage]);
 
   const updateUnit = useCallback(async (unitId, unitData) => {
     try {
-      setLoading(true);
+      setUpdatingUnit(true);
       setError('');
 
-      const result = await updatePropertyUnit(propertyId, unitId, unitData);
+      const result = await updatePropertyUnit(unitId, unitData);
 
       if (result.success) {
-        setUnits(prev => 
-          prev.map(unit => unit.id === unitId ? result.data : unit)
-        );
+        await fetchUnits(currentPage);
+        setEditingUnitId(null);
+        setEditUnitData({ unit_name: '', rent_amount_per_unit: '' });
         return { success: true, data: result.data };
       } else {
         setError(result.error || 'Failed to update unit');
@@ -84,22 +99,21 @@ export const usePropertyUnits = (propertyId) => {
       setError(errorMsg);
       return { success: false, error: errorMsg };
     } finally {
-      setLoading(false);
+      setUpdatingUnit(false);
     }
-  }, [propertyId]);
+  }, [fetchUnits, currentPage]);
 
   const deleteUnit = useCallback(async (unitId) => {
     try {
       setLoading(true);
       setError('');
 
-      const result = await deletePropertyUnit(propertyId, unitId);
+      const result = await deletePropertyUnit(unitId);
 
       if (result.success) {
-        setUnits(prev => prev.filter(unit => unit.id !== unitId));
+        await fetchUnits(currentPage);
         return { success: true };
       } else {
-        setError(result.error || 'Failed to delete unit');
         return { success: false, error: result.error };
       }
     } catch (err) {
@@ -109,7 +123,56 @@ export const usePropertyUnits = (propertyId) => {
     } finally {
       setLoading(false);
     }
-  }, [propertyId]);
+  }, [fetchUnits, currentPage]);
+
+  // UI handlers
+  const handleAddUnit = useCallback(() => {
+    setIsAddingUnit(true);
+    setNewUnitData({ unit_name: '', rent_amount_per_unit: '' });
+  }, []);
+
+  const handleCancelAddUnit = useCallback(() => {
+    setIsAddingUnit(false);
+    setNewUnitData({ unit_name: '', rent_amount_per_unit: '' });
+  }, []);
+
+  const handleNewUnitChange = useCallback((field, value) => {
+    setNewUnitData(prev => ({ ...prev, [field]: value }));
+  }, []);
+
+  const handleSaveNewUnit = useCallback(async () => {
+    return await addUnit(newUnitData);
+  }, [addUnit, newUnitData]);
+
+  const handleEditUnit = useCallback((unit) => {
+    setEditingUnitId(unit.id);
+    setEditUnitData({
+      unit_name: unit.unit_name,
+      rent_amount_per_unit: unit.rent_amount_per_unit
+    });
+  }, []);
+
+  const handleCancelEditUnit = useCallback(() => {
+    setEditingUnitId(null);
+    setEditUnitData({ unit_name: '', rent_amount_per_unit: '' });
+  }, []);
+
+  const handleEditUnitChange = useCallback((field, value) => {
+    setEditUnitData(prev => ({ ...prev, [field]: value }));
+  }, []);
+
+  const handleSaveEditUnit = useCallback(async () => {
+    if (!editingUnitId) return { success: false };
+    return await updateUnit(editingUnitId, editUnitData);
+  }, [editingUnitId, editUnitData, updateUnit]);
+
+  const handleDeleteUnit = useCallback(async (unitId) => {
+    return await deleteUnit(unitId);
+  }, [deleteUnit]);
+
+  const handlePageChange = useCallback((page) => {
+    fetchUnits(page);
+  }, [fetchUnits]);
 
   const refreshUnits = useCallback((page = 1) => {
     return fetchUnits(page);
@@ -117,13 +180,27 @@ export const usePropertyUnits = (propertyId) => {
 
   return {
     units,
-    loading,
+    unitsLoading: loading,
     error,
     pagination,
+    currentPage,
+    isAddingUnit,
+    editingUnitId,
+    newUnitData,
+    editUnitData,
+    addingUnitLoading,
+    updatingUnit,
     fetchUnits,
-    addUnit,
-    updateUnit,
-    deleteUnit,
+    handleAddUnit,
+    handleCancelAddUnit,
+    handleNewUnitChange,
+    handleSaveNewUnit,
+    handleEditUnit,
+    handleCancelEditUnit,
+    handleEditUnitChange,
+    handleSaveEditUnit,
+    handleDeleteUnit,
+    handlePageChange,
     refreshUnits,
     setError,
   };
