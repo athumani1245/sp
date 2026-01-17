@@ -3,13 +3,29 @@ import { Modal, Form, Row, Col, Alert } from 'react-bootstrap';
 import { formatNumberWithCommas, parseFormattedNumber } from '../../utils/formatUtils';
 import { renewLease } from '../../services/leaseService';
 
-// Helper function to parse DD-MM-YYYY format dates
+// Helper function to parse DD-MM-YYYY format to Date object
 const parseDateFromDDMMYYYY = (dateString) => {
-    if (!dateString || typeof dateString !== 'string') return null;
+    if (!dateString) return null;
+    
+    // Handle DD-MM-YYYY format
     const parts = dateString.split('-');
-    if (parts.length !== 3) return null;
-    const [day, month, year] = parts;
-    return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    if (parts.length === 3) {
+        const day = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10);
+        const year = parseInt(parts[2], 10);
+        
+        // Create date (month is 0-indexed in JavaScript)
+        const date = new Date(year, month - 1, day);
+        
+        // Validate the date
+        if (!isNaN(date.getTime())) {
+            return date;
+        }
+    }
+    
+    // Try standard Date parsing as fallback
+    const date = new Date(dateString);
+    return !isNaN(date.getTime()) ? date : null;
 };
 
 const RenewLeaseModal = ({ show, onHide, lease, onRenewalSuccess }) => {
@@ -26,10 +42,21 @@ const RenewLeaseModal = ({ show, onHide, lease, onRenewalSuccess }) => {
 
     useEffect(() => {
         if (lease && show) {
-            // Parse the end date (DD-MM-YYYY format)
-            const currentEndDate = parseDateFromDDMMYYYY(lease.end_date) || new Date(lease.end_date);
-            const newStartDate = new Date(currentEndDate);
-            newStartDate.setDate(newStartDate.getDate() + 1);
+            // Calculate new start date (day after current end date)
+            let newStartDateValue;
+            
+            // Parse the lease end date (handles DD-MM-YYYY format)
+            const currentEndDate = parseDateFromDDMMYYYY(lease.end_date);
+            
+            if (currentEndDate) {
+                // Add one day for the new start date
+                const newStartDate = new Date(currentEndDate);
+                newStartDate.setDate(newStartDate.getDate() + 1);
+                newStartDateValue = newStartDate.toISOString().split('T')[0];
+            } else {
+                // If end_date is invalid or missing, use today as default
+                newStartDateValue = new Date().toISOString().split('T')[0];
+            }
             
             // Format date as YYYY-MM-DD without timezone conversion
             const year = newStartDate.getFullYear();
@@ -38,13 +65,14 @@ const RenewLeaseModal = ({ show, onHide, lease, onRenewalSuccess }) => {
             const formattedStartDate = `${year}-${month}-${day}`;
             
             setFormData({
-                start_date: formattedStartDate,
-                duration_months: lease.duration_months || '6',
-                monthly_rent: formatNumberWithCommas(lease.rent_amount_per_unit || lease.monthly_rent || '0')
+                start_date: newStartDateValue,
+                duration_months: lease.duration_months || '12',
+                monthly_rent: formatNumberWithCommas(lease.monthly_rent || '0'),
+                additional_terms: ''
             });
             
             // Calculate initial end date
-            calculateEndDate(formattedStartDate, lease.duration_months || '6');
+            calculateEndDate(newStartDateValue, lease.duration_months || '12');
         }
     }, [lease, show]);
 
@@ -55,6 +83,13 @@ const RenewLeaseModal = ({ show, onHide, lease, onRenewalSuccess }) => {
         }
 
         const start = new Date(startDate);
+        
+        // Validate the start date
+        if (isNaN(start.getTime())) {
+            setEndDate('');
+            return;
+        }
+        
         const duration = parseInt(durationMonths);
         
         if (isNaN(duration) || duration <= 0) {
@@ -303,7 +338,12 @@ const RenewLeaseModal = ({ show, onHide, lease, onRenewalSuccess }) => {
                                 <div className="mb-2">
                                     <small className="text-muted d-block">Current End Date</small>
                                     <strong className="text-danger">
-                                        {lease.end_date}
+                                        {lease.end_date ? (() => {
+                                            const endDate = parseDateFromDDMMYYYY(lease.end_date);
+                                            return endDate 
+                                                ? endDate.toLocaleDateString() 
+                                                : 'Invalid Date';
+                                        })() : 'N/A'}
                                     </strong>
                                 </div>
                             </Col>
