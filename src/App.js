@@ -1,4 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import ErrorBoundary from './components/ErrorBoundary';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
@@ -23,8 +24,6 @@ import PrivateRoute from './components/PrivateRoute';
 import { AuthProvider } from './context/AuthContext';
 import { SubscriptionModalProvider } from './context/SubscriptionModalContext';
 import { TourProvider } from './context/TourContext';
-
-// Report page components
 import PropertySummaryReport from './pages/reports/PropertySummaryReport';
 import PropertyReport from './pages/reports/PropertyReport';
 import LeaseAgreementsReport from './pages/reports/LeaseAgreementsReport';
@@ -33,16 +32,28 @@ import TenantPaymentHistoryReport from './pages/reports/TenantPaymentHistoryRepo
 import GenericReport from './pages/reports/GenericReport';
 import './App.css';
 
+// Create a client
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+      staleTime: 60 * 1000, // 1 minute
+    },
+  },
+});
+
 
 
 function App() {
   return (
-    <AuthProvider>
-      <SubscriptionModalProvider>
-        <TourProvider>
-          <ErrorBoundary>
-            <div className="App">
-              <Routes>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <SubscriptionModalProvider>
+          <TourProvider>
+            <ErrorBoundary>
+              <div className="App">
+                <Routes>
               {/* Public routes */}
               <Route path="/" element={<Landing />} />
               <Route path="/login" element={<Login />} />
@@ -220,6 +231,7 @@ function App() {
       </TourProvider>
       </SubscriptionModalProvider>
     </AuthProvider>
+    </QueryClientProvider>
   );
 }
 

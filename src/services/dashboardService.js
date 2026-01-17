@@ -6,7 +6,7 @@ const API_BASE = process.env.REACT_APP_API_BASE;
 // Retrieve dashboard summary info
 export const getDashboardInfo = async () => {
     try {
-        const response = await api.get(`${API_BASE}/dashboard/properties-rent-summary/`);
+        const response = await api.get('https://pangishatanaka.xyz/api/dashboard');
         return {
             success: true,
             data: response.data.data

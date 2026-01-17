@@ -5,6 +5,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import { formatDate } from '../../../utils/formatUtils';
 
 const BillingHistoryCard = ({ billingHistory }) => {
   return (
@@ -36,7 +37,7 @@ const BillingHistoryCard = ({ billingHistory }) => {
               {billingHistory.slice(0, 5).map((billing, index) => (
                 <tr key={billing.id || index}>
                   <td style={{ padding: '0.5rem', border: 'none', borderBottom: '1px solid #e3e6e8' }}>
-                    {billing.payment_date || 'N/A'}
+                    {billing.payment_date ? formatDate(billing.payment_date) : 'N/A'}
                   </td>
                   <td style={{ padding: '0.5rem', border: 'none', borderBottom: '1px solid #e3e6e8', fontSize: '0.75rem', color: '#6c757d' }}>
                     {billing.package_name} - {billing.plan_name || 'N/A'}

@@ -37,15 +37,15 @@ const UnitsSection = ({
       <div className="leases-filters-section">
         <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
           <div className="d-flex align-items-center">
-            <h5 className="mb-0 me-3 d-flex align-items-center">
-              <i className="bi bi-door-open me-2"></i>
+            <h5 className="mb-0 me-3 d-flex align-items-center" style={{ fontSize: '0.95rem' }}>
+              <i className="bi bi-door-open me-2" style={{ fontSize: '0.9rem' }}></i>
               Units Management
-              <span className="badge bg-primary ms-3">
+              <span className="badge bg-primary ms-3" style={{ fontSize: '0.7rem', padding: '0.25rem 0.5rem' }}>
                 {pagination?.count || units.length} Units
               </span>
             </h5>
             {(pagination && (pagination.total_pages > 1 || pagination.count > 0)) && (
-              <small className="text-muted">
+              <small className="text-muted" style={{ fontSize: '0.75rem' }}>
                 Page {pagination.current_page || 1} of {pagination.total_pages || 1} 
                 ({pagination.count || units.length} total)
               </small>
@@ -57,10 +57,10 @@ const UnitsSection = ({
                 className="odoo-btn odoo-btn-primary add-unit-btn"
                 onClick={onAddUnit}
                 disabled={editingUnitId !== null || !hasActiveSubscription}
-                style={{ minWidth: '120px' }}
+                style={{ minWidth: '90px', fontSize: '0.8rem', padding: '0.35rem 0.75rem' }}
                 title={!hasActiveSubscription ? 'Subscription expired. Please renew to add units.' : ''}
               >
-                <i className="bi bi-plus-circle me-2"></i>
+                <i className="bi bi-plus-circle me-1" style={{ fontSize: '0.75rem' }}></i>
                 Add Unit
               </button>
             )}
@@ -94,13 +94,13 @@ const UnitsSection = ({
           <>
             {/* Desktop Table View */}
             <div className="table-responsive d-none d-md-block">
-              <table className="table table-hover align-middle mb-0 leases-table">
+              <table className="table table-hover align-middle mb-0 leases-table" style={{ fontSize: '0.85rem' }}>
                 <thead className="table-light">
                   <tr>
-                    <th style={{ width: '30%' }}>Unit Name</th>
-                    <th style={{ width: '25%' }}>Rent/Month</th>
-                    <th style={{ width: '20%' }}>Status</th>
-                    <th style={{ width: '25%' }} className="text-end">Actions</th>
+                    <th style={{ width: '30%', fontSize: '0.8rem', padding: '0.5rem' }}>Unit Name</th>
+                    <th style={{ width: '25%', fontSize: '0.8rem', padding: '0.5rem' }}>Rent/Month</th>
+                    <th style={{ width: '20%', fontSize: '0.8rem', padding: '0.5rem' }}>Status</th>
+                    <th style={{ width: '25%', fontSize: '0.8rem', padding: '0.5rem' }} className="text-end">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -176,13 +176,14 @@ const UnitsSection = ({
                       className="odoo-btn odoo-btn-secondary"
                       disabled={pagination.current_page <= 1}
                       onClick={() => onPageChange(pagination.current_page - 1)}
+                      style={{ fontSize: '0.8rem', padding: '0.35rem 0.75rem' }}
                     >
-                      <i className="bi bi-chevron-left me-1"></i>
+                      <i className="bi bi-chevron-left me-1" style={{ fontSize: '0.75rem' }}></i>
                       Previous
                     </button>
 
                     <div className="pagination-info">
-                      <span className="text-muted">
+                      <span className="text-muted" style={{ fontSize: '0.8rem' }}>
                         Page {pagination.current_page} of {pagination.total_pages || 1}
                       </span>
                     </div>
@@ -191,9 +192,10 @@ const UnitsSection = ({
                       className="odoo-btn odoo-btn-secondary"
                       disabled={pagination.current_page >= pagination.total_pages}
                       onClick={() => onPageChange(pagination.current_page + 1)}
+                      style={{ fontSize: '0.8rem', padding: '0.35rem 0.75rem' }}
                     >
                       Next
-                      <i className="bi bi-chevron-right ms-1"></i>
+                      <i className="bi bi-chevron-right ms-1" style={{ fontSize: '0.75rem' }}></i>
                     </button>
                   </div>
                 </nav>
