@@ -20,9 +20,6 @@ const PropertyStatCard = ({ data, loading }) => {
                             </div>
                             <span style={{ fontSize: '14px', color: '#6B7280', fontWeight: '400' }}>Properties & Units</span>
                         </div>
-                        <button className="btn btn-link p-0 text-muted" style={{ lineHeight: 1 }}>
-                            <i className="bi bi-three-dots" style={{ fontSize: '18px' }}></i>
-                        </button>
                     </div>
                     
                     {loading ? (
@@ -70,9 +67,6 @@ const OccupancyStatCard = ({ data, loading }) => {
                             </div>
                             <span style={{ fontSize: '14px', color: '#6B7280', fontWeight: '400' }}>Occupancy</span>
                         </div>
-                        <button className="btn btn-link p-0 text-muted" style={{ lineHeight: 1 }}>
-                            <i className="bi bi-three-dots" style={{ fontSize: '18px' }}></i>
-                        </button>
                     </div>
                     
                     {loading ? (
@@ -122,9 +116,6 @@ const StatCard = ({ icon, title, value, change, changeLabel, loading }) => {
                             </div>
                             <span style={{ fontSize: '14px', color: '#6B7280', fontWeight: '400' }}>{title}</span>
                         </div>
-                        <button className="btn btn-link p-0 text-muted" style={{ lineHeight: 1 }}>
-                            <i className="bi bi-three-dots" style={{ fontSize: '18px' }}></i>
-                        </button>
                     </div>
                     
                     {loading ? (
@@ -137,15 +128,17 @@ const StatCard = ({ icon, title, value, change, changeLabel, loading }) => {
                                 <h2 className="fw-bold mb-0" style={{ fontSize: '24px', color: '#111827', lineHeight: '1' }}>
                                     {value}
                                 </h2>
-                                <div className="d-flex align-items-center gap-2">
-                                    <span className={`d-inline-flex align-items-center ${isPositive ? 'text-success' : 'text-danger'}`} 
-                                          style={{ fontSize: '13px', fontWeight: '500', whiteSpace: 'nowrap' }}>
-                                        {isPositive ? '↑' : '↓'}{Math.abs(change)}%
-                                    </span>
-                                    <span style={{ fontSize: '13px', color: '#9CA3AF', whiteSpace: 'nowrap' }}>
-                                        {changeLabel}
-                                    </span>
-                                </div>
+                                {change !== null && change !== undefined && (
+                                    <div className="d-flex align-items-center gap-2">
+                                        <span className={`d-inline-flex align-items-center ${isPositive ? 'text-success' : 'text-danger'}`} 
+                                              style={{ fontSize: '13px', fontWeight: '500', whiteSpace: 'nowrap' }}>
+                                            {isPositive ? '↑' : '↓'}{Math.abs(change)}%
+                                        </span>
+                                        <span style={{ fontSize: '13px', color: '#9CA3AF', whiteSpace: 'nowrap' }}>
+                                            {changeLabel}
+                                        </span>
+                                    </div>
+                                )}
                             </div>
                         </>
                     )}
@@ -225,10 +218,10 @@ const DashboardStats = ({ data, loading, error, onRetry }) => {
             />
             <StatCard
                 icon={<i className="bi bi-file-text" style={{ fontSize: '20px', color: '#666' }}></i>}
-                title="Total Leases"
+                title="Total Active Leases"
                 value={formatNumber(stats.totalLeases)}
-                change={leasesChange}
-                changeLabel={`Last month total ${formatNumber(stats.totalLeases + Math.round(stats.totalLeases * 0.2))}`}
+                change={null}
+                changeLabel=""
                 loading={loading}
             />
             <div className="col-12 col-md-6 col-lg-3">
@@ -249,9 +242,6 @@ const DashboardStats = ({ data, loading, error, onRetry }) => {
                                 </div>
                                 <span style={{ fontSize: '14px', color: '#6B7280', fontWeight: '400' }}>Revenue</span>
                             </div>
-                            <button className="btn btn-link p-0 text-muted" style={{ lineHeight: 1 }}>
-                                <i className="bi bi-three-dots" style={{ fontSize: '18px' }}></i>
-                            </button>
                         </div>
                         
                         {loading ? (

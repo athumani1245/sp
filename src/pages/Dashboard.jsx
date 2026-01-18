@@ -88,7 +88,7 @@ function Dashboard() {
                         Hello, {getUserName()}!
                     </h2>
                     <p className="text-muted mb-0" style={{ fontSize: '14px' }}>
-                        Explore information and activity about your property
+                        Explore General information about your properties and leases below.
                     </p>
                 </div>
 
