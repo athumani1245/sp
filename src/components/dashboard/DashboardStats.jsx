@@ -20,9 +20,6 @@ const PropertyStatCard = ({ data, loading }) => {
                             </div>
                             <span style={{ fontSize: '14px', color: '#6B7280', fontWeight: '400' }}>Properties & Units</span>
                         </div>
-                        <button className="btn btn-link p-0 text-muted" style={{ lineHeight: 1 }}>
-                            <i className="bi bi-three-dots" style={{ fontSize: '18px' }}></i>
-                        </button>
                     </div>
                     
                     {loading ? (
@@ -70,9 +67,6 @@ const OccupancyStatCard = ({ data, loading }) => {
                             </div>
                             <span style={{ fontSize: '14px', color: '#6B7280', fontWeight: '400' }}>Occupancy</span>
                         </div>
-                        <button className="btn btn-link p-0 text-muted" style={{ lineHeight: 1 }}>
-                            <i className="bi bi-three-dots" style={{ fontSize: '18px' }}></i>
-                        </button>
                     </div>
                     
                     {loading ? (
@@ -122,9 +116,6 @@ const StatCard = ({ icon, title, value, change, changeLabel, loading }) => {
                             </div>
                             <span style={{ fontSize: '14px', color: '#6B7280', fontWeight: '400' }}>{title}</span>
                         </div>
-                        <button className="btn btn-link p-0 text-muted" style={{ lineHeight: 1 }}>
-                            <i className="bi bi-three-dots" style={{ fontSize: '18px' }}></i>
-                        </button>
                     </div>
                     
                     {loading ? (
@@ -251,9 +242,6 @@ const DashboardStats = ({ data, loading, error, onRetry }) => {
                                 </div>
                                 <span style={{ fontSize: '14px', color: '#6B7280', fontWeight: '400' }}>Revenue</span>
                             </div>
-                            <button className="btn btn-link p-0 text-muted" style={{ lineHeight: 1 }}>
-                                <i className="bi bi-three-dots" style={{ fontSize: '18px' }}></i>
-                            </button>
                         </div>
                         
                         {loading ? (
