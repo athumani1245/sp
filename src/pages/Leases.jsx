@@ -27,6 +27,7 @@ function Leases() {
     leases,
     loading,
     error,
+    totalsData,
     filters,
     handleFilterChange,
     handleClearFilters,
@@ -44,7 +45,6 @@ function Leases() {
     activeLeases: 0,
     outstandingPayments: 0,
   });
-  const [totalsData, setTotalsData] = useState(null);
 
   // Fetch summary data
   useEffect(() => {
@@ -58,7 +58,6 @@ function Leases() {
         const allLeases = result.data || [];
         const stats = calculateSummaryStats(allLeases);
         setSummaryStats(stats);
-        setTotalsData(result.totals || null);
       }
     } catch (error) {
       console.error('Failed to fetch summary data:', error);
