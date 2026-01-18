@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 
 const Toast = ({ 
   show, 
@@ -74,6 +75,23 @@ const Toast = ({
       )}
     </div>
   );
+};
+
+Toast.propTypes = {
+  show: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  title: PropTypes.string,
+  message: PropTypes.string.isRequired,
+  variant: PropTypes.oneOf(['success', 'danger', 'warning', 'info']),
+  autoHide: PropTypes.bool,
+  delay: PropTypes.number,
+};
+
+Toast.defaultProps = {
+  variant: 'success',
+  autoHide: true,
+  delay: 3000,
+  title: '',
 };
 
 export default Toast;

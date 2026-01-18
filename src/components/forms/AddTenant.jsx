@@ -1,120 +1,31 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Modal, Button, Form, Row, Col, Alert } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
-import { createTenant } from '../../services/tenantService';
 import { InfoTooltip } from '../common/Tooltip';
+import { useTenantForm } from '../../features/tenants/hooks/useTenantForm';
+import { useTenantSubmit } from '../../features/tenants/hooks/useTenantSubmit';
 import '../../assets/styles/add-tenant.css';
 import '../../assets/styles/forms-responsive.css';
 
 const AddTenantModal = ({ isOpen, onClose, onTenantAdded }) => {
-    const [formData, setFormData] = useState({
-        first_name: '',
-        last_name: '',
-        username: '', // will hold phone number
-    });
-    const [phoneNumber, setPhoneNumber] = useState('');
+    const {
+        formData,
+        phoneNumber,
+        handleInputChange,
+        handlePhoneChange,
+        validateForm
+    } = useTenantForm(isOpen);
 
-    const [submitLoading, setSubmitLoading] = useState(false);
-    const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
-
-    // Reset form when modal opens/closes
-    useEffect(() => {
-        if (isOpen) {
-            resetForm();
-        }
-    }, [isOpen]);
-
-    const resetForm = () => {
-        setFormData({
-            first_name: '',
-            last_name: '',
-            username: '',
-        });
-        setPhoneNumber('');
-        setError('');
-        setSuccess('');
-    };
-
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
-        setError('');
-        setSuccess('');
-    };
-
-    const handlePhoneChange = (value) => {
-        setPhoneNumber(value);
-        setFormData(prev => ({
-            ...prev,
-            username: value || ''
-        }));
-        setError('');
-        setSuccess('');
-    };
-
-    
-
-    const validateForm = () => {
-        const requiredFields = [
-            'first_name', 'last_name', 'username'
-        ];
-        for (let field of requiredFields) {
-            if (!formData[field]) {
-                setError(`Please fill in ${field.replace('_', ' ')}`);
-                return false;
-            }
-        }
-        // Validate phone number format (international)
-        if (!phoneNumber || phoneNumber.length < 10) {
-            setError('Please enter a valid phone number');
-            return false;
-        }
-        return true;
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        
-        if (!validateForm()) {
-            return;
-        }
-
-        setSubmitLoading(true);
-        setError('');
-        
-        try {
-            // Only send required fields, set default password
-            const tenantData = {
-                username: formData.username,
-                password: 'StrongPass123',
-                first_name: formData.first_name,
-                last_name: formData.last_name,
-                role: "Tenant"
-            };
-            const result = await createTenant(tenantData);
-            if (result.success) {
-                setSuccess(result.message || 'Tenant created successfully!');
-                if (onTenantAdded) {
-                    onTenantAdded({ id: result.data?.id || Date.now(), ...tenantData });
-                }
-                setTimeout(() => {
-                    onClose();
-                }, 1500);
-            } else {
-                setError(typeof result.error === 'string' ? result.error : 'Failed to create tenant. Please try again.');
-            }
-        } catch (error) {
-            setError(error.message || 'Failed to create tenant. Please try again.');
-        } finally {
-            setSubmitLoading(false);
-        }
-    };
+    const {
+        submitLoading,
+        error,
+        success,
+        setError,
+        setSuccess,
+        handleSubmit
+    } = useTenantSubmit(formData, onTenantAdded, onClose);
 
     return (
         <Modal 
@@ -133,7 +44,7 @@ const AddTenantModal = ({ isOpen, onClose, onTenantAdded }) => {
                 </Modal.Title>
             </Modal.Header>
             
-            <Form onSubmit={handleSubmit}>
+            <Form onSubmit={(e) => handleSubmit(e, validateForm)}>
                 <Modal.Body>
                     {error && (
                         <Alert variant="danger" className="alert alert-danger">
