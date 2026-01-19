@@ -824,7 +824,20 @@ const SubscriptionModal = ({ show, onHide, onSubscriptionSuccess }) => {
                     <div className="row g-3">
                         {getAvailablePlans().map((plan, index) => {
                             const isSelected = selectedPlan === plan.id;
-                            const pricePerDay = (parseFloat(plan.price) / plan.duration_days).toFixed(2);
+                            
+                            // Calculate days based on duration_value and duration_unit
+                            let durationDays = plan.duration_days || 30;
+                            if (plan.duration_value && plan.duration_unit) {
+                                if (plan.duration_unit.toLowerCase() === 'months') {
+                                    durationDays = plan.duration_value * 30;
+                                } else if (plan.duration_unit.toLowerCase() === 'days') {
+                                    durationDays = plan.duration_value;
+                                } else if (plan.duration_unit.toLowerCase() === 'years') {
+                                    durationDays = plan.duration_value * 365;
+                                }
+                            }
+                            
+                            const pricePerDay = (parseFloat(plan.price) / durationDays).toFixed(2);
                             
                             return (
                                 <div key={plan.id} className="col-md-6">
@@ -874,7 +887,7 @@ const SubscriptionModal = ({ show, onHide, onSubscriptionSuccess }) => {
                                                         TSh {parseFloat(plan.price).toLocaleString()}
                                                     </strong>
                                                     <span className="text-muted ms-2" style={{ fontSize: '0.9rem' }}>
-                                                        / {plan.duration_days} days
+                                                        / {durationDays} days
                                                     </span>
                                                 </div>
                                                 <small className="text-muted">

@@ -191,7 +191,20 @@ function Subscription() {
                                   </div>
                                   <div style={{ fontSize: '0.75rem', color: '#155724' }}>
                                     TSH {parseFloat(selectedPlans[plan.id].price).toLocaleString()} /{' '}
-                                    {selectedPlans[plan.id].duration_days} days
+                                    {(() => {
+                                      const selectedPlan = selectedPlans[plan.id];
+                                      let days = selectedPlan.duration_days || 30;
+                                      if (selectedPlan.duration_value && selectedPlan.duration_unit) {
+                                        if (selectedPlan.duration_unit.toLowerCase() === 'months') {
+                                          days = selectedPlan.duration_value * 30;
+                                        } else if (selectedPlan.duration_unit.toLowerCase() === 'days') {
+                                          days = selectedPlan.duration_value;
+                                        } else if (selectedPlan.duration_unit.toLowerCase() === 'years') {
+                                          days = selectedPlan.duration_value * 365;
+                                        }
+                                      }
+                                      return days;
+                                    })()} days
                                   </div>
                                 </div>
                               )}
