@@ -16,7 +16,8 @@ const LeaseActionButtons = ({
   onCancel,
   isMobile = false
 }) => {
-  const canRenew = lease.status === LEASE_STATUS.ACTIVE || lease.status === 'expiring';
+  // Renew button should only appear for active (running) or expired leases
+  const canRenew = lease.status === LEASE_STATUS.ACTIVE || lease.status === LEASE_STATUS.EXPIRED;
   const canCancel = ![LEASE_STATUS.CANCELLED, LEASE_STATUS.TERMINATED, LEASE_STATUS.EXPIRED].includes(lease.status);
 
   if (isMobile) {

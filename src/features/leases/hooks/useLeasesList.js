@@ -11,6 +11,7 @@ export const useLeasesList = () => {
   const [leases, setLeases] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [totalsData, setTotalsData] = useState(null);
   
   // Initialize filters
   const {
@@ -61,6 +62,11 @@ export const useLeasesList = () => {
 
       if (result.success) {
         setLeases(result.data || []);
+        
+        // Set totals data from the response
+        if (result.totals) {
+          setTotalsData(result.totals);
+        }
         
         // Set pagination data from the response
         if (result.pagination) {
@@ -116,6 +122,7 @@ export const useLeasesList = () => {
     leases,
     loading,
     error,
+    totalsData,
     filters,
     handleFilterChange,
     handleClearFilters,
