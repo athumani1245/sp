@@ -873,9 +873,15 @@ const SubscriptionModal = ({ show, onHide, onSubscriptionSuccess }) => {
                                                     <strong className="h3 mb-0">
                                                         TSh {parseFloat(plan.price).toLocaleString()}
                                                     </strong>
+                                                    <span className="text-muted ms-2" style={{ fontSize: '0.9rem' }}>
+                                                        / {plan.duration_days} days
+                                                    </span>
                                                 </div>
+                                                <small className="text-muted">
+                                                    TSh {pricePerDay}/day
+                                                </small>
                                             </div>
-                                            
+                            
                                             {plan.description && (
                                                 <p className="text-muted small mb-3">
                                                     {plan.description}
