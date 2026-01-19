@@ -44,7 +44,8 @@ export const useSubscriptionPlans = () => {
             duration: pkg.duration_days ? `${pkg.duration_days} days` : 'month',
             max_units: pkg.max_units,
             features: features.length > 0 ? features : ['Contact us for details'],
-            plans: pkg.plans || []
+            plans: pkg.plans || [],
+            description: pkg.description
           };
         });
 

@@ -50,7 +50,7 @@ const PlanSelectionModal = ({ show, onHide, selectedPackage, onSelectPlan }) => 
                   <div style={{ fontSize: '1.6rem', fontWeight: 700, color: '#CC5B4B', marginBottom: '1rem' }}>
                     TSH {parseFloat(plan.price).toLocaleString()}
                     <span style={{ fontSize: '0.85rem', fontWeight: 400, color: '#6c757d' }}>
-                      /{plan.duration_days} days
+                    
                     </span>
                   </div>
 

@@ -123,9 +123,6 @@ function Landing() {
                                 <a className="nav-link" href="#features">Features</a>
                             </li>
                             <li className="nav-item">
-                                <a className="nav-link" href="#pricing">Pricing</a>
-                            </li>
-                            <li className="nav-item">
                                 <a className="nav-link" href="#about">About</a>
                             </li>
                             <li className="nav-item">
@@ -257,109 +254,6 @@ function Landing() {
                 </div>
             </section>
 
-            {/* Pricing Section */}
-            <section id="pricing" className="pricing-section" aria-labelledby="pricing-title">
-                <div className="container">
-                    <div className="text-center mb-5">
-                        <h2 id="pricing-title" className="section-title">Choose Your Plan</h2>
-                        <p className="section-description">
-                            Select the perfect plan for your property management needs. 
-                            Start with our free trial and upgrade as you grow.
-                        </p>
-                    </div>
-                    <div className="row g-4 justify-content-center">
-                        {/* Starter Plan */}
-                        <div className="col-lg-4 col-md-6">
-                            <div className="pricing-card">
-                                <div className="pricing-header">
-                                    <h4 className="plan-name">Starter</h4>
-                                    <p className="plan-description">For individual landlords</p>
-                                </div>
-                                <div className="pricing-price">
-                                    <span className="currency">TZS</span>
-                                    <span className="amount">15,000</span>
-                                    <span className="period">/month</span>
-                                </div>
-                                <ul className="pricing-features">
-                                    <li><i className="bi bi-check-circle-fill"></i>Up to 5 properties</li>
-                                    <li><i className="bi bi-check-circle-fill"></i>Tenant & payment tracking</li>
-                                    <li><i className="bi bi-check-circle-fill"></i>Monthly reports</li>
-                                </ul>
-                                <button 
-                                    className="odoo-btn odoo-btn-outline-primary w-100"
-                                    onClick={() => navigate("/register")}
-                                >
-                                    Start Free Trial
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Professional Plan - Popular */}
-                        <div className="col-lg-4 col-md-6">
-                            <div className="pricing-card featured">
-                                <div className="popular-badge">Most Popular</div>
-                                <div className="pricing-header">
-                                    <h4 className="plan-name">Professional</h4>
-                                    <p className="plan-description">For growing portfolios</p>
-                                </div>
-                                <div className="pricing-price">
-                                    <span className="currency">TZS</span>
-                                    <span className="amount">35,000</span>
-                                    <span className="period">/month</span>
-                                </div>
-                                <ul className="pricing-features">
-                                    <li><i className="bi bi-check-circle-fill"></i>Up to 25 properties</li>
-                                    <li><i className="bi bi-check-circle-fill"></i>Advanced management & analytics</li>
-                                    <li><i className="bi bi-check-circle-fill"></i>Automated reminders</li>
-                                    <li><i className="bi bi-check-circle-fill"></i>Priority support</li>
-                                </ul>
-                                <button 
-                                    className="odoo-btn odoo-btn-primary w-100"
-                                    onClick={() => navigate("/register")}
-                                >
-                                    Get Started
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Enterprise Plan */}
-                        <div className="col-lg-4 col-md-6">
-                            <div className="pricing-card">
-                                <div className="pricing-header">
-                                    <h4 className="plan-name">Enterprise</h4>
-                                    <p className="plan-description">For large managers</p>
-                                </div>
-                                <div className="pricing-price">
-                                    <span className="currency">TZS</span>
-                                    <span className="amount">75,000</span>
-                                    <span className="period">/month</span>
-                                </div>
-                                <ul className="pricing-features">
-                                    <li><i className="bi bi-check-circle-fill"></i>Unlimited properties</li>
-                                    <li><i className="bi bi-check-circle-fill"></i>Multi-user & custom integrations</li>
-                                    <li><i className="bi bi-check-circle-fill"></i>White-label options</li>
-                                    <li><i className="bi bi-check-circle-fill"></i>24/7 phone support</li>
-                                </ul>
-                                <button 
-                                    className="odoo-btn odoo-btn-outline-primary w-100"
-                                    onClick={() => navigate("/register")}
-                                >
-                                    Contact Sales
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Additional Info */}
-                    <div className="text-center mt-4">
-                        <p className="pricing-note">
-                            <i className="bi bi-shield-check text-primary me-2"></i>
-                            14-day free trial • No credit card required
-                        </p>
-                    </div>
-                </div>
-            </section>
-
             {/* About Section */}
             <section id="about" className="about-section" aria-labelledby="about-title">
                 <div className="container">
@@ -417,6 +311,7 @@ function Landing() {
                     </div>
                 </div>
             </section>
+            
 
             {/* Testimonials Section */}
             <section id="testimonials" className="testimonials-section" aria-labelledby="testimonials-title">
@@ -500,7 +395,6 @@ function Landing() {
                                 <div className="col-6">
                                     <ul className="footer-links">
                                         <li><a href="#features">Features</a></li>
-                                        <li><a href="#pricing">Pricing</a></li>
                                     </ul>
                                 </div>
                                 <div className="col-6">
