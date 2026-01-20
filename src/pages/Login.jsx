@@ -37,7 +37,8 @@ function Login() {
                 // Update auth context with subscription data
                 await login(result.token, {
                     user: result.user,
-                    subscription: result.subscription
+                    subscription: result.subscription,
+                    refresh: result.refresh
                 });
                 
                 // Always navigate to dashboard
