@@ -47,10 +47,10 @@ const AddUnitRow = ({
           </div>
           <div className="col-md-6">
             <input
-              type="text"
+              type="number"
               className="form-control"
               name="rent_per_month"
-              value={newUnitData.rent_per_month ? parseInt(newUnitData.rent_per_month).toLocaleString() : ''}
+              value={newUnitData.rent_per_month}
               onChange={onNewUnitChange}
               onKeyPress={handleKeyPress}
               placeholder="Rent per month *"
@@ -109,10 +109,10 @@ const AddUnitRow = ({
           </div>
           <div className="mb-3">
             <input
-              type="text"
+              type="number"
               className="form-control form-control-sm"
               name="rent_per_month"
-              value={newUnitData.rent_per_month ? parseInt(newUnitData.rent_per_month).toLocaleString() : ''}
+              value={newUnitData.rent_per_month}
               onChange={onNewUnitChange}
               onKeyPress={handleKeyPress}
               placeholder="Rent per month *"
@@ -161,10 +161,10 @@ const AddUnitRow = ({
       </td>
       <td>
         <input
-          type="text"
+          type="number"
           className="form-control form-control-sm"
           name="rent_per_month"
-          value={newUnitData.rent_per_month ? parseInt(newUnitData.rent_per_month).toLocaleString() : ''}
+          value={newUnitData.rent_per_month}
           onChange={onNewUnitChange}
           onKeyPress={handleKeyPress}
           placeholder="Rent per month *"

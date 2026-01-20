@@ -77,10 +77,10 @@ const UnitRow = ({
             <span className="unit-info-label">Rent/Month:</span>
             {isEditing ? (
               <input
-                type="text"
+                type="number"
                 className="form-control form-control-sm"
                 name="rent_per_month"
-                value={editData.rent_per_month ? parseInt(editData.rent_per_month).toLocaleString() : ''}
+                value={editData.rent_per_month}
                 onChange={onEditChange}
                 onKeyPress={handleKeyPress}
                 disabled={updatingUnit}
@@ -88,7 +88,7 @@ const UnitRow = ({
               />
             ) : (
               <span className="unit-info-value fw-semibold text-primary">
-                {formatCurrency(unit.rent_per_month)}
+                {formatCurrency(unit.rent_amount_per_unit || unit.rent_per_month)}
               </span>
             )}
           </div>
@@ -164,10 +164,10 @@ const UnitRow = ({
       <td style={{ padding: '0.5rem', fontSize: '0.85rem' }}>
         {isEditing ? (
           <input
-            type="text"
+            type="number"
             className="form-control form-control-sm"
             name="rent_per_month"
-            value={editData.rent_per_month ? parseInt(editData.rent_per_month).toLocaleString() : ''}
+            value={editData.rent_per_month}
             onChange={onEditChange}
             onKeyPress={handleKeyPress}
             disabled={updatingUnit}
@@ -175,7 +175,7 @@ const UnitRow = ({
             style={{ fontSize: '0.8rem' }}
           />
         ) : (
-          <span className="text-primary fw-semibold">{formatCurrency(unit.rent_per_month)}</span>
+          <span className="text-primary fw-semibold">{formatCurrency(unit.rent_amount_per_unit || unit.rent_per_month)}</span>
         )}
       </td>
       <td style={{ padding: '0.5rem', fontSize: '0.85rem' }}>

@@ -20,8 +20,8 @@ export const usePropertyUnits = (propertyId) => {
   // Form state
   const [isAddingUnit, setIsAddingUnit] = useState(false);
   const [editingUnitId, setEditingUnitId] = useState(null);
-  const [newUnitData, setNewUnitData] = useState({ unit_name: '', rent_amount_per_unit: '' });
-  const [editUnitData, setEditUnitData] = useState({ unit_name: '', rent_amount_per_unit: '' });
+  const [newUnitData, setNewUnitData] = useState({ unit_name: '', rent_per_month: '' });
+  const [editUnitData, setEditUnitData] = useState({ unit_name: '', rent_per_month: '' });
   const [addingUnitLoading, setAddingUnitLoading] = useState(false);
   const [updatingUnit, setUpdatingUnit] = useState(false);
 
@@ -56,14 +56,18 @@ export const usePropertyUnits = (propertyId) => {
       setAddingUnitLoading(true);
       setError('');
 
-      // Add property ID to unit data
-      const dataWithProperty = { ...unitData, property: propertyId };
+      // Add property ID to unit data and map rent_per_month to rent_amount_per_unit for backend
+      const dataWithProperty = { 
+        property: propertyId,
+        unit_name: unitData.unit_name,
+        rent_per_month: unitData.rent_per_month
+      };
       const result = await addPropertyUnit(propertyId, dataWithProperty);
 
       if (result.success) {
         await fetchUnits(currentPage);
         setIsAddingUnit(false);
-        setNewUnitData({ unit_name: '', rent_amount_per_unit: '' });
+        setNewUnitData({ unit_name: '', rent_per_month: '' });
         return { success: true, data: result.data };
       } else {
         setError(result.error || 'Failed to add unit');
@@ -88,7 +92,7 @@ export const usePropertyUnits = (propertyId) => {
       if (result.success) {
         await fetchUnits(currentPage);
         setEditingUnitId(null);
-        setEditUnitData({ unit_name: '', rent_amount_per_unit: '' });
+        setEditUnitData({ unit_name: '', rent_per_month: '' });
         return { success: true, data: result.data };
       } else {
         setError(result.error || 'Failed to update unit');
@@ -128,16 +132,19 @@ export const usePropertyUnits = (propertyId) => {
   // UI handlers
   const handleAddUnit = useCallback(() => {
     setIsAddingUnit(true);
-    setNewUnitData({ unit_name: '', rent_amount_per_unit: '' });
+    setNewUnitData({ unit_name: '', rent_per_month: '' });
   }, []);
 
   const handleCancelAddUnit = useCallback(() => {
     setIsAddingUnit(false);
-    setNewUnitData({ unit_name: '', rent_amount_per_unit: '' });
+    setNewUnitData({ unit_name: '', rent_per_month: '' });
   }, []);
 
-  const handleNewUnitChange = useCallback((field, value) => {
-    setNewUnitData(prev => ({ ...prev, [field]: value }));
+  const handleNewUnitChange = useCallback((e) => {
+    const { name, value } = e.target;
+    // Remove any commas for numeric input
+    const cleanValue = name === 'rent_per_month' ? value.replace(/,/g, '') : value;
+    setNewUnitData(prev => ({ ...prev, [name]: cleanValue }));
   }, []);
 
   const handleSaveNewUnit = useCallback(async () => {
@@ -148,22 +155,30 @@ export const usePropertyUnits = (propertyId) => {
     setEditingUnitId(unit.id);
     setEditUnitData({
       unit_name: unit.unit_name,
-      rent_amount_per_unit: unit.rent_amount_per_unit
+      rent_per_month: unit.rent_per_month
     });
   }, []);
 
   const handleCancelEditUnit = useCallback(() => {
     setEditingUnitId(null);
-    setEditUnitData({ unit_name: '', rent_amount_per_unit: '' });
+    setEditUnitData({ unit_name: '', rent_per_month: '' });
   }, []);
 
-  const handleEditUnitChange = useCallback((field, value) => {
-    setEditUnitData(prev => ({ ...prev, [field]: value }));
+  const handleEditUnitChange = useCallback((e) => {
+    const { name, value } = e.target;
+    // Remove any commas for numeric input
+    const cleanValue = name === 'rent_per_month' ? value.replace(/,/g, '') : value;
+    setEditUnitData(prev => ({ ...prev, [name]: cleanValue }));
   }, []);
 
   const handleSaveEditUnit = useCallback(async () => {
     if (!editingUnitId) return { success: false };
-    return await updateUnit(editingUnitId, editUnitData);
+    // Map rent_per_month to rent_per_month for backend
+    const dataForBackend = {
+      unit_name: editUnitData.unit_name,
+      rent_per_month: editUnitData.rent_per_month
+    };
+    return await updateUnit(editingUnitId, dataForBackend);
   }, [editingUnitId, editUnitData, updateUnit]);
 
   const handleDeleteUnit = useCallback(async (unitId) => {
