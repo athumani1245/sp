@@ -79,6 +79,11 @@ export const AuthProvider = ({ children }) => {
     const login = async (token, userData) => {
         localStorage.setItem('token', token);
         
+        // Also ensure refresh token is stored if available
+        if (userData && userData.refresh) {
+            localStorage.setItem('refresh', userData.refresh);
+        }
+        
         // Store subscription data if provided
         if (userData && userData.subscription) {
             localStorage.setItem('subscription', JSON.stringify(userData.subscription));

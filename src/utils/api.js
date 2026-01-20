@@ -19,7 +19,10 @@ const handleLogout = () => {
     localStorage.removeItem('subscription');
     
     // Redirect to login page
-    window.location.href = '/login';
+    setTimeout(() => {
+        window.location.href = '/login';
+        isLoggingOut = false;
+    }, 100);
 };
 
 // Add a request interceptor
