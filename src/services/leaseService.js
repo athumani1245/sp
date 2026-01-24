@@ -72,16 +72,23 @@ export const getLeases = async (params = {}) => {
     try {
         const queryParams = new URLSearchParams();
         
+        // Search and pagination
         if (params.search) queryParams.append('search', params.search);
         if (params.page) queryParams.append('page', params.page);
         if (params.limit) queryParams.append('limit', params.limit);
+        
+        // Filter parameters
         if (params.status) queryParams.append('status', params.status);
         if (params.property_id) queryParams.append('property_id', params.property_id);
+        if (params.unit_id) queryParams.append('unit_id', params.unit_id);
+        if (params.tenant_id) queryParams.append('tenant_id', params.tenant_id);
         if (params.tenant_name) queryParams.append('tenant_name', params.tenant_name);
         if (params.start_date) queryParams.append('start_date', params.start_date);
         if (params.end_date) queryParams.append('end_date', params.end_date);
 
-        const response = await api.get(`${API_BASE}/leases/?${queryParams.toString()}`);
+        const fullUrl = `${API_BASE}/leases/?${queryParams.toString()}`;
+
+        const response = await api.get(fullUrl);
         
         const responseData = response.data.data || {};
 
@@ -107,15 +114,14 @@ export const getAllLeases = async (filters = {}) => {
     try {
         const queryParams = new URLSearchParams();
         
-        // Add filters but no pagination parameters
+        // Add filters - backend will handle all data and calculations
         if (filters.status) queryParams.append('status', filters.status);
         if (filters.property_id) queryParams.append('property_id', filters.property_id);
+        if (filters.unit_id) queryParams.append('unit_id', filters.unit_id);
+        if (filters.tenant_id) queryParams.append('tenant_id', filters.tenant_id);
         if (filters.tenant_name) queryParams.append('tenant_name', filters.tenant_name);
         if (filters.start_date) queryParams.append('start_date', filters.start_date);
         if (filters.end_date) queryParams.append('end_date', filters.end_date);
-        
-        // Use a very high limit to get all records, or don't include limit at all
-        queryParams.append('limit', '10000'); // High limit to ensure we get all records
 
         const response = await api.get(`${API_BASE}/leases/?${queryParams.toString()}`);
 
