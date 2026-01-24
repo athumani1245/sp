@@ -28,10 +28,13 @@ export const useUnitSubmit = (propertyId, formatFormData, resetForm, onUnitAdded
                     onClose();
                 }, 1500);
             } else {
-                setError(result.error);
+                // Display the server's error message (including 403 description)
+                setError(result.error || 'Failed to add unit. Please try again.');
             }
         } catch (err) {
-            setError('Failed to add unit. Please try again.');
+            // This catch block is for unexpected errors (network issues, etc.)
+            console.error('Unexpected error adding unit:', err);
+            setError(err.message || 'Failed to add unit. Please try again.');
         } finally {
             setLoading(false);
         }

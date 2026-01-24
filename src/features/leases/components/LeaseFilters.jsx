@@ -21,11 +21,17 @@ const LeaseFilters = ({
   const [units, setUnits] = useState([]);
   const [tenants, setTenants] = useState([]);
   const [loadingFilters, setLoadingFilters] = useState(false);
+  const [searchInput, setSearchInput] = useState(filters.search || '');
 
   // Fetch dropdown data on mount
   useEffect(() => {
     fetchFilterData();
   }, []);
+
+  // Sync searchInput with filters.search
+  useEffect(() => {
+    setSearchInput(filters.search || '');
+  }, [filters.search]);
 
   // Fetch units when property changes
   useEffect(() => {
@@ -66,6 +72,28 @@ const LeaseFilters = ({
       console.error('Failed to fetch filter data:', error);
     } finally {
       setLoadingFilters(false);
+    }
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchInput(e.target.value);
+  };
+
+  const handleSearchSubmit = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      onFilterChange('search', searchInput);
+    }
+  };
+
+  const handleSearchButtonClick = () => {
+    onFilterChange('search', searchInput);
+  };
+
+  const handleSearchBlur = () => {
+    // Update filter when user clicks away from search input
+    if (searchInput !== filters.search) {
+      onFilterChange('search', searchInput);
     }
   };
 
@@ -131,8 +159,10 @@ const LeaseFilters = ({
         <input
           type="text"
           placeholder="Search leases..."
-          value={filters.search}
-          onChange={(e) => onFilterChange('search', e.target.value)}
+          value={searchInput}
+          onChange={handleSearchChange}
+          onKeyDown={handleSearchSubmit}
+          onBlur={handleSearchBlur}
           className="odoo-search-input"
         />
       </div>

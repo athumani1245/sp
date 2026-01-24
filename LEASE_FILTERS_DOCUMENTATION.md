@@ -108,7 +108,58 @@ const response = await api.get(`${API_BASE}/leases/?${queryParams.toString()}`);
 Final URL: {{base}}leases/?status=active&property_id=123&page=1&limit=10
 ```
 
-## Filter Behavior
+## Search Functionality
+
+### How Search Works
+
+The search input has multiple trigger mechanisms for better UX:
+
+1. **Press Enter Key**: Immediately triggers search
+   ```javascript
+   onKeyDown={(e) => {
+     if (e.key === 'Enter') {
+       // Triggers API call: GET /leases/?search=searchstring
+     }
+   }}
+   ```
+
+2. **Click Away (Blur)**: Triggers search when user clicks outside the input
+   ```javascript
+   onBlur={() => {
+     // Triggers API call if search text has changed
+   }}
+   ```
+
+3. **Debounced Auto-search**: Also keeps the 500ms debounce for typing
+   - Automatically searches 500ms after user stops typing
+   - Reduces unnecessary API calls while typing
+
+### Search Query Parameter
+
+**Important:** When a search is active, pagination parameters (page, limit) are **NOT** included in the API request. The backend returns all matching results.
+
+The search string is sent to the backend as:
+```
+GET {{base}}leases/?search=searchstring
+```
+
+Examples:
+- `GET /leases/?search=john` (no pagination)
+- `GET /leases/?search=apartment&status=active` (no pagination)
+- `GET /leases/?search=unit%20201` (no pagination)
+
+**Without Search (Normal Listing):**
+- `GET /leases/?page=1&limit=10` (with pagination)
+- `GET /leases/?status=active&page=1&limit=10` (with pagination)
+
+### Backend Search Scope
+
+The backend should search across multiple fields including:
+- Tenant name (first_name, last_name)
+- Property name
+- Unit name/number
+- Lease number
+- Any other relevant text fields
 
 ### Active Filter Count
 The system tracks how many filters are currently active and displays a badge:
@@ -148,8 +199,14 @@ const handleClearFilters = () => {
 ### Example 3: Search with Filters
 1. User types "John" in search box
 2. User selects status "Active"
-3. System sends: `GET /leases/?status=active&search=john`
-4. Backend returns active leases matching "John"
+3. System sends: `GET /leases/?search=john&status=active` (no pagination)
+4. Backend returns ALL active leases matching "John"
+
+### Example 4: Normal Listing with Filters
+1. User clears search box
+2. User selects status "Active"
+3. System sends: `GET /leases/?status=active&page=1&limit=10` (with pagination)
+4. Backend returns paginated active leases
 
 ## Frontend Components Involved
 

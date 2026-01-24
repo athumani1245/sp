@@ -170,7 +170,7 @@ const DashboardStats = ({ data, loading, error, onRetry }) => {
         totalUnits: data?.summary?.total_units || 0,
         occupiedUnits: data?.summary?.occupied_units || 0,
         vacantUnits: data?.summary?.vacant_units || 0,
-        totalLeases: data?.summary?.occupied_units || 0,
+        totalLeases: data?.summary?.total_active_leases || 0,
         totalRevenue: data?.summary?.total_rent_collected || 0,
         expectedRent: data?.summary?.total_expected_rent || 0,
         pendingIncome: data?.summary?.pending_income || 0,
