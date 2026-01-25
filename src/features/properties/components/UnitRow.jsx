@@ -36,10 +36,13 @@ const UnitRow = ({
   };
 
   const getStatusBadge = (unit) => {
-    if (unit.has_active_lease) {
+    // Use is_occupied field from API, fallback to has_active_lease for backward compatibility
+    const isOccupied = unit.is_occupied !== undefined ? unit.is_occupied : unit.has_active_lease;
+    
+    if (isOccupied) {
       return <span className="badge bg-success">Occupied</span>;
     } else {
-      return <span className="badge bg-secondary">Vacant</span>;
+      return <span className="badge bg-secondary">Available</span>;
     }
   };
 
@@ -179,8 +182,8 @@ const UnitRow = ({
         )}
       </td>
       <td style={{ padding: '0.5rem', fontSize: '0.85rem' }}>
-        <span className="badge" style={{ fontSize: '0.7rem', padding: '0.25rem 0.5rem', backgroundColor: unit.has_active_lease ? '#28a745' : '#6c757d' }}>
-          {unit.has_active_lease ? 'Occupied' : 'Vacant'}
+        <span className="badge" style={{ fontSize: '0.7rem', padding: '0.25rem 0.5rem', backgroundColor: (unit.is_occupied !== undefined ? unit.is_occupied : unit.has_active_lease) ? '#28a745' : '#6c757d' }}>
+          {(unit.is_occupied !== undefined ? unit.is_occupied : unit.has_active_lease) ? 'Occupied' : 'Available'}
         </span>
       </td>
       <td className="text-end" style={{ padding: '0.5rem' }}>
