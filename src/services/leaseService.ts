@@ -86,7 +86,7 @@ export const getLeases = async (params: LeaseParams = {}) => {
   // Include payments in the response
   queryParams.append('include_payments', 'true');
 
-  const response = await api.get(`${API_BASE}/leases/?${queryParams.toString()}`);
+  const response = await api.get(`/leases/?${queryParams.toString()}`);
   return {
     items: response.data.data.items || [],
     pagination: {
@@ -102,7 +102,7 @@ export const getLeases = async (params: LeaseParams = {}) => {
 // Get a single lease by ID
 export const getLeaseById = async (leaseId: string) => {
   // Include payments in the query to ensure they're returned
-  const response = await api.get(`${API_BASE}/leases/${leaseId}/?include_payments=true`);
+  const response = await api.get(`/leases/${leaseId}/?include_payments=true`);
   return response.data.data || response.data;
 };
 
@@ -111,31 +111,31 @@ export const createLease = async (leaseData: LeaseData) => {
   console.log('Original lease data:', leaseData);
   const formattedData = formatLeaseData(leaseData);
   console.log('Formatted lease data:', formattedData);
-  const response = await api.post(`${API_BASE}/v1/leases/create`, formattedData);
+  const response = await api.post(`/v1/leases/create`, formattedData);
   return response.data.data;
 };
 
 // Update an existing lease
 export const updateLease = async ({ leaseId, leaseData }: { leaseId: string; leaseData: LeaseData }) => {
-  const response = await api.patch(`${API_BASE}/leases/${leaseId}/`, leaseData);
+  const response = await api.patch(`/leases/${leaseId}/`, leaseData);
   return response.data.data;
 };
 
 // Delete a lease
 export const deleteLease = async (leaseId: string) => {
-  await api.delete(`${API_BASE}/leases/${leaseId}/`);
+  await api.delete(`/leases/${leaseId}/`);
   return { success: true };
 };
 
 // Cancel a lease
 export const cancelLease = async (leaseId: string) => {
-  const response = await api.post(`${API_BASE}/leases/${leaseId}/cancel/`);
+  const response = await api.post(`/leases/${leaseId}/cancel/`);
   return response.data.data;
 };
 
 // Renew a lease
 export const renewLease = async ({ leaseId, renewalData }: { leaseId: string; renewalData: any }) => {
-  const response = await api.post(`${API_BASE}/leases/${leaseId}/renew/`, renewalData);
+  const response = await api.post(`/leases/${leaseId}/renew/`, renewalData);
   return response.data.data;
 };
 
@@ -147,7 +147,7 @@ export const getLeasePayments = async (leaseId: string, params: PaymentParams = 
   if (params.limit) queryParams.append('limit', params.limit.toString());
   if (params.status) queryParams.append('status', params.status);
 
-  const response = await api.get(`${API_BASE}/leases/${leaseId}/payments/?${queryParams.toString()}`);
+  const response = await api.get(`/leases/${leaseId}/payments/?${queryParams.toString()}`);
   return {
     items: response.data.data.items || [],
     pagination: {
@@ -163,12 +163,12 @@ export const getLeasePayments = async (leaseId: string, params: PaymentParams = 
 
 // Cancel a payment
 export const cancelPayment = async (paymentId: string) => {
-  const response = await api.post(`${API_BASE}/payments/${paymentId}/cancel/`, {});
+  const response = await api.post(`/payments/${paymentId}/cancel/`, {});
   return response.data.data || { success: true };
 };
 
 // Get lease report
 export const getLeaseReport = async () => {
-  const response = await api.get(`${API_BASE}/reports/lease`);
+  const response = await api.get(`/reports/lease`);
   return response.data.data || [];
 };

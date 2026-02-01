@@ -32,7 +32,7 @@ import {
   WarningOutlined,
   PlusOutlined,
 } from '@ant-design/icons';
-import { useLease, useCancelPayment } from '../hooks/useLeases';
+import { useLease, useCancelPayment, useCancelLease } from '../hooks/useLeases';
 import AddPaymentModal from '../components/forms/AddPaymentModal';
 
 const { Title, Text } = Typography;
@@ -83,6 +83,7 @@ const Lease: React.FC = () => {
   // Use TanStack Query to fetch lease data
   const { data: lease, isLoading: loading, error, refetch } = useLease(leaseId || null);
   const cancelPaymentMutation = useCancelPayment();
+  const cancelLeaseMutation = useCancelLease();
   
   const [isCancelling, setIsCancelling] = useState(false);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
@@ -130,16 +131,16 @@ const Lease: React.FC = () => {
       okType: 'danger',
       cancelText: 'No, Keep Lease',
       onOk: async () => {
+        if (!leaseId) return;
+        
         try {
           setIsCancelling(true);
-          // Simulate API call
-          setTimeout(() => {
-            messageApi.success('Lease cancelled successfully');
-            refetch();
-            setIsCancelling(false);
-          }, 1000);
+          await cancelLeaseMutation.mutateAsync(leaseId);
+          refetch();
         } catch (error) {
-          messageApi.error('Failed to cancel lease');
+          // Error message is handled by the mutation hook
+          console.error('Failed to cancel lease:', error);
+        } finally {
           setIsCancelling(false);
         }
       },
