@@ -1,70 +1,25 @@
 {
-  "short_name": "Tanaka",
-  "name": "Tanaka Property Management - Professional Property Management System",
-  "description": "Streamline your property management in with Tanaka's comprehensive platform. Manage properties, tenants, rent collection, and financial reporting.",
-  "version": "1.0.0",
-  "manifest_version": 2,
+  "short_name": "React App",
+  "name": "Create React App Sample",
   "icons": [
     {
-      "src": "Logo.png",
-      "type": "image/png",
-      "sizes": "192x192",
-      "purpose": "any maskable"
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
     },
     {
-      "src": "Logo.png",
+      "src": "logo192.png",
       "type": "image/png",
-      "sizes": "512x512",
-      "purpose": "any maskable"
+      "sizes": "192x192"
+    },
+    {
+      "src": "logo512.png",
+      "type": "image/png",
+      "sizes": "512x512"
     }
   ],
-  "start_url": "/",
-  "scope": "/",
+  "start_url": ".",
   "display": "standalone",
-  "orientation": "portrait-primary",
-  "theme_color": "#CC5B4B",
-  "background_color": "#ffffff",
-  "categories": ["business", "productivity", "utilities"],
-  "lang": "en",
-  "dir": "ltr",
-  "prefer_related_applications": false,
-  "screenshots": [
-    {
-      "src": "dashboard-screenshot.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "platform": "wide",
-      "label": "Property Management Dashboard"
-    },
-    {
-      "src": "mobile-screenshot.png",
-      "sizes": "750x1334",
-      "type": "image/png",
-      "platform": "narrow",
-      "label": "Mobile Property Management"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "Dashboard",
-      "short_name": "Dashboard",
-      "description": "View your property management dashboard",
-      "url": "/dashboard",
-      "icons": [{ "src": "Logo.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "Add Property",
-      "short_name": "Add Property",
-      "description": "Add a new property to manage",
-      "url": "/properties/add",
-      "icons": [{ "src": "Logo.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "Reports",
-      "short_name": "Reports",
-      "description": "View property management reports",
-      "url": "/reports",
-      "icons": [{ "src": "Logo.png", "sizes": "192x192" }]
-    }
-  ]
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
 }
