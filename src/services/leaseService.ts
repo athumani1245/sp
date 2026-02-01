@@ -135,7 +135,7 @@ export const cancelLease = async (leaseId: string) => {
 
 // Renew a lease
 export const renewLease = async ({ leaseId, renewalData }: { leaseId: string; renewalData: any }) => {
-  const response = await api.post(`/leases/${leaseId}/renew/`, renewalData);
+  const response = await api.post(`/leases/renew/`, renewalData);
   return response.data.data;
 };
 

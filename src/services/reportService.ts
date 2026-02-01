@@ -8,10 +8,12 @@ interface LeaseReportData {
   unit: string;
   start_date: string;
   end_date: string;
-  rent_amount_per_unit: string;
-  lease_status: string;
-  duration: number;
+  rent_expected: number;
+  amount_paid: number;
+  amount_to_be_paid: number;
+  overpayment: number;
   remaining_days: number;
+  lease_status: string;
   payment_status: string;
 }
 
@@ -57,25 +59,40 @@ const LEASE_REPORT_COLUMNS: { [key: string]: ColumnConfig } = {
     dataIndex: 'end_date',
     formatter: (date: string) => date ? dayjs(date).format('DD/MM/YYYY') : 'N/A'
   },
-  monthly_rent: { 
-    title: 'Monthly Rent (TSh)', 
-    dataIndex: 'rent_amount_per_unit',
-    formatter: (rent: string) => parseFloat(rent || '0')
+  rent_expected: { 
+    title: 'Rent Expected (TSh)', 
+    dataIndex: 'rent_expected',
+    formatter: (amount: number) => amount || 0
   },
-  status: { 
-    title: 'Status', 
-    dataIndex: 'lease_status',
-    formatter: (status: string) => (status || 'unknown').toUpperCase()
+  amount_paid: { 
+    title: 'Amount Paid (TSh)', 
+    dataIndex: 'amount_paid',
+    formatter: (amount: number) => amount || 0
   },
-  duration: { 
-    title: 'Duration (Days)', 
-    dataIndex: 'duration',
-    formatter: (days: number) => days || 0
+  amount_to_be_paid: { 
+    title: 'Amount Due (TSh)', 
+    dataIndex: 'amount_to_be_paid',
+    formatter: (amount: number) => amount || 0
+  },
+  overpayment: { 
+    title: 'Overpayment (TSh)', 
+    dataIndex: 'overpayment',
+    formatter: (amount: number) => amount || 0
   },
   remaining_days: { 
     title: 'Remaining Days', 
     dataIndex: 'remaining_days',
     formatter: (days: number) => days || 0
+  },
+  lease_status: { 
+    title: 'Lease Status', 
+    dataIndex: 'lease_status',
+    formatter: (status: string) => (status || 'unknown').toUpperCase()
+  },
+  payment_status: { 
+    title: 'Payment Status', 
+    dataIndex: 'payment_status',
+    formatter: (status: string) => status || 'N/A'
   },
 };
 
@@ -165,7 +182,7 @@ export const exportLeaseReportToExcel = (options: ExportOptions): void => {
       for (let col = range.s.c; col <= range.e.c; col++) {
         const cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
         const columnKey = visibleColumnKeys[col];
-        const isMonetary = columnKey === 'monthly_rent';
+        const isMonetary = ['rent_expected', 'amount_paid', 'amount_to_be_paid', 'overpayment'].includes(columnKey);
         
         applyCellStyle(worksheet[cellAddress], false, isMonetary);
       }

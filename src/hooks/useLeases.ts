@@ -152,7 +152,23 @@ export const useRenewLease = () => {
       message.success('Lease renewed successfully!');
     },
     onError: (error: any) => {
-      const errorMsg = error.response?.data?.description || error.response?.data?.message || 'Failed to renew lease';
+      let errorMsg = 'Failed to renew lease';
+      
+      if (error.response?.data?.description) {
+        const desc = error.response.data.description;
+        // Check if description is an object (nested errors)
+        if (typeof desc === 'object') {
+          // Extract first error message from nested object
+          const firstKey = Object.keys(desc)[0];
+          const firstError = desc[firstKey];
+          errorMsg = Array.isArray(firstError) ? firstError[0] : firstError;
+        } else {
+          errorMsg = desc;
+        }
+      } else if (error.response?.data?.message) {
+        errorMsg = error.response.data.message;
+      }
+      
       message.error(errorMsg);
     },
   });

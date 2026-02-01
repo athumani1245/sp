@@ -42,10 +42,12 @@ interface LeaseData {
   unit: string;
   start_date: string;
   end_date: string;
-  rent_amount_per_unit: string;
-  lease_status: string;
-  duration: number;
+  rent_expected: number;
+  amount_paid: number;
+  amount_to_be_paid: number;
+  overpayment: number;
   remaining_days: number;
+  lease_status: string;
   payment_status: string;
 }
 
@@ -53,6 +55,7 @@ const LeaseReport: React.FC = () => {
   const navigate = useNavigate();
   const [filterText, setFilterText] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('');
+  const [paymentStatusFilter, setPaymentStatusFilter] = useState<string>('');
   const [dateRange, setDateRange] = useState<[Dayjs | null, Dayjs | null] | null>(null);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [visibleColumns, setVisibleColumns] = useState({
@@ -62,10 +65,13 @@ const LeaseReport: React.FC = () => {
     unit: true,
     start_date: true,
     end_date: true,
-    monthly_rent: true,
-    status: true,
-    duration: true,
+    rent_expected: true,
+    amount_paid: true,
+    amount_to_be_paid: true,
+    overpayment: true,
     remaining_days: true,
+    lease_status: true,
+    payment_status: true,
   });
 
   const { data: leases = [], isLoading, refetch } = useLeaseReport();
@@ -86,6 +92,9 @@ const LeaseReport: React.FC = () => {
       // Status filter
       const matchesStatus = !statusFilter || item.lease_status?.toLowerCase() === statusFilter.toLowerCase();
 
+      // Payment status filter
+      const matchesPaymentStatus = !paymentStatusFilter || item.payment_status?.toLowerCase() === paymentStatusFilter.toLowerCase();
+
       // Date range filter
       let matchesDateRange = true;
       if (dateRange && dateRange[0] && dateRange[1]) {
@@ -99,20 +108,25 @@ const LeaseReport: React.FC = () => {
         }
       }
 
-      return matchesSearch && matchesStatus && matchesDateRange;
+      return matchesSearch && matchesStatus && matchesPaymentStatus && matchesDateRange;
     });
-  }, [leases, filterText, statusFilter, dateRange]);
+  }, [leases, filterText, statusFilter, paymentStatusFilter, dateRange]);
 
   // Calculate statistics
   const statistics = useMemo(() => {
     const totalLeases = filteredData.length;
     const activeLeases = filteredData.filter((item: LeaseData) => item.lease_status?.toLowerCase() === 'active').length;
-    const totalRent = filteredData.reduce((sum: number, item: LeaseData) => {
-      const rent = parseFloat(item.rent_amount_per_unit) || 0;
-      return sum + rent;
+    const totalRentExpected = filteredData.reduce((sum: number, item: LeaseData) => {
+      return sum + (item.rent_expected || 0);
+    }, 0);
+    const totalAmountPaid = filteredData.reduce((sum: number, item: LeaseData) => {
+      return sum + (item.amount_paid || 0);
+    }, 0);
+    const totalAmountDue = filteredData.reduce((sum: number, item: LeaseData) => {
+      return sum + (item.amount_to_be_paid || 0);
     }, 0);
 
-    return { totalLeases, activeLeases, totalRent };
+    return { totalLeases, activeLeases, totalRentExpected, totalAmountPaid, totalAmountDue };
   }, [filteredData]);
 
   // Quick date range presets
@@ -149,6 +163,7 @@ const LeaseReport: React.FC = () => {
   const resetFilters = () => {
     setFilterText('');
     setStatusFilter('');
+    setPaymentStatusFilter('');
     setDateRange(null);
     message.success('Filters reset');
   };
@@ -234,16 +249,37 @@ const LeaseReport: React.FC = () => {
       render: (date) => date ? dayjs(date).format('DD/MM/YYYY') : 'N/A',
     },
     {
-      title: 'Monthly Rent',
-      dataIndex: 'rent_amount_per_unit',
-      key: 'monthly_rent',
-      sorter: (a, b) => parseFloat(a.rent_amount_per_unit) - parseFloat(b.rent_amount_per_unit),
-      render: (rent) => `TSh ${parseFloat(rent || 0).toLocaleString()}`,
+      title: 'Rent Expected',
+      dataIndex: 'rent_expected',
+      key: 'rent_expected',
+      sorter: (a, b) => (a.rent_expected || 0) - (b.rent_expected || 0),
+      render: (rent) => `TSh ${(rent || 0).toLocaleString()}`,
     },
     {
-      title: 'Status',
+      title: 'Amount Paid',
+      dataIndex: 'amount_paid',
+      key: 'amount_paid',
+      sorter: (a, b) => (a.amount_paid || 0) - (b.amount_paid || 0),
+      render: (amount) => <Text style={{ color: '#52c41a' }}>TSh {(amount || 0).toLocaleString()}</Text>,
+    },
+    {
+      title: 'Amount Due',
+      dataIndex: 'amount_to_be_paid',
+      key: 'amount_to_be_paid',
+      sorter: (a, b) => (a.amount_to_be_paid || 0) - (b.amount_to_be_paid || 0),
+      render: (amount) => <Text style={{ color: amount > 0 ? '#ff4d4f' : '#52c41a' }}>TSh {(amount || 0).toLocaleString()}</Text>,
+    },
+    {
+      title: 'Overpayment',
+      dataIndex: 'overpayment',
+      key: 'overpayment',
+      sorter: (a, b) => (a.overpayment || 0) - (b.overpayment || 0),
+      render: (amount) => amount > 0 ? <Text style={{ color: '#1890ff' }}>TSh {amount.toLocaleString()}</Text> : '-',
+    },
+    {
+      title: 'Lease Status',
       dataIndex: 'lease_status',
-      key: 'status',
+      key: 'lease_status',
       sorter: (a, b) => (a.lease_status || '').localeCompare(b.lease_status || ''),
       render: (status) => {
         const statusLower = (status || 'unknown').toLowerCase();
@@ -253,8 +289,8 @@ const LeaseReport: React.FC = () => {
           case 'active':
             color = 'success';
             break;
-          case 'pending':
-            color = 'warning';
+          case 'draft':
+            color = 'default';
             break;
           case 'expired':
             color = 'error';
@@ -263,7 +299,7 @@ const LeaseReport: React.FC = () => {
             color = 'default';
             break;
           case 'cancelled':
-            color = 'default';
+            color = 'warning';
             break;
         }
         
@@ -271,11 +307,31 @@ const LeaseReport: React.FC = () => {
       },
     },
     {
-      title: 'Duration (Days)',
-      dataIndex: 'duration',
-      key: 'duration',
-      sorter: (a, b) => (a.duration || 0) - (b.duration || 0),
-      render: (days) => `${days || 0} days`,
+      title: 'Payment Status',
+      dataIndex: 'payment_status',
+      key: 'payment_status',
+      sorter: (a, b) => (a.payment_status || '').localeCompare(b.payment_status || ''),
+      render: (status) => {
+        let color = 'default';
+        const statusLower = (status || '').toLowerCase();
+        
+        switch (statusLower) {
+          case 'paid':
+            color = 'success';
+            break;
+          case 'partial':
+            color = 'warning';
+            break;
+          case 'unpaid':
+            color = 'error';
+            break;
+          case 'overpaid':
+            color = 'processing';
+            break;
+        }
+        
+        return <Tag color={color}>{status || 'N/A'}</Tag>;
+      },
     },
     {
       title: 'Remaining Days',
@@ -341,7 +397,7 @@ const LeaseReport: React.FC = () => {
 
       {/* Statistics Cards */}
       <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-        <Col xs={24} sm={8}>
+        <Col xs={24} sm={6}>
           <Card>
             <Statistic
               title="Total Leases"
@@ -350,7 +406,7 @@ const LeaseReport: React.FC = () => {
             />
           </Card>
         </Col>
-        <Col xs={24} sm={8}>
+        <Col xs={24} sm={6}>
           <Card>
             <Statistic
               title="Active Leases"
@@ -360,13 +416,49 @@ const LeaseReport: React.FC = () => {
             />
           </Card>
         </Col>
-        <Col xs={24} sm={8}>
+        <Col xs={24} sm={6}>
           <Card>
             <Statistic
-              title="Total Monthly Rent"
-              value={statistics.totalRent}
+              title="Expected Rent"
+              value={statistics.totalRentExpected}
               prefix="TSh"
               precision={0}
+            />
+          </Card>
+        </Col>
+        <Col xs={24} sm={6}>
+          <Card>
+            <Statistic
+              title="Total Paid"
+              value={statistics.totalAmountPaid}
+              prefix="TSh"
+              precision={0}
+              valueStyle={{ color: '#52c41a' }}
+            />
+          </Card>
+        </Col>
+      </Row>
+
+      <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+        <Col xs={24} sm={12}>
+          <Card>
+            <Statistic
+              title="Total Amount Due"
+              value={statistics.totalAmountDue}
+              prefix="TSh"
+              precision={0}
+              valueStyle={{ color: statistics.totalAmountDue > 0 ? '#ff4d4f' : '#52c41a' }}
+            />
+          </Card>
+        </Col>
+        <Col xs={24} sm={12}>
+          <Card>
+            <Statistic
+              title="Collection Rate"
+              value={statistics.totalRentExpected > 0 ? (statistics.totalAmountPaid / statistics.totalRentExpected * 100) : 0}
+              precision={1}
+              suffix="%"
+              valueStyle={{ color: '#1890ff' }}
             />
           </Card>
         </Col>
@@ -443,7 +535,7 @@ const LeaseReport: React.FC = () => {
 
           {/* Filters */}
           <Row gutter={[16, 16]}>
-            <Col xs={24} sm={12} md={6}>
+            <Col xs={24} sm={12} md={5}>
               <RangePicker
                 style={{ width: '100%' }}
                 value={dateRange}
@@ -451,21 +543,40 @@ const LeaseReport: React.FC = () => {
                 format="DD/MM/YYYY"
               />
             </Col>
-            <Col xs={24} sm={12} md={6}>
+            <Col xs={24} sm={12} md={4}>
               <Select
                 style={{ width: '100%' }}
-                placeholder="Filter by Status"
+                placeholder="Lease Status"
                 value={statusFilter}
                 onChange={setStatusFilter}
                 allowClear
                 options={[
                   { label: 'All Statuses', value: '' },
                   { label: 'Active', value: 'active' },
+                  { label: 'Draft', value: 'draft' },
                   { label: 'Expired', value: 'expired' },
+                  { label: 'Cancelled', value: 'cancelled' },
+                  { label: 'Terminated', value: 'terminated' },
                 ]}
               />
             </Col>
-            <Col xs={24} sm={12} md={8}>
+            <Col xs={24} sm={12} md={4}>
+              <Select
+                style={{ width: '100%' }}
+                placeholder="Payment Status"
+                value={paymentStatusFilter}
+                onChange={setPaymentStatusFilter}
+                allowClear
+                options={[
+                  { label: 'All', value: '' },
+                  { label: 'Paid', value: 'paid' },
+                  { label: 'Partial', value: 'partial' },
+                  { label: 'Unpaid', value: 'unpaid' },
+                  { label: 'Overpaid', value: 'overpaid' },
+                ]}
+              />
+            </Col>
+            <Col xs={24} sm={12} md={7}>
               <Input
                 placeholder="Search leases..."
                 prefix={<SearchOutlined />}
@@ -486,11 +597,12 @@ const LeaseReport: React.FC = () => {
           </Row>
 
           {/* Active Filters Display */}
-          {(filterText || statusFilter || dateRange) && (
+          {(filterText || statusFilter || paymentStatusFilter || dateRange) && (
             <Space wrap>
               <Text type="secondary">Active Filters:</Text>
               {filterText && <Tag closable onClose={() => setFilterText('')}>Search: {filterText}</Tag>}
-              {statusFilter && <Tag closable onClose={() => setStatusFilter('')}>Status: {statusFilter}</Tag>}
+              {statusFilter && <Tag closable onClose={() => setStatusFilter('')}>Lease Status: {statusFilter}</Tag>}
+              {paymentStatusFilter && <Tag closable onClose={() => setPaymentStatusFilter('')}>Payment Status: {paymentStatusFilter}</Tag>}
               {dateRange && (
                 <Tag closable onClose={() => setDateRange(null)}>
                   Date: {dateRange[0]?.format('DD/MM/YYYY')} - {dateRange[1]?.format('DD/MM/YYYY')}

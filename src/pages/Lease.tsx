@@ -34,6 +34,7 @@ import {
 } from '@ant-design/icons';
 import { useLease, useCancelPayment, useCancelLease } from '../hooks/useLeases';
 import AddPaymentModal from '../components/forms/AddPaymentModal';
+import RenewLeaseModal from '../components/forms/RenewLeaseModal';
 
 const { Title, Text } = Typography;
 
@@ -696,6 +697,16 @@ const Lease: React.FC = () => {
         onPaymentAdded={() => {
           // Payments will auto-refresh via TanStack Query
         }}
+      />
+
+      {/* Renew Lease Modal */}
+      <RenewLeaseModal
+        visible={showRenewModal}
+        onCancel={() => setShowRenewModal(false)}
+        onSuccess={() => {
+          refetch();
+        }}
+        lease={lease}
       />
     </div>
   );
