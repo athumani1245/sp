@@ -102,7 +102,6 @@ const Landing: React.FC = () => {
             </div>
             <nav className="nav-links">
               <a href="#features">Features</a>
-              <a href="#pricing">Pricing</a>
               <a href="#about">About</a>
               <a href="#testimonials">Testimonials</a>
               <a href="#contact">Contact</a>
@@ -209,146 +208,6 @@ const Landing: React.FC = () => {
                 </Col>
               ))}
             </Row>
-          </div>
-        </section>
-
-        {/* Pricing Section */}
-        <section id="pricing" className="pricing-section">
-          <div className="container">
-            <div className="section-header">
-              <Title level={2}>Choose Your Plan</Title>
-              <Paragraph>
-                Select the perfect plan for your property management needs. Start with our free
-                trial and upgrade as you grow.
-              </Paragraph>
-            </div>
-            <Row gutter={[24, 24]} justify="center">
-              {/* Starter Plan */}
-              <Col xs={24} md={12} lg={8}>
-                <Card className="pricing-card">
-                  <Title level={4}>Starter</Title>
-                  <Paragraph type="secondary">For individual landlords</Paragraph>
-                  <div className="pricing-price">
-                    <Text className="currency">TZS</Text>
-                    <Title level={2} style={{ margin: 0 }}>
-                      15,000
-                    </Title>
-                    <Text type="secondary">/month</Text>
-                  </div>
-                  <Space direction="vertical" style={{ width: '100%' }} size="small">
-                    <div>
-                      <CheckCircleOutlined style={{ color: '#52c41a', marginRight: 8 }} />
-                      Up to 5 properties
-                    </div>
-                    <div>
-                      <CheckCircleOutlined style={{ color: '#52c41a', marginRight: 8 }} />
-                      Tenant & payment tracking
-                    </div>
-                    <div>
-                      <CheckCircleOutlined style={{ color: '#52c41a', marginRight: 8 }} />
-                      Monthly reports
-                    </div>
-                  </Space>
-                  <Button
-                    block
-                    size="large"
-                    style={{ marginTop: 24 }}
-                    onClick={() => navigate('/register')}
-                  >
-                    Start Free Trial
-                  </Button>
-                </Card>
-              </Col>
-
-              {/* Professional Plan */}
-              <Col xs={24} md={12} lg={8}>
-                <Badge.Ribbon text="Most Popular" color="#CC5B4B">
-                  <Card className="pricing-card featured">
-                    <Title level={4}>Professional</Title>
-                    <Paragraph type="secondary">For growing portfolios</Paragraph>
-                    <div className="pricing-price">
-                      <Text className="currency">TZS</Text>
-                      <Title level={2} style={{ margin: 0 }}>
-                        35,000
-                      </Title>
-                      <Text type="secondary">/month</Text>
-                    </div>
-                    <Space direction="vertical" style={{ width: '100%' }} size="small">
-                      <div>
-                        <CheckCircleOutlined style={{ color: '#52c41a', marginRight: 8 }} />
-                        Up to 25 properties
-                      </div>
-                      <div>
-                        <CheckCircleOutlined style={{ color: '#52c41a', marginRight: 8 }} />
-                        Advanced management & analytics
-                      </div>
-                      <div>
-                        <CheckCircleOutlined style={{ color: '#52c41a', marginRight: 8 }} />
-                        Automated reminders
-                      </div>
-                      <div>
-                        <CheckCircleOutlined style={{ color: '#52c41a', marginRight: 8 }} />
-                        Priority support
-                      </div>
-                    </Space>
-                    <Button
-                      type="primary"
-                      block
-                      size="large"
-                      style={{ marginTop: 24 }}
-                      onClick={() => navigate('/register')}
-                    >
-                      Get Started
-                    </Button>
-                  </Card>
-                </Badge.Ribbon>
-              </Col>
-
-              {/* Enterprise Plan */}
-              <Col xs={24} md={12} lg={8}>
-                <Card className="pricing-card">
-                  <Title level={4}>Enterprise</Title>
-                  <Paragraph type="secondary">For large managers</Paragraph>
-                  <div className="pricing-price">
-                    <Text className="currency">TZS</Text>
-                    <Title level={2} style={{ margin: 0 }}>
-                      75,000
-                    </Title>
-                    <Text type="secondary">/month</Text>
-                  </div>
-                  <Space direction="vertical" style={{ width: '100%' }} size="small">
-                    <div>
-                      <CheckCircleOutlined style={{ color: '#52c41a', marginRight: 8 }} />
-                      Unlimited properties
-                    </div>
-                    <div>
-                      <CheckCircleOutlined style={{ color: '#52c41a', marginRight: 8 }} />
-                      Multi-user & custom integrations
-                    </div>
-                    <div>
-                      <CheckCircleOutlined style={{ color: '#52c41a', marginRight: 8 }} />
-                      White-label options
-                    </div>
-                    <div>
-                      <CheckCircleOutlined style={{ color: '#52c41a', marginRight: 8 }} />
-                      24/7 phone support
-                    </div>
-                  </Space>
-                  <Button
-                    block
-                    size="large"
-                    style={{ marginTop: 24 }}
-                    onClick={() => navigate('/register')}
-                  >
-                    Contact Sales
-                  </Button>
-                </Card>
-              </Col>
-            </Row>
-            <div className="pricing-note">
-              <SafetyOutlined style={{ color: '#CC5B4B', marginRight: 8 }} />
-              14-day free trial • No credit card required
-            </div>
           </div>
         </section>
 
@@ -468,7 +327,7 @@ const Landing: React.FC = () => {
                 <img src="/Logo.png" alt="Tanaka" width="40" height="40" />
                 <span className="brand-name">Tanaka</span>
               </div>
-              <Paragraph>Streamlining property management across Tanzania.</Paragraph>
+              <Paragraph style={{ color: 'white' }}>Streamlining property management across Tanzania.</Paragraph>
             </Col>
             <Col xs={24} md={8}>
               <Title level={5}>Contact</Title>
@@ -489,7 +348,6 @@ const Landing: React.FC = () => {
                 <Col span={12}>
                   <Space direction="vertical">
                     <a href="#features">Features</a>
-                    <a href="#pricing">Pricing</a>
                   </Space>
                 </Col>
                 <Col span={12}>
@@ -502,7 +360,7 @@ const Landing: React.FC = () => {
             </Col>
           </Row>
           <div className="footer-bottom">
-            <Text>© {new Date().getFullYear()} Tanaka. All rights reserved.</Text>
+            <Text style={{ color: 'white' }}  >© {new Date().getFullYear()} Tanaka. All rights reserved.</Text>
             <Space size="large" className="footer-social">
               <a
                 href="https://www.linkedin.com/company/tanakas"
