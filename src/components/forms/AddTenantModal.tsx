@@ -24,6 +24,7 @@ import {
   PlusOutlined,
   DeleteOutlined,
 } from '@ant-design/icons';
+import { useCreateTenant } from '../../hooks/useTenants';
 
 const { Text, Title } = Typography;
 
@@ -45,10 +46,10 @@ const AddTenantModal: React.FC<AddTenantModalProps> = ({
   onTenantAdded,
 }) => {
   const [form] = Form.useForm();
-  const [submitLoading, setSubmitLoading] = useState(false);
   const [error, setError] = useState('');
   const [messageApi, contextHolder] = message.useMessage();
   const [emergencyContacts, setEmergencyContacts] = useState<EmergencyContact[]>([]);
+  const createTenantMutation = useCreateTenant();
 
   useEffect(() => {
     if (isOpen) {
@@ -59,7 +60,6 @@ const AddTenantModal: React.FC<AddTenantModalProps> = ({
   }, [isOpen, form]);
 
   const handleSubmit = async (values: any) => {
-    setSubmitLoading(true);
     setError('');
 
     try {
@@ -74,22 +74,15 @@ const AddTenantModal: React.FC<AddTenantModalProps> = ({
         role: 'Tenant',
       };
 
-      // Simulate API call
-      setTimeout(() => {
-        messageApi.success('Tenant created successfully!');
-
-        if (onTenantAdded) {
-          onTenantAdded({ id: Date.now().toString(), ...tenantData });
-        }
-
-        setTimeout(() => {
-          onClose();
-          setSubmitLoading(false);
-        }, 1000);
-      }, 500);
+      await createTenantMutation.mutateAsync(tenantData);
+      
+      if (onTenantAdded) {
+        onTenantAdded();
+      }
+      
+      onClose();
     } catch (error: any) {
-      setError(error.message || 'Failed to create tenant. Please try again.');
-      setSubmitLoading(false);
+      setError(error.response?.data?.description || error.response?.data?.message || 'Failed to create tenant. Please try again.');
     }
   };
 
@@ -309,7 +302,7 @@ const AddTenantModal: React.FC<AddTenantModalProps> = ({
               <Button
                 icon={<CloseOutlined />}
                 onClick={onClose}
-                disabled={submitLoading}
+                disabled={createTenantMutation.isPending}
                 size="large"
               >
                 Cancel
@@ -318,10 +311,10 @@ const AddTenantModal: React.FC<AddTenantModalProps> = ({
                 type="primary"
                 htmlType="submit"
                 icon={<SaveOutlined />}
-                loading={submitLoading}
+                loading={createTenantMutation.isPending}
                 size="large"
               >
-                {submitLoading ? 'Creating Tenant...' : 'Create Tenant'}
+                {createTenantMutation.isPending ? 'Creating Tenant...' : 'Create Tenant'}
               </Button>
             </Space>
           </Form.Item>
