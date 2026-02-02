@@ -53,8 +53,8 @@ const MainLayout: React.FC = () => {
             placement="left"
             onClose={() => setMobileDrawerVisible(false)}
             open={mobileDrawerVisible}
-            bodyStyle={{ padding: 0 }}
-            width={250}
+            styles={{ body: { padding: 0 } }}
+            size={250}
           >
             <AppSidebar collapsed={false} isMobile={true} />
           </Drawer>

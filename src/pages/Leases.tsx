@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Table,
@@ -15,7 +15,9 @@ import {
   Select,
   Tooltip,
   Skeleton,
+  Tour,
 } from 'antd';
+import type { TourProps } from 'antd';
 import {
   PlusOutlined,
   SearchOutlined,
@@ -32,6 +34,7 @@ import {
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import AddLeaseModal from '../components/forms/AddLeaseModal';
 import { useLeases, useDeleteLease } from '../hooks/useLeases';
+import { useTour } from '../hooks/useTour';
 import dayjs from 'dayjs';
 
 const { Search } = Input;
@@ -62,6 +65,8 @@ interface Lease {
 
 const Leases: React.FC = () => {
   const navigate = useNavigate();
+  const { open: tourOpen, setOpen: setTourOpen, markTourCompleted } = useTour('leases');
+
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [page, setPage] = useState(1);
@@ -69,6 +74,34 @@ const Leases: React.FC = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [selectedLease, setSelectedLease] = useState<Lease | null>(null);
+
+  // Tour refs
+  const addButtonRef = useRef(null);
+  const filtersRef = useRef(null);
+  const tableRef = useRef(null);
+
+  // Tour steps configuration
+  const tourSteps: TourProps['steps'] = [
+    {
+      title: 'Welcome to Leases Management',
+      description: 'Track and manage all your property leases here. Let\'s walk through the main features!',
+    },
+    {
+      title: 'Add New Lease',
+      description: 'Click here to create a new lease agreement. You can assign properties, tenants, and set payment terms.',
+      target: () => addButtonRef.current,
+    },
+    {
+      title: 'Filter Options',
+      description: 'Use search and status filters to quickly find specific leases. Filter by active, expired, or other statuses.',
+      target: () => filtersRef.current,
+    },
+    {
+      title: 'Leases List',
+      description: 'View all lease details including rent amounts, payment status, and lease periods. Click any row for more details.',
+      target: () => tableRef.current,
+    },
+  ];
 
   // Fetch leases with TanStack Query
   const { data, isLoading, refetch } = useLeases({
@@ -169,7 +202,7 @@ const Leases: React.FC = () => {
       title: 'Property',
       key: 'property',
       render: (_, record) => (
-        <Space direction="vertical" size={0}>
+        <Space vertical size={0}>
           <Text>{record.property?.property_name || 'N/A'}</Text>
           <Text type="secondary" style={{ fontSize: '12px' }}>
             {getUnitInfo(record)}
@@ -193,7 +226,7 @@ const Leases: React.FC = () => {
       title: 'Period',
       key: 'period',
       render: (_, record) => (
-        <Space direction="vertical" size={0}>
+        <Space vertical size={0}>
           <Text style={{ fontSize: '12px' }}>
             <CalendarOutlined /> {formatDate(record.start_date)}
           </Text>
@@ -252,7 +285,7 @@ const Leases: React.FC = () => {
 
   return (
     <div style={{ padding: '24px' }}>
-      <Space direction="vertical" size="large" style={{ width: '100%' }}>
+      <Space vertical size="large" style={{ width: '100%' }}>
         {/* Header */}
         <Row justify="space-between" align="middle">
           <Col xs={24} sm={12}>
@@ -261,15 +294,17 @@ const Leases: React.FC = () => {
             </Title>
           </Col>
           <Col xs={24} sm={12} style={{ textAlign: 'right', marginTop: window.innerWidth < 576 ? 16 : 0 }}>
-            <Button type="primary" icon={<PlusOutlined />} onClick={() => setShowAddModal(true)}>
-              Add Lease
-            </Button>
+            <div ref={addButtonRef}>
+              <Button type="primary" icon={<PlusOutlined />} onClick={() => setShowAddModal(true)}>
+                Add Lease
+              </Button>
+            </div>
           </Col>
         </Row>
 
 
         {/* Filters */}
-        <Card>
+        <Card ref={filtersRef}>
           <Row gutter={[16, 16]} align="middle">
             <Col xs={24} sm={24} md={12} lg={10}>
               <Search
@@ -304,7 +339,7 @@ const Leases: React.FC = () => {
         </Card>
 
         {/* Leases Table */}
-        <Card>
+        <Card ref={tableRef}>
           {isLoading ? (
             <div>
               <Skeleton active paragraph={{ rows: 2 }} style={{ marginBottom: 16 }} />
@@ -359,6 +394,14 @@ const Leases: React.FC = () => {
           This action cannot be undone.
         </p>
       </Modal>
+
+      {/* Tour */}
+      <Tour
+        open={tourOpen}
+        onClose={() => setTourOpen(false)}
+        onFinish={markTourCompleted}
+        steps={tourSteps}
+      />
     </div>
   );
 };

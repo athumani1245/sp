@@ -6,8 +6,9 @@ import {
   UserOutlined,
   LogoutOutlined,
   QuestionCircleOutlined,
+  CompassOutlined,
 } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import type { MenuProps } from 'antd';
 import { useAuth } from '../../context/AuthContext';
 import { logout } from '../../services/authService';
@@ -22,6 +23,7 @@ interface AppHeaderProps {
 
 const AppHeader: React.FC<AppHeaderProps> = ({ collapsed, setCollapsed }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { setIsAuthenticated, setSubscription } = useAuth();
 
   const handleLogout = async () => {
@@ -37,6 +39,53 @@ const AppHeader: React.FC<AppHeaderProps> = ({ collapsed, setCollapsed }) => {
       navigate('/login');
     }
   };
+
+  const handleRestartTour = () => {
+    // Get current page tour key
+    const pathToTourKey: { [key: string]: string } = {
+      '/dashboard': 'dashboard',
+      '/properties': 'properties',
+      '/tenants': 'tenants',
+      '/leases': 'leases',
+    };
+
+    const tourKey = pathToTourKey[location.pathname];
+    
+    if (tourKey) {
+      // Reset the specific tour
+      const STORAGE_KEY = 'tanaka_tours_completed';
+      const stored = localStorage.getItem(STORAGE_KEY);
+      const completedTours = stored ? JSON.parse(stored) : {};
+      delete completedTours[tourKey];
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(completedTours));
+      
+      message.success('Tour restarted! Refresh the page to see it.');
+      // Refresh the page to trigger the tour
+      window.location.reload();
+    } else {
+      message.info('No tour available for this page. Visit Dashboard, Properties, Tenants, or Leases to see tours.');
+    }
+  };
+
+  const handleResetAllTours = () => {
+    localStorage.removeItem('tanaka_tours_completed');
+    message.success('All tours have been reset!');
+  };
+
+  const helpMenuItems: MenuProps['items'] = [
+    {
+      key: 'restart-tour',
+      label: 'Restart Page Tour',
+      icon: <CompassOutlined />,
+      onClick: handleRestartTour,
+    },
+    {
+      key: 'reset-all-tours',
+      label: 'Reset All Tours',
+      icon: <QuestionCircleOutlined />,
+      onClick: handleResetAllTours,
+    },
+  ];
 
   const menuItems: MenuProps['items'] = [
     {
@@ -71,12 +120,14 @@ const AppHeader: React.FC<AppHeaderProps> = ({ collapsed, setCollapsed }) => {
 
       <div className="header-right">
         <Space size="middle">
-          <Button
-            type="text"
-            icon={<QuestionCircleOutlined />}
-            className="help-btn"
-            title="Help"
-          />
+          <Dropdown menu={{ items: helpMenuItems }} placement="bottomRight" trigger={['click']}>
+            <Button
+              type="text"
+              icon={<QuestionCircleOutlined />}
+              className="help-btn"
+              title="Help & Tours"
+            />
+          </Dropdown>
           <Dropdown menu={{ items: menuItems }} placement="bottomRight" trigger={['click']}>
             <Avatar
               size="large"

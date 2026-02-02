@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Card,
@@ -13,7 +13,9 @@ import {
   Skeleton,
   Row,
   Col,
+  Tour,
 } from 'antd';
+import type { TourProps } from 'antd';
 import {
   PlusOutlined,
   SearchOutlined,
@@ -28,6 +30,7 @@ import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import AddPropertyModal from '../components/forms/AddPropertyModal';
 import { useProperties, useDeleteProperty } from '../hooks/useProperties';
 import { useQueryClient } from '@tanstack/react-query';
+import { useTour } from '../hooks/useTour';
 
 const { Title, Text } = Typography;
 const { Search } = Input;
@@ -58,10 +61,39 @@ const Properties: React.FC = () => {
   const navigate = useNavigate();
   const [messageApi, contextHolder] = message.useMessage();
   const queryClient = useQueryClient();
+  const { open: tourOpen, setOpen: setTourOpen, markTourCompleted } = useTour('properties');
 
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [showModal, setShowModal] = useState(false);
+  
+  // Tour refs
+  const addButtonRef = useRef(null);
+  const searchRef = useRef(null);
+  const tableRef = useRef(null);
+
+  // Tour steps configuration
+  const tourSteps: TourProps['steps'] = [
+    {
+      title: 'Welcome to Properties Management',
+      description: 'This is where you can manage all your properties. Let\'s take a quick tour to show you around!',
+    },
+    {
+      title: 'Add New Property',
+      description: 'Click here to add a new property to your portfolio. You can add apartments, houses, commercial buildings, or land.',
+      target: () => addButtonRef.current,
+    },
+    {
+      title: 'Search Properties',
+      description: 'Use this search bar to quickly find properties by name or location. Results update as you type.',
+      target: () => searchRef.current,
+    },
+    {
+      title: 'Properties Table',
+      description: 'View all your properties here with details like type, location, and number of units. Click on any row to view more details.',
+      target: () => tableRef.current,
+    },
+  ];
 
   // Use TanStack Query hook
   const { data, isLoading, error, refetch } = useProperties({
@@ -150,7 +182,7 @@ const Properties: React.FC = () => {
       title: 'Location',
       key: 'location',
       render: (_, record) => (
-        <Space direction="vertical" size={0}>
+        <Space vertical size={0}>
           <Space>
             <EnvironmentOutlined />
             <Text>{record.address?.region_name || 'N/A'}</Text>
@@ -202,7 +234,7 @@ const Properties: React.FC = () => {
 
       {/* Header Section */}
       <div style={{ marginBottom: '24px' }}>
-        <Space direction="vertical" size="small" style={{ width: '100%' }}>
+        <Space vertical size="small" style={{ width: '100%' }}>
           <Row justify="space-between" align="middle" gutter={[16, 16]}>
             <Col xs={24} sm={12}>
               <Title level={2} style={{ margin: 0 }}>
@@ -221,14 +253,16 @@ const Properties: React.FC = () => {
                     Refresh
                   </Button>
                 </Tooltip>
-                <Button
-                  type="primary"
-                  icon={<PlusOutlined />}
-                  onClick={() => setShowModal(true)}
-                  size="large"
-                >
-                  Add New Property
-                </Button>
+                <div ref={addButtonRef}>
+                  <Button
+                    type="primary"
+                    icon={<PlusOutlined />}
+                    onClick={() => setShowModal(true)}
+                    size="large"
+                  >
+                    Add New Property
+                  </Button>
+                </div>
               </Space>
             </Col>
           </Row>
@@ -237,7 +271,7 @@ const Properties: React.FC = () => {
       </div>
 
       {/* Search Section */}
-      <Card style={{ marginBottom: '16px' }}>
+      <Card style={{ marginBottom: '16px' }} ref={searchRef}>
         <Search
           placeholder="Search by property name, location..."
           allowClear
@@ -249,7 +283,7 @@ const Properties: React.FC = () => {
       </Card>
 
       {/* Properties Table */}
-      <Card>
+      <Card ref={tableRef}>
         {isLoading ? (
           <div>
             <Skeleton active paragraph={{ rows: 2 }} style={{ marginBottom: 16 }} />
@@ -282,6 +316,14 @@ const Properties: React.FC = () => {
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         onPropertyAdded={handlePropertyAdded}
+      />
+
+      {/* Tour */}
+      <Tour
+        open={tourOpen}
+        onClose={() => setTourOpen(false)}
+        onFinish={markTourCompleted}
+        steps={tourSteps}
       />
     </div>
   );

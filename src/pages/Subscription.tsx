@@ -407,7 +407,7 @@ const Subscription: React.FC = () => {
               style={{ height: '100%' }}
             >
               {subscription ? (
-                <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                <Space vertical size="middle" style={{ width: '100%' }}>
                   <div>
                     <Title level={3} style={{ margin: 0, color: '#CC5B4B' }}>
                       {subscription.package_name || 'N/A'}
@@ -507,7 +507,7 @@ const Subscription: React.FC = () => {
                     }}
                     onClick={() => hasPlans && handleSelectPackage(pkg.id)}
                   >
-                    <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                    <Space vertical size="middle" style={{ width: '100%' }}>
                       <div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <Title level={4} style={{ margin: 0 }}>
@@ -523,7 +523,7 @@ const Subscription: React.FC = () => {
                       </div>
 
                       {/* Package Features */}
-                      <Space direction="vertical" size="small" style={{ width: '100%' }}>
+                      <Space vertical size="small" style={{ width: '100%' }}>
                         {pkg.max_units && (
                           <Text>
                             <HomeOutlined style={{ color: '#1890ff', marginRight: '8px' }} />
@@ -542,7 +542,7 @@ const Subscription: React.FC = () => {
                       {selectedPlan && (
                         <Alert
                           message={
-                            <Space direction="vertical" size={0}>
+                            <Space vertical size={0}>
                               <Text strong>Selected: {selectedPlan.name}</Text>
                               {selectedPlan.full_price && selectedPlan.discount_amount && selectedPlan.discount_amount > 0 ? (
                                 <>
@@ -575,7 +575,7 @@ const Subscription: React.FC = () => {
                       {isExpanded && hasPlans && (
                         <>
                           <Divider style={{ margin: '8px 0' }}>Available Plans</Divider>
-                          <Space direction="vertical" size="small" style={{ width: '100%' }}>
+                          <Space vertical size="small" style={{ width: '100%' }}>
                             {pkg.plans.map((plan) => (
                               <Card
                                 key={plan.id}
@@ -590,7 +590,7 @@ const Subscription: React.FC = () => {
                                   handleSelectPlan(pkg.id, plan);
                                 }}
                               >
-                                <Space direction="vertical" size={0} style={{ width: '100%' }}>
+                                <Space vertical size={0} style={{ width: '100%' }}>
                                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <Text strong>{plan.name}</Text>
                                     {plan.discount_amount && plan.discount_amount > 0 && (
@@ -624,7 +624,7 @@ const Subscription: React.FC = () => {
                       )}
 
                       {/* Action Buttons */}
-                      <Space direction="vertical" size="small" style={{ width: '100%' }}>
+                      <Space vertical size="small" style={{ width: '100%' }}>
                         {!selectedPlan && hasPlans && (
                           <Button
                             type="primary"
@@ -844,7 +844,7 @@ const Subscription: React.FC = () => {
 
               <div style={{ textAlign: 'left', marginBottom: '16px' }}>
                 <Title level={5}>Follow these steps:</Title>
-                <Space direction="vertical" style={{ width: '100%' }}>
+                <Space vertical style={{ width: '100%' }}>
                   <div>
                     <Text strong>1.</Text> Check your phone for a USSD prompt
                   </div>

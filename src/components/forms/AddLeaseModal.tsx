@@ -111,17 +111,6 @@ const AddLeaseModal: React.FC<AddLeaseModalProps> = ({ visible, onCancel, onSucc
   const tenants = tenantsData || [];
   const availableUnits = unitsData?.items || [];
 
-  // Debug logging
-  useEffect(() => {
-    console.log('Properties data:', propertiesData);
-    console.log('Properties count:', properties.length);
-    console.log('Tenants data:', tenantsData);
-    console.log('Tenants count:', tenants.length);
-    console.log('Selected property ID:', selectedPropertyId);
-    console.log('Units data:', unitsData);
-    console.log('Units count:', availableUnits.length);
-  }, [propertiesData, properties, tenantsData, tenants, selectedPropertyId, unitsData, availableUnits]);
-
   const [formData, setFormData] = useState<FormData>({
     property_id: '',
     unit_id: '',

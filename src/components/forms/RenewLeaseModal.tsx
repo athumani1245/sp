@@ -429,12 +429,14 @@ const RenewLeaseModal: React.FC<RenewLeaseModalProps> = ({
           </Col>
 
           <Col xs={24} sm={12}>
-            <Form.Item label="Total Amount (Auto-calculated)">
-              <Input
-                value={`TSh ${calculateTotalAmount().toLocaleString()}`}
-                disabled
-                style={{ fontWeight: 'bold' }}
-              />
+            <Form.Item label="Total Amount (Auto-calculated)" shouldUpdate>
+              {() => (
+                <Input
+                  value={`TSh ${calculateTotalAmount().toLocaleString()}`}
+                  disabled
+                  style={{ fontWeight: 'bold' }}
+                />
+              )}
             </Form.Item>
           </Col>
         </Row>

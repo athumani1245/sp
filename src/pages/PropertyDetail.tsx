@@ -147,14 +147,12 @@ const PropertyDetail: React.FC = () => {
   const handleSave = async () => {
     try {
       const values = await form.validateFields();
-      console.log('Form values before save:', values);
       await updatePropertyMutation.mutateAsync({
         propertyId: id!,
         propertyData: values,
       });
       setIsEditMode(false);
     } catch (error) {
-      console.error('Save error:', error);
       // Error already handled by mutation or validation
     }
   };

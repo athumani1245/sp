@@ -363,7 +363,7 @@ const LeaseReport: React.FC = () => {
   // Column selector
   const columnSelector = (
     <div style={{ padding: '8px' }}>
-      <Space direction="vertical" style={{ width: '100%' }}>
+      <Space vertical style={{ width: '100%' }}>
         <div>
           <Button size="small" onClick={() => setVisibleColumns(Object.keys(visibleColumns).reduce((acc, key) => ({ ...acc, [key]: true }), {} as any))} style={{ marginRight: 8 }}>
             Select All
@@ -466,7 +466,7 @@ const LeaseReport: React.FC = () => {
 
       {/* Filters and Actions */}
       <Card style={{ marginBottom: 16 }}>
-        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+        <Space vertical size="middle" style={{ width: '100%' }}>
           {/* Export and Refresh Buttons */}
           <Row gutter={[8, 8]}>
             <Col>

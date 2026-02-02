@@ -158,7 +158,7 @@ const Landing: React.FC = () => {
               <Col xs={24} lg={12}>
                 <Card className="hero-card">
                   <Title level={5}>Property Dashboard</Title>
-                  <Space direction="vertical" style={{ width: '100%' }} size="middle">
+                  <Space vertical style={{ width: '100%' }} size="middle">
                     <div className="metric">
                       <Text type="secondary">Total Properties</Text>
                       <Title level={3} style={{ margin: 0 }}>
@@ -221,7 +221,7 @@ const Landing: React.FC = () => {
                   We understand the challenges of property management in Tanzania. That's why
                   we've built a platform specifically designed for local needs.
                 </Paragraph>
-                <Space direction="vertical" size="middle">
+                <Space vertical size="middle">
                   <div className="about-feature">
                     <CheckCircleOutlined style={{ color: '#52c41a', fontSize: 20 }} />
                     <Text>Local currency and payment methods</Text>
@@ -243,7 +243,7 @@ const Landing: React.FC = () => {
               <Col xs={24} lg={12}>
                 <Card className="about-card">
                   <Title level={5}>Recent Activity</Title>
-                  <Space direction="vertical" style={{ width: '100%' }}>
+                  <Space vertical style={{ width: '100%' }}>
                     <div className="activity-item">
                       <UserAddOutlined style={{ color: '#1890ff' }} />
                       <Text>New tenant registered: John Mwamba</Text>
@@ -331,7 +331,7 @@ const Landing: React.FC = () => {
             </Col>
             <Col xs={24} md={8}>
               <Title level={5}>Contact</Title>
-              <Space direction="vertical">
+              <Space vertical>
                 <div>
                   <MailOutlined style={{ marginRight: 8 }} />
                   <a href="mailto:info@tanaka.co.tz">info@tanaka.co.tz</a>
@@ -346,12 +346,12 @@ const Landing: React.FC = () => {
               <Title level={5}>Quick Links</Title>
               <Row gutter={[16, 8]}>
                 <Col span={12}>
-                  <Space direction="vertical">
+                  <Space vertical>
                     <a href="#features">Features</a>
                   </Space>
                 </Col>
                 <Col span={12}>
-                  <Space direction="vertical">
+                  <Space vertical>
                     <a href="/privacy-policy">Privacy</a>
                     <a href="#contact">Support</a>
                   </Space>

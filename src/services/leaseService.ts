@@ -108,9 +108,7 @@ export const getLeaseById = async (leaseId: string) => {
 
 // Create a new lease
 export const createLease = async (leaseData: LeaseData) => {
-  console.log('Original lease data:', leaseData);
   const formattedData = formatLeaseData(leaseData);
-  console.log('Formatted lease data:', formattedData);
   const response = await api.post(`/v1/leases/create`, formattedData);
   return response.data.data;
 };

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Table,
@@ -13,7 +13,9 @@ import {
   Skeleton,
   Row,
   Col,
+  Tour,
 } from 'antd';
+import type { TourProps } from 'antd';
 import {
   PlusOutlined,
   SearchOutlined,
@@ -28,6 +30,7 @@ import {
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import AddTenantModal from '../components/forms/AddTenantModal';
 import { useTenants, useDeleteTenant } from '../hooks/useTenants';
+import { useTour } from '../hooks/useTour';
 
 const { Search } = Input;
 const { Title, Text } = Typography;
@@ -46,10 +49,39 @@ interface Tenant {
 const Tenants: React.FC = () => {
   const navigate = useNavigate();
   const [messageApi, contextHolder] = message.useMessage();
+  const { open: tourOpen, setOpen: setTourOpen, markTourCompleted } = useTour('tenants');
 
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [showAddModal, setShowAddModal] = useState(false);
+
+  // Tour refs
+  const addButtonRef = useRef(null);
+  const searchRef = useRef(null);
+  const tableRef = useRef(null);
+
+  // Tour steps configuration
+  const tourSteps: TourProps['steps'] = [
+    {
+      title: 'Welcome to Tenants Management',
+      description: 'Manage all your tenants in one place. Let\'s explore the key features!',
+    },
+    {
+      title: 'Add New Tenant',
+      description: 'Click here to add a new tenant. You can store contact information, emergency contacts, and other important details.',
+      target: () => addButtonRef.current,
+    },
+    {
+      title: 'Search Tenants',
+      description: 'Quickly find tenants by searching their name, phone number, or email address.',
+      target: () => searchRef.current,
+    },
+    {
+      title: 'Tenants Table',
+      description: 'View all your tenants with their contact information. Click on any row to see full details and history.',
+      target: () => tableRef.current,
+    },
+  ];
 
   // Use TanStack Query hook
   const { data, isLoading, error } = useTenants({
@@ -194,7 +226,7 @@ const Tenants: React.FC = () => {
 
       {/* Header Section */}
       <div style={{ marginBottom: '24px' }}>
-        <Space direction="vertical" size="small" style={{ width: '100%' }}>
+        <Space vertical size="small" style={{ width: '100%' }}>
           <Row justify="space-between" align="middle" gutter={[16, 16]}>
             <Col xs={24} sm={12}>
               <Title level={2} style={{ margin: 0 }}>
@@ -202,14 +234,16 @@ const Tenants: React.FC = () => {
               </Title>
             </Col>
             <Col xs={24} sm={12} style={{ textAlign: 'right' }}>
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                onClick={() => setShowAddModal(true)}
-                size="large"
-              >
-                Add New Tenant
-              </Button>
+              <div ref={addButtonRef}>
+                <Button
+                  type="primary"
+                  icon={<PlusOutlined />}
+                  onClick={() => setShowAddModal(true)}
+                  size="large"
+                >
+                  Add New Tenant
+                </Button>
+              </div>
             </Col>
           </Row>
           <Text type="secondary">Manage your tenants and their information</Text>
@@ -217,7 +251,7 @@ const Tenants: React.FC = () => {
       </div>
 
       {/* Search Section */}
-      <Card style={{ marginBottom: '16px' }}>
+      <Card style={{ marginBottom: '16px' }} ref={searchRef}>
         <Search
           placeholder="Search by name, phone, or email..."
           allowClear
@@ -229,7 +263,7 @@ const Tenants: React.FC = () => {
       </Card>
 
       {/* Tenants Table */}
-      <Card>
+      <Card ref={tableRef}>
         {isLoading ? (
           <div>
             <Skeleton active paragraph={{ rows: 2 }} style={{ marginBottom: 16 }} />
@@ -262,6 +296,14 @@ const Tenants: React.FC = () => {
         isOpen={showAddModal}
         onClose={() => setShowAddModal(false)}
         onTenantAdded={handleTenantAdded}
+      />
+
+      {/* Tour */}
+      <Tour
+        open={tourOpen}
+        onClose={() => setTourOpen(false)}
+        onFinish={markTourCompleted}
+        steps={tourSteps}
       />
     </div>
   );

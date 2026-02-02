@@ -386,7 +386,7 @@ const Lease: React.FC = () => {
                 </Space>
               }
             >
-              <Space direction="vertical" size="large" style={{ width: '100%' }}>
+              <Space vertical size="large" style={{ width: '100%' }}>
                 <div>
                   <Text type="secondary" style={{ display: 'block', marginBottom: 8 }}>
                     Total Amount
@@ -729,7 +729,7 @@ const Lease: React.FC = () => {
 
       {/* Header Card with Title, Status and Actions */}
       <Card style={{ marginBottom: '16px' }}>
-        <Space direction="vertical" style={{ width: '100%' }} size="middle">
+        <Space vertical style={{ width: '100%' }} size="middle">
           {/* Title and Quick Actions Row */}
           <Row justify="space-between" align="middle">
             <Col>

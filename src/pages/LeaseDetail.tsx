@@ -124,7 +124,7 @@ const LeaseDetail: React.FC = () => {
 
   return (
     <div style={{ padding: '24px' }}>
-      <Space direction="vertical" size="large" style={{ width: '100%' }}>
+      <Space vertical size="large" style={{ width: '100%' }}>
         {/* Breadcrumb */}
         <Breadcrumb
           items={[

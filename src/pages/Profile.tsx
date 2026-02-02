@@ -536,7 +536,7 @@ const Profile: React.FC = () => {
               ))}
             </Space>
 
-            <Space direction="vertical" style={{ width: '100%' }}>
+            <Space vertical style={{ width: '100%' }}>
               <Button
                 type="primary"
                 block
