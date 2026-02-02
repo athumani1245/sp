@@ -55,6 +55,15 @@ export const useLeaseReport = () => {
   });
 };
 
+// Hook to fetch original lease (used for lease history/renewal chain)
+export const useOriginalLease = (originalLeaseId: string | null | undefined) => {
+  return useQuery({
+    queryKey: leaseKeys.detail(originalLeaseId || ''),
+    queryFn: () => getLeaseById(originalLeaseId!),
+    enabled: !!originalLeaseId,
+  });
+};
+
 
 // Lease Mutations
 export const useCreateLease = () => {

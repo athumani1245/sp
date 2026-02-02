@@ -31,8 +31,9 @@ import {
   InfoCircleOutlined,
   WarningOutlined,
   PlusOutlined,
+  HistoryOutlined,
 } from '@ant-design/icons';
-import { useLease, useCancelPayment, useCancelLease } from '../hooks/useLeases';
+import { useLease, useCancelPayment, useCancelLease, useOriginalLease } from '../hooks/useLeases';
 import AddPaymentModal from '../components/forms/AddPaymentModal';
 import RenewLeaseModal from '../components/forms/RenewLeaseModal';
 
@@ -85,6 +86,10 @@ const Lease: React.FC = () => {
   const { data: lease, isLoading: loading, error, refetch } = useLease(leaseId || null);
   const cancelPaymentMutation = useCancelPayment();
   const cancelLeaseMutation = useCancelLease();
+  
+  // Fetch original lease if this is a renewed lease
+  const originalLeaseId = lease?.original_lease;
+  const { data: originalLease, isLoading: originalLeaseLoading } = useOriginalLease(originalLeaseId);
   
   const [isCancelling, setIsCancelling] = useState(false);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
@@ -599,6 +604,108 @@ const Lease: React.FC = () => {
       ),
     },
   ];
+
+  // Add History tab if this lease has an original lease
+  if (originalLeaseId) {
+    tabItems.push({
+      key: 'history',
+      label: (
+        <span>
+          <HistoryOutlined /> History
+        </span>
+      ),
+      children: (
+        <Card title="Lease Renewal History">
+          {originalLeaseLoading ? (
+            <Skeleton active paragraph={{ rows: 6 }} />
+          ) : originalLease ? (
+            <>
+              <Alert
+                message="Renewal Information"
+                description="This lease is a renewal of a previous lease. Below are the details of the original lease."
+                type="info"
+                icon={<HistoryOutlined />}
+                showIcon
+                style={{ marginBottom: 16 }}
+              />
+              <Descriptions
+                bordered
+                column={{ xs: 1, sm: 1, md: 2 }}
+                size="middle"
+              >
+                <Descriptions.Item label="Lease Number">
+                  <Space>
+                    <Text strong>{originalLease.lease_number}</Text>
+                  </Space>
+                </Descriptions.Item>
+                <Descriptions.Item label="Status">
+                  {getStatusTag(originalLease.status)}
+                </Descriptions.Item>
+                <Descriptions.Item label="Property">
+                  <Space>
+                    <HomeOutlined />
+                    <span>{originalLease.property?.property_name || 'N/A'}</span>
+                  </Space>
+                </Descriptions.Item>
+                <Descriptions.Item label="Unit">
+                  {getUnitInfo(originalLease)}
+                </Descriptions.Item>
+                <Descriptions.Item label="Tenant">
+                  <Space>
+                    <UserOutlined />
+                    <span>{getTenantName(originalLease)}</span>
+                  </Space>
+                </Descriptions.Item>
+                <Descriptions.Item label="Duration">
+                  {originalLease.number_of_month ? `${originalLease.number_of_month} months` : 'N/A'}
+                </Descriptions.Item>
+                <Descriptions.Item label="Start Date">
+                  <Space>
+                    <CalendarOutlined />
+                    <span>{formatDate(originalLease.start_date)}</span>
+                  </Space>
+                </Descriptions.Item>
+                <Descriptions.Item label="End Date">
+                  <Space>
+                    <CalendarOutlined />
+                    <span>{formatDate(originalLease.end_date)}</span>
+                  </Space>
+                </Descriptions.Item>
+                <Descriptions.Item label="Total Amount">
+                  {formatCurrency(originalLease.total_amount)}
+                </Descriptions.Item>
+                <Descriptions.Item label="Amount Paid">
+                  <Text style={{ color: '#52c41a' }}>
+                    {formatCurrency(originalLease.amount_paid)}
+                  </Text>
+                </Descriptions.Item>
+                <Descriptions.Item label="Discount">
+                  {formatCurrency(originalLease.discount || 0)}
+                </Descriptions.Item>
+                <Descriptions.Item label="Remaining Balance">
+                  <Text
+                    style={{
+                      color:
+                        (originalLease.remaining_amount || originalLease.total_amount - originalLease.amount_paid) > 0
+                          ? '#ff4d4f'
+                          : '#52c41a',
+                    }}
+                  >
+                    {formatCurrency(originalLease.remaining_amount || originalLease.total_amount - originalLease.amount_paid)}
+                  </Text>
+                </Descriptions.Item>
+              </Descriptions>
+            </>
+          ) : (
+            <Empty
+              description="Original lease information not available"
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+            />
+          )}
+        </Card>
+      ),
+    });
+  }
 
   return (
     <div>
