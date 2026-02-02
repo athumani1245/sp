@@ -24,17 +24,27 @@ import {
   PhoneOutlined,
   MailOutlined,
   PhoneFilled,
+  PlusOutlined,
+  DeleteOutlined,
+  TeamOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useTenant, useUpdateTenant } from '../hooks/useTenants';
 
 const { Title, Text } = Typography;
 
+interface EmergencyContact {
+  full_name: string;
+  relationship: string;
+  phone_number: string;
+}
+
 const TenantDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [isEditMode, setIsEditMode] = useState(false);
+  const [emergencyContacts, setEmergencyContacts] = useState<EmergencyContact[]>([]);
 
   // Fetch data using TanStack Query hooks
   const { data: tenant, isLoading, error } = useTenant(id || '');
@@ -50,6 +60,8 @@ const TenantDetail: React.FC = () => {
         email: tenant.email,
         gender: tenant.gender,
       });
+      // Initialize emergency contacts
+      setEmergencyContacts(tenant.emergency_contacts || []);
     }
   }, [tenant, form]);
 
@@ -72,6 +84,8 @@ const TenantDetail: React.FC = () => {
         email: tenant.email,
         gender: tenant.gender,
       });
+      // Reset emergency contacts
+      setEmergencyContacts(tenant.emergency_contacts || []);
     }
   };
 
@@ -80,7 +94,10 @@ const TenantDetail: React.FC = () => {
       const values = await form.validateFields();
       await updateTenantMutation.mutateAsync({
         tenantId: id!,
-        tenantData: values,
+        tenantData: {
+          ...values,
+          emergency_contacts: emergencyContacts,
+        },
       });
       setIsEditMode(false);
     } catch (error) {
@@ -88,12 +105,29 @@ const TenantDetail: React.FC = () => {
     }
   };
 
+  const addEmergencyContact = () => {
+    setEmergencyContacts([
+      ...emergencyContacts,
+      { full_name: '', relationship: '', phone_number: '' },
+    ]);
+  };
+
+  const removeEmergencyContact = (index: number) => {
+    setEmergencyContacts(emergencyContacts.filter((_, i) => i !== index));
+  };
+
+  const updateEmergencyContact = (index: number, field: string, value: string) => {
+    const updated = [...emergencyContacts];
+    updated[index] = { ...updated[index], [field]: value };
+    setEmergencyContacts(updated);
+  };
+
   // Emergency contacts table columns
   const emergencyContactsColumns: ColumnsType<any> = [
     {
       title: 'Name',
-      dataIndex: 'name',
-      key: 'name',
+      dataIndex: 'full_name',
+      key: 'full_name',
       render: (text) => (
         <Space>
           <UserOutlined />
@@ -103,8 +137,8 @@ const TenantDetail: React.FC = () => {
     },
     {
       title: 'Phone Number',
-      dataIndex: 'phone',
-      key: 'phone',
+      dataIndex: 'phone_number',
+      key: 'phone_number',
       render: (phone) => (
         <Space>
           <PhoneFilled />
@@ -266,33 +300,119 @@ const TenantDetail: React.FC = () => {
                 />
               </Form.Item>
             </Col>
-            <Col xs={24} sm={12}>
-              <Form.Item label="Emergency Contacts">
-                <Input
-                  value={tenant.emergency_contacts?.length || 0}
-                  disabled
-                  addonAfter="contacts"
-                />
-              </Form.Item>
-            </Col>
           </Row>
         </Form>
       </Card>
 
       {/* Emergency Contacts */}
       <Card 
-        title={`Emergency Contacts (${tenant.emergency_contacts?.length || 0})`}
+        title={
+          <Space>
+            <TeamOutlined />
+            <span>Emergency Contacts ({emergencyContacts.length})</span>
+          </Space>
+        }
         style={{ marginTop: 16 }}
+        extra={
+          isEditMode && (
+            <Button
+              type="dashed"
+              icon={<PlusOutlined />}
+              onClick={addEmergencyContact}
+            >
+              Add Contact
+            </Button>
+          )
+        }
       >
-        <Table
-          columns={emergencyContactsColumns}
-          dataSource={tenant.emergency_contacts || []}
-          rowKey={(record, index) => record.id || index}
-          pagination={false}
-          locale={{
-            emptyText: 'No emergency contacts added',
-          }}
-        />
+        {isEditMode ? (
+          <>
+            {emergencyContacts.length === 0 ? (
+              <Alert
+                message="No emergency contacts"
+                description="Add emergency contacts to ensure we can reach someone in case of emergency."
+                type="info"
+                showIcon
+                style={{ marginBottom: 16 }}
+              />
+            ) : null}
+            {emergencyContacts.map((contact, index) => (
+              <Card
+                key={index}
+                size="small"
+                style={{ marginBottom: 16 }}
+                extra={
+                  <Button
+                    type="text"
+                    danger
+                    size="small"
+                    icon={<DeleteOutlined />}
+                    onClick={() => removeEmergencyContact(index)}
+                  >
+                    Remove
+                  </Button>
+                }
+              >
+                <Row gutter={16}>
+                  <Col xs={24} md={8}>
+                    <Form.Item label="Full Name" style={{ marginBottom: 8 }}>
+                      <Input
+                        prefix={<UserOutlined />}
+                        placeholder="Enter full name"
+                        value={contact.full_name || ''}
+                        onChange={(e) =>
+                          updateEmergencyContact(index, 'full_name', e.target.value)
+                        }
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col xs={24} md={8}>
+                    <Form.Item label="Relationship" style={{ marginBottom: 8 }}>
+                      <Select
+                        placeholder="Select relationship"
+                        value={contact.relationship || undefined}
+                        onChange={(value) =>
+                          updateEmergencyContact(index, 'relationship', value)
+                        }
+                        style={{ width: '100%' }}
+                        options={[
+                          { value: 'Parent', label: 'Parent' },
+                          { value: 'Friend', label: 'Friend' },
+                          { value: 'Spouse', label: 'Spouse' },
+                          { value: 'Sibling', label: 'Sibling' },
+                          { value: 'Relative', label: 'Relative' },
+                          { value: 'Other', label: 'Other' },
+                        ]}
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col xs={24} md={8}>
+                    <Form.Item label="Phone Number" style={{ marginBottom: 8 }}>
+                      <Input
+                        prefix={<PhoneOutlined />}
+                        placeholder="Enter phone number"
+                        value={contact.phone_number || ''}
+                        onChange={(e) =>
+                          updateEmergencyContact(index, 'phone_number', e.target.value)
+                        }
+                      />
+                    </Form.Item>
+                  </Col>
+                </Row>
+              </Card>
+            ))}
+          </>
+        ) : (
+          <Table
+            columns={emergencyContactsColumns}
+            dataSource={emergencyContacts}
+            rowKey={(record, index) => `contact-${index}`}
+            pagination={false}
+            locale={{
+              emptyText: 'No emergency contacts added',
+            }}
+          />
+        )}
       </Card>
     </div>
   );
