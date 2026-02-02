@@ -137,8 +137,8 @@ const Register: React.FC = () => {
       
       if (result.success) {
         // Store the token from OTP verification
-        if (result.data?.token) {
-          setOtpToken(result.data.token);
+        if (result.data?.data?.token) {
+          setOtpToken(result.data.data.token);
         }
         setStage('form');
         setShowOtpModal(false);
