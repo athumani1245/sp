@@ -15,6 +15,7 @@ import {
   Col,
   Tour,
   Grid,
+  Select,
 } from 'antd';
 import type { TourProps } from 'antd';
 import {
@@ -30,7 +31,7 @@ import {
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import AddPropertyModal from '../components/forms/AddPropertyModal';
 import MobilePropertiesList from '../components/mobile/MobilePropertiesList';
-import { useProperties, useDeleteProperty } from '../hooks/useProperties';
+import { useAllProperties, useDeleteProperty } from '../hooks/useProperties';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTour } from '../hooks/useTour';
 
@@ -68,8 +69,10 @@ const Properties: React.FC = () => {
   const screens = useBreakpoint();
 
   const [search, setSearch] = useState('');
+  const [propertyType, setPropertyType] = useState<string>('');
   const [page, setPage] = useState(1);
   const [showModal, setShowModal] = useState(false);
+  const pageSize = 10;
   
   // Tour refs
   const addButtonRef = useRef(null);
@@ -99,18 +102,46 @@ const Properties: React.FC = () => {
     },
   ];
 
-  // Use TanStack Query hook
-  const { data, isLoading, error, refetch } = useProperties({
-    search,
-    page,
-    page_size: 10,
-  });
+  // Use TanStack Query hook - fetch all properties
+  const { data: allPropertiesData, isLoading, error, refetch } = useAllProperties();
   
   const deletePropertyMutation = useDeleteProperty();
 
   // Ensure properties is always an array
-  const properties = Array.isArray(data?.items) ? data?.items : [];
-  const totalCount = data?.pagination?.total || 0;
+  const allProperties: Property[] = (allPropertiesData as Property[]) || [];
+  
+  // Filter properties by search and type on the client side
+  const filteredProperties: Property[] = allProperties.filter(p => {
+    // Search filter
+    if (search) {
+      const searchLower = search.toLowerCase();
+      const matchesName = p.property_name?.toLowerCase().includes(searchLower);
+      const matchesLocation = p.address?.region_name?.toLowerCase().includes(searchLower) ||
+                             p.address?.district_name?.toLowerCase().includes(searchLower) ||
+                             p.address?.ward_name?.toLowerCase().includes(searchLower) ||
+                             p.address?.street?.toLowerCase().includes(searchLower);
+      if (!matchesName && !matchesLocation) return false;
+    }
+    
+    // Type filter
+    if (propertyType && p.property_type !== propertyType) return false;
+    
+    return true;
+  });
+  
+  // Client-side pagination
+  const totalCount = filteredProperties.length;
+  const startIndex = (page - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  const properties: Property[] = filteredProperties.slice(startIndex, endIndex);
+
+  // Property type options matching AddPropertyModal
+  const propertyTypeOptions = [
+    { label: 'All Types', value: '' },
+    { label: 'Standalone', value: 'Standalone' },
+    { label: 'Apartment', value: 'Apartment' },
+    { label: 'Commercial building', value: 'Commercial building' },
+  ];
 
   // Handle error state
   if (error) {
@@ -120,6 +151,17 @@ const Properties: React.FC = () => {
 
   const handleSearch = (value: string) => {
     setSearch(value);
+    setPage(1);
+  };
+
+  const handlePropertyTypeChange = (value: string) => {
+    setPropertyType(value);
+    setPage(1);
+  };
+
+  const handleClearFilters = () => {
+    setSearch('');
+    setPropertyType('');
     setPage(1);
   };
 
@@ -174,13 +216,6 @@ const Properties: React.FC = () => {
       key: 'type',
       dataIndex: 'property_type',
       render: (type: string) => getPropertyTypeTag(type),
-      filters: [
-        { text: 'Apartment', value: 'apartment' },
-        { text: 'House', value: 'house' },
-        { text: 'Commercial', value: 'commercial' },
-        { text: 'Land', value: 'land' },
-      ],
-      onFilter: (value, record) => record.property_type === value,
     },
     {
       title: 'Location',
@@ -274,16 +309,53 @@ const Properties: React.FC = () => {
         </Space>
       </div>
 
-      {/* Search Section */}
+      {/* Search and Filters Section */}
       <Card style={{ marginBottom: '16px' }} ref={searchRef}>
-        <Search
-          placeholder="Search by property name, location..."
-          allowClear
-          enterButton={<SearchOutlined />}
-          size="large"
-          onSearch={handleSearch}
-          style={{ width: '100%', maxWidth: 400 }}
-        />
+        <Space direction="vertical" style={{ width: '100%' }} size="middle">
+          <Row gutter={[16, 16]} align="middle">
+            <Col xs={24} sm={24} md={12}>
+              <Search
+                placeholder="Search by property name, location..."
+                allowClear
+                enterButton={<SearchOutlined />}
+                size="large"
+                onSearch={handleSearch}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                style={{ width: '100%' }}
+              />
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+              <Select
+                placeholder="Filter by Type"
+                allowClear
+                size="large"
+                value={propertyType || undefined}
+                onChange={handlePropertyTypeChange}
+                style={{ width: '100%' }}
+                options={propertyTypeOptions}
+                disabled={isLoading}
+              />
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+              <Button
+                size="large"
+                onClick={handleClearFilters}
+                style={{ width: '100%' }}
+                disabled={!search && !propertyType}
+              >
+                Clear Filters
+              </Button>
+            </Col>
+          </Row>
+          {(search || propertyType) && (
+            <Text type="secondary">
+              Showing {totalCount} result{totalCount !== 1 ? 's' : ''}
+              {search && ` for "${search}"`}
+              {propertyType && ` in ${propertyType.charAt(0).toUpperCase() + propertyType.slice(1)}`}
+            </Text>
+          )}
+        </Space>
       </Card>
 
       {/* Properties Table */}
@@ -302,7 +374,7 @@ const Properties: React.FC = () => {
             rowKey="id"
             pagination={{
               current: page,
-              pageSize: 10,
+              pageSize: pageSize,
               total: totalCount,
             }}
             onChange={handleTableChange}
