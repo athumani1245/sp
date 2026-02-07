@@ -16,6 +16,7 @@ import {
   Tooltip,
   Skeleton,
   Tour,
+  Grid,
 } from 'antd';
 import type { TourProps } from 'antd';
 import {
@@ -33,12 +34,14 @@ import {
 } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import AddLeaseModal from '../components/forms/AddLeaseModal';
+import MobileLeasesList from '../components/mobile/MobileLeasesList';
 import { useLeases, useDeleteLease } from '../hooks/useLeases';
 import { useTour } from '../hooks/useTour';
 import dayjs from 'dayjs';
 
 const { Search } = Input;
 const { Title, Text } = Typography;
+const { useBreakpoint } = Grid;
 
 interface Lease {
   id: string;
@@ -65,6 +68,7 @@ interface Lease {
 
 const Leases: React.FC = () => {
   const navigate = useNavigate();
+  const screens = useBreakpoint();
   const { open: tourOpen, setOpen: setTourOpen, markTourCompleted } = useTour('leases');
 
   const [search, setSearch] = useState('');
@@ -347,7 +351,7 @@ const Leases: React.FC = () => {
               <Skeleton active paragraph={{ rows: 2 }} style={{ marginBottom: 16 }} />
               <Skeleton active paragraph={{ rows: 2 }} />
             </div>
-          ) : (
+          ) : screens.md ? (
             <Table<Lease>
               columns={columns}
               dataSource={Array.isArray(data?.items) ? data?.items : []}
@@ -365,6 +369,11 @@ const Leases: React.FC = () => {
                 onClick: () => handleViewLease(record.id),
                 style: { cursor: 'pointer' },
               })}
+            />
+          ) : (
+            <MobileLeasesList
+              leases={(data?.items as Lease[]) || []}
+              loading={false}
             />
           )}
         </Card>

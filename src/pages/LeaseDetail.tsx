@@ -33,11 +33,14 @@ import {
   CheckCircleOutlined,
   CloseCircleOutlined,
   HistoryOutlined,
+  FilePdfOutlined,
+  EyeOutlined,
 } from '@ant-design/icons';
 import { useLease } from '../hooks/useLeases';
 import { useLeasePayments } from '../hooks/usePayments';
 import { useOriginalLease } from '../hooks/useLeases';
 import AddPaymentModal from '../components/forms/AddPaymentModal';
+import LeasePDFPreviewModal from '../components/pdf/LeasePDFPreviewModal';
 import dayjs from 'dayjs';
 import type { ColumnsType } from 'antd/es/table';
 
@@ -47,6 +50,7 @@ const LeaseDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showPDFModal, setShowPDFModal] = useState(false);
   const [activeTab, setActiveTab] = useState('1');
 
   // Fetch lease data
@@ -135,12 +139,22 @@ const LeaseDetail: React.FC = () => {
         />
 
         {/* Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
           <Space>
             <FileTextOutlined style={{ fontSize: '24px', color: '#CC5B4B' }} />
             <Title level={2} style={{ margin: 0 }}>
               {lease.lease_number}
             </Title>
+          </Space>
+          <Space>
+            <Button
+              type="primary"
+              icon={<FilePdfOutlined />}
+              onClick={() => setShowPDFModal(true)}
+              style={{ backgroundColor: '#CC5B4B', borderColor: '#CC5B4B' }}
+            >
+              View PDF
+            </Button>
           </Space>
         </div>
 
@@ -456,6 +470,15 @@ const LeaseDetail: React.FC = () => {
           // Payments will auto-refresh via TanStack Query
         }}
       />
+
+      {/* PDF Preview Modal */}
+      {showPDFModal && (
+        <LeasePDFPreviewModal
+          open={showPDFModal}
+          onClose={() => setShowPDFModal(false)}
+          lease={lease}
+        />
+      )}
     </div>
   );
 };

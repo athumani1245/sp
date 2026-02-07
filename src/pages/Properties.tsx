@@ -14,6 +14,7 @@ import {
   Row,
   Col,
   Tour,
+  Grid,
 } from 'antd';
 import type { TourProps } from 'antd';
 import {
@@ -28,12 +29,14 @@ import {
 } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import AddPropertyModal from '../components/forms/AddPropertyModal';
+import MobilePropertiesList from '../components/mobile/MobilePropertiesList';
 import { useProperties, useDeleteProperty } from '../hooks/useProperties';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTour } from '../hooks/useTour';
 
 const { Title, Text } = Typography;
 const { Search } = Input;
+const { useBreakpoint } = Grid;
 
 interface Address {
   region_name?: string;
@@ -62,6 +65,7 @@ const Properties: React.FC = () => {
   const [messageApi, contextHolder] = message.useMessage();
   const queryClient = useQueryClient();
   const { open: tourOpen, setOpen: setTourOpen, markTourCompleted } = useTour('properties');
+  const screens = useBreakpoint();
 
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
@@ -291,7 +295,7 @@ const Properties: React.FC = () => {
             <Skeleton active paragraph={{ rows: 2 }} style={{ marginBottom: 16 }} />
             <Skeleton active paragraph={{ rows: 2 }} />
           </div>
-        ) : (
+        ) : screens.md ? (
           <Table
             columns={columns}
             dataSource={properties}
@@ -307,6 +311,12 @@ const Properties: React.FC = () => {
               onClick: () => handleViewProperty(record.id),
               style: { cursor: 'pointer' },
             })}
+          />
+        ) : (
+          <MobilePropertiesList
+            properties={properties || []}
+            loading={false}
+            onDelete={handleDeleteProperty}
           />
         )}
       </Card>

@@ -68,7 +68,7 @@ const MainLayout: React.FC = () => {
           }}
         >
           <Content className="main-content">
-            <div className="content-wrapper" style={{ padding: isMobile ? '16px' : '24px' }}>
+            <div className="content-wrapper">
               <Outlet />
             </div>
           </Content>

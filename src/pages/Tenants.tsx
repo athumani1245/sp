@@ -14,6 +14,7 @@ import {
   Row,
   Col,
   Tour,
+  Grid,
 } from 'antd';
 import type { TourProps } from 'antd';
 import {
@@ -29,12 +30,14 @@ import {
 } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import AddTenantModal from '../components/forms/AddTenantModal';
+import MobileTenantsList from '../components/mobile/MobileTenantsList';
 import { useTenants, useDeleteTenant } from '../hooks/useTenants';
 import { useTour } from '../hooks/useTour';
 
 const { Search } = Input;
 const { Title, Text } = Typography;
 const { confirm } = Modal;
+const { useBreakpoint } = Grid;
 
 interface Tenant {
   id: string;
@@ -48,6 +51,7 @@ interface Tenant {
 
 const Tenants: React.FC = () => {
   const navigate = useNavigate();
+  const screens = useBreakpoint();
   const [messageApi, contextHolder] = message.useMessage();
   const { open: tourOpen, setOpen: setTourOpen, markTourCompleted } = useTour('tenants');
 
@@ -271,7 +275,7 @@ const Tenants: React.FC = () => {
             <Skeleton active paragraph={{ rows: 2 }} style={{ marginBottom: 16 }} />
             <Skeleton active paragraph={{ rows: 2 }} />
           </div>
-        ) : (
+        ) : screens.md ? (
           <Table
             columns={columns}
             dataSource={tenants}
@@ -287,6 +291,12 @@ const Tenants: React.FC = () => {
               onClick: () => handleViewTenant(record.id),
               style: { cursor: 'pointer' },
             })}
+          />
+        ) : (
+          <MobileTenantsList
+            tenants={tenants || []}
+            loading={false}
+            onDelete={handleDelete}
           />
         )}
       </Card>

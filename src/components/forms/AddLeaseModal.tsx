@@ -568,7 +568,14 @@ const AddLeaseModal: React.FC<AddLeaseModalProps> = ({ visible, onCancel, onSucc
               </Col>
               <Col span={6}>
                 <Form.Item name="amount_paid" style={{ marginBottom: 0 }}>
-                  <InputNumber placeholder="Amount" style={{ width: '100%' }} size="small" min={0} />
+                  <InputNumber 
+                    placeholder="Amount" 
+                    style={{ width: '100%' }} 
+                    size="small" 
+                    min={0}
+                    formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                    parser={(value) => Number(value!.replace(/\$\s?|(,*)/g, '')) as any}
+                  />
                 </Form.Item>
               </Col>
             </Row>

@@ -32,10 +32,13 @@ import {
   WarningOutlined,
   PlusOutlined,
   HistoryOutlined,
+  FilePdfOutlined,
+  EyeOutlined,
 } from '@ant-design/icons';
 import { useLease, useCancelPayment, useCancelLease, useOriginalLease } from '../hooks/useLeases';
 import AddPaymentModal from '../components/forms/AddPaymentModal';
 import RenewLeaseModal from '../components/forms/RenewLeaseModal';
+import LeasePDFPreviewModal from '../components/pdf/LeasePDFPreviewModal';
 
 const { Title, Text } = Typography;
 
@@ -95,6 +98,7 @@ const Lease: React.FC = () => {
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [showRenewModal, setShowRenewModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showPDFModal, setShowPDFModal] = useState(false);
   const [activeTab, setActiveTab] = useState('details');
   const [messageApi, contextHolder] = message.useMessage();
 
@@ -154,21 +158,7 @@ const Lease: React.FC = () => {
   };
 
   const handleDownloadDocument = async () => {
-    try {
-      setIsGeneratingPDF(true);
-      messageApi.loading('Generating lease document...', 0);
-
-      // Simulate PDF generation
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      messageApi.destroy();
-      messageApi.success('Document generated successfully!');
-    } catch (error) {
-      messageApi.destroy();
-      messageApi.error('Failed to generate document');
-    } finally {
-      setIsGeneratingPDF(false);
-    }
+    setShowPDFModal(true);
   };
 
   const handleRefresh = async () => {
@@ -815,6 +805,15 @@ const Lease: React.FC = () => {
         }}
         lease={lease}
       />
+
+      {/* PDF Preview Modal */}
+      {showPDFModal && lease && (
+        <LeasePDFPreviewModal
+          open={showPDFModal}
+          onClose={() => setShowPDFModal(false)}
+          lease={lease}
+        />
+      )}
     </div>
   );
 };
