@@ -29,11 +29,17 @@ import {
   DeleteOutlined,
   SaveOutlined,
   CloseOutlined,
+  FileTextOutlined,
+  EyeOutlined,
+  UserOutlined,
+  CalendarOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useProperty, useUpdateProperty, usePropertyUnits, usePropertyStats, useDeletePropertyUnit, useRegions, useDistricts, useWards } from '../hooks/useProperties';
+import { useLeases } from '../hooks/useLeases';
 import AddUnitModal from '../components/forms/AddUnitModal';
 import EditUnitModal from '../components/forms/EditUnitModal';
+import dayjs from 'dayjs';
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
@@ -62,6 +68,7 @@ const PropertyDetail: React.FC = () => {
   const { data: property, isLoading, error } = useProperty(id || '');
   const { data: unitsData, isLoading: unitsLoading, error: unitsError, refetch: refetchUnits } = usePropertyUnits({ property: id || '' });
   const { data: stats } = usePropertyStats(id || '');
+  const { data: leasesData, isLoading: leasesLoading, error: leasesError } = useLeases({ property: id || '' });
   const updatePropertyMutation = useUpdateProperty();
   const deleteUnitMutation = useDeletePropertyUnit();
   const { data: regions, isLoading: regionsLoading } = useRegions();
@@ -69,6 +76,7 @@ const PropertyDetail: React.FC = () => {
   const { data: wards, isLoading: wardsLoading } = useWards(selectedDistrict || '');
 
   const units = unitsData?.items || [];
+  const leases = leasesData?.items || [];
 
   // Debug logging
   useEffect(() => {
@@ -222,6 +230,49 @@ const PropertyDetail: React.FC = () => {
     return <Tag color={colors[status?.toLowerCase()] || 'default'}>{status}</Tag>;
   };
 
+  const getLeaseStatusTag = (status: string) => {
+    const statusConfig: Record<string, { color: string; text: string }> = {
+      active: { color: 'success', text: 'Active' },
+      draft: { color: 'default', text: 'Draft' },
+      expired: { color: 'error', text: 'Expired' },
+      terminated: { color: 'default', text: 'Terminated' },
+      cancelled: { color: 'warning', text: 'Cancelled' },
+    };
+    const config = statusConfig[status?.toLowerCase()] || statusConfig.draft;
+    return <Tag color={config.color}>{config.text}</Tag>;
+  };
+
+  const formatCurrency = (amount: number) => {
+    if (!amount && amount !== 0) return 'TSh 0';
+    return `TSh ${amount.toLocaleString()}`;
+  };
+
+  const formatDate = (dateString: string) => {
+    if (!dateString) return 'N/A';
+    // API returns dates in DD-MM-YYYY format, parse accordingly
+    const [day, month, year] = dateString.split('-');
+    return dayjs(`${year}-${month}-${day}`).format('MMM DD, YYYY');
+  };
+
+  const getTenantName = (lease: any) => {
+    if (!lease.tenant) return 'Unknown Tenant';
+    if (lease.tenant.first_name && lease.tenant.last_name) {
+      return `${lease.tenant.first_name} ${lease.tenant.last_name}`;
+    }
+    return 'Unknown Tenant';
+  };
+
+  const getUnitInfo = (lease: any) => {
+    if (!lease.unit) return 'Unknown Unit';
+    if (lease.unit.unit_name) return lease.unit.unit_name;
+    if (lease.unit.unit_number) return `Unit ${lease.unit.unit_number}`;
+    return 'Unknown Unit';
+  };
+
+  const handleViewLease = (leaseId: string) => {
+    navigate(`/leases/${leaseId}`);
+  };
+
   // Units table columns
   const unitsColumns: ColumnsType<Unit> = [
     {
@@ -270,6 +321,90 @@ const PropertyDetail: React.FC = () => {
           </Button>
         </Space>
       ),
+    },
+  ];
+
+  // Leases table columns
+  const leasesColumns: ColumnsType<any> = [
+    {
+      title: 'Lease #',
+      dataIndex: 'lease_number',
+      key: 'lease_number',
+      render: (text: string) => <Text strong>{text || 'N/A'}</Text>,
+      width: 140,
+    },
+    {
+      title: 'Unit',
+      key: 'unit',
+      render: (_, record) => (
+        <Space>
+          <HomeOutlined />
+          <Text>{getUnitInfo(record)}</Text>
+        </Space>
+      ),
+      width: 150,
+    },
+    {
+      title: 'Tenant',
+      key: 'tenant',
+      render: (_, record) => (
+        <Space>
+          <UserOutlined />
+          <Text>{getTenantName(record)}</Text>
+        </Space>
+      ),
+      width: 180,
+    },
+    {
+      title: 'Period',
+      key: 'period',
+      render: (_, record) => (
+        <Space direction="vertical" size={0}>
+          <Text style={{ fontSize: '12px' }}>
+            <CalendarOutlined /> {formatDate(record.start_date)}
+          </Text>
+          <Text type="secondary" style={{ fontSize: '12px' }}>
+            to {formatDate(record.end_date)}
+          </Text>
+        </Space>
+      ),
+      width: 150,
+    },
+    {
+      title: 'Rent Amount',
+      dataIndex: 'total_amount',
+      key: 'total_amount',
+      render: (amount: number) => <Text>{formatCurrency(amount)}</Text>,
+      width: 130,
+    },
+    {
+      title: 'Amount Paid',
+      dataIndex: 'amount_paid',
+      key: 'amount_paid',
+      render: (amount: number) => <Text type="success">{formatCurrency(amount)}</Text>,
+      width: 130,
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      render: (status: string) => getLeaseStatusTag(status),
+      width: 100,
+    },
+    {
+      title: 'Actions',
+      key: 'actions',
+      render: (_, record) => (
+        <Button
+          type="link"
+          size="small"
+          icon={<EyeOutlined />}
+          onClick={() => handleViewLease(record.id)}
+        >
+          View
+        </Button>
+      ),
+      width: 80,
     },
   ];
 
@@ -609,6 +744,50 @@ const PropertyDetail: React.FC = () => {
                       rowKey="id"
                       pagination={{ pageSize: 10 }}
                       scroll={{ x: 800 }}
+                    />
+                  )}
+                </div>
+              ),
+            },
+            {
+              key: 'leases',
+              label: (
+                <span>
+                  <FileTextOutlined /> Leases ({leases.length})
+                </span>
+              ),
+              children: (
+                <div>
+                  {leasesLoading ? (
+                    <div>
+                      <Skeleton active paragraph={{ rows: 3 }} style={{ marginBottom: 16 }} />
+                      <Skeleton active paragraph={{ rows: 3 }} />
+                    </div>
+                  ) : leasesError ? (
+                    <Alert
+                      message="Error Loading Leases"
+                      description="Failed to load property leases. Please try again."
+                      type="error"
+                      showIcon
+                    />
+                  ) : leases.length === 0 ? (
+                    <Alert
+                      message="No Leases Found"
+                      description="This property has no leases yet. Create a lease from the Leases page."
+                      type="info"
+                      showIcon
+                    />
+                  ) : (
+                    <Table
+                      columns={leasesColumns}
+                      dataSource={leases}
+                      rowKey="id"
+                      pagination={{ pageSize: 10 }}
+                      scroll={{ x: 1200 }}
+                      onRow={(record) => ({
+                        onClick: () => handleViewLease(record.id),
+                        style: { cursor: 'pointer' },
+                      })}
                     />
                   )}
                 </div>

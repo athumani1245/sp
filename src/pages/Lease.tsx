@@ -34,10 +34,12 @@ import {
   HistoryOutlined,
   FilePdfOutlined,
   EyeOutlined,
+  StopOutlined,
 } from '@ant-design/icons';
 import { useLease, useCancelPayment, useCancelLease, useOriginalLease } from '../hooks/useLeases';
 import AddPaymentModal from '../components/forms/AddPaymentModal';
 import RenewLeaseModal from '../components/forms/RenewLeaseModal';
+import TerminateLeaseModal from '../components/forms/TerminateLeaseModal';
 import LeasePDFPreviewModal from '../components/pdf/LeasePDFPreviewModal';
 
 const { Title, Text } = Typography;
@@ -99,6 +101,7 @@ const Lease: React.FC = () => {
   const [showRenewModal, setShowRenewModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showPDFModal, setShowPDFModal] = useState(false);
+  const [showTerminateModal, setShowTerminateModal] = useState(false);
   const [activeTab, setActiveTab] = useState('details');
   const [messageApi, contextHolder] = message.useMessage();
 
@@ -750,6 +753,16 @@ const Lease: React.FC = () => {
                     Renew
                   </Button>
                 )}
+                {lease.status === 'active' && (
+                  <Button
+                    danger
+                    size="small"
+                    icon={<StopOutlined />}
+                    onClick={() => setShowTerminateModal(true)}
+                  >
+                    Terminate
+                  </Button>
+                )}
                 {lease.status !== 'cancelled' &&
                   lease.status !== 'terminated' &&
                   lease.status !== 'expired' && (
@@ -801,6 +814,17 @@ const Lease: React.FC = () => {
         visible={showRenewModal}
         onCancel={() => setShowRenewModal(false)}
         onSuccess={() => {
+          refetch();
+        }}
+        lease={lease}
+      />
+
+      {/* Terminate Lease Modal */}
+      <TerminateLeaseModal
+        visible={showTerminateModal}
+        onCancel={() => setShowTerminateModal(false)}
+        onSuccess={() => {
+          setShowTerminateModal(false);
           refetch();
         }}
         lease={lease}

@@ -58,8 +58,8 @@ const SubscriptionBanner: React.FC = () => {
     );
   }
 
-  // Show warning if subscription is ending soon (less than 7 days)
-  if (subscription.days_left !== undefined && subscription.days_left <= 7 && subscription.days_left > 0) {
+  // Show warning if subscription is ending soon (8 days or less)
+  if (subscription.days_left !== undefined && subscription.days_left <= 8 && subscription.days_left > 0) {
     const isTrialEnding = subscription.is_trial;
     return (
       <Alert
@@ -89,7 +89,7 @@ const SubscriptionBanner: React.FC = () => {
   }
 
   // Show info if subscription is less than 30 days
-  if (subscription.days_left !== undefined && subscription.days_left < 30 && subscription.days_left > 7) {
+  if (subscription.days_left !== undefined && subscription.days_left < 30 && subscription.days_left > 8) {
     const isTrialReminder = subscription.is_trial;
     return (
       <Alert
@@ -118,50 +118,7 @@ const SubscriptionBanner: React.FC = () => {
     );
   }
 
-  // Show info if on trial period
-  if (subscription.is_trial && subscription.days_left !== undefined && subscription.days_left >= 30) {
-    return (
-      <Alert
-        message="Trial Period Active"
-        description={
-          <span>
-            You have <strong>{subscription.days_left} days</strong> remaining in your trial period.
-            {subscription.package_name && <> Package: <strong>{subscription.package_name}</strong></>}
-            {subscription.max_units && <> | Max Units: <strong>{subscription.max_units}</strong></>}
-          </span>
-        }
-        type="info"
-        showIcon
-        icon={<InfoCircleOutlined />}
-        closable
-        onClose={() => setDismissed(true)}
-        style={{ marginBottom: '16px' }}
-      />
-    );
-  }
-
-  // Show info if subscription has high days_left (regular subscription)
-  if (!subscription.is_trial && subscription.days_left !== undefined && subscription.days_left >= 30) {
-    return (
-      <Alert
-        message="Active Subscription"
-        description={
-          <span>
-            You have <strong>{subscription.days_left} days</strong> remaining in your subscription.
-            {subscription.plan_name && <> Plan: <strong>{subscription.plan_name}</strong></>}
-            {subscription.max_units && <> | Max Units: <strong>{subscription.max_units}</strong></>}
-          </span>
-        }
-        type="info"
-        showIcon
-        icon={<InfoCircleOutlined />}
-        closable
-        onClose={() => setDismissed(true)}
-        style={{ marginBottom: '16px' }}
-      />
-    );
-  }
-
+  // No banner needed for healthy subscriptions with 30+ days remaining
   return null;
 };
 

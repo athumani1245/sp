@@ -131,6 +131,17 @@ export const cancelLease = async (leaseId: string) => {
   return response.data.data;
 };
 
+// Terminate a lease
+export const terminateLease = async ({ leaseId, terminationData }: { leaseId: string; terminationData: any }) => {
+  const formattedData = {
+    termination_date: formatDateForApi(terminationData.termination_date),
+    reason: terminationData.reason,
+    adjustment_amount: parseFloat(String(terminationData.adjustment_amount || 0)),
+  };
+  const response = await api.post(`/leases/terminate/${leaseId}/`, formattedData);
+  return response.data.data;
+};
+
 // Renew a lease
 export const renewLease = async ({ leaseId, renewalData }: { leaseId: string; renewalData: any }) => {
   const response = await api.post(`/leases/renew/`, renewalData);

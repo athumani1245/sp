@@ -265,7 +265,7 @@ const TenantDetail: React.FC = () => {
               >
                 <Input
                   placeholder="Enter phone number"
-                  disabled
+                  disabled={!isEditMode}
                   prefix={<PhoneOutlined />}
                 />
               </Form.Item>

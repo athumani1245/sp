@@ -6,6 +6,7 @@ import {
   updateLease,
   deleteLease,
   cancelLease,
+  terminateLease,
   renewLease,
   getLeasePayments,
   cancelPayment,
@@ -146,6 +147,24 @@ export const useCancelLease = () => {
     },
     onError: (error: any) => {
       const errorMsg = error.response?.data?.description || error.response?.data?.message || 'Failed to cancel lease';
+      message.error(errorMsg);
+    },
+  });
+};
+
+export const useTerminateLease = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: terminateLease,
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: leaseKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: leaseKeys.detail(variables.leaseId) });
+      queryClient.invalidateQueries({ queryKey: leaseKeys.stats() });
+      message.success('Lease terminated successfully!');
+    },
+    onError: (error: any) => {
+      const errorMsg = error.response?.data?.description || error.response?.data?.message || 'Failed to terminate lease';
       message.error(errorMsg);
     },
   });
