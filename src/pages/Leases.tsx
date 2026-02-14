@@ -256,15 +256,6 @@ const Leases: React.FC = () => {
       width: 130,
     },
     {
-      title: 'Balance',
-      key: 'balance',
-      render: (_, record) => {
-        const balance = record.total_amount - record.amount_paid;
-        return <Text type={balance > 0 ? 'danger' : 'secondary'}>{formatCurrency(balance)}</Text>;
-      },
-      width: 130,
-    },
-    {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
@@ -277,7 +268,7 @@ const Leases: React.FC = () => {
       fixed: 'right',
       width: 150,
       render: (_, record) => {
-        const remaining = record.total_amount - record.amount_paid;
+        const remaining = record.remaining_amount || 0;
         return (
           <Text strong type={remaining > 0 ? 'danger' : 'success'}>
             {formatCurrency(remaining)}
