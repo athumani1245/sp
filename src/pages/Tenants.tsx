@@ -259,7 +259,7 @@ const Tenants: React.FC = () => {
         <Search
           placeholder="Search by name, phone, or email..."
           allowClear
-          enterButton={<SearchOutlined />}
+          prefix={<SearchOutlined />}
           size="large"
           onSearch={handleSearch}
           style={{ width: '100%', maxWidth: 400 }}
