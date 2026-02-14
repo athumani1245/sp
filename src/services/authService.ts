@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 const API_BASE = process.env.REACT_APP_API_BASE || '';
+const API_KEY = process.env.REACT_APP_API_KEY || '';
 
 interface LoginResponse {
   success: boolean;
@@ -22,7 +23,7 @@ export const login = async (username: string, password: string): Promise<LoginRe
     const response = await axios.post(
       `${API_BASE}/auth/login/`,
       { username, password },
-      { headers: { 'Content-Type': 'application/json' } }
+      { headers: { 'Content-Type': 'application/json', 'X-API-KEY': API_KEY } }
     );
 
     const { access, refresh, subscription } = response.data.data;
@@ -59,7 +60,7 @@ export const register = async (phoneNumber: string, otp: string, userData: any):
         otp: otp,
         ...userData,
       },
-      { headers: { 'Content-Type': 'application/json' } }
+      { headers: { 'Content-Type': 'application/json', 'X-API-KEY': API_KEY } }
     );
 
     return {
@@ -80,7 +81,7 @@ export const sendOTP = async (phoneNumber: string): Promise<{ success: boolean; 
     await axios.post(
       `${API_BASE}/auth/send-otp/`,
       { phone_number: phoneNumber },
-      { headers: { 'Content-Type': 'application/json' } }
+      { headers: { 'Content-Type': 'application/json', 'X-API-KEY': API_KEY } }
     );
 
     return { success: true };
@@ -98,7 +99,7 @@ export const verifyOTP = async (phoneNumber: string, otp: string): Promise<{ suc
     await axios.post(
       `${API_BASE}/auth/verify-otp/`,
       { phone_number: phoneNumber, otp: otp },
-      { headers: { 'Content-Type': 'application/json' } }
+      { headers: { 'Content-Type': 'application/json', 'X-API-KEY': API_KEY } }
     );
 
     return { success: true };
@@ -124,6 +125,7 @@ export const logout = async (): Promise<{ success: boolean; error?: string }> =>
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
+            'X-API-KEY': API_KEY,
           },
         }
       );
@@ -148,7 +150,7 @@ export const refreshToken = async (refresh: string): Promise<{ success: boolean;
     const response = await axios.post(
       `${API_BASE}/token/refresh/`,
       { refresh },
-      { headers: { 'Content-Type': 'application/json' } }
+      { headers: { 'Content-Type': 'application/json', 'X-API-KEY': API_KEY } }
     );
 
     if (response.data && response.data.access) {
