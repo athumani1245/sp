@@ -317,7 +317,7 @@ const Properties: React.FC = () => {
               <Search
                 placeholder="Search by property name, location..."
                 allowClear
-                enterButton={<SearchOutlined />}
+                prefix={<SearchOutlined />}
                 size="large"
                 onSearch={handleSearch}
                 value={search}
