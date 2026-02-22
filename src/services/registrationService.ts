@@ -1,6 +1,7 @@
 import axios from "axios";
 
 const API_BASE = process.env.REACT_APP_API_BASE || '';
+const API_KEY = process.env.REACT_APP_API_KEY || '';
 
 interface RegistrationResponse {
   success?: boolean;
@@ -16,7 +17,8 @@ export const registerUser = async (data: any): Promise<RegistrationResponse> => 
       data,
       {
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'X-API-KEY': API_KEY,
         }
       }
     );
@@ -36,7 +38,8 @@ export const sendRegistrationOtp = async (phoneNumber: string): Promise<Registra
       { username: phoneNumber },
       {
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'X-API-KEY': API_KEY,
         }
       }
     );
@@ -62,7 +65,8 @@ export const verifyRegistrationOtp = async (phoneNumber: string, otpCode: string
       },
       {
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'X-API-KEY': API_KEY,
         }
       }
     );
