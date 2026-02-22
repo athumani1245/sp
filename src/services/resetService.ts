@@ -1,6 +1,4 @@
-import axios from 'axios';
-
-const API_BASE = process.env.REACT_APP_API_BASE || '';
+import api from '../utils/api';
 
 interface ApiResponse {
   success: boolean;
@@ -12,10 +10,9 @@ interface ApiResponse {
 // Send OTP for password reset
 export const sendOtpForReset = async (username: string): Promise<ApiResponse> => {
   try {
-    await axios.post(
-      `${API_BASE}/get-otp/`,
-      { username },
-      { headers: { 'Content-Type': 'application/json' } }
+    await api.post(
+      '/get-otp/',
+      { username }
     );
     
     return {
@@ -31,10 +28,9 @@ export const sendOtpForReset = async (username: string): Promise<ApiResponse> =>
 // Verify OTP for password reset
 export const verifyOtpForReset = async (username: string, otp_code: string): Promise<ApiResponse> => {
   try {
-    const response = await axios.post(
-      `${API_BASE}/otp/verify-otp/`,
-      { username, otp_code },
-      { headers: { 'Content-Type': 'application/json' } }
+    const response = await api.post(
+      '/otp/verify-otp/',
+      { username, otp_code }
     );
     
     // Return the response data including token
@@ -53,10 +49,9 @@ export const verifyOtpForReset = async (username: string, otp_code: string): Pro
 export const resetPassword = async (token: string, newPassword: string): Promise<ApiResponse> => {
   try {
     const response = await axios.post(
-      `${API_BASE}/reset-password/`,
-      { token, new_password: newPassword },
-      { headers: { 'Content-Type': 'application/json' } }
-    );
+      `${API_BASE}/reset-paspi.post(
+      '/reset-password/',
+      { token, new_password: newPassword
     
     return {
       success: true,
