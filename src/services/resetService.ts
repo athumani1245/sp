@@ -48,10 +48,10 @@ export const verifyOtpForReset = async (username: string, otp_code: string): Pro
 // Reset password with token
 export const resetPassword = async (token: string, newPassword: string): Promise<ApiResponse> => {
   try {
-    const response = await axios.post(
-      `${API_BASE}/reset-paspi.post(
+    const response = await api.post(
       '/reset-password/',
-      { token, new_password: newPassword
+      { token, new_password: newPassword }
+    );
     
     return {
       success: true,
