@@ -87,14 +87,19 @@ export const getLeases = async (params: LeaseParams = {}) => {
   queryParams.append('include_payments', 'true');
 
   const response = await api.get(`/leases/?${queryParams.toString()}`);
+  
+  // Handle response structure - data can be array directly or object with items
+  const leaseData = response.data.data;
+  const items = Array.isArray(leaseData) ? leaseData : (leaseData?.items || []);
+  
   return {
-    items: response.data.data.items || [],
+    items,
     pagination: {
-      total: response.data.data.count,
-      current_page: response.data.data.current_page,
-      total_pages: response.data.data.total_pages,
-      next: response.data.data.next,
-      previous: response.data.data.previous,
+      total: leaseData?.count || items.length,
+      current_page: leaseData?.current_page || 1,
+      total_pages: leaseData?.total_pages || 1,
+      next: leaseData?.next || null,
+      previous: leaseData?.previous || null,
     },
   };
 };

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Card,
@@ -35,8 +35,10 @@ import {
   CalendarOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
+import { useQueryClient } from '@tanstack/react-query';
 import { useProperty, useUpdateProperty, usePropertyUnits, usePropertyStats, useDeletePropertyUnit, useRegions, useDistricts, useWards } from '../hooks/useProperties';
-import { useLeases } from '../hooks/useLeases';
+import { useLeases, leaseKeys } from '../hooks/useLeases';
+import { getLeases } from '../services/leaseService';
 import AddUnitModal from '../components/forms/AddUnitModal';
 import EditUnitModal from '../components/forms/EditUnitModal';
 import dayjs from 'dayjs';
@@ -55,6 +57,7 @@ interface Unit {
 const PropertyDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [form] = Form.useForm();
   const [isEditMode, setIsEditMode] = useState(false);
   const [activeTab, setActiveTab] = useState('details');
@@ -68,7 +71,11 @@ const PropertyDetail: React.FC = () => {
   const { data: property, isLoading, error } = useProperty(id || '');
   const { data: unitsData, isLoading: unitsLoading, error: unitsError, refetch: refetchUnits } = usePropertyUnits({ property: id || '' });
   const { data: stats } = usePropertyStats(id || '');
-  const { data: leasesData, isLoading: leasesLoading, error: leasesError } = useLeases({ property: id || '' });
+  
+  // Fetch all leases without pagination for client-side filtering
+  // Don't pass page/limit to get all leases
+  const { data: leasesData, isLoading: leasesLoading, error: leasesError } = useLeases({});
+  
   const updatePropertyMutation = useUpdateProperty();
   const deleteUnitMutation = useDeletePropertyUnit();
   const { data: regions, isLoading: regionsLoading } = useRegions();
@@ -76,7 +83,28 @@ const PropertyDetail: React.FC = () => {
   const { data: wards, isLoading: wardsLoading } = useWards(selectedDistrict || '');
 
   const units = unitsData?.items || [];
-  const leases = leasesData?.items || [];
+  
+  // Filter leases client-side based on property ID
+  const leases = useMemo(() => {
+    if (!leasesData?.items || !id) return [];
+    return leasesData.items.filter((lease: any) => {
+      // Match against property ID in lease.property.id
+      const leasePropertyId = lease.property?.id;
+      return leasePropertyId === id;
+    });
+  }, [leasesData, id]);
+
+  // Prefetch leases when property loads
+  useEffect(() => {
+    if (id) {
+      // Prefetch all leases for better performance (no pagination params = fetch all)
+      queryClient.prefetchQuery({
+        queryKey: leaseKeys.list({}),
+        queryFn: () => getLeases({}),
+        staleTime: 1 * 60 * 1000, // Consider data fresh for 1 minute
+      });
+    }
+  }, [id, queryClient]);
 
   // Debug logging
   useEffect(() => {
@@ -87,7 +115,11 @@ const PropertyDetail: React.FC = () => {
     if (unitsError) {
       console.error('Units Error:', unitsError);
     }
-  }, [unitsData, units, unitsError]);
+    if (leasesData) {
+      console.log('All Leases:', leasesData.items?.length || 0);
+      console.log('Filtered Leases for Property:', leases.length);
+    }
+  }, [unitsData, units, unitsError, leasesData, leases]);
 
   // Update form when property data loads
   useEffect(() => {
@@ -440,7 +472,7 @@ const PropertyDetail: React.FC = () => {
           Back to Properties
         </Button>
         <Alert
-          message="Error"
+          title="Error"
           description="Failed to load property details. Please try again."
           type="error"
           showIcon
@@ -689,11 +721,14 @@ const PropertyDetail: React.FC = () => {
                   <Row gutter={16}>
                     <Col xs={24} sm={12}>
                       <Form.Item label="Total Units">
-                        <Input
-                          value={property.units_count || 0}
-                          disabled
-                          addonAfter={<HomeOutlined />}
-                        />
+                        <Space.Compact style={{ width: '100%' }}>
+                          <Input
+                            value={property.units_count || 0}
+                            disabled
+                            style={{ width: 'calc(100% - 32px)' }}
+                          />
+                          <Button disabled icon={<HomeOutlined />} />
+                        </Space.Compact>
                       </Form.Item>
                     </Col>
                   </Row>
@@ -725,14 +760,14 @@ const PropertyDetail: React.FC = () => {
                     </div>
                   ) : unitsError ? (
                     <Alert
-                      message="Error Loading Units"
+                      title="Error Loading Units"
                       description="Failed to load property units. Please try again."
                       type="error"
                       showIcon
                     />
                   ) : units.length === 0 ? (
                     <Alert
-                      message="No Units Found"
+                      title="No Units Found"
                       description="This property has no units yet. Click 'Add Unit' to create one."
                       type="info"
                       showIcon
@@ -765,14 +800,14 @@ const PropertyDetail: React.FC = () => {
                     </div>
                   ) : leasesError ? (
                     <Alert
-                      message="Error Loading Leases"
+                      title="Error Loading Leases"
                       description="Failed to load property leases. Please try again."
                       type="error"
                       showIcon
                     />
                   ) : leases.length === 0 ? (
                     <Alert
-                      message="No Leases Found"
+                      title="No Leases Found"
                       description="This property has no leases yet. Create a lease from the Leases page."
                       type="info"
                       showIcon
