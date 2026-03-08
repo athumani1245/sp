@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Card,
   Button,
@@ -40,6 +41,7 @@ interface EmergencyContact {
 }
 
 const TenantDetail: React.FC = () => {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [form] = Form.useForm();
@@ -125,32 +127,32 @@ const TenantDetail: React.FC = () => {
   // Emergency contacts table columns
   const emergencyContactsColumns: ColumnsType<any> = [
     {
-      title: 'Name',
+      title: t('tenants:tenantDetail.fullName'),
       dataIndex: 'full_name',
       key: 'full_name',
       render: (text) => (
         <Space>
           <UserOutlined />
-          <Text strong>{text || 'N/A'}</Text>
+          <Text strong>{text || t('tenants:tenantDetail.na')}</Text>
         </Space>
       ),
     },
     {
-      title: 'Phone Number',
+      title: t('tenants:tenantDetail.phoneNumberLabel'),
       dataIndex: 'phone_number',
       key: 'phone_number',
       render: (phone) => (
         <Space>
           <PhoneFilled />
-          <Text>{phone || 'N/A'}</Text>
+          <Text>{phone || t('tenants:tenantDetail.na')}</Text>
         </Space>
       ),
     },
     {
-      title: 'Relationship',
+      title: t('tenants:tenantDetail.relationship'),
       dataIndex: 'relationship',
       key: 'relationship',
-      render: (relationship) => relationship || 'N/A',
+      render: (relationship) => relationship || t('tenants:tenantDetail.na'),
     },
   ];
 
@@ -175,11 +177,11 @@ const TenantDetail: React.FC = () => {
     return (
       <div>
         <Button icon={<ArrowLeftOutlined />} onClick={handleBack} style={{ marginBottom: 16 }}>
-          Back to Tenants
+          {t('tenants:tenantDetail.back')}
         </Button>
         <Alert
-          message="Error"
-          description="Failed to load tenant details. Please try again."
+          message={t('common:common.error')}
+          description={t('tenants:tenantDetail.tenantNotFound')}
           type="error"
           showIcon
         />
@@ -194,7 +196,7 @@ const TenantDetail: React.FC = () => {
         <Space style={{ justifyContent: 'space-between', width: '100%' }}>
           <Space>
             <Button icon={<ArrowLeftOutlined />} onClick={handleBack}>
-              Back
+              {t('tenants:tenantDetail.back')}
             </Button>
             <Title level={2} style={{ margin: 0 }}>
               <UserOutlined /> {tenant.first_name} {tenant.last_name}
@@ -203,12 +205,12 @@ const TenantDetail: React.FC = () => {
           <Space>
             {!isEditMode ? (
               <Button type="primary" icon={<EditOutlined />} onClick={handleEdit}>
-                Edit Tenant
+                {t('tenants:tenantDetail.edit')}
               </Button>
             ) : (
               <>
                 <Button icon={<CloseOutlined />} onClick={handleCancel}>
-                  Cancel
+                  {t('tenants:tenantDetail.cancel')}
                 </Button>
                 <Button
                   type="primary"
@@ -216,7 +218,7 @@ const TenantDetail: React.FC = () => {
                   onClick={handleSave}
                   loading={updateTenantMutation.isPending}
                 >
-                  Save Changes
+                  {t('tenants:tenantDetail.save')}
                 </Button>
               </>
             )}
@@ -225,17 +227,17 @@ const TenantDetail: React.FC = () => {
       </div>
 
       {/* Tenant Details Form */}
-      <Card title="Tenant Information">
+      <Card title={t('tenants:tenantDetail.tenantInformation')}>
         <Form form={form} layout="vertical">
           <Row gutter={16}>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="First Name"
+                label={t('tenants:tenantDetail.firstName')}
                 name="first_name"
-                rules={[{ required: true, message: 'Please enter first name' }]}
+                rules={[{ required: true, message: t('tenants:tenantDetail.firstNameRequired') }]}
               >
                 <Input
-                  placeholder="Enter first name"
+                  placeholder={t('tenants:tenantDetail.firstNamePlaceholder')}
                   disabled={!isEditMode}
                   prefix={<UserOutlined />}
                 />
@@ -243,12 +245,12 @@ const TenantDetail: React.FC = () => {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Last Name"
+                label={t('tenants:tenantDetail.lastName')}
                 name="last_name"
-                rules={[{ required: true, message: 'Please enter last name' }]}
+                rules={[{ required: true, message: t('tenants:tenantDetail.lastNameRequired') }]}
               >
                 <Input
-                  placeholder="Enter last name"
+                  placeholder={t('tenants:tenantDetail.lastNamePlaceholder')}
                   disabled={!isEditMode}
                   prefix={<UserOutlined />}
                 />
@@ -259,12 +261,12 @@ const TenantDetail: React.FC = () => {
           <Row gutter={16}>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Phone Number"
+                label={t('tenants:tenantDetail.phoneNumber')}
                 name="username"
-                rules={[{ required: true, message: 'Please enter phone number' }]}
+                rules={[{ required: true, message: t('tenants:tenantDetail.phoneNumberRequired') }]}
               >
                 <Input
-                  placeholder="Enter phone number"
+                  placeholder={t('tenants:tenantDetail.phoneNumberPlaceholder')}
                   disabled={!isEditMode}
                   prefix={<PhoneOutlined />}
                 />
@@ -272,12 +274,12 @@ const TenantDetail: React.FC = () => {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Email"
+                label={t('tenants:tenantDetail.email')}
                 name="email"
-                rules={[{ type: 'email', message: 'Please enter a valid email' }]}
+                rules={[{ type: 'email', message: t('tenants:tenantDetail.emailInvalid') }]}
               >
                 <Input
-                  placeholder="Enter email address"
+                  placeholder={t('tenants:tenantDetail.emailPlaceholder')}
                   disabled={!isEditMode}
                   prefix={<MailOutlined />}
                 />
@@ -287,15 +289,15 @@ const TenantDetail: React.FC = () => {
 
           <Row gutter={16}>
             <Col xs={24} sm={12}>
-              <Form.Item label="Gender" name="gender">
+              <Form.Item label={t('tenants:tenantDetail.gender')} name="gender">
                 <Select
-                  placeholder="Select gender"
+                  placeholder={t('tenants:tenantDetail.selectGender')}
                   disabled={!isEditMode}
                   allowClear
                   options={[
-                    { value: 'Male', label: 'Male' },
-                    { value: 'Female', label: 'Female' },
-                    { value: 'Other', label: 'Other' },
+                    { value: 'Male', label: t('tenants:tenantDetail.male') },
+                    { value: 'Female', label: t('tenants:tenantDetail.female') },
+                    { value: 'Other', label: t('tenants:tenantDetail.other') },
                   ]}
                 />
               </Form.Item>
@@ -309,7 +311,7 @@ const TenantDetail: React.FC = () => {
         title={
           <Space>
             <TeamOutlined />
-            <span>Emergency Contacts ({emergencyContacts.length})</span>
+            <span>{t('tenants:tenantDetail.emergencyContactsTitle')} ({emergencyContacts.length})</span>
           </Space>
         }
         style={{ marginTop: 16 }}
@@ -320,7 +322,7 @@ const TenantDetail: React.FC = () => {
               icon={<PlusOutlined />}
               onClick={addEmergencyContact}
             >
-              Add Contact
+              {t('tenants:tenantDetail.addContact')}
             </Button>
           )
         }
@@ -329,8 +331,8 @@ const TenantDetail: React.FC = () => {
           <>
             {emergencyContacts.length === 0 ? (
               <Alert
-                message="No emergency contacts"
-                description="Add emergency contacts to ensure we can reach someone in case of emergency."
+                message={t('tenants:tenantDetail.noEmergencyContacts')}
+                description={t('tenants:tenantDetail.noEmergencyContactsDesc')}
                 type="info"
                 showIcon
                 style={{ marginBottom: 16 }}
@@ -349,16 +351,16 @@ const TenantDetail: React.FC = () => {
                     icon={<DeleteOutlined />}
                     onClick={() => removeEmergencyContact(index)}
                   >
-                    Remove
+                    {t('tenants:tenantDetail.remove')}
                   </Button>
                 }
               >
                 <Row gutter={16}>
                   <Col xs={24} md={8}>
-                    <Form.Item label="Full Name" style={{ marginBottom: 8 }}>
+                    <Form.Item label={t('tenants:tenantDetail.fullName')} style={{ marginBottom: 8 }}>
                       <Input
                         prefix={<UserOutlined />}
-                        placeholder="Enter full name"
+                        placeholder={t('tenants:tenantDetail.fullNamePlaceholder')}
                         value={contact.full_name || ''}
                         onChange={(e) =>
                           updateEmergencyContact(index, 'full_name', e.target.value)
@@ -367,30 +369,30 @@ const TenantDetail: React.FC = () => {
                     </Form.Item>
                   </Col>
                   <Col xs={24} md={8}>
-                    <Form.Item label="Relationship" style={{ marginBottom: 8 }}>
+                    <Form.Item label={t('tenants:tenantDetail.relationship')} style={{ marginBottom: 8 }}>
                       <Select
-                        placeholder="Select relationship"
+                        placeholder={t('tenants:tenantDetail.selectRelationship')}
                         value={contact.relationship || undefined}
                         onChange={(value) =>
                           updateEmergencyContact(index, 'relationship', value)
                         }
                         style={{ width: '100%' }}
                         options={[
-                          { value: 'Parent', label: 'Parent' },
-                          { value: 'Friend', label: 'Friend' },
-                          { value: 'Spouse', label: 'Spouse' },
-                          { value: 'Sibling', label: 'Sibling' },
-                          { value: 'Relative', label: 'Relative' },
-                          { value: 'Other', label: 'Other' },
+                          { value: 'Parent', label: t('tenants:tenantDetail.relationshipParent') },
+                          { value: 'Friend', label: t('tenants:tenantDetail.relationshipFriend') },
+                          { value: 'Spouse', label: t('tenants:tenantDetail.relationshipSpouse') },
+                          { value: 'Sibling', label: t('tenants:tenantDetail.relationshipSibling') },
+                          { value: 'Relative', label: t('tenants:tenantDetail.relationshipRelative') },
+                          { value: 'Other', label: t('tenants:tenantDetail.relationshipOther') },
                         ]}
                       />
                     </Form.Item>
                   </Col>
                   <Col xs={24} md={8}>
-                    <Form.Item label="Phone Number" style={{ marginBottom: 8 }}>
+                    <Form.Item label={t('tenants:tenantDetail.phoneNumberLabel')} style={{ marginBottom: 8 }}>
                       <Input
                         prefix={<PhoneOutlined />}
-                        placeholder="Enter phone number"
+                        placeholder={t('tenants:tenantDetail.phoneNumberPlaceholder')}
                         value={contact.phone_number || ''}
                         onChange={(e) =>
                           updateEmergencyContact(index, 'phone_number', e.target.value)
@@ -409,7 +411,7 @@ const TenantDetail: React.FC = () => {
             rowKey={(record, index) => `contact-${index}`}
             pagination={false}
             locale={{
-              emptyText: 'No emergency contacts added',
+              emptyText: t('tenants:tenantDetail.noContactsAdded'),
             }}
           />
         )}

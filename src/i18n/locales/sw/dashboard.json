@@ -1,0 +1,50 @@
+{
+  "welcome": "Habari, {{name}}!",
+  "subtitle": "Chunguza taarifa za jumla kuhusu mali na mikataba yako hapa chini.",
+  "stats": {
+    "propertiesAndUnits": "Majengo & Vyumba",
+    "properties": "Majengo",
+    "units": "Vyumba",
+    "occupancy": "Upatikanaji",
+    "occupied": "Vyenye wapangaji",
+    "vacant": "Vilivyo wazi",
+    "totalActiveLeases": "Jumla ya Mikataba Inayofanya Kazi",
+    "revenue": "Mapato",
+    "revenueLabel": "mapato",
+    "outstanding": "deni",
+    "errorLoading": "Imeshindwa kupakia takwimu",
+    "retry": "Jaribu Tena"
+  },
+  "salesChart": {
+    "title": "Kodi Iliyotolewa dhidi ya Kodi Iliyokusanywa",
+    "billed": "Mategemeo",
+    "collected": "Iliyokusanywa",
+    "monthly": "Kwa Mwezi",
+    "yearly": "Kwa Mwaka"
+  },
+  "costChart": {
+    "title": "Mgawanyiko wa Malipo",
+    "year": "Mwaka",
+    "month": "Mwezi",
+    "noData": "Hakuna Taarifa",
+    "noPaymentData": "Hakuna taarifa ya malipo kwa {{month}} {{year}}",
+    "categories": {
+      "rent": "Kodi",
+      "electricity": "Umeme",
+      "water": "Maji",
+      "securityDeposit": "Pesa ya Dhamana",
+      "serviceCharge": "Ada ya Huduma",
+      "other": "Nyingine"
+    }
+  },
+  "tour": {
+    "welcomeTitle": "Karibu kwenye Dashibodi Yako!",
+    "welcomeDesc": "Hapa ndipo kitovu chako ambapo unaweza kuona taarifa muhimu zote kuhusu usimamizi wa mali yako kwa mtazamo wa haraka.",
+    "statsTitle": "Takwimu za Dashibodi",
+    "statsDesc": "Hapa unaweza kuona vipimo muhimu kama jumla ya mali, mikataba inayofanya kazi, jumla ya wapangaji, na mapato ya kila mwezi. Kadi hizi zinakupa muhtasari wa haraka wa biashara yako.",
+    "salesChartTitle": "Chati ya Ripoti ya Mauzo",
+    "salesChartDesc": "Chati hii inaonyesha mwenendo wa mapato yako ya kila mwezi, inakusaidia kufuatilia kipato chako kwa muda.",
+    "costChartTitle": "Mgawanyiko wa Gharama",
+    "costChartDesc": "Angalia usambazaji wa gharama yako katika kategoria mbalimbali kama kodi, huduma za umma, na matengenezo."
+  }
+}

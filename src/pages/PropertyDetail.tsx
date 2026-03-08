@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Card,
   Button,
@@ -57,6 +58,7 @@ interface Unit {
 const PropertyDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [form] = Form.useForm();
   const [isEditMode, setIsEditMode] = useState(false);
@@ -212,11 +214,14 @@ const PropertyDetail: React.FC = () => {
 
   const handleDeleteUnit = (unit: Unit) => {
     Modal.confirm({
-      title: 'Delete Unit',
-      content: `Are you sure you want to delete "${unit.unit_name}" (TSh ${unit.rent_per_month.toLocaleString()}/month)?`,
-      okText: 'Delete',
+      title: t('properties:propertyDetail.deleteUnit'),
+      content: t('properties:propertyDetail.deleteUnitConfirm', { 
+        unitName: unit.unit_name, 
+        rent: unit.rent_per_month.toLocaleString() 
+      }),
+      okText: t('properties:propertyDetail.delete'),
       okType: 'danger',
-      cancelText: 'Cancel',
+      cancelText: t('properties:propertyDetail.cancel'),
       onOk: async () => {
         try {
           await deleteUnitMutation.mutateAsync(unit.id);
@@ -263,15 +268,15 @@ const PropertyDetail: React.FC = () => {
   };
 
   const getLeaseStatusTag = (status: string) => {
-    const statusConfig: Record<string, { color: string; text: string }> = {
-      active: { color: 'success', text: 'Active' },
-      draft: { color: 'default', text: 'Draft' },
-      expired: { color: 'error', text: 'Expired' },
-      terminated: { color: 'default', text: 'Terminated' },
-      cancelled: { color: 'warning', text: 'Cancelled' },
+    const statusConfig: Record<string, { color: string; key: string }> = {
+      active: { color: 'success', key: 'active' },
+      draft: { color: 'default', key: 'draft' },
+      expired: { color: 'error', key: 'expired' },
+      terminated: { color: 'default', key: 'terminated' },
+      cancelled: { color: 'warning', key: 'cancelled' },
     };
     const config = statusConfig[status?.toLowerCase()] || statusConfig.draft;
-    return <Tag color={config.color}>{config.text}</Tag>;
+    return <Tag color={config.color}>{t(`properties:propertyDetail.${config.key}`)}</Tag>;
   };
 
   const formatCurrency = (amount: number) => {
@@ -287,18 +292,18 @@ const PropertyDetail: React.FC = () => {
   };
 
   const getTenantName = (lease: any) => {
-    if (!lease.tenant) return 'Unknown Tenant';
+    if (!lease.tenant) return t('properties:propertyDetail.unknownTenant');
     if (lease.tenant.first_name && lease.tenant.last_name) {
       return `${lease.tenant.first_name} ${lease.tenant.last_name}`;
     }
-    return 'Unknown Tenant';
+    return t('properties:propertyDetail.unknownTenant');
   };
 
   const getUnitInfo = (lease: any) => {
-    if (!lease.unit) return 'Unknown Unit';
+    if (!lease.unit) return t('properties:propertyDetail.unknownUnit');
     if (lease.unit.unit_name) return lease.unit.unit_name;
     if (lease.unit.unit_number) return `Unit ${lease.unit.unit_number}`;
-    return 'Unknown Unit';
+    return t('properties:propertyDetail.unknownUnit');
   };
 
   const handleViewLease = (leaseId: string) => {
@@ -308,29 +313,29 @@ const PropertyDetail: React.FC = () => {
   // Units table columns
   const unitsColumns: ColumnsType<Unit> = [
     {
-      title: 'Unit Name',
+      title: t('properties:propertyDetail.unitName'),
       dataIndex: 'unit_name',
       key: 'unit_name',
       render: (text) => <Text strong>{text}</Text>,
     },
     {
-      title: 'Rent Per Month',
+      title: t('properties:propertyDetail.rentPerMonth'),
       dataIndex: 'rent_per_month',
       key: 'rent_per_month',
       render: (amount) => `TSh ${amount?.toLocaleString() || 0}`,
     },
     {
-      title: 'Status',
+      title: t('properties:propertyDetail.status'),
       dataIndex: 'is_occupied',
       key: 'is_occupied',
       render: (isOccupied) => (
         <Tag color={isOccupied ? 'error' : 'success'}>
-          {isOccupied ? 'Occupied' : 'Available'}
+          {isOccupied ? t('properties:propertyDetail.occupied') : t('properties:propertyDetail.available')}
         </Tag>
       ),
     },
     {
-      title: 'Actions',
+      title: t('properties:propertyDetail.actions'),
       key: 'actions',
       render: (_, record) => (
         <Space size="small">
@@ -340,7 +345,7 @@ const PropertyDetail: React.FC = () => {
             icon={<EditOutlined />}
             onClick={() => handleEditUnit(record)}
           >
-            Edit
+            {t('properties:propertyDetail.edit')}
           </Button>
           <Button 
             type="link" 
@@ -349,7 +354,7 @@ const PropertyDetail: React.FC = () => {
             icon={<DeleteOutlined />}
             onClick={() => handleDeleteUnit(record)}
           >
-            Delete
+            {t('properties:propertyDetail.delete')}
           </Button>
         </Space>
       ),
@@ -359,14 +364,14 @@ const PropertyDetail: React.FC = () => {
   // Leases table columns
   const leasesColumns: ColumnsType<any> = [
     {
-      title: 'Lease #',
+      title: t('properties:propertyDetail.leaseNumber'),
       dataIndex: 'lease_number',
       key: 'lease_number',
       render: (text: string) => <Text strong>{text || 'N/A'}</Text>,
       width: 140,
     },
     {
-      title: 'Unit',
+      title: t('properties:propertyDetail.unit'),
       key: 'unit',
       render: (_, record) => (
         <Space>
@@ -377,7 +382,7 @@ const PropertyDetail: React.FC = () => {
       width: 150,
     },
     {
-      title: 'Tenant',
+      title: t('properties:propertyDetail.tenant'),
       key: 'tenant',
       render: (_, record) => (
         <Space>
@@ -388,7 +393,7 @@ const PropertyDetail: React.FC = () => {
       width: 180,
     },
     {
-      title: 'Period',
+      title: t('properties:propertyDetail.period'),
       key: 'period',
       render: (_, record) => (
         <Space direction="vertical" size={0}>
@@ -396,7 +401,7 @@ const PropertyDetail: React.FC = () => {
             <CalendarOutlined /> {formatDate(record.start_date)}
           </Text>
           <Text type="secondary" style={{ fontSize: '12px' }}>
-            to {formatDate(record.end_date)}
+            {t('properties:propertyDetail.to')} {formatDate(record.end_date)}
           </Text>
         </Space>
       ),
@@ -433,7 +438,7 @@ const PropertyDetail: React.FC = () => {
           icon={<EyeOutlined />}
           onClick={() => handleViewLease(record.id)}
         >
-          View
+          {t('properties:propertyDetail.view')}
         </Button>
       ),
       width: 80,
@@ -469,11 +474,11 @@ const PropertyDetail: React.FC = () => {
     return (
       <div>
         <Button icon={<ArrowLeftOutlined />} onClick={handleBack} style={{ marginBottom: 16 }}>
-          Back to Properties
+          {t('properties:propertyDetail.back')}
         </Button>
         <Alert
-          title="Error"
-          description="Failed to load property details. Please try again."
+          title={t('common:common.error')}
+          description={t('properties:propertyDetail.propertyNotFound')}
           type="error"
           showIcon
         />
@@ -488,7 +493,7 @@ const PropertyDetail: React.FC = () => {
         <Space style={{ justifyContent: 'space-between', width: '100%' }}>
           <Space>
             <Button icon={<ArrowLeftOutlined />} onClick={handleBack}>
-              Back
+              {t('properties:propertyDetail.back')}
             </Button>
             <Title level={2} style={{ margin: 0 }}>
               <BankOutlined /> {property.property_name}
@@ -497,12 +502,12 @@ const PropertyDetail: React.FC = () => {
           <Space>
             {!isEditMode ? (
               <Button type="primary" icon={<EditOutlined />} onClick={handleEdit}>
-                Edit Property
+                {t('properties:propertyDetail.edit')}
               </Button>
             ) : (
               <>
                 <Button icon={<CloseOutlined />} onClick={handleCancel}>
-                  Cancel
+                  {t('properties:propertyDetail.cancel')}
                 </Button>
                 <Button
                   type="primary"
@@ -510,7 +515,7 @@ const PropertyDetail: React.FC = () => {
                   onClick={handleSave}
                   loading={updatePropertyMutation.isPending}
                 >
-                  Save Changes
+                  {t('properties:propertyDetail.save')}
                 </Button>
               </>
             )}
@@ -524,7 +529,7 @@ const PropertyDetail: React.FC = () => {
           <Col xs={24} sm={12} md={6}>
             <Card>
               <Statistic
-                title="Total Units"
+                title={t('properties:propertyDetail.totalUnits')}
                 value={stats.total_units || property.units_count || 0}
                 prefix={<HomeOutlined />}
               />
@@ -533,7 +538,7 @@ const PropertyDetail: React.FC = () => {
           <Col xs={24} sm={12} md={6}>
             <Card>
               <Statistic
-                title="Occupied Units"
+                title={t('properties:propertyDetail.occupiedUnits')}
                 value={stats.occupied_units || 0}
                 valueStyle={{ color: '#3f8600' }}
               />
@@ -542,7 +547,7 @@ const PropertyDetail: React.FC = () => {
           <Col xs={24} sm={12} md={6}>
             <Card>
               <Statistic
-                title="Available Units"
+                title={t('properties:propertyDetail.availableUnits')}
                 value={stats.available_units || 0}
                 valueStyle={{ color: '#1890ff' }}
               />
@@ -551,7 +556,7 @@ const PropertyDetail: React.FC = () => {
           <Col xs={24} sm={12} md={6}>
             <Card>
               <Statistic
-                title="Total Revenue"
+                title={t('properties:propertyDetail.totalRevenue')}
                 value={stats.total_revenue || 0}
                 prefix="TZS"
                 precision={0}
@@ -567,32 +572,31 @@ const PropertyDetail: React.FC = () => {
           activeKey={activeTab}
           onChange={setActiveTab}
           items={[
-            {
-              key: 'details',
-              label: 'Property Details',
+            {              key: 'details',
+              label: t('properties:propertyDetail.propertyDetails'),
               children: (
                 <Form form={form} layout="vertical">
                   <Row gutter={16}>
                     <Col xs={24} sm={12}>
                       <Form.Item
-                        label="Property Name"
+                        label={t('properties:propertyDetail.propertyName')}
                         name="property_name"
-                        rules={[{ required: true, message: 'Please enter property name' }]}
+                        rules={[{ required: true, message: t('properties:propertyDetail.propertyNameRequired') }]}
                       >
                         <Input
-                          placeholder="Enter property name"
+                          placeholder={t('properties:propertyDetail.enterPropertyName')}
                           disabled={!isEditMode}
                         />
                       </Form.Item>
                     </Col>
                     <Col xs={24} sm={12}>
                       <Form.Item
-                        label="Property Type"
+                        label={t('properties:propertyDetail.propertyType')}
                         name="property_type"
-                        rules={[{ required: true, message: 'Please select property type' }]}
+                        rules={[{ required: true, message: t('properties:propertyDetail.propertyTypeRequired') }]}
                       >
                         <Select
-                          placeholder="Select property type"
+                          placeholder={t('properties:propertyDetail.selectPropertyType')}
                           disabled={!isEditMode}
                           options={[
                             { value: 'Standalone', label: 'Standalone' },
@@ -607,7 +611,7 @@ const PropertyDetail: React.FC = () => {
                   <Row gutter={16}>
                     <Col xs={24} sm={12}>
                       {!isEditMode ? (
-                        <Form.Item label="Region">
+                        <Form.Item label={t('properties:propertyDetail.region')}>
                           <Input
                             value={property.address?.region_name || 'N/A'}
                             disabled
@@ -615,12 +619,12 @@ const PropertyDetail: React.FC = () => {
                         </Form.Item>
                       ) : (
                         <Form.Item
-                          label="Region"
+                          label={t('properties:propertyDetail.region')}
                           name="region"
-                          rules={[{ required: true, message: 'Please select region' }]}
+                          rules={[{ required: true, message: t('properties:propertyDetail.regionRequired') }]}
                         >
                           <Select
-                            placeholder="Select Region"
+                            placeholder={t('properties:propertyDetail.selectRegion')}
                             onChange={handleRegionChange}
                             showSearch
                             filterOption={(input, option) =>
@@ -636,7 +640,7 @@ const PropertyDetail: React.FC = () => {
                     </Col>
                     <Col xs={24} sm={12}>
                       {!isEditMode ? (
-                        <Form.Item label="District">
+                        <Form.Item label={t('properties:propertyDetail.district')}>
                           <Input
                             value={property.address?.district_name || 'N/A'}
                             disabled
@@ -644,12 +648,12 @@ const PropertyDetail: React.FC = () => {
                         </Form.Item>
                       ) : (
                         <Form.Item
-                          label="District"
+                          label={t('properties:propertyDetail.district')}
                           name="district"
-                          rules={[{ required: true, message: 'Please select district' }]}
+                          rules={[{ required: true, message: t('properties:propertyDetail.districtRequired') }]}
                         >
                           <Select
-                            placeholder="Select District"
+                            placeholder={t('properties:propertyDetail.selectDistrict')}
                             disabled={!districts || districts.length === 0}
                             onChange={handleDistrictChange}
                             showSearch
@@ -658,8 +662,8 @@ const PropertyDetail: React.FC = () => {
                             }
                             notFoundContent={
                               form.getFieldValue('region')
-                                ? 'No districts available'
-                                : 'Please select a region first'
+                                ? t('properties:propertyDetail.noDistrictsAvailable')
+                                : t('properties:propertyDetail.selectRegionFirst')
                             }
                             options={districts?.map((district: any) => ({
                               value: district.district_code,
@@ -674,16 +678,16 @@ const PropertyDetail: React.FC = () => {
                   <Row gutter={16}>
                     <Col xs={24} sm={12}>
                       {!isEditMode ? (
-                        <Form.Item label="Ward">
+                        <Form.Item label={t('properties:propertyDetail.ward')}>
                           <Input
                             value={property.address?.ward_name || 'N/A'}
                             disabled
                           />
                         </Form.Item>
                       ) : (
-                        <Form.Item label="Ward" name="ward">
+                        <Form.Item label={t('properties:propertyDetail.ward')} name="ward">
                           <Select
-                            placeholder="Select Ward"
+                            placeholder={t('properties:propertyDetail.selectWard')}
                             disabled={!wards || wards.length === 0}
                             allowClear
                             showSearch
@@ -692,8 +696,8 @@ const PropertyDetail: React.FC = () => {
                             }
                             notFoundContent={
                               form.getFieldValue('district')
-                                ? 'No wards available'
-                                : 'Please select a district first'
+                                ? t('properties:propertyDetail.noWardsAvailable')
+                                : t('properties:propertyDetail.selectDistrictFirst')
                             }
                             options={wards?.map((ward: any) => ({
                               value: ward.ward_code,
@@ -705,12 +709,12 @@ const PropertyDetail: React.FC = () => {
                     </Col>
                     <Col xs={24} sm={12}>
                       <Form.Item
-                        label="Street"
+                        label={t('properties:propertyDetail.street')}
                         name="street"
-                        rules={[{ required: true, message: 'Please enter street address' }]}
+                        rules={[{ required: true, message: t('properties:propertyDetail.streetRequired') }]}
                       >
                         <Input
-                          placeholder="Enter street address"
+                          placeholder={t('properties:propertyDetail.enterStreetAddress')}
                           disabled={!isEditMode}
                           prefix={<EnvironmentOutlined />}
                         />
@@ -720,7 +724,7 @@ const PropertyDetail: React.FC = () => {
 
                   <Row gutter={16}>
                     <Col xs={24} sm={12}>
-                      <Form.Item label="Total Units">
+                      <Form.Item label={t('properties:propertyDetail.totalUnits')}>
                         <Space.Compact style={{ width: '100%' }}>
                           <Input
                             value={property.units_count || 0}
@@ -739,7 +743,7 @@ const PropertyDetail: React.FC = () => {
               key: 'units',
               label: (
                 <span>
-                  <HomeOutlined /> Units ({units.length})
+                  <HomeOutlined /> {t('properties:propertyDetail.units')} ({units.length})
                 </span>
               ),
               children: (
@@ -750,7 +754,7 @@ const PropertyDetail: React.FC = () => {
                       icon={<PlusOutlined />}
                       onClick={() => setShowAddUnitModal(true)}
                     >
-                      Add Unit
+                      {t('properties:propertyDetail.addUnit')}
                     </Button>
                   </div>
                   {unitsLoading ? (
@@ -760,15 +764,15 @@ const PropertyDetail: React.FC = () => {
                     </div>
                   ) : unitsError ? (
                     <Alert
-                      title="Error Loading Units"
-                      description="Failed to load property units. Please try again."
+                      title={t('properties:propertyDetail.errorLoadingUnits')}
+                      description={t('properties:propertyDetail.errorLoadingUnitsDesc')}
                       type="error"
                       showIcon
                     />
                   ) : units.length === 0 ? (
                     <Alert
-                      title="No Units Found"
-                      description="This property has no units yet. Click 'Add Unit' to create one."
+                      title={t('properties:propertyDetail.noUnitsFound')}
+                      description={t('properties:propertyDetail.noUnitsFoundDesc')}
                       type="info"
                       showIcon
                     />
@@ -788,7 +792,7 @@ const PropertyDetail: React.FC = () => {
               key: 'leases',
               label: (
                 <span>
-                  <FileTextOutlined /> Leases ({leases.length})
+                  <FileTextOutlined /> {t('properties:propertyDetail.leases')} ({leases.length})
                 </span>
               ),
               children: (
@@ -800,15 +804,15 @@ const PropertyDetail: React.FC = () => {
                     </div>
                   ) : leasesError ? (
                     <Alert
-                      title="Error Loading Leases"
-                      description="Failed to load property leases. Please try again."
+                      title={t('properties:propertyDetail.errorLoadingLeases')}
+                      description={t('properties:propertyDetail.errorLoadingLeasesDesc')}
                       type="error"
                       showIcon
                     />
                   ) : leases.length === 0 ? (
                     <Alert
-                      title="No Leases Found"
-                      description="This property has no leases yet. Create a lease from the Leases page."
+                      title={t('properties:propertyDetail.noLeasesFound')}
+                      description={t('properties:propertyDetail.noLeasesFoundDesc')}
                       type="info"
                       showIcon
                     />

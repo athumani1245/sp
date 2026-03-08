@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Form, Input, Select, Row, Col, message, Spin } from 'antd';
 import { BankOutlined, InfoCircleOutlined, EnvironmentOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import { useRegions, useDistricts, useWards, useAddProperty } from '../../hooks/useProperties';
 
 interface Region {
@@ -36,6 +37,7 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
   onClose,
   onPropertyAdded,
 }) => {
+  const { t } = useTranslation();
   const [form] = Form.useForm();
   const [selectedRegion, setSelectedRegion] = useState<string>();
   const [selectedDistrict, setSelectedDistrict] = useState<string>();
@@ -86,15 +88,15 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
       title={
         <span>
           <BankOutlined style={{ color: '#CC5B4B', marginRight: 8 }} />
-          Add Property
+          {t('properties:addPropertyModal.title')}
         </span>
       }
       open={isOpen}
       onCancel={handleClose}
       onOk={() => form.submit()}
       confirmLoading={addPropertyMutation.isPending}
-      okText="Add Property"
-      cancelText="Cancel"
+      okText={t('properties:addPropertyModal.addProperty')}
+      cancelText={t('properties:addPropertyModal.cancel')}
       width={800}
       okButtonProps={{
         style: { backgroundColor: '#CC5B4B', borderColor: '#CC5B4B' },
@@ -121,29 +123,29 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
             }}
           >
             <InfoCircleOutlined style={{ marginRight: 8 }} />
-            Basic Information
+            {t('properties:addPropertyModal.basicInformation')}
           </div>
 
           <Row gutter={16}>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Property Name"
+                label={t('properties:addPropertyModal.propertyName')}
                 name="propertyName"
-                rules={[{ required: true, message: 'Please enter property name' }]}
-                tooltip="Give your property a unique, descriptive name (e.g., 'Sunset Apartments', 'Green Valley Plaza')"
+                rules={[{ required: true, message: t('properties:addPropertyModal.propertyNameRequired') }]}
+                tooltip={t('properties:addPropertyModal.propertyNameTooltip')}
               >
-                <Input placeholder="Enter property name" prefix={<BankOutlined />} />
+                <Input placeholder={t('properties:addPropertyModal.propertyNamePlaceholder')} prefix={<BankOutlined />} />
               </Form.Item>
             </Col>
 
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Property Type"
+                label={t('properties:addPropertyModal.propertyType')}
                 name="propertyType"
-                tooltip="Select the type of property you're adding"
+                tooltip={t('properties:addPropertyModal.propertyTypeTooltip')}
               >
                 <Select
-                  placeholder="Select property type"
+                  placeholder={t('properties:addPropertyModal.propertyTypePlaceholder')}
                   options={[
                     { value: 'Standalone', label: 'Standalone' },
                     { value: 'Apartment', label: 'Apartment' },
@@ -167,19 +169,19 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
             }}
           >
             <EnvironmentOutlined style={{ marginRight: 8 }} />
-            Location Information
+            {t('properties:addPropertyModal.locationInformation')}
           </div>
 
           <Row gutter={16}>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Region"
+                label={t('properties:addPropertyModal.region')}
                 name="region"
-                rules={[{ required: true, message: 'Please select region' }]}
-                tooltip="Select the administrative region where this property is located"
+                rules={[{ required: true, message: t('properties:addPropertyModal.regionRequired') }]}
+                tooltip={t('properties:addPropertyModal.regionTooltip')}
               >
                 <Select
-                  placeholder="Select Region"
+                  placeholder={t('properties:addPropertyModal.regionPlaceholder')}
                   onChange={handleRegionChange}
                   showSearch
                   filterOption={(input, option) =>
@@ -195,13 +197,13 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
 
             <Col xs={24} sm={12}>
               <Form.Item
-                label="District"
+                label={t('properties:addPropertyModal.district')}
                 name="district"
-                rules={[{ required: true, message: 'Please select district' }]}
-                tooltip="Select the district within the chosen region. Districts will load after selecting a region."
+                rules={[{ required: true, message: t('properties:addPropertyModal.districtRequired') }]}
+                tooltip={t('properties:addPropertyModal.districtTooltip')}
               >
                 <Select
-                  placeholder="Select District"
+                  placeholder={t('properties:addPropertyModal.districtPlaceholder')}
                   onChange={handleDistrictChange}
                   disabled={!districts || districts.length === 0}
                   showSearch
@@ -210,8 +212,8 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
                   }
                   notFoundContent={
                     form.getFieldValue('region')
-                      ? 'No districts available'
-                      : 'Please select a region first'
+                      ? t('properties:addPropertyModal.noDistrictsAvailable')
+                      : t('properties:addPropertyModal.selectRegionFirst')
                   }
                   options={districts?.map((district: any) => ({
                     value: district.district_code,
@@ -225,12 +227,12 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
           <Row gutter={16}>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Ward"
+                label={t('properties:addPropertyModal.ward')}
                 name="ward"
-                tooltip="Optionally specify the ward/neighborhood for more precise location tracking"
+                tooltip={t('properties:addPropertyModal.wardTooltip')}
               >
                 <Select
-                  placeholder="Select Ward"
+                  placeholder={t('properties:addPropertyModal.wardPlaceholder')}
                   disabled={!wards || wards.length === 0}
                   allowClear
                   showSearch
@@ -239,8 +241,8 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
                   }
                   notFoundContent={
                     form.getFieldValue('district')
-                      ? 'No wards available'
-                      : 'Please select a district first'
+                      ? t('properties:addPropertyModal.noWardsAvailable')
+                      : t('properties:addPropertyModal.selectDistrictFirst')
                   }
                   options={wards?.map((ward: any) => ({
                     value: ward.ward_code,
@@ -252,12 +254,12 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
 
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Street Address"
+                label={t('properties:addPropertyModal.streetAddress')}
                 name="street"
-                rules={[{ required: true, message: 'Please enter street address' }]}
-                tooltip="Enter the complete street address including building/plot number (e.g., '123 Beach Road', 'Plot 456 Nyerere St')"
+                rules={[{ required: true, message: t('properties:addPropertyModal.streetAddressRequired') }]}
+                tooltip={t('properties:addPropertyModal.streetAddressTooltip')}
               >
-                <Input placeholder="e.g., 123 Beach Road" prefix={<EnvironmentOutlined />} />
+                <Input placeholder={t('properties:addPropertyModal.streetAddressPlaceholder')} prefix={<EnvironmentOutlined />} />
               </Form.Item>
             </Col>
           </Row>

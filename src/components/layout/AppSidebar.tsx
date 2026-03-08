@@ -12,6 +12,7 @@ import {
 import { useNavigate, useLocation } from 'react-router-dom';
 import type { MenuProps } from 'antd';
 import { useAuth } from '../../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 const { Sider } = Layout;
 
@@ -23,6 +24,7 @@ interface AppSidebarProps {
 type MenuItem = Required<MenuProps>['items'][number];
 
 const AppSidebar: React.FC<AppSidebarProps> = ({ collapsed, isMobile = false }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { hasActiveSubscription, subscription } = useAuth();
@@ -38,17 +40,17 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ collapsed, isMobile = false }) 
     {
       key: '/dashboard',
       icon: <HomeOutlined />,
-      label: 'Home',
+      label: t('common:nav.home'),
       onClick: () => navigate('/dashboard'),
     },
     {
       key: '/properties',
       icon: isSubscriptionExpired ? <LockOutlined /> : <BankOutlined />,
       label: isSubscriptionExpired ? (
-        <Tooltip title="Subscription required">
-          <span>Properties</span>
+        <Tooltip title={t('common:nav.subscriptionRequired')}>
+          <span>{t('common:nav.properties')}</span>
         </Tooltip>
-      ) : 'Properties',
+      ) : t('common:nav.properties'),
       onClick: () => !isSubscriptionExpired && navigate('/properties'),
       disabled: isSubscriptionExpired,
       style: isSubscriptionExpired ? { cursor: 'not-allowed', opacity: 0.5 } : {},
@@ -57,10 +59,10 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ collapsed, isMobile = false }) 
       key: '/tenants',
       icon: isSubscriptionExpired ? <LockOutlined /> : <TeamOutlined />,
       label: isSubscriptionExpired ? (
-        <Tooltip title="Subscription required">
-          <span>Tenants</span>
+        <Tooltip title={t('common:nav.subscriptionRequired')}>
+          <span>{t('common:nav.tenants')}</span>
         </Tooltip>
-      ) : 'Tenants',
+      ) : t('common:nav.tenants'),
       onClick: () => !isSubscriptionExpired && navigate('/tenants'),
       disabled: isSubscriptionExpired,
       style: isSubscriptionExpired ? { cursor: 'not-allowed', opacity: 0.5 } : {},
@@ -69,10 +71,10 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ collapsed, isMobile = false }) 
       key: '/leases',
       icon: isSubscriptionExpired ? <LockOutlined /> : <FileTextOutlined />,
       label: isSubscriptionExpired ? (
-        <Tooltip title="Subscription required">
-          <span>Leases</span>
+        <Tooltip title={t('common:nav.subscriptionRequired')}>
+          <span>{t('common:nav.leases')}</span>
         </Tooltip>
-      ) : 'Leases',
+      ) : t('common:nav.leases'),
       onClick: () => !isSubscriptionExpired && navigate('/leases'),
       disabled: isSubscriptionExpired,
       style: isSubscriptionExpired ? { cursor: 'not-allowed', opacity: 0.5 } : {},
@@ -80,23 +82,23 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ collapsed, isMobile = false }) 
     {
       key: '/subscription',
       icon: <CreditCardOutlined />,
-      label: 'Subscription',
+      label: t('common:nav.subscription'),
       onClick: () => navigate('/subscription'),
     },
     {
       key: 'reports',
       icon: isSubscriptionExpired ? <LockOutlined /> : <FolderOutlined />,
       label: isSubscriptionExpired ? (
-        <Tooltip title="Subscription required">
-          <span>Reports</span>
+        <Tooltip title={t('common:nav.subscriptionRequired')}>
+          <span>{t('common:nav.reports')}</span>
         </Tooltip>
-      ) : 'Reports',
+      ) : t('common:nav.reports'),
       disabled: isSubscriptionExpired,
       style: isSubscriptionExpired ? { cursor: 'not-allowed', opacity: 0.5 } : {},
       children: isSubscriptionExpired ? undefined : [
         {
           key: '/reports/lease',
-          label: 'Lease Agreements',
+          label: t('common:nav.leaseAgreements'),
           onClick: () => navigate('/reports/lease'),
         },
       ],

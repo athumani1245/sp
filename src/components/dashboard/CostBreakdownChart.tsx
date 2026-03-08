@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Card, Select, Typography } from 'antd';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import { useTranslation } from 'react-i18next';
 
 const { Text } = Typography;
 const { Option } = Select;
@@ -11,6 +12,7 @@ interface CostBreakdownChartProps {
 }
 
 const CostBreakdownChart: React.FC<CostBreakdownChartProps> = ({ data, loading }) => {
+  const { t } = useTranslation();
   const [selectedYear, setSelectedYear] = useState<string | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
 
@@ -50,6 +52,21 @@ const CostBreakdownChart: React.FC<CostBreakdownChartProps> = ({ data, loading }
     OTHER: '#6b7280',
   };
 
+  const getCategoryName = (category: string): string => {
+    const categoryMap: Record<string, string> = {
+      'RENT': t('dashboard:costChart.categories.rent'),
+      'ELECTRICITY': t('dashboard:costChart.categories.electricity'),
+      'WATER': t('dashboard:costChart.categories.water'),
+      'Security Deposit': t('dashboard:costChart.categories.securityDeposit'),
+      'SERVICE_CHARGE': t('dashboard:costChart.categories.serviceCharge'),
+      'OTHER': t('dashboard:costChart.categories.other'),
+    };
+    return categoryMap[category] || category
+      .split('_')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+  };
+
   const paymentData = useMemo(() => {
     if (!data?.payment || !selectedYear || !selectedMonth) {
       return [];
@@ -60,15 +77,12 @@ const CostBreakdownChart: React.FC<CostBreakdownChartProps> = ({ data, loading }
 
     return Object.entries(monthData)
       .map(([category, value]: [string, any]) => ({
-        name: category
-          .split('_')
-          .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-          .join(' '),
+        name: getCategoryName(category),
         value: Math.abs(parseFloat(value) || 0),
         color: categoryColors[category] || '#6b7280',
       }))
       .filter((item) => item.value > 0);
-  }, [data?.payment, selectedYear, selectedMonth]);
+  }, [data?.payment, selectedYear, selectedMonth, t]);
 
   const total = paymentData.reduce((sum, item) => sum + item.value, 0);
 
@@ -101,7 +115,7 @@ const CostBreakdownChart: React.FC<CostBreakdownChartProps> = ({ data, loading }
     if (total === 0) {
       return (
         <text x={cx} y={cy} fill="#6b7280" textAnchor="middle" dominantBaseline="central" style={{ fontSize: '14px' }}>
-          No Data
+          {t('dashboard:costChart.noData')}
         </text>
       );
     }
@@ -140,7 +154,7 @@ const CostBreakdownChart: React.FC<CostBreakdownChartProps> = ({ data, loading }
     <Card bordered={false} style={{ borderRadius: '12px', height: '100%' }} loading={loading}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
         <Text strong style={{ fontSize: '16px' }}>
-          Payments Breakdown
+          {t('dashboard:costChart.title')}
         </Text>
         <div style={{ display: 'flex', gap: '8px' }}>
           <Select
@@ -152,7 +166,7 @@ const CostBreakdownChart: React.FC<CostBreakdownChartProps> = ({ data, loading }
             style={{ width: '100px' }}
             size="small"
             disabled={availableYears.length === 0}
-            placeholder="Year"
+            placeholder={t('dashboard:costChart.year')}
           >
             {availableYears.map((year) => (
               <Option key={year} value={year}>
@@ -167,7 +181,7 @@ const CostBreakdownChart: React.FC<CostBreakdownChartProps> = ({ data, loading }
             style={{ width: '100px' }}
             size="small"
             disabled={availableMonths.length === 0}
-            placeholder="Month"
+            placeholder={t('dashboard:costChart.month')}
           >
             {availableMonths.map((month) => (
               <Option key={month} value={month}>
@@ -181,7 +195,10 @@ const CostBreakdownChart: React.FC<CostBreakdownChartProps> = ({ data, loading }
       {paymentData.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '60px 0' }}>
           <Text type="secondary" style={{ fontSize: '14px' }}>
-            No payment data available for {selectedMonth ? monthNames[parseInt(selectedMonth)] : ''} {selectedYear}
+            {t('dashboard:costChart.noPaymentData', {
+              month: selectedMonth ? monthNames[parseInt(selectedMonth)] : '',
+              year: selectedYear || ''
+            })}
           </Text>
         </div>
       ) : (

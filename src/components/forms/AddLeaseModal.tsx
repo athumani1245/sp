@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Modal,
   Form,
@@ -92,6 +93,7 @@ const PAYMENT_SOURCES = [
 
 const AddLeaseModal: React.FC<AddLeaseModalProps> = ({ visible, onCancel, onSuccess }) => {
   const [form] = Form.useForm();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [selectedPropertyId, setSelectedPropertyId] = useState<string>('');
   const [payments, setPayments] = useState<Payment[]>([]);
@@ -219,44 +221,59 @@ const AddLeaseModal: React.FC<AddLeaseModalProps> = ({ visible, onCancel, onSucc
     setPayments([...payments, newPayment]);
     setIsAddingPayment(false);
     form.resetFields(['payment_date', 'category', 'payment_source', 'amount_paid']);
-    message.success('Payment added successfully');
+    message.success(t('leases:addLeaseModal.paymentAddedSuccess'));
   };
 
   const removePayment = (id: string) => {
     setPayments(payments.filter((p) => p.id !== id));
-    message.success('Payment removed');
+    message.success(t('leases:addLeaseModal.paymentRemoved'));
   };
 
   const paymentColumns = [
     {
-      title: 'Date',
+      title: t('leases:addLeaseModal.date'),
       dataIndex: 'payment_date',
       key: 'payment_date',
       width: 120,
       render: (date: string) => dayjs(date).format('DD-MM-YYYY'),
     },
     {
-      title: 'Category',
+      title: t('leases:addLeaseModal.category'),
       dataIndex: 'category',
       key: 'category',
-      render: (category: string) =>
-        PAYMENT_CATEGORIES.find((c) => c.value === category)?.label || category,
+      render: (category: string) => {
+        const categoryMap: Record<string, string> = {
+          'WATER': t('leases:addLeaseModal.water'),
+          'RENT': t('leases:addLeaseModal.rent'),
+          'Security Deposit': t('leases:addLeaseModal.securityDeposit'),
+          'SERVICE_CHARGE': t('leases:addLeaseModal.serviceCharge'),
+          'ELECTRICITY': t('leases:addLeaseModal.electricity'),
+          'OTHER': t('leases:addLeaseModal.other'),
+        };
+        return categoryMap[category] || category;
+      },
     },
     {
-      title: 'Source',
+      title: t('leases:addLeaseModal.source'),
       dataIndex: 'payment_source',
       key: 'payment_source',
-      render: (source: string) =>
-        PAYMENT_SOURCES.find((s) => s.value === source)?.label || source,
+      render: (source: string) => {
+        const sourceMap: Record<string, string> = {
+          'CASH': t('leases:addLeaseModal.cash'),
+          'MB': t('leases:addLeaseModal.mobileMoney'),
+          'BANK': t('leases:addLeaseModal.bankTransfer'),
+        };
+        return sourceMap[source] || source;
+      },
     },
     {
-      title: 'Amount (TSh)',
+      title: t('leases:addLeaseModal.amountTsh'),
       dataIndex: 'amount_paid',
       key: 'amount_paid',
       render: (amount: number) => amount.toLocaleString(),
     },
     {
-      title: 'Actions',
+      title: t('leases:addLeaseModal.actions'),
       key: 'actions',
       width: 80,
       render: (_: any, record: Payment) => (
@@ -279,7 +296,7 @@ const AddLeaseModal: React.FC<AddLeaseModalProps> = ({ visible, onCancel, onSucc
       const selectedTenant = tenants.find((t: any) => t.id === values.tenant_id);
       
       if (!selectedTenant) {
-        message.error('Selected tenant not found');
+        message.error(t('leases:addLeaseModal.selectedTenantNotFound'));
         setLoading(false);
         return;
       }
@@ -341,16 +358,16 @@ const AddLeaseModal: React.FC<AddLeaseModalProps> = ({ visible, onCancel, onSucc
 
   return (
     <Modal
-      title="Create New Lease"
+      title={t('leases:addLeaseModal.title')}
       open={visible}
       onCancel={handleCancel}
       width={700}
       footer={[
         <Button key="cancel" onClick={handleCancel}>
-          Cancel
+          {t('leases:addLeaseModal.cancel')}
         </Button>,
         <Button key="submit" type="primary" loading={loading} onClick={handleSubmit}>
-          Create Lease
+          {t('leases:addLeaseModal.createLease')}
         </Button>,
       ]}
     >
@@ -359,12 +376,12 @@ const AddLeaseModal: React.FC<AddLeaseModalProps> = ({ visible, onCancel, onSucc
         <Row gutter={12}>
           <Col span={12}>
             <Form.Item
-              label="Property"
+              label={t('leases:addLeaseModal.property')}
               name="property_id"
-              rules={[{ required: true, message: 'Please select a property' }]}
+              rules={[{ required: true, message: t('leases:addLeaseModal.propertyRequired') }]}
             >
               <Select
-                placeholder="Select property"
+                placeholder={t('leases:addLeaseModal.selectProperty')}
                 onChange={(value) => handleFieldChange('property_id', value)}
                 showSearch
                 optionFilterProp="children"
@@ -379,12 +396,12 @@ const AddLeaseModal: React.FC<AddLeaseModalProps> = ({ visible, onCancel, onSucc
           </Col>
           <Col span={12}>
             <Form.Item
-              label="Unit"
+              label={t('leases:addLeaseModal.unit')}
               name="unit_id"
-              rules={[{ required: true, message: 'Please select a unit' }]}
+              rules={[{ required: true, message: t('leases:addLeaseModal.unitRequired') }]}
             >
               <Select
-                placeholder="Select unit"
+                placeholder={t('leases:addLeaseModal.selectUnit')}
                 onChange={(value) => handleFieldChange('unit_id', value)}
                 disabled={!formData.property_id}
                 showSearch
@@ -392,7 +409,7 @@ const AddLeaseModal: React.FC<AddLeaseModalProps> = ({ visible, onCancel, onSucc
               >
                 {availableUnits.map((unit: Unit) => (
                   <Option key={unit.id} value={unit.id}>
-                    {unit.unit_name || unit.unit_number || 'Unknown Unit'} - TSh {(unit.rent_per_month || unit.rent_amount || 0).toLocaleString()}/month
+                    {unit.unit_name || unit.unit_number || t('leases:addLeaseModal.unknownUnit')} - TSh {(unit.rent_per_month || unit.rent_amount || 0).toLocaleString()}{t('leases:addLeaseModal.perMonth')}
                   </Option>
                 ))}
               </Select>
@@ -403,12 +420,12 @@ const AddLeaseModal: React.FC<AddLeaseModalProps> = ({ visible, onCancel, onSucc
         <Row gutter={12}>
           <Col span={24}>
             <Form.Item
-              label="Tenant"
+              label={t('leases:addLeaseModal.tenant')}
               name="tenant_id"
-              rules={[{ required: true, message: 'Please select a tenant' }]}
+              rules={[{ required: true, message: t('leases:addLeaseModal.tenantRequired') }]}
             >
               <Select
-                placeholder="Select tenant"
+                placeholder={t('leases:addLeaseModal.selectTenant')}
                 onChange={(value) => handleFieldChange('tenant_id', value)}
                 showSearch
                 optionFilterProp="children"
@@ -429,9 +446,9 @@ const AddLeaseModal: React.FC<AddLeaseModalProps> = ({ visible, onCancel, onSucc
         <Row gutter={12}>
           <Col span={8}>
             <Form.Item
-              label="Start Date"
+              label={t('leases:addLeaseModal.startDate')}
               name="start_date"
-              rules={[{ required: true, message: 'Required' }]}
+              rules={[{ required: true, message: t('leases:addLeaseModal.startDateRequired') }]}
             >
               <DatePicker
                 style={{ width: '100%' }}
@@ -444,15 +461,15 @@ const AddLeaseModal: React.FC<AddLeaseModalProps> = ({ visible, onCancel, onSucc
           </Col>
           <Col span={8}>
             <Form.Item
-              label="Duration (Months)"
+              label={t('leases:addLeaseModal.duration')}
               name="number_of_month"
               rules={[
-                { required: true, message: 'Required' },
-                { type: 'number', min: 1, message: 'Must be at least 1' },
+                { required: true, message: t('leases:addLeaseModal.durationRequired') },
+                { type: 'number', min: 1, message: t('leases:addLeaseModal.mustBeAtLeast1') },
               ]}
             >
               <InputNumber
-                placeholder="Months"
+                placeholder={t('leases:addLeaseModal.enterMonths')}
                 min={1}
                 style={{ width: '100%' }}
                 onChange={(value) => handleFieldChange('number_of_month', value || 0)}
@@ -460,11 +477,11 @@ const AddLeaseModal: React.FC<AddLeaseModalProps> = ({ visible, onCancel, onSucc
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item label="End Date">
+            <Form.Item label={t('leases:addLeaseModal.endDate')}>
               <Input
                 disabled
                 value={formData.end_date ? dayjs(formData.end_date).format('DD-MM-YYYY') : ''}
-                placeholder="Auto-calculated"
+                placeholder={t('leases:addLeaseModal.autoCalculated')}
               />
             </Form.Item>
             <Form.Item name="end_date" hidden>
@@ -477,9 +494,9 @@ const AddLeaseModal: React.FC<AddLeaseModalProps> = ({ visible, onCancel, onSucc
         <Row gutter={12}>
           <Col span={8}>
             <Form.Item
-              label="Monthly Rent (TSh)"
+              label={t('leases:addLeaseModal.monthlyRent')}
               name="rent_amount_per_unit"
-              rules={[{ required: true, message: 'Required' }]}
+              rules={[{ required: true, message: t('leases:addLeaseModal.monthlyRentRequired') }]}
             >
               <InputNumber
                 placeholder="0"
@@ -491,9 +508,9 @@ const AddLeaseModal: React.FC<AddLeaseModalProps> = ({ visible, onCancel, onSucc
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item label="Total Amount (TSh)" name="total_amount">
+            <Form.Item label={t('leases:addLeaseModal.totalAmount')} name="total_amount">
               <InputNumber
-                placeholder="Auto-calculated"
+                placeholder={t('leases:addLeaseModal.autoCalculated')}
                 style={{ width: '100%' }}
                 disabled
                 value={formData.total_amount}
@@ -503,7 +520,7 @@ const AddLeaseModal: React.FC<AddLeaseModalProps> = ({ visible, onCancel, onSucc
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item label="Discount (TSh)" name="discount" initialValue={0}>
+            <Form.Item label={t('leases:addLeaseModal.discount')} name="discount" initialValue={0}>
               <InputNumber
                 placeholder="0"
                 style={{ width: '100%' }}
@@ -519,7 +536,7 @@ const AddLeaseModal: React.FC<AddLeaseModalProps> = ({ visible, onCancel, onSucc
           <InputNumber />
         </Form.Item>
 
-        <Divider style={{ margin: '12px 0' }}>Payments</Divider>
+        <Divider style={{ margin: '12px 0' }}>{t('leases:addLeaseModal.payments')}</Divider>
 
         {/* Payments */}
         <Table
@@ -537,7 +554,7 @@ const AddLeaseModal: React.FC<AddLeaseModalProps> = ({ visible, onCancel, onSucc
               <Col span={6}>
                 <Form.Item name="payment_date" style={{ marginBottom: 0 }}>
                   <DatePicker
-                    placeholder="Date"
+                    placeholder={t('leases:addLeaseModal.paymentDatePlaceholder')}
                     style={{ width: '100%' }}
                     size="small"
                     format="DD-MM-YYYY"
@@ -546,7 +563,7 @@ const AddLeaseModal: React.FC<AddLeaseModalProps> = ({ visible, onCancel, onSucc
               </Col>
               <Col span={6}>
                 <Form.Item name="category" style={{ marginBottom: 0 }}>
-                  <Select placeholder="Category" size="small">
+                  <Select placeholder={t('leases:addLeaseModal.categoryPlaceholder')} size="small">
                     {PAYMENT_CATEGORIES.map((cat) => (
                       <Option key={cat.value} value={cat.value}>
                         {cat.label}
@@ -557,7 +574,7 @@ const AddLeaseModal: React.FC<AddLeaseModalProps> = ({ visible, onCancel, onSucc
               </Col>
               <Col span={6}>
                 <Form.Item name="payment_source" style={{ marginBottom: 0 }}>
-                  <Select placeholder="Source" size="small">
+                  <Select placeholder={t('leases:addLeaseModal.sourcePlaceholder')} size="small">
                     {PAYMENT_SOURCES.map((source) => (
                       <Option key={source.value} value={source.value}>
                         {source.label}
@@ -569,7 +586,7 @@ const AddLeaseModal: React.FC<AddLeaseModalProps> = ({ visible, onCancel, onSucc
               <Col span={6}>
                 <Form.Item name="amount_paid" style={{ marginBottom: 0 }}>
                   <InputNumber 
-                    placeholder="Amount" 
+                    placeholder={t('leases:addLeaseModal.amountPlaceholder')} 
                     style={{ width: '100%' }} 
                     size="small" 
                     min={0}
@@ -600,15 +617,15 @@ const AddLeaseModal: React.FC<AddLeaseModalProps> = ({ visible, onCancel, onSucc
                           amount_paid: values.amount_paid,
                         });
                       } else {
-                        message.error('Please fill all payment fields');
+                        message.error(t('leases:addLeaseModal.fillAllPaymentFields'));
                       }
                     });
                 }}
               >
-                Save
+                {t('leases:addLeaseModal.save')}
               </Button>
               <Button size="small" onClick={() => setIsAddingPayment(false)}>
-                Cancel
+                {t('leases:addLeaseModal.cancel')}
               </Button>
             </Space>
           </div>
@@ -622,7 +639,7 @@ const AddLeaseModal: React.FC<AddLeaseModalProps> = ({ visible, onCancel, onSucc
             size="small"
             block
           >
-            Add Payment
+            {t('leases:addLeaseModal.addPayment')}
           </Button>
         )}
       </Form>

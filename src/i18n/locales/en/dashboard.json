@@ -1,0 +1,50 @@
+{
+  "welcome": "Hello, {{name}}!",
+  "subtitle": "Explore General information about your properties and leases below.",
+  "stats": {
+    "propertiesAndUnits": "Properties & Units",
+    "properties": "properties",
+    "units": "units",
+    "occupancy": "Occupancy",
+    "occupied": "occupied",
+    "vacant": "vacant",
+    "totalActiveLeases": "Total Active Leases",
+    "revenue": "Revenue",
+    "revenueLabel": "revenue",
+    "outstanding": "outstanding",
+    "errorLoading": "Failed to load statistics",
+    "retry": "Retry"
+  },
+  "salesChart": {
+    "title": "Rent Billed vs Rent Collected",
+    "billed": "Billed",
+    "collected": "Collected",
+    "monthly": "Monthly",
+    "yearly": "Yearly"
+  },
+  "costChart": {
+    "title": "Payments Breakdown",
+    "year": "Year",
+    "month": "Month",
+    "noData": "No Data",
+    "noPaymentData": "No payment data available for {{month}} {{year}}",
+    "categories": {
+      "rent": "Rent",
+      "electricity": "Electricity",
+      "water": "Water",
+      "securityDeposit": "Security Deposit",
+      "serviceCharge": "Service Charge",
+      "other": "Other"
+    }
+  },
+  "tour": {
+    "welcomeTitle": "Welcome to Your Dashboard!",
+    "welcomeDesc": "This is your central hub where you can view all important information about your property management at a glance.",
+    "statsTitle": "Dashboard Statistics",
+    "statsDesc": "Here you can see key metrics like total properties, active leases, total tenants, and monthly revenue. These cards give you a quick overview of your business.",
+    "salesChartTitle": "Sales Report Chart",
+    "salesChartDesc": "This chart shows your monthly revenue trends, helping you track your income over time.",
+    "costChartTitle": "Cost Breakdown",
+    "costChartDesc": "View your cost distribution across different categories like rent, utilities, and maintenance."
+  }
+}

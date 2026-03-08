@@ -3,6 +3,7 @@ import { Modal, Form, InputNumber, DatePicker, Select, Row, Col } from 'antd';
 import { DollarOutlined, CalendarOutlined, TagOutlined, WalletOutlined } from '@ant-design/icons';
 import { useCreatePayment } from '../../hooks/usePayments';
 import dayjs from 'dayjs';
+import { useTranslation } from 'react-i18next';
 
 interface AddPaymentModalProps {
   isOpen: boolean;
@@ -17,6 +18,7 @@ const AddPaymentModal: React.FC<AddPaymentModalProps> = ({
   leaseId,
   onPaymentAdded,
 }) => {
+  const { t } = useTranslation();
   const [form] = Form.useForm();
   const createPaymentMutation = useCreatePayment();
 
@@ -62,15 +64,15 @@ const AddPaymentModal: React.FC<AddPaymentModalProps> = ({
       title={
         <span>
           <DollarOutlined style={{ color: '#CC5B4B', marginRight: 8 }} />
-          Record Payment
+          {t('leases:addPaymentModal.title')}
         </span>
       }
       open={isOpen}
       onCancel={handleClose}
       onOk={() => form.submit()}
       confirmLoading={createPaymentMutation.isPending}
-      okText="Record Payment"
-      cancelText="Cancel"
+      okText={t('leases:addPaymentModal.recordPayment')}
+      cancelText={t('leases:addPaymentModal.cancel')}
       width={600}
       okButtonProps={{
         style: { backgroundColor: '#CC5B4B', borderColor: '#CC5B4B' },
@@ -85,13 +87,13 @@ const AddPaymentModal: React.FC<AddPaymentModalProps> = ({
         <Row gutter={16}>
           <Col xs={24} sm={12}>
             <Form.Item
-              label="Amount (TSh)"
+              label={t('leases:addPaymentModal.amount')}
               name="amount_paid"
               rules={[
-                { required: true, message: 'Please enter the payment amount' },
-                { type: 'number', min: 1, message: 'Amount must be greater than 0' },
+                { required: true, message: t('leases:addPaymentModal.amountRequired') },
+                { type: 'number', min: 1, message: t('leases:addPaymentModal.amountMustBePositive') },
               ]}
-              tooltip="Enter the amount paid by the tenant"
+              tooltip={t('leases:addPaymentModal.amountTooltip')}
             >
               <InputNumber
                 style={{ width: '100%' }}
@@ -99,17 +101,17 @@ const AddPaymentModal: React.FC<AddPaymentModalProps> = ({
                 prefix={<DollarOutlined />}
                 formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                 parser={(value) => Number(value?.replace(/\$\s?|(,*)/g, '') || 0) as any}
-                placeholder="0"
+                placeholder={t('leases:addPaymentModal.amountPlaceholder')}
               />
             </Form.Item>
           </Col>
 
           <Col xs={24} sm={12}>
             <Form.Item
-              label="Payment Date"
+              label={t('leases:addPaymentModal.paymentDate')}
               name="date_paid"
-              rules={[{ required: true, message: 'Please select payment date' }]}
-              tooltip="Date when the payment was received"
+              rules={[{ required: true, message: t('leases:addPaymentModal.paymentDateRequired') }]}
+              tooltip={t('leases:addPaymentModal.paymentDateTooltip')}
             >
               <DatePicker
                 style={{ width: '100%' }}
@@ -123,21 +125,21 @@ const AddPaymentModal: React.FC<AddPaymentModalProps> = ({
         <Row gutter={16}>
           <Col xs={24} sm={12}>
             <Form.Item
-              label="Category"
+              label={t('leases:addPaymentModal.category')}
               name="category"
-              rules={[{ required: true, message: 'Please select category' }]}
-              tooltip="Type of payment being recorded"
+              rules={[{ required: true, message: t('leases:addPaymentModal.categoryRequired') }]}
+              tooltip={t('leases:addPaymentModal.categoryTooltip')}
             >
               <Select
-                placeholder="Select Category"
+                placeholder={t('leases:addPaymentModal.categoryPlaceholder')}
                 suffixIcon={<TagOutlined />}
                 options={[
-                  { value: 'RENT', label: 'Rent' },
-                  { value: 'WATER', label: 'Water' },
-                  { value: 'ELECTRICITY', label: 'Electricity' },
-                  { value: 'SERVICE_CHARGE', label: 'Service Charge' },
-                  { value: 'Security Deposit', label: 'Security Deposit' },
-                  { value: 'OTHER', label: 'Other' },
+                  { value: 'RENT', label: t('leases:addPaymentModal.rent') },
+                  { value: 'WATER', label: t('leases:addPaymentModal.water') },
+                  { value: 'ELECTRICITY', label: t('leases:addPaymentModal.electricity') },
+                  { value: 'SERVICE_CHARGE', label: t('leases:addPaymentModal.serviceCharge') },
+                  { value: 'Security Deposit', label: t('leases:addPaymentModal.securityDeposit') },
+                  { value: 'OTHER', label: t('leases:addPaymentModal.other') },
                 ]}
               />
             </Form.Item>
@@ -145,18 +147,18 @@ const AddPaymentModal: React.FC<AddPaymentModalProps> = ({
 
           <Col xs={24} sm={12}>
             <Form.Item
-              label="Payment Source"
+              label={t('leases:addPaymentModal.paymentSource')}
               name="payment_source"
-              rules={[{ required: true, message: 'Please select payment source' }]}
-              tooltip="Method used for payment"
+              rules={[{ required: true, message: t('leases:addPaymentModal.paymentSourceRequired') }]}
+              tooltip={t('leases:addPaymentModal.paymentSourceTooltip')}
             >
               <Select
-                placeholder="Select Payment Source"
+                placeholder={t('leases:addPaymentModal.paymentSourcePlaceholder')}
                 suffixIcon={<WalletOutlined />}
                 options={[
-                  { value: 'CASH', label: 'Cash' },
-                  { value: 'MB', label: 'Mobile Money' },
-                  { value: 'BANK', label: 'Bank Transfer' },
+                  { value: 'CASH', label: t('leases:addPaymentModal.cash') },
+                  { value: 'MB', label: t('leases:addPaymentModal.mobileMoney') },
+                  { value: 'BANK', label: t('leases:addPaymentModal.bankTransfer') },
                 ]}
               />
             </Form.Item>

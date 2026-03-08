@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, Row, Col, Typography, Statistic } from 'antd';
 import { HomeOutlined, DollarOutlined, FileTextOutlined, KeyOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 
 const { Text } = Typography;
 
@@ -12,17 +13,18 @@ interface DashboardStatsProps {
 }
 
 const DashboardStats: React.FC<DashboardStatsProps> = ({ data, loading, error, onRetry }) => {
+  const { t } = useTranslation();
   if (error) {
     return (
       <div style={{ marginBottom: '24px', padding: '16px', background: '#fff2f0', border: '1px solid #ffccc7', borderRadius: '8px' }}>
         <Text type="danger">
-          {error.message || 'Failed to load statistics'}
+          {error.message || t('dashboard:stats.errorLoading')}
         </Text>
         <button
           style={{ marginLeft: '16px', padding: '4px 12px', fontSize: '12px' }}
           onClick={onRetry}
         >
-          Retry
+          {t('dashboard:stats.retry')}
         </button>
       </div>
     );
@@ -67,14 +69,14 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({ data, loading, error, o
             >
               <HomeOutlined style={{ fontSize: '20px', color: '#666' }} />
             </div>
-            <Text style={{ fontSize: '14px', color: '#6B7280' }}>Properties & Units</Text>
+            <Text style={{ fontSize: '14px', color: '#6B7280' }}>{t('dashboard:stats.propertiesAndUnits')}</Text>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Statistic value={stats.totalProperty} valueStyle={{ fontSize: '24px', fontWeight: 'bold' }} />
-            <Text style={{ fontSize: '14px', color: '#6B7280' }}>properties</Text>
+            <Text style={{ fontSize: '14px', color: '#6B7280' }}>{t('dashboard:stats.properties')}</Text>
             <Text style={{ fontSize: '18px', color: '#E5E7EB' }}>|</Text>
             <Statistic value={stats.totalUnits} valueStyle={{ fontSize: '24px', fontWeight: 'bold' }} />
-            <Text style={{ fontSize: '14px', color: '#6B7280' }}>units</Text>
+            <Text style={{ fontSize: '14px', color: '#6B7280' }}>{t('dashboard:stats.units')}</Text>
           </div>
         </Card>
       </Col>
@@ -96,14 +98,14 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({ data, loading, error, o
             >
               <KeyOutlined style={{ fontSize: '20px', color: '#666' }} />
             </div>
-            <Text style={{ fontSize: '14px', color: '#6B7280' }}>Occupancy</Text>
+            <Text style={{ fontSize: '14px', color: '#6B7280' }}>{t('dashboard:stats.occupancy')}</Text>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Statistic value={stats.occupiedUnits} valueStyle={{ fontSize: '24px', fontWeight: 'bold' }} />
-            <Text style={{ fontSize: '14px', color: '#6B7280' }}>occupied</Text>
+            <Text style={{ fontSize: '14px', color: '#6B7280' }}>{t('dashboard:stats.occupied')}</Text>
             <Text style={{ fontSize: '18px', color: '#E5E7EB' }}>|</Text>
             <Statistic value={stats.vacantUnits} valueStyle={{ fontSize: '24px', fontWeight: 'bold' }} />
-            <Text style={{ fontSize: '14px', color: '#6B7280' }}>vacant</Text>
+            <Text style={{ fontSize: '14px', color: '#6B7280' }}>{t('dashboard:stats.vacant')}</Text>
           </div>
         </Card>
       </Col>
@@ -125,7 +127,7 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({ data, loading, error, o
             >
               <FileTextOutlined style={{ fontSize: '20px', color: '#666' }} />
             </div>
-            <Text style={{ fontSize: '14px', color: '#6B7280' }}>Total Active Leases</Text>
+            <Text style={{ fontSize: '14px', color: '#6B7280' }}>{t('dashboard:stats.totalActiveLeases')}</Text>
           </div>
           <Statistic value={stats.totalLeases} valueStyle={{ fontSize: '24px', fontWeight: 'bold' }} />
         </Card>
@@ -148,7 +150,7 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({ data, loading, error, o
             >
               <DollarOutlined style={{ fontSize: '20px', color: '#666' }} />
             </div>
-            <Text style={{ fontSize: '14px', color: '#6B7280' }}>Revenue</Text>
+            <Text style={{ fontSize: '14px', color: '#6B7280' }}>{t('dashboard:stats.revenue')}</Text>
           </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>
             <div>
@@ -156,7 +158,7 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({ data, loading, error, o
                 {formatCurrency(stats.totalRevenue)}
               </Text>
               <br />
-              <Text style={{ fontSize: '11px', color: '#6B7280' }}>revenue</Text>
+              <Text style={{ fontSize: '11px', color: '#6B7280' }}>{t('dashboard:stats.revenueLabel')}</Text>
             </div>
             <Text style={{ fontSize: '16px', color: '#E5E7EB' }}>|</Text>
             <div>
@@ -164,7 +166,7 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({ data, loading, error, o
                 {formatCurrency(stats.totalOutstanding)}
               </Text>
               <br />
-              <Text style={{ fontSize: '11px', color: '#6B7280' }}>outstanding</Text>
+              <Text style={{ fontSize: '11px', color: '#6B7280' }}>{t('dashboard:stats.outstanding')}</Text>
             </div>
           </div>
         </Card>

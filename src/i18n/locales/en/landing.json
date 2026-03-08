@@ -1,0 +1,108 @@
+{
+  "nav": {
+    "features": "Features",
+    "about": "About",
+    "testimonials": "Testimonials",
+    "contact": "Contact",
+    "login": "Login",
+    "getStarted": "Get Started"
+  },
+  "hero": {
+    "title": "Rent & Manage with",
+    "titleHighlight": "Ease",
+    "description": "Streamline your property management with Tanaka's comprehensive platform. From tenant screening to rent collection, we've got you covered.",
+    "startFreeTrial": "Start Free Trial",
+    "signIn": "Sign In",
+    "stats": {
+      "propertiesManaged": "Properties Managed",
+      "happyTenants": "Happy Tenants",
+      "uptime": "Uptime"
+    },
+    "dashboard": {
+      "title": "Property Dashboard",
+      "totalProperties": "Total Properties",
+      "occupiedUnits": "Occupied Units",
+      "monthlyRevenue": "Monthly Revenue",
+      "outstanding": "Outstanding"
+    }
+  },
+  "features": {
+    "title": "Powerful Features",
+    "subtitle": "Everything you need to manage your properties efficiently",
+    "propertyManagement": {
+      "title": "Property Management",
+      "description": "Manage multiple properties with ease. Track units, tenants, and maintenance all in one place."
+    },
+    "tenantManagement": {
+      "title": "Tenant Management",
+      "description": "Keep detailed tenant records, track lease agreements, and manage communications effortlessly."
+    },
+    "leaseTracking": {
+      "title": "Lease Tracking",
+      "description": "Monitor lease terms, renewal dates, and rental agreements with automated reminders."
+    },
+    "paymentTracking": {
+      "title": "Payment Tracking",
+      "description": "Track rent payments, late fees, and generate financial reports with our integrated system."
+    },
+    "maintenanceRequests": {
+      "title": "Maintenance Requests",
+      "description": "Handle maintenance requests efficiently with our ticketing system and vendor management."
+    },
+    "analytics": {
+      "title": "Analytics & Reports",
+      "description": "Get insights into your property performance with detailed analytics and custom reports."
+    }
+  },
+  "about": {
+    "title": "Why Choose Tanaka?",
+    "description": "We understand the challenges of property management in Tanzania. That's why we've built a platform specifically designed for local needs.",
+    "features": {
+      "localCurrency": "Local currency and payment methods",
+      "language": "Swahili and English language support",
+      "mobileFirst": "Mobile-first design for accessibility",
+      "support": "24/7 customer support"
+    },
+    "recentActivity": {
+      "title": "Recent Activity",
+      "newTenant": "New tenant registered: John Mwamba",
+      "paymentReceived": "Payment received: TZS 450,000",
+      "maintenanceRequest": "Maintenance request submitted",
+      "leaseRenewed": "Lease agreement renewed"
+    }
+  },
+  "testimonials": {
+    "title": "What Our Users Say",
+    "subtitle": "Join thousands of satisfied property managers and owners",
+    "testimonial1": {
+      "name": "Sarah Johnson",
+      "role": "Property Owner",
+      "text": "Tanaka has revolutionized how I manage my rental properties. Everything is so much easier now!"
+    },
+    "testimonial2": {
+      "name": "Michael Chen",
+      "role": "Real Estate Investor",
+      "text": "The best property management platform I've used. Saves me hours every week."
+    },
+    "testimonial3": {
+      "name": "Emily Davis",
+      "role": "Property Manager",
+      "text": "Outstanding features and excellent customer support. Highly recommended!"
+    }
+  },
+  "cta": {
+    "title": "Ready to Get Started?",
+    "description": "Join thousands of property managers who trust Tanaka for their business",
+    "startFreeTrial": "Start Free Trial",
+    "signIn": "Sign In"
+  },
+  "footer": {
+    "tagline": "Streamlining property management across Tanzania.",
+    "contact": "Contact",
+    "quickLinks": "Quick Links",
+    "features": "Features",
+    "privacy": "Privacy",
+    "support": "Support",
+    "copyright": "All rights reserved."
+  }
+}

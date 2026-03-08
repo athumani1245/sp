@@ -1,0 +1,93 @@
+{
+  "title": "Subscription",
+  "subtitle": "Manage your subscription and billing",
+  "currentPlan": {
+    "title": "Current Plan",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "maxUnits": "Maximum Units",
+    "daysRemaining": "days remaining",
+    "noSubscription": "No Active Subscription",
+    "noSubscriptionDesc": "Choose a plan below to get started"
+  },
+  "billingHistory": {
+    "title": "Billing History",
+    "date": "Date",
+    "package": "Package",
+    "plan": "Plan",
+    "amount": "Amount",
+    "status": "Status",
+    "statusSuccess": "Success",
+    "statusPending": "Pending",
+    "statusFailed": "Failed",
+    "noHistory": "No billing history"
+  },
+  "packages": {
+    "title": "Available Packages",
+    "upTo": "Up to",
+    "units": "units",
+    "propertyManagers": "property managers",
+    "selected": "Selected",
+    "youSave": "You save",
+    "days": "days",
+    "availablePlans": "Available Plans",
+    "save": "Save",
+    "viewPlan": "View {{count}} Plan",
+    "viewPlans": "View {{count}} Plans",
+    "close": "Close",
+    "noPlansAvailable": "No Plans Available",
+    "proceedToPayment": "Proceed to Payment",
+    "changePlan": "Change Plan"
+  },
+  "confirmModal": {
+    "title": "Confirm Payment",
+    "heading": "Please confirm your subscription details:",
+    "selectedPlan": "Selected Plan",
+    "duration": "Duration",
+    "amount": "Amount",
+    "paymentInfo": "Payment Information",
+    "paymentInfoDesc": "A payment prompt will be sent to your phone. Please enter your PIN to complete the payment.",
+    "phoneNumber": "Phone Number",
+    "phoneNumberHelp": "Enter your mobile money number without the country code",
+    "phoneNumberError": "Please enter a valid 9-digit phone number",
+    "back": "Back",
+    "confirmAndPay": "Confirm & Pay"
+  },
+  "paymentModal": {
+    "titleProcessing": "Complete Payment on Your Phone",
+    "titleSuccess": "Payment Successful",
+    "titleFailed": "Payment Failed",
+    "waitingForPayment": "Waiting for Payment Confirmation",
+    "checkPhone": "Please check your phone for a payment prompt",
+    "amount": "Amount",
+    "phone": "Phone",
+    "followSteps": "Follow these steps:",
+    "step1": "Check your phone for a USSD prompt",
+    "step2": "Enter your PIN when prompted",
+    "step3": "Confirm the payment amount and details",
+    "step4": "Wait for confirmation (this page will update automatically)",
+    "processing": "This may take a few moments to process...",
+    "cancelPayment": "Cancel Payment",
+    "continue": "Continue",
+    "close": "Close",
+    "successHeading": "Payment Completed Successfully!",
+    "successDesc": "Your subscription has been activated. You can now enjoy all the features of your selected plan.",
+    "plan": "Plan",
+    "accountUpgraded": "Your account has been upgraded successfully!",
+    "autoCloseMessage": "This modal will close automatically in a few seconds...",
+    "failedHeading": "Payment Failed",
+    "failedReasons": "Your payment could not be processed. This might be due to:",
+    "reason1": "Insufficient balance in your mobile money account",
+    "reason2": "Network connectivity issues",
+    "reason3": "Incorrect PIN entered",
+    "reason4": "Payment timeout",
+    "checkBalance": "Please check your mobile money balance and try again or contact support if you need assistance."
+  },
+  "status": {
+    "active": "Active",
+    "expired": "Expired"
+  },
+  "messages": {
+    "successActivated": "Subscription activated successfully!"
+  }
+}

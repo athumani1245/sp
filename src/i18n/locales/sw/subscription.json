@@ -1,0 +1,93 @@
+{
+  "title": "Usajili",
+  "subtitle": "Simamia usajili na malipo yako",
+  "currentPlan": {
+    "title": "Mpango wa Sasa",
+    "startDate": "Tarehe ya Kuanza",
+    "endDate": "Tarehe ya Mwisho",
+    "maxUnits": "Idadi ya Juu ya Vyumba",
+    "daysRemaining": "siku zilizobaki",
+    "noSubscription": "Hakuna Usajili wa Sasa",
+    "noSubscriptionDesc": "Chagua mpango hapa chini ili kuanza"
+  },
+  "billingHistory": {
+    "title": "Historia ya Malipo",
+    "date": "Tarehe",
+    "package": "Kifurushi",
+    "plan": "Mpango",
+    "amount": "Kiasi",
+    "status": "Hali",
+    "statusSuccess": "Imefaulu",
+    "statusPending": "Inasubiri",
+    "statusFailed": "Imeshindwa",
+    "noHistory": "Hakuna historia ya malipo"
+  },
+  "packages": {
+    "title": "Vifurushi Vinavyopatikana",
+    "upTo": "Hadi",
+    "units": "vitengo",
+    "propertyManagers": "wasimamizi wa mali",
+    "selected": "Umechagua",
+    "youSave": "Unaokoa",
+    "days": "siku",
+    "availablePlans": "Mipango Inayopatikana",
+    "save": "Okoa",
+    "viewPlan": "Angalia Mpango {{count}}",
+    "viewPlans": "Angalia Mipango {{count}}",
+    "close": "Funga",
+    "noPlansAvailable": "Hakuna Mipango Inayopatikana",
+    "proceedToPayment": "Endelea na Malipo",
+    "changePlan": "Badilisha Mpango"
+  },
+  "confirmModal": {
+    "title": "Thibitisha Malipo",
+    "heading": "Tafadhali thibitisha maelezo ya usajili wako:",
+    "selectedPlan": "Mpango Uliochagua",
+    "duration": "Muda",
+    "amount": "Kiasi",
+    "paymentInfo": "Taarifa za Malipo",
+    "paymentInfoDesc": "Ujumbe wa malipo utatumwa kwenye simu yako. Tafadhali ingiza PIN yako ili kukamilisha malipo.",
+    "phoneNumber": "Nambari ya Simu",
+    "phoneNumberHelp": "Ingiza nambari yako ya pesa ya simu bila msimbo wa nchi",
+    "phoneNumberError": "Tafadhali ingiza nambari sahihi ya tarakimu 9",
+    "back": "Rudi",
+    "confirmAndPay": "Thibitisha na Lipa"
+  },
+  "paymentModal": {
+    "titleProcessing": "Kamilisha Malipo Kwenye Simu Yako",
+    "titleSuccess": "Malipo Yamefaulu",
+    "titleFailed": "Malipo Yameshindwa",
+    "waitingForPayment": "Inasubiri Uthibitisho wa Malipo",
+    "checkPhone": "Tafadhali angalia simu yako kwa ujumbe wa malipo",
+    "amount": "Kiasi",
+    "phone": "Simu",
+    "followSteps": "Fuata hatua hizi:",
+    "step1": "Angalia simu yako kwa ujumbe wa USSD",
+    "step2": "Ingiza PIN yako unapoulizwa",
+    "step3": "Thibitisha kiasi cha malipo na maelezo",
+    "step4": "Subiri uthibitisho (ukurasa huu utajisasisha moja kwa moja)",
+    "processing": "Hii inaweza kuchukua muda kidogo...",
+    "cancelPayment": "Ghairi Malipo",
+    "continue": "Endelea",
+    "close": "Funga",
+    "successHeading": "Malipo Yamekamilika kwa Ufanisi!",
+    "successDesc": "Usajili wako umewashwa. Sasa unaweza kufurahia vipengele vyote vya mpango uliochagua.",
+    "plan": "Mpango",
+    "accountUpgraded": "Akaunti yako imeboreshwa kwa mafanikio!",
+    "autoCloseMessage": "Kidirisha hiki kitafungwa moja kwa moja baada ya sekunde chache...",
+    "failedHeading": "Malipo Yameshindwa",
+    "failedReasons": "Malipo yako hayakuweza kusindikwa. Hii inaweza kuwa kwa sababu ya:",
+    "reason1": "Salio dogo kwenye akaunti yako ya pesa ya simu",
+    "reason2": "Matatizo ya muunganisho wa mtandao",
+    "reason3": "PIN isiyo sahihi",
+    "reason4": "Muda wa malipo umeisha",
+    "checkBalance": "Tafadhali angalia salio lako la pesa ya simu na jaribu tena au wasiliana na msaada ikiwa unahitaji usaidizi."
+  },
+  "status": {
+    "active": "Inafanya Kazi",
+    "expired": "Imeisha"
+  },
+  "messages": {
+    "successActivated": "Usajili umewashwa kwa mafanikio!"
+  }
+}

@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Table,
   Button,
@@ -69,6 +70,7 @@ interface Lease {
 const Leases: React.FC = () => {
   const navigate = useNavigate();
   const screens = useBreakpoint();
+  const { t } = useTranslation();
   const { open: tourOpen, setOpen: setTourOpen, markTourCompleted } = useTour('leases');
 
   const [search, setSearch] = useState('');
@@ -87,22 +89,22 @@ const Leases: React.FC = () => {
   // Tour steps configuration
   const tourSteps: TourProps['steps'] = [
     {
-      title: 'Welcome to Leases Management',
-      description: 'Track and manage all your property leases here. Let\'s walk through the main features!',
+      title: t('leases:leases.tourWelcomeTitle'),
+      description: t('leases:leases.tourWelcomeDesc'),
     },
     {
-      title: 'Add New Lease',
-      description: 'Click here to create a new lease agreement. You can assign properties, tenants, and set payment terms.',
+      title: t('leases:leases.tourAddTitle'),
+      description: t('leases:leases.tourAddDesc'),
       target: () => addButtonRef.current,
     },
     {
-      title: 'Filter Options',
-      description: 'Use search and status filters to quickly find specific leases. Filter by active, expired, or other statuses.',
+      title: t('leases:leases.tourFiltersTitle'),
+      description: t('leases:leases.tourFiltersDesc'),
       target: () => filtersRef.current,
     },
     {
-      title: 'Leases List',
-      description: 'View all lease details including rent amounts, payment status, and lease periods. Click any row for more details.',
+      title: t('leases:leases.tourTableTitle'),
+      description: t('leases:leases.tourTableDesc'),
       target: () => tableRef.current,
     },
   ];
@@ -157,11 +159,11 @@ const Leases: React.FC = () => {
 
   const getStatusTag = (status: string) => {
     const statusConfig: Record<string, { color: string; text: string }> = {
-      active: { color: 'success', text: 'Active' },
-      draft: { color: 'default', text: 'Draft' },
-      expired: { color: 'error', text: 'Expired' },
-      terminated: { color: 'default', text: 'Terminated' },
-      cancelled: { color: 'warning', text: 'Cancelled' },
+      active: { color: 'success', text: t('leases:leases.active') },
+      draft: { color: 'default', text: t('leases:leases.draft') },
+      expired: { color: 'error', text: t('leases:leases.expired') },
+      terminated: { color: 'default', text: t('leases:leases.terminated') },
+      cancelled: { color: 'warning', text: t('leases:leases.cancelled') },
     };
     const config = statusConfig[status?.toLowerCase()] || statusConfig.draft;
     return <Tag color={config.color}>{config.text}</Tag>;
@@ -173,41 +175,41 @@ const Leases: React.FC = () => {
   };
 
   const formatDate = (dateString: string) => {
-    if (!dateString) return 'N/A';
+    if (!dateString) return t('leases:leases.na');
     // API returns dates in DD-MM-YYYY format, parse accordingly
     const [day, month, year] = dateString.split('-');
     return dayjs(`${year}-${month}-${day}`).format('MMM DD, YYYY');
   };
 
   const getUnitInfo = (lease: Lease) => {
-    if (!lease.unit) return 'Unknown Unit';
+    if (!lease.unit) return t('leases:leases.unknownUnit');
     if (lease.unit.unit_name) return lease.unit.unit_name;
-    if (lease.unit.unit_number) return `Unit ${lease.unit.unit_number}`;
-    return 'Unknown Unit';
+    if (lease.unit.unit_number) return `${t('leases:leases.unit')} ${lease.unit.unit_number}`;
+    return t('leases:leases.unknownUnit');
   };
 
   const getTenantName = (lease: Lease) => {
-    if (!lease.tenant) return 'Unknown Tenant';
+    if (!lease.tenant) return t('leases:leases.unknownTenant');
     if (lease.tenant.first_name && lease.tenant.last_name) {
       return `${lease.tenant.first_name} ${lease.tenant.last_name}`;
     }
-    return 'Unknown Tenant';
+    return t('leases:leases.unknownTenant');
   };
 
   const columns: ColumnsType<Lease> = [
     {
-      title: 'Lease #',
+      title: t('leases:leases.leaseNumber'),
       dataIndex: 'lease_number',
       key: 'lease_number',
-      render: (text: string) => <Text strong>{text || 'N/A'}</Text>,
+      render: (text: string) => <Text strong>{text || t('leases:leases.na')}</Text>,
       width: 140,
     },
     {
-      title: 'Property',
+      title: t('leases:leases.property'),
       key: 'property',
       render: (_, record) => (
         <Space vertical size={0}>
-          <Text>{record.property?.property_name || 'N/A'}</Text>
+          <Text>{record.property?.property_name || t('leases:leases.na')}</Text>
           <Text type="secondary" style={{ fontSize: '12px' }}>
             {getUnitInfo(record)}
           </Text>
@@ -216,7 +218,7 @@ const Leases: React.FC = () => {
       width: 200,
     },
     {
-      title: 'Tenant',
+      title: t('leases:leases.tenant'),
       key: 'tenant',
       render: (_, record) => (
         <Space>
@@ -227,7 +229,7 @@ const Leases: React.FC = () => {
       width: 180,
     },
     {
-      title: 'Period',
+      title: t('leases:leases.period'),
       key: 'period',
       render: (_, record) => (
         <Space vertical size={0}>
@@ -235,35 +237,35 @@ const Leases: React.FC = () => {
             <CalendarOutlined /> {formatDate(record.start_date)}
           </Text>
           <Text type="secondary" style={{ fontSize: '12px' }}>
-            to {formatDate(record.end_date)}
+            {t('leases:leases.to')} {formatDate(record.end_date)}
           </Text>
         </Space>
       ),
       width: 150,
     },
     {
-      title: 'Rent Amount',
+      title: t('leases:leases.rentAmount'),
       dataIndex: 'total_amount',
       key: 'total_amount',
       render: (amount: number) => <Text>{formatCurrency(amount)}</Text>,
       width: 130,
     },
     {
-      title: 'Amount Paid',
+      title: t('leases:leases.amountPaid'),
       dataIndex: 'amount_paid',
       key: 'amount_paid',
       render: (amount: number) => <Text type="success">{formatCurrency(amount)}</Text>,
       width: 130,
     },
     {
-      title: 'Status',
+      title: t('leases:leases.status'),
       dataIndex: 'status',
       key: 'status',
       render: (status: string) => getStatusTag(status),
       width: 100,
     },
     {
-      title: 'Amount Remaining',
+      title: t('leases:leases.amountRemaining'),
       key: 'amount_remaining',
       fixed: 'right',
       width: 150,
@@ -285,13 +287,13 @@ const Leases: React.FC = () => {
         <Row justify="space-between" align="middle">
           <Col xs={24} sm={12}>
             <Title level={2} style={{ margin: 0 }}>
-              <FileTextOutlined /> Leases
+              <FileTextOutlined /> {t('leases:leases.title')}
             </Title>
           </Col>
           <Col xs={24} sm={12} style={{ textAlign: 'right', marginTop: window.innerWidth < 576 ? 16 : 0 }}>
             <div ref={addButtonRef}>
               <Button type="primary" icon={<PlusOutlined />} onClick={() => setShowAddModal(true)}>
-                Add Lease
+                {t('leases:leases.addLease')}
               </Button>
             </div>
           </Col>
@@ -303,7 +305,7 @@ const Leases: React.FC = () => {
           <Row gutter={[16, 16]} align="middle">
             <Col xs={24} sm={24} md={12} lg={10}>
               <Search
-                placeholder="Search by lease number, tenant, or property..."
+                placeholder={t('leases:leases.searchPlaceholder')}
                 allowClear
                 onSearch={handleSearch}
                 style={{ width: '100%' }}
@@ -312,22 +314,22 @@ const Leases: React.FC = () => {
             </Col>
             <Col xs={12} sm={8} md={6} lg={4}>
               <Select
-                placeholder="Filter by status"
+                placeholder={t('leases:leases.filterByStatus')}
                 allowClear
                 style={{ width: '100%' }}
                 value={statusFilter || undefined}
                 onChange={handleStatusChange}
               >
-                <Select.Option value="active">Active</Select.Option>
-                <Select.Option value="expired">Expired</Select.Option>
-                <Select.Option value="terminated">Terminated</Select.Option>
-                <Select.Option value="cancelled">Cancelled</Select.Option>
-                <Select.Option value="draft">Draft</Select.Option>
+                <Select.Option value="active">{t('leases:leases.active')}</Select.Option>
+                <Select.Option value="expired">{t('leases:leases.expired')}</Select.Option>
+                <Select.Option value="terminated">{t('leases:leases.terminated')}</Select.Option>
+                <Select.Option value="cancelled">{t('leases:leases.cancelled')}</Select.Option>
+                <Select.Option value="draft">{t('leases:leases.draft')}</Select.Option>
               </Select>
             </Col>
             <Col xs={12} sm={8} md={6} lg={4}>
               <Button icon={<ReloadOutlined />} onClick={() => refetch()} style={{ width: '100%' }}>
-                Refresh
+                {t('leases:leases.refresh')}
               </Button>
             </Col>
           </Row>
@@ -352,7 +354,7 @@ const Leases: React.FC = () => {
                 pageSize: pageSize,
                 total: data?.pagination?.total || 0,
                 showSizeChanger: true,
-                showTotal: (total) => `Total ${total} leases`,
+                showTotal: (total) => t('leases:leases.totalLeases', { count: total }),
               }}
               onChange={handleTableChange}
               scroll={{ x: 1200 }}
@@ -379,19 +381,19 @@ const Leases: React.FC = () => {
 
       {/* Delete Confirmation Modal */}
       <Modal
-        title="Delete Lease"
+        title={t('leases:leases.deleteLease')}
         open={deleteModalVisible}
         onOk={handleDeleteConfirm}
         onCancel={() => {
           setDeleteModalVisible(false);
           setSelectedLease(null);
         }}
-        okText="Delete"
+        okText={t('leases:leases.delete')}
+        cancelText={t('leases:leases.cancel')}
         okButtonProps={{ danger: true, loading: deleteMutation.isPending }}
       >
         <p>
-          Are you sure you want to delete lease <strong>{selectedLease?.lease_number}</strong>?
-          This action cannot be undone.
+          {t('leases:leases.deleteLeaseConfirm', { leaseNumber: selectedLease?.lease_number })}
         </p>
       </Modal>
 

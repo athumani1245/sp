@@ -1,0 +1,27 @@
+{
+  "language": {
+    "en": "Kiingereza",
+    "sw": "Kiswahili"
+  },
+  "common": {
+    "yes": "Ndiyo",
+    "no": "Hapana",
+    "ok": "Sawa",
+    "cancel": "Ghairi",
+    "save": "Hifadhi",
+    "delete": "Futa",
+    "edit": "Hariri",
+    "close": "Funga",
+    "loading": "Inapakia...",
+    "error": "Kosa",
+    "success": "Imefanikiwa"  },
+  "nav": {
+    "home": "Nyumbani",
+    "properties": "Mali",
+    "tenants": "Wapangaji",
+    "leases": "Mikataba",
+    "subscription": "Usajili",
+    "reports": "Ripoti",
+    "leaseAgreements": "Mikataba ya Upangaji",
+    "subscriptionRequired": "Unahitaji usajili"  }
+}

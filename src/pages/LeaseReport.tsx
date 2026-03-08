@@ -31,6 +31,7 @@ import type { ColumnsType } from 'antd/es/table';
 import { useLeaseReport } from '../hooks/useLeases';
 import dayjs, { Dayjs } from 'dayjs';
 import { exportLeaseReportToExcel, exportLeaseReportToPDF } from '../services/reportService';
+import { useTranslation } from 'react-i18next';
 
 const { Title, Text } = Typography;
 const { RangePicker } = DatePicker;
@@ -52,6 +53,7 @@ interface LeaseData {
 }
 
 const LeaseReport: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [filterText, setFilterText] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('');
@@ -165,7 +167,7 @@ const LeaseReport: React.FC = () => {
     setStatusFilter('');
     setPaymentStatusFilter('');
     setDateRange(null);
-    message.success('Filters reset');
+    message.success(t('leaseReport:filters.filtersReset'));
   };
 
   // Handle export
@@ -175,7 +177,7 @@ const LeaseReport: React.FC = () => {
       : filteredData;
 
     if (exportData.length === 0) {
-      message.warning('No data available to export');
+      message.warning(t('leaseReport:export.noData'));
       return;
     }
 
@@ -190,94 +192,94 @@ const LeaseReport: React.FC = () => {
           data: exportData,
           visibleColumns: visibleColumnKeys,
         });
-        message.success(`Successfully exported ${exportData.length} records to Excel`);
+        message.success(t('leaseReport:export.successExcel', { count: exportData.length }));
       } else if (format === 'pdf') {
         exportLeaseReportToPDF({
           data: exportData,
           visibleColumns: visibleColumnKeys,
         });
-        message.success(`Successfully exported ${exportData.length} records to PDF`);
+        message.success(t('leaseReport:export.successPdf', { count: exportData.length }));
       }
     } catch (error: any) {
       console.error('Export error:', error);
-      message.error(error.message || `Failed to export data to ${format.toUpperCase()}`);
+      message.error(error.message || t(`leaseReport:export.error${format === 'excel' ? 'Excel' : 'Pdf'}`));
     }
   };
 
   // Column definitions
   const allColumns: ColumnsType<LeaseData> = [
     {
-      title: 'Lease No.',
+      title: t('leaseReport:columns.leaseNo'),
       dataIndex: 'lease_number',
       key: 'lease_number',
       sorter: (a, b) => (a.lease_number || '').localeCompare(b.lease_number || ''),
-      render: (text) => text || 'N/A',
+      render: (text) => text || t('leaseReport:table.na'),
     },
     {
-      title: 'Tenant',
+      title: t('leaseReport:columns.tenant'),
       dataIndex: 'tenant',
       key: 'tenant',
       sorter: (a, b) => (a.tenant || '').localeCompare(b.tenant || ''),
-      render: (text) => text || 'N/A',
+      render: (text) => text || t('leaseReport:table.na'),
     },
     {
-      title: 'Property',
+      title: t('leaseReport:columns.property'),
       dataIndex: 'property',
       key: 'property',
       sorter: (a, b) => (a.property || '').localeCompare(b.property || ''),
-      render: (text) => text || 'N/A',
+      render: (text) => text || t('leaseReport:table.na'),
     },
     {
-      title: 'Unit',
+      title: t('leaseReport:columns.unit'),
       dataIndex: 'unit',
       key: 'unit',
       sorter: (a, b) => (a.unit || '').localeCompare(b.unit || ''),
-      render: (text) => text || 'N/A',
+      render: (text) => text || t('leaseReport:table.na'),
     },
     {
-      title: 'Start Date',
+      title: t('leaseReport:columns.startDate'),
       dataIndex: 'start_date',
       key: 'start_date',
       sorter: (a, b) => dayjs(a.start_date).unix() - dayjs(b.start_date).unix(),
-      render: (date) => date ? dayjs(date).format('DD/MM/YYYY') : 'N/A',
+      render: (date) => date ? dayjs(date).format('DD/MM/YYYY') : t('leaseReport:table.na'),
     },
     {
-      title: 'End Date',
+      title: t('leaseReport:columns.endDate'),
       dataIndex: 'end_date',
       key: 'end_date',
       sorter: (a, b) => dayjs(a.end_date).unix() - dayjs(b.end_date).unix(),
-      render: (date) => date ? dayjs(date).format('DD/MM/YYYY') : 'N/A',
+      render: (date) => date ? dayjs(date).format('DD/MM/YYYY') : t('leaseReport:table.na'),
     },
     {
-      title: 'Rent Expected',
+      title: t('leaseReport:columns.rentExpected'),
       dataIndex: 'rent_expected',
       key: 'rent_expected',
       sorter: (a, b) => (a.rent_expected || 0) - (b.rent_expected || 0),
       render: (rent) => `TSh ${(rent || 0).toLocaleString()}`,
     },
     {
-      title: 'Amount Paid',
+      title: t('leaseReport:columns.amountPaid'),
       dataIndex: 'amount_paid',
       key: 'amount_paid',
       sorter: (a, b) => (a.amount_paid || 0) - (b.amount_paid || 0),
       render: (amount) => <Text style={{ color: '#52c41a' }}>TSh {(amount || 0).toLocaleString()}</Text>,
     },
     {
-      title: 'Amount Due',
+      title: t('leaseReport:columns.amountDue'),
       dataIndex: 'amount_to_be_paid',
       key: 'amount_to_be_paid',
       sorter: (a, b) => (a.amount_to_be_paid || 0) - (b.amount_to_be_paid || 0),
       render: (amount) => <Text style={{ color: amount > 0 ? '#ff4d4f' : '#52c41a' }}>TSh {(amount || 0).toLocaleString()}</Text>,
     },
     {
-      title: 'Overpayment',
+      title: t('leaseReport:columns.overpayment'),
       dataIndex: 'overpayment',
       key: 'overpayment',
       sorter: (a, b) => (a.overpayment || 0) - (b.overpayment || 0),
       render: (amount) => amount > 0 ? <Text style={{ color: '#1890ff' }}>TSh {amount.toLocaleString()}</Text> : '-',
     },
     {
-      title: 'Lease Status',
+      title: t('leaseReport:columns.leaseStatus'),
       dataIndex: 'lease_status',
       key: 'lease_status',
       sorter: (a, b) => (a.lease_status || '').localeCompare(b.lease_status || ''),
@@ -307,7 +309,7 @@ const LeaseReport: React.FC = () => {
       },
     },
     {
-      title: 'Payment Status',
+      title: t('leaseReport:columns.paymentStatus'),
       dataIndex: 'payment_status',
       key: 'payment_status',
       sorter: (a, b) => (a.payment_status || '').localeCompare(b.payment_status || ''),
@@ -330,11 +332,11 @@ const LeaseReport: React.FC = () => {
             break;
         }
         
-        return <Tag color={color}>{status || 'N/A'}</Tag>;
+        return <Tag color={color}>{status || t('leaseReport:table.na')}</Tag>;
       },
     },
     {
-      title: 'Remaining Days',
+      title: t('leaseReport:columns.remainingDays'),
       dataIndex: 'remaining_days',
       key: 'remaining_days',
       sorter: (a, b) => (a.remaining_days || 0) - (b.remaining_days || 0),
@@ -350,7 +352,7 @@ const LeaseReport: React.FC = () => {
           color = 'processing';
         }
         
-        return <Tag color={color}>{remaining} days</Tag>;
+        return <Tag color={color}>{t('leaseReport:table.days', { count: remaining })}</Tag>;
       },
     },
   ];
@@ -366,10 +368,10 @@ const LeaseReport: React.FC = () => {
       <Space vertical style={{ width: '100%' }}>
         <div>
           <Button size="small" onClick={() => setVisibleColumns(Object.keys(visibleColumns).reduce((acc, key) => ({ ...acc, [key]: true }), {} as any))} style={{ marginRight: 8 }}>
-            Select All
+            {t('leaseReport:columns.selectAll')}
           </Button>
           <Button size="small" onClick={() => setVisibleColumns(Object.keys(visibleColumns).reduce((acc, key) => ({ ...acc, [key]: false }), {} as any))}>
-            Deselect All
+            {t('leaseReport:columns.deselectAll')}
           </Button>
         </div>
         {Object.keys(visibleColumns).map(key => (
@@ -390,9 +392,9 @@ const LeaseReport: React.FC = () => {
       {/* Header */}
       <div style={{ marginBottom: '24px' }}>
         <Title level={2}>
-          <FileTextOutlined /> Lease Agreements Report
+          <FileTextOutlined /> {t('leaseReport:title')}
         </Title>
-        <Text type="secondary">View and export lease agreements data</Text>
+        <Text type="secondary">{t('leaseReport:subtitle')}</Text>
       </div>
 
       {/* Statistics Cards */}
@@ -400,7 +402,7 @@ const LeaseReport: React.FC = () => {
         <Col xs={24} sm={6}>
           <Card>
             <Statistic
-              title="Total Leases"
+              title={t('leaseReport:statistics.totalLeases')}
               value={statistics.totalLeases}
               prefix={<FileTextOutlined />}
             />
@@ -409,7 +411,7 @@ const LeaseReport: React.FC = () => {
         <Col xs={24} sm={6}>
           <Card>
             <Statistic
-              title="Active Leases"
+              title={t('leaseReport:statistics.activeLeases')}
               value={statistics.activeLeases}
               prefix={<FileTextOutlined />}
               valueStyle={{ color: '#3f8600' }}
@@ -419,7 +421,7 @@ const LeaseReport: React.FC = () => {
         <Col xs={24} sm={6}>
           <Card>
             <Statistic
-              title="Expected Rent"
+              title={t('leaseReport:statistics.expectedRent')}
               value={statistics.totalRentExpected}
               prefix="TSh"
               precision={0}
@@ -429,7 +431,7 @@ const LeaseReport: React.FC = () => {
         <Col xs={24} sm={6}>
           <Card>
             <Statistic
-              title="Total Paid"
+              title={t('leaseReport:statistics.totalPaid')}
               value={statistics.totalAmountPaid}
               prefix="TSh"
               precision={0}
@@ -443,7 +445,7 @@ const LeaseReport: React.FC = () => {
         <Col xs={24} sm={12}>
           <Card>
             <Statistic
-              title="Total Amount Due"
+              title={t('leaseReport:statistics.totalAmountDue')}
               value={statistics.totalAmountDue}
               prefix="TSh"
               precision={0}
@@ -454,7 +456,7 @@ const LeaseReport: React.FC = () => {
         <Col xs={24} sm={12}>
           <Card>
             <Statistic
-              title="Collection Rate"
+              title={t('leaseReport:statistics.collectionRate')}
               value={statistics.totalRentExpected > 0 ? (statistics.totalAmountPaid / statistics.totalRentExpected * 100) : 0}
               precision={1}
               suffix="%"
@@ -476,7 +478,7 @@ const LeaseReport: React.FC = () => {
                 onClick={() => handleExport('excel')}
                 loading={isLoading}
               >
-                Export Excel
+                {t('leaseReport:export.exportExcel')}
               </Button>
             </Col>
             <Col>
@@ -486,18 +488,18 @@ const LeaseReport: React.FC = () => {
                 onClick={() => handleExport('pdf')}
                 loading={isLoading}
               >
-                Export PDF
+                {t('leaseReport:export.exportPdf')}
               </Button>
             </Col>
             <Col>
               <Button icon={<ReloadOutlined />} onClick={() => refetch()}>
-                Refresh
+                {t('leaseReport:export.refresh')}
               </Button>
             </Col>
             <Col>
-              <Popover content={columnSelector} title="Select Columns" trigger="click">
+              <Popover content={columnSelector} title={t('leaseReport:columns.selectColumns')} trigger="click">
                 <Button icon={<ColumnHeightOutlined />}>
-                  Columns
+                  {t('leaseReport:export.columns')}
                 </Button>
               </Popover>
             </Col>
@@ -508,27 +510,27 @@ const LeaseReport: React.FC = () => {
             <Col>
               <Space>
                 <CalendarOutlined />
-                <Text strong>Quick Range:</Text>
+                <Text strong>{t('leaseReport:quickRange.label')}</Text>
               </Space>
             </Col>
             <Col>
               <Button size="small" onClick={() => setQuickDateRange('today')}>
-                Today
+                {t('leaseReport:quickRange.today')}
               </Button>
             </Col>
             <Col>
               <Button size="small" onClick={() => setQuickDateRange('thisWeek')}>
-                This Week
+                {t('leaseReport:quickRange.thisWeek')}
               </Button>
             </Col>
             <Col>
               <Button size="small" onClick={() => setQuickDateRange('thisMonth')}>
-                This Month
+                {t('leaseReport:quickRange.thisMonth')}
               </Button>
             </Col>
             <Col>
               <Button size="small" onClick={() => setQuickDateRange('thisYear')}>
-                This Year
+                {t('leaseReport:quickRange.thisYear')}
               </Button>
             </Col>
           </Row>
@@ -546,39 +548,39 @@ const LeaseReport: React.FC = () => {
             <Col xs={24} sm={12} md={4}>
               <Select
                 style={{ width: '100%' }}
-                placeholder="Lease Status"
+                placeholder={t('leaseReport:filters.leaseStatus')}
                 value={statusFilter}
                 onChange={setStatusFilter}
                 allowClear
                 options={[
-                  { label: 'All Statuses', value: '' },
-                  { label: 'Active', value: 'active' },
-                  { label: 'Draft', value: 'draft' },
-                  { label: 'Expired', value: 'expired' },
-                  { label: 'Cancelled', value: 'cancelled' },
-                  { label: 'Terminated', value: 'terminated' },
+                  { label: t('leaseReport:filters.allStatuses'), value: '' },
+                  { label: t('leaseReport:status.active'), value: 'active' },
+                  { label: t('leaseReport:status.draft'), value: 'draft' },
+                  { label: t('leaseReport:status.expired'), value: 'expired' },
+                  { label: t('leaseReport:status.cancelled'), value: 'cancelled' },
+                  { label: t('leaseReport:status.terminated'), value: 'terminated' },
                 ]}
               />
             </Col>
             <Col xs={24} sm={12} md={4}>
               <Select
                 style={{ width: '100%' }}
-                placeholder="Payment Status"
+                placeholder={t('leaseReport:filters.paymentStatus')}
                 value={paymentStatusFilter}
                 onChange={setPaymentStatusFilter}
                 allowClear
                 options={[
-                  { label: 'All', value: '' },
-                  { label: 'Paid', value: 'paid' },
-                  { label: 'Partial', value: 'partial' },
-                  { label: 'Unpaid', value: 'unpaid' },
-                  { label: 'Overpaid', value: 'overpaid' },
+                  { label: t('leaseReport:filters.all'), value: '' },
+                  { label: t('leaseReport:paymentStatus.paid'), value: 'paid' },
+                  { label: t('leaseReport:paymentStatus.partial'), value: 'partial' },
+                  { label: t('leaseReport:paymentStatus.unpaid'), value: 'unpaid' },
+                  { label: t('leaseReport:paymentStatus.overpaid'), value: 'overpaid' },
                 ]}
               />
             </Col>
             <Col xs={24} sm={12} md={7}>
               <Input
-                placeholder="Search leases..."
+                placeholder={t('leaseReport:filters.searchPlaceholder')}
                 prefix={<SearchOutlined />}
                 value={filterText}
                 onChange={(e) => setFilterText(e.target.value)}
@@ -591,7 +593,7 @@ const LeaseReport: React.FC = () => {
                 onClick={resetFilters}
                 block
               >
-                Reset Filters
+                {t('leaseReport:filters.resetFilters')}
               </Button>
             </Col>
           </Row>
@@ -599,13 +601,13 @@ const LeaseReport: React.FC = () => {
           {/* Active Filters Display */}
           {(filterText || statusFilter || paymentStatusFilter || dateRange) && (
             <Space wrap>
-              <Text type="secondary">Active Filters:</Text>
-              {filterText && <Tag closable onClose={() => setFilterText('')}>Search: {filterText}</Tag>}
-              {statusFilter && <Tag closable onClose={() => setStatusFilter('')}>Lease Status: {statusFilter}</Tag>}
-              {paymentStatusFilter && <Tag closable onClose={() => setPaymentStatusFilter('')}>Payment Status: {paymentStatusFilter}</Tag>}
+              <Text type="secondary">{t('leaseReport:filters.activeFilters')}</Text>
+              {filterText && <Tag closable onClose={() => setFilterText('')}>{t('leaseReport:filters.search')}: {filterText}</Tag>}
+              {statusFilter && <Tag closable onClose={() => setStatusFilter('')}>{t('leaseReport:filters.leaseStatus')}: {statusFilter}</Tag>}
+              {paymentStatusFilter && <Tag closable onClose={() => setPaymentStatusFilter('')}>{t('leaseReport:filters.paymentStatus')}: {paymentStatusFilter}</Tag>}
               {dateRange && (
                 <Tag closable onClose={() => setDateRange(null)}>
-                  Date: {dateRange[0]?.format('DD/MM/YYYY')} - {dateRange[1]?.format('DD/MM/YYYY')}
+                  {t('leaseReport:filters.dateRange')}: {dateRange[0]?.format('DD/MM/YYYY')} - {dateRange[1]?.format('DD/MM/YYYY')}
                 </Tag>
               )}
             </Space>
@@ -636,11 +638,11 @@ const LeaseReport: React.FC = () => {
         {/* Footer Info */}
         <div style={{ marginTop: 16, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
           <Text type="secondary">
-            Showing {filteredData.length} of {leases.length} lease agreements
+            {t('leaseReport:table.showing', { count: filteredData.length, total: leases.length })}
           </Text>
           {selectedRowKeys.length > 0 && (
             <Text type="secondary">
-              {selectedRowKeys.length} selected
+              {t('leaseReport:table.selected', { count: selectedRowKeys.length })}
             </Text>
           )}
         </div>

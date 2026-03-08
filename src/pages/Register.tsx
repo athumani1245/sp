@@ -25,7 +25,9 @@ import {
   PhoneOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { sendRegistrationOtp, verifyRegistrationOtp, registerUser } from '../services/registrationService';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 import '../assets/styles/Auth.css';
 
 const { Title, Text, Paragraph } = Typography;
@@ -33,6 +35,7 @@ const { Header, Footer, Content } = Layout;
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [form] = Form.useForm();
   const [phoneForm] = Form.useForm();
 
@@ -109,12 +112,12 @@ const Register: React.FC = () => {
         setCountdown(60);
         setCanResend(false);
         setError('');
-        message.success('Verification code sent to your phone');
+        message.success(t('auth:register.verificationCodeSent'));
       } else {
-        setError(result.error || 'Failed to send verification code. Please try again.');
+        setError(result.error || t('auth:register.failedToSendCode'));
       }
     } catch (error) {
-      setError('Failed to send verification code. Please try again.');
+      setError(t('auth:register.failedToSendCode'));
     } finally {
       setLoading(false);
     }
@@ -126,7 +129,7 @@ const Register: React.FC = () => {
 
     const otpCode = otp.join('');
     if (otpCode.length !== 4) {
-      setOtpError('Please enter all 4 digits');
+      setOtpError(t('auth:register.otpPlaceholder'));
       return;
     }
 
@@ -143,9 +146,9 @@ const Register: React.FC = () => {
         setStage('form');
         setShowOtpModal(false);
         setOtpError('');
-        message.success('Phone number verified successfully');
+        message.success(t('auth:register.phoneVerifiedSuccess'));
       } else {
-        setOtpError(result.error || 'Invalid verification code');
+        setOtpError(result.error || t('auth:register.invalidOtp'));
         // Clear OTP inputs on error
         setOtp(['', '', '', '']);
         if (inputRefs[0].current) {
@@ -177,17 +180,17 @@ const Register: React.FC = () => {
 
       if (registerResult.statusCode === 200 || registerResult.success) {
         setStage('success');
-        message.success('Registration successful! Redirecting to login...');
+        message.success(t('auth:register.registrationSuccess'));
 
         // Redirect to login after showing success
         setTimeout(() => {
           navigate('/login', { replace: true });
         }, 3000);
       } else {
-        setError(registerResult.error || 'Registration failed. Please try again.');
+        setError(registerResult.error || t('auth:register.registrationFailed'));
       }
     } catch (error) {
-      setError('Registration failed. Please try again.');
+      setError(t('auth:register.registrationFailed'));
     } finally {
       setLoading(false);
     }
@@ -207,7 +210,7 @@ const Register: React.FC = () => {
         setCanResend(false);
         setOtp(['', '', '', '']);
         inputRefs[0].current?.focus();
-        message.success('Verification code resent');
+        message.success(t('auth:register.verificationCodeSent'));
       } else {
         setOtpError(result.error || 'Failed to resend OTP');
       }
@@ -244,11 +247,12 @@ const Register: React.FC = () => {
       <Header className="auth-header">
         <div className="container">
           <div className="auth-header-content">
-            <div className="text-brand">Tanaka</div>
+            <div className="text-brand">{t('auth:brand')}</div>
             <Space>
-              <Text>Already have an account?</Text>
+              <LanguageSwitcher />
+              <Text>{t('auth:register.haveAccount')}</Text>
               <Button type="link" onClick={() => navigate('/login')} className="auth-link-btn">
-                Log In
+                {t('auth:register.logIn')}
               </Button>
             </Space>
           </div>
@@ -279,16 +283,16 @@ const Register: React.FC = () => {
                 )}
 
                 <Title level={4} className="auth-title">
-                  {stage === 'phone' && 'Enter Your Phone Number'}
-                  {stage === 'otp' && 'Verify Your Phone Number'}
-                  {stage === 'form' && 'Complete Your Registration'}
-                  {stage === 'success' && 'Registration Successful!'}
+                  {stage === 'phone' && t('auth:register.phoneStepTitle')}
+                  {stage === 'otp' && t('auth:register.otpModalTitle')}
+                  {stage === 'form' && t('auth:register.title')}
+                  {stage === 'success' && t('auth:register.successTitle')}
                 </Title>
                 <Text type="secondary" className="auth-subtitle">
-                  {stage === 'phone' && "We'll send you a verification code"}
-                  {stage === 'otp' && 'Enter the code sent to your phone'}
-                  {stage === 'form' && 'Fill in your details to complete registration'}
-                  {stage === 'success' && 'Your account has been created successfully'}
+                  {stage === 'phone' && t('auth:register.phoneStepSubtitle')}
+                  {stage === 'otp' && t('auth:register.otpModalSubtitle')}
+                  {stage === 'form' && t('auth:register.subtitle')}
+                  {stage === 'success' && t('auth:register.successMessage')}
                 </Text>
               </div>
 
@@ -322,16 +326,16 @@ const Register: React.FC = () => {
                   requiredMark={false}
                 >
                   <Form.Item
-                    label="Phone Number"
+                    label={t('auth:register.phoneLabel')}
                     name="phoneNumber"
                     rules={[
-                      { required: true, message: 'Please input your phone number!' },
-                      { pattern: /^[0-9]{9}$/, message: 'Please enter a valid 9-digit phone number' }
+                      { required: true, message: t('auth:register.phoneRequired') },
+                      { pattern: /^[0-9]{9}$/, message: t('auth:register.phoneInvalid') }
                     ]}
                   >
                     <Input
                       prefix={<><PhoneOutlined /> <span style={{ marginLeft: 8, color: '#666' }}>+255</span></>}
-                      placeholder="Enter 9 digit phone number"
+                      placeholder={t('auth:register.phonePlaceholder')}
                       maxLength={9}
                       size="large"
                     />
@@ -348,7 +352,7 @@ const Register: React.FC = () => {
                       icon={!loading && <ArrowRightOutlined />}
                       iconPosition="end"
                     >
-                      {loading ? 'Sending Code...' : 'Continue'}
+                      {loading ? t('auth:register.sendingCode') : t('auth:register.sendCodeButton')}
                     </Button>
                   </Form.Item>
                 </Form>
@@ -378,69 +382,71 @@ const Register: React.FC = () => {
                     <Row gutter={16}>
                       <Col xs={24} sm={12}>
                         <Form.Item
-                          label="First Name"
+                          label={t('auth:register.firstNameLabel')}
                           name="firstName"
-                          rules={[{ required: true, message: 'Please input your first name!' }]}
+                          rules={[{ required: true, message: t('auth:register.firstNameRequired') }]}
                         >
-                          <Input size="large" className="auth-input" />
+                          <Input size="large" className="auth-input" placeholder={t('auth:register.firstNamePlaceholder')} />
                         </Form.Item>
                       </Col>
                       <Col xs={24} sm={12}>
                         <Form.Item
-                          label="Last Name"
+                          label={t('auth:register.lastNameLabel')}
                           name="lastName"
-                          rules={[{ required: true, message: 'Please input your last name!' }]}
+                          rules={[{ required: true, message: t('auth:register.lastNameRequired') }]}
                         >
-                          <Input size="large" className="auth-input" />
+                          <Input size="large" className="auth-input" placeholder={t('auth:register.lastNamePlaceholder')} />
                         </Form.Item>
                       </Col>
                     </Row>
 
                     <Form.Item
-                      label="Email Address"
+                      label={t('auth:register.emailLabel')}
                       name="email"
                       rules={[
-                        { required: true, message: 'Please input your email!' },
-                        { type: 'email', message: 'Please enter a valid email!' },
+                        { required: true, message: t('auth:register.emailRequired') },
+                        { type: 'email', message: t('auth:register.emailInvalid') },
                       ]}
                     >
                       <Input
                         prefix={<MailOutlined />}
                         size="large"
                         className="auth-input"
+                        placeholder={t('auth:register.emailPlaceholder')}
                       />
                     </Form.Item>
 
                     <Row gutter={16}>
                       <Col xs={24} sm={12}>
                         <Form.Item
-                          label="Password"
+                          label={t('auth:register.passwordLabel')}
                           name="password"
                           rules={[
-                            { required: true, message: 'Please input your password!' },
-                            { min: 6, message: 'Password must be at least 6 characters!' },
+                            { required: true, message: t('auth:register.passwordRequired') },
+                            { min: 6, message: t('auth:register.passwordMinLength') },
                           ]}
                         >
                           <Input.Password
                             prefix={<LockOutlined />}
                             size="large"
                             className="auth-input"
+                            placeholder={t('auth:register.passwordPlaceholder')}
                           />
                         </Form.Item>
                       </Col>
                       <Col xs={24} sm={12}>
                         <Form.Item
-                          label="Confirm Password"
+                          label={t('auth:register.confirmPasswordLabel')}
                           name="confirmPassword"
                           dependencies={['password']}
                           rules={[
-                            { required: true, message: 'Please confirm your password!' },
+                            { required: true, message: t('auth:register.confirmPasswordRequired') },
                             ({ getFieldValue }) => ({
                               validator(_, value) {
                                 if (!value || getFieldValue('password') === value) {
                                   return Promise.resolve();
                                 }
-                                return Promise.reject(new Error('Passwords do not match!'));
+                                return Promise.reject(new Error(t('auth:register.passwordMismatch')));
                               },
                             }),
                           ]}
@@ -449,6 +455,7 @@ const Register: React.FC = () => {
                             prefix={<LockOutlined />}
                             size="large"
                             className="auth-input"
+                            placeholder={t('auth:register.confirmPasswordPlaceholder')}
                           />
                         </Form.Item>
                       </Col>
@@ -465,7 +472,7 @@ const Register: React.FC = () => {
                         icon={!loading && <CheckCircleOutlined />}
                         iconPosition="end"
                       >
-                        {loading ? 'Creating Account...' : 'Create Account'}
+                        {loading ? t('auth:register.registering') : t('auth:register.registerButton')}
                       </Button>
                     </Form.Item>
                   </Form>
@@ -476,7 +483,7 @@ const Register: React.FC = () => {
             {stage !== 'success' && (
               <div className="auth-card-footer">
                 <div className="auth-footer-link">
-                  Already have an account?{' '}
+                  {t('auth:register.haveAccount')}{' '}
                   <a
                     href="#"
                     onClick={(e) => {
@@ -485,7 +492,7 @@ const Register: React.FC = () => {
                     }}
                     className="auth-link"
                   >
-                    Log In
+                    {t('auth:register.logIn')}
                   </a>
                 </div>
               </div>
@@ -511,12 +518,12 @@ const Register: React.FC = () => {
       >
         <div className="text-center mb-4">
           <Paragraph type="secondary" className="mb-0">
-            We've sent a verification code to
+            {t('auth:register.otpModalSubtitle')}
           </Paragraph>
           <Paragraph strong className="mb-0">
             {phoneNumber}
           </Paragraph>
-          <Text type="secondary">Enter the 4-digit code below</Text>
+          <Text type="secondary">{t('auth:register.otpPlaceholder')}</Text>
         </div>
 
         {otpError && (
@@ -559,13 +566,13 @@ const Register: React.FC = () => {
             className="auth-submit-btn"
             style={{ marginTop: 24, marginBottom: 16 }}
           >
-            {loading ? 'Verifying...' : 'Verify & Continue'}
+            {loading ? t('auth:register.verifying') : t('auth:register.verifyButton')}
           </Button>
 
           <div className="text-center">
             {!canResend ? (
               <Text type="secondary">
-                Resend code in <Text strong>{countdown}s</Text>
+                {t('auth:register.resendCodeIn', { seconds: countdown })}
               </Text>
             ) : (
               <Button
@@ -574,7 +581,7 @@ const Register: React.FC = () => {
                 loading={resendLoading}
                 className="auth-link-btn"
               >
-                {resendLoading ? 'Sending...' : 'Resend Code'}
+                {resendLoading ? t('auth:register.sendingCode') : t('auth:register.resendCode')}
               </Button>
             )}
           </div>
@@ -583,7 +590,7 @@ const Register: React.FC = () => {
 
       <Footer className="auth-footer-bottom">
         <Text className="auth-footer-text">
-          © {new Date().getFullYear()} Tanaka. All rights reserved.
+          {t('auth:copyright', { year: new Date().getFullYear() })}
         </Text>
       </Footer>
     </Layout>
