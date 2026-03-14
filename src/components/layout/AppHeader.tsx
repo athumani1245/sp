@@ -12,6 +12,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import type { MenuProps } from 'antd';
 import { useAuth } from '../../context/AuthContext';
 import { logout } from '../../services/authService';
+import LanguageSwitcher from '../LanguageSwitcher';
 
 const { Header } = Layout;
 
@@ -120,6 +121,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({ collapsed, setCollapsed }) => {
 
       <div className="header-right">
         <Space size="middle">
+          <LanguageSwitcher />
           <Dropdown menu={{ items: helpMenuItems }} placement="bottomRight" trigger={['click']}>
             <Button
               type="text"

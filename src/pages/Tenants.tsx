@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Table,
   Button,
@@ -50,6 +51,7 @@ interface Tenant {
 }
 
 const Tenants: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const screens = useBreakpoint();
   const [messageApi, contextHolder] = message.useMessage();
@@ -67,22 +69,22 @@ const Tenants: React.FC = () => {
   // Tour steps configuration
   const tourSteps: TourProps['steps'] = [
     {
-      title: 'Welcome to Tenants Management',
-      description: 'Manage all your tenants in one place. Let\'s explore the key features!',
+      title: t('tenants:tenants.tourWelcomeTitle'),
+      description: t('tenants:tenants.tourWelcomeDesc'),
     },
     {
-      title: 'Add New Tenant',
-      description: 'Click here to add a new tenant. You can store contact information, emergency contacts, and other important details.',
+      title: t('tenants:tenants.tourAddTitle'),
+      description: t('tenants:tenants.tourAddDesc'),
       target: () => addButtonRef.current,
     },
     {
-      title: 'Search Tenants',
-      description: 'Quickly find tenants by searching their name, phone number, or email address.',
+      title: t('tenants:tenants.tourSearchTitle'),
+      description: t('tenants:tenants.tourSearchDesc'),
       target: () => searchRef.current,
     },
     {
-      title: 'Tenants Table',
-      description: 'View all your tenants with their contact information. Click on any row to see full details and history.',
+      title: t('tenants:tenants.tourTableTitle'),
+      description: t('tenants:tenants.tourTableDesc'),
       target: () => tableRef.current,
     },
   ];
@@ -103,7 +105,7 @@ const Tenants: React.FC = () => {
   // Handle error state
   if (error) {
     console.error('Tenants fetch error:', error);
-    messageApi.error('Failed to load tenants');
+    messageApi.error(t('tenants:tenants.loadFailed'));
   }
 
   const handleSearch = (value: string) => {
@@ -121,12 +123,12 @@ const Tenants: React.FC = () => {
 
   const handleDelete = (tenantId: string, tenantName: string) => {
     confirm({
-      title: 'Delete Tenant',
+      title: t('tenants:tenants.deleteTenant'),
       icon: <ExclamationCircleOutlined />,
-      content: `Are you sure you want to delete ${tenantName}? This action cannot be undone.`,
-      okText: 'Yes, Delete',
+      content: t('tenants:tenants.deleteTenantConfirm', { name: tenantName }),
+      okText: t('tenants:tenants.yes'),
       okType: 'danger',
-      cancelText: 'Cancel',
+      cancelText: t('tenants:tenants.cancel'),
       onOk() {
         deleteTenantMutation.mutate(tenantId);
       },
@@ -135,12 +137,12 @@ const Tenants: React.FC = () => {
 
   const handleTenantAdded = () => {
     setShowAddModal(false);
-    messageApi.success('Tenant added successfully!');
+    messageApi.success(t('tenants:tenants.tenantAdded'));
   };
 
   const columns: ColumnsType<Tenant> = [
     {
-      title: 'Name',
+      title: t('tenants:tenants.name'),
       key: 'name',
       render: (_, record) => (
         <Space>
@@ -154,7 +156,7 @@ const Tenants: React.FC = () => {
         `${a.first_name} ${a.last_name}`.localeCompare(`${b.first_name} ${b.last_name}`),
     },
     {
-      title: 'Phone',
+      title: t('tenants:tenants.phone'),
       dataIndex: 'username',
       key: 'username',
       render: (phone) => (
@@ -165,7 +167,7 @@ const Tenants: React.FC = () => {
       ),
     },
     {
-      title: 'Email',
+      title: t('tenants:tenants.email'),
       dataIndex: 'email',
       key: 'email',
       render: (email) => (
@@ -180,13 +182,13 @@ const Tenants: React.FC = () => {
       ),
     },
     {
-      title: 'Gender',
+      title: t('tenants:tenants.gender'),
       dataIndex: 'gender',
       key: 'gender',
       render: (gender) => gender || <Text type="secondary">-</Text>,
     },
     {
-      title: 'Emergency Contacts',
+      title: t('tenants:tenants.emergencyContacts'),
       dataIndex: 'emergency_contacts',
       key: 'emergency_contacts',
       render: (contacts) => (
@@ -194,11 +196,11 @@ const Tenants: React.FC = () => {
       ),
     },
     {
-      title: 'Actions',
+      title: t('tenants:tenants.actions'),
       key: 'actions',
       render: (_, record) => (
         <Space size="small">
-          <Tooltip title="View Details">
+          <Tooltip title={t('tenants:tenants.viewDetails')}>
             <Button
               type="link"
               icon={<EyeOutlined />}
@@ -208,7 +210,7 @@ const Tenants: React.FC = () => {
               }}
             />
           </Tooltip>
-          <Tooltip title="Delete">
+          <Tooltip title={t('tenants:tenants.delete')}>
             <Button
               type="link"
               danger
@@ -234,7 +236,7 @@ const Tenants: React.FC = () => {
           <Row justify="space-between" align="middle" gutter={[16, 16]}>
             <Col xs={24} sm={12}>
               <Title level={2} style={{ margin: 0 }}>
-                <TeamOutlined /> Tenants
+                <TeamOutlined /> {t('tenants:tenants.title')}
               </Title>
             </Col>
             <Col xs={24} sm={12} style={{ textAlign: 'right' }}>
@@ -245,19 +247,19 @@ const Tenants: React.FC = () => {
                   onClick={() => setShowAddModal(true)}
                   size="large"
                 >
-                  Add New Tenant
+                  {t('tenants:tenants.addNewTenant')}
                 </Button>
               </div>
             </Col>
           </Row>
-          <Text type="secondary">Manage your tenants and their information</Text>
+          <Text type="secondary">{t('tenants:tenants.subtitle')}</Text>
         </Space>
       </div>
 
       {/* Search Section */}
       <Card style={{ marginBottom: '16px' }} ref={searchRef}>
         <Search
-          placeholder="Search by name, phone, or email..."
+          placeholder={t('tenants:tenants.searchPlaceholder')}
           allowClear
           prefix={<SearchOutlined />}
           size="large"

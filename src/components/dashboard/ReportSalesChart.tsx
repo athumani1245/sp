@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Card, Select, Switch, Typography } from 'antd';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { useTranslation } from 'react-i18next';
 
 const { Text } = Typography;
 const { Option } = Select;
@@ -11,6 +12,7 @@ interface ReportSalesChartProps {
 }
 
 const ReportSalesChart: React.FC<ReportSalesChartProps> = ({ data: dashboardData, loading }) => {
+  const { t } = useTranslation();
   const getAvailableYears = () => {
     if (!dashboardData || !dashboardData.monthly_revenue_collection) return [];
     return Object.keys(dashboardData.monthly_revenue_collection).sort((a, b) => Number(b) - Number(a));
@@ -88,10 +90,10 @@ const ReportSalesChart: React.FC<ReportSalesChartProps> = ({ data: dashboardData
         >
           <p style={{ marginBottom: '4px', fontWeight: 'bold' }}>{payload[0].payload.fullDate}</p>
           <p style={{ marginBottom: '4px', color: '#4ade80' }}>
-            Billed: TSh {formatCurrency(payload[0].payload.billed)}
+            {t('dashboard:salesChart.billed')}: TSh {formatCurrency(payload[0].payload.billed)}
           </p>
           <p style={{ marginBottom: 0, color: '#60a5fa' }}>
-            Collected: TSh {formatCurrency(payload[0].payload.collected)}
+            {t('dashboard:salesChart.collected')}: TSh {formatCurrency(payload[0].payload.collected)}
           </p>
         </div>
       );
@@ -104,28 +106,28 @@ const ReportSalesChart: React.FC<ReportSalesChartProps> = ({ data: dashboardData
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
         <div>
           <Text strong style={{ fontSize: '16px' }}>
-            Rent Billed vs Rent Collected
+            {t('dashboard:salesChart.title')}
           </Text>
           <div style={{ display: 'flex', gap: '16px', marginTop: '8px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <div style={{ width: '12px', height: '12px', borderRadius: '2px', background: '#4ade80' }} />
-              <Text style={{ fontSize: '12px', color: '#6B7280' }}>Billed</Text>
+              <Text style={{ fontSize: '12px', color: '#6B7280' }}>{t('dashboard:salesChart.billed')}</Text>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <div style={{ width: '12px', height: '12px', borderRadius: '2px', background: '#60a5fa' }} />
-              <Text style={{ fontSize: '12px', color: '#6B7280' }}>Collected</Text>
+              <Text style={{ fontSize: '12px', color: '#6B7280' }}>{t('dashboard:salesChart.collected')}</Text>
             </div>
           </div>
         </div>
         <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Text style={{ fontSize: '13px', color: '#6B7280' }}>Monthly</Text>
+            <Text style={{ fontSize: '13px', color: '#6B7280' }}>{t('dashboard:salesChart.monthly')}</Text>
             <Switch
               checked={viewType === 'yearly'}
               onChange={(checked) => setViewType(checked ? 'yearly' : 'monthly')}
               size="small"
             />
-            <Text style={{ fontSize: '13px', color: '#6B7280' }}>Yearly</Text>
+            <Text style={{ fontSize: '13px', color: '#6B7280' }}>{t('dashboard:salesChart.yearly')}</Text>
           </div>
 
           {viewType === 'monthly' && availableYears.length > 0 && (

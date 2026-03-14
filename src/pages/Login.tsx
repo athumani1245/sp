@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { Card, Form, Input, Button, Typography, Space, Layout, message } from 'antd';
 import { LockOutlined, EyeOutlined, EyeInvisibleOutlined, PhoneOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { login } from '../services/authService';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 import '../assets/styles/Auth.css';
 
 const { Title, Text } = Typography;
@@ -11,6 +13,7 @@ const { Header, Footer, Content } = Layout;
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { setIsAuthenticated, setSubscription, checkAuthentication } = useAuth();
   const [loading, setLoading] = useState(false);
 
@@ -18,13 +21,26 @@ const Login: React.FC = () => {
     setLoading(true);
     
     try {
-      // Add +255 prefix to phone number
-      const phoneNumber = '+255' + values.phoneNumber;
+      // Normalize phone number to +255 format
+      let phoneNumber = values.phoneNumber.trim();
+      
+      // If starts with 0, replace with +255
+      if (phoneNumber.startsWith('0')) {
+        phoneNumber = '+255' + phoneNumber.substring(1);
+      }
+      // If starts with +255, use as is
+      else if (phoneNumber.startsWith('+255')) {
+        phoneNumber = phoneNumber;
+      }
+      // If just 9 digits, add +255
+      else if (/^\d{9}$/.test(phoneNumber)) {
+        phoneNumber = '+255' + phoneNumber;
+      }
 
       const result = await login(phoneNumber, values.password);
 
       if (result.success) {
-        message.success('Login successful!');
+        message.success(t('auth:login.loginSuccess'));
         setIsAuthenticated(true);
         
         if (result.subscription) {
@@ -34,10 +50,10 @@ const Login: React.FC = () => {
         await checkAuthentication();
         navigate('/dashboard');
       } else {
-        message.error(result.error || 'Login failed. Please try again.');
+        message.error(result.error || t('auth:login.loginFailed'));
       }
     } catch (error) {
-      message.error('An unexpected error occurred. Please try again.');
+      message.error(t('auth:login.unexpectedError'));
     } finally {
       setLoading(false);
     }
@@ -46,8 +62,9 @@ const Login: React.FC = () => {
   return (
     <Layout className="auth-layout">
       <Header className="auth-header">
-        <div className="container">
-          <div className="text-brand">Tanaka</div>
+        <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div className="text-brand">{t('auth:brand')}</div>
+          <LanguageSwitcher />
         </div>
       </Header>
       <Content className="auth-content">
@@ -56,9 +73,9 @@ const Login: React.FC = () => {
             <div className="auth-card-body">
               <div className="auth-logo-section">
                 <img src="/Logo.png" alt="Tanaka" width="64" height="64" className="mb-3" />
-                <Title level={4} className="auth-title">Rent & Manage with Ease</Title>
+                <Title level={4} className="auth-title">{t('auth:login.title')}</Title>
                 <Text type="secondary" className="auth-subtitle">
-                  Please log in to your account
+                  {t('auth:login.subtitle')}
                 </Text>
               </div>
               <Form
@@ -71,34 +88,39 @@ const Login: React.FC = () => {
                 <Form.Item
                   name="phoneNumber"
                   rules={[
-                    { required: true, message: 'Please input your phone number!' },
+                    { required: true, message: t('auth:login.phoneRequired') },
                     {
-                      pattern: /^[0-9]{9}$/,
-                      message: 'Phone number must be exactly 9 digits',
+                      pattern: /^(\+255\d{9}|0\d{9}|\d{9})$/,
+                      message: t('auth:login.phoneInvalid'),
                     },
                   ]}
                 >
                   <Input
-                    prefix={<><PhoneOutlined /> <span style={{ marginLeft: 8, color: '#666' }}>+255</span></>}
-                    placeholder="Enter 9 digit phone number"
-                    maxLength={9}
+                    prefix={<PhoneOutlined />}
+                    placeholder={t('auth:login.phonePlaceholder')}
                     size="large"
+                    autoComplete="tel"
+                    id="phoneNumber"
+                    name="phoneNumber"
                   />
                 </Form.Item>
 
                 <Form.Item
                   name="password"
-                  rules={[{ required: true, message: 'Please input your password!' }]}
+                  rules={[{ required: true, message: t('auth:login.passwordRequired') }]}
                 >
                   <Input.Password
                     prefix={<LockOutlined />}
-                    placeholder="Password"
+                    placeholder={t('auth:login.passwordPlaceholder')}
                     size="large"
                     className="auth-input"
                     iconRender={(visible) =>
                       visible ? <EyeOutlined /> : <EyeInvisibleOutlined />
                     }
                     visibilityToggle
+                    autoComplete="current-password"
+                    id="password"
+                    name="password"
                   />
                 </Form.Item>
 
@@ -111,14 +133,14 @@ const Login: React.FC = () => {
                     loading={loading}
                     className="auth-submit-btn"
                   >
-                    {loading ? 'Logging in...' : 'Log in'}
+                    {loading ? t('auth:login.loggingIn') : t('auth:login.loginButton')}
                   </Button>
                 </Form.Item>
               </Form>
             </div>
             <div className="auth-card-footer">
               <div className="auth-footer-link">
-                Don't have an account?{' '}
+                {t('auth:login.noAccount')}{' '}
                 <a
                   href="#"
                   onClick={(e) => {
@@ -127,7 +149,7 @@ const Login: React.FC = () => {
                   }}
                   className="auth-link"
                 >
-                  Sign up
+                  {t('auth:login.signUp')}
                 </a>
               </div>
               <div className="auth-footer-link">
@@ -139,7 +161,7 @@ const Login: React.FC = () => {
                   }}
                   className="auth-link"
                 >
-                  Forgot password?
+                  {t('auth:login.forgotPassword')}
                 </a>
               </div>
               <div className="auth-footer-link">
@@ -151,7 +173,7 @@ const Login: React.FC = () => {
                   }}
                   className="auth-link"
                 >
-                  Privacy Policy
+                  {t('auth:login.privacyPolicy')}
                 </a>
               </div>
             </div>
@@ -160,7 +182,7 @@ const Login: React.FC = () => {
       </Content>
       <Footer className="auth-footer-bottom">
         <Text className="auth-footer-text">
-          © {new Date().getFullYear()} Tanaka. All rights reserved.
+          {t('auth:copyright', { year: new Date().getFullYear() })}
         </Text>
       </Footer>
     </Layout>

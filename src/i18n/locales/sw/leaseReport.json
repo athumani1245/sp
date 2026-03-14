@@ -1,0 +1,79 @@
+{
+  "title": "Ripoti ya Mikataba na Kodi",
+  "subtitle": "Angalia na pakua taarifa za mikataba",
+  "statistics": {
+    "totalLeases": "Jumla ya Mikataba",
+    "activeLeases": "Mikataba Inayoendelea",
+    "expectedRent": "Kodi Inayotarajiwa",
+    "totalPaid": "Jumla Iliyolipwa",
+    "totalAmountDue": "Deni Lote",
+    "collectionRate": "Kiwango cha Makusanyo"
+  },
+  "export": {
+    "exportExcel": "Pakua Excel",
+    "exportPdf": "Pakua PDF",
+    "refresh": "Onyesha Tena",
+    "columns": "Safu",
+    "successExcel": "Rekodi {{count}} zimepakuliwa kwenye Excel",
+    "successPdf": "Rekodi {{count}} zimepakuliwa kwenye PDF",
+    "noData": "Hakuna data ya kupakua",
+    "errorExcel": "Imeshindwa kupakua Excel",
+    "errorPdf": "Imeshindwa kupakua PDF"
+  },
+  "quickRange": {
+    "label": "Chagua Haraka:",
+    "today": "Leo",
+    "thisWeek": "Wiki hii",
+    "thisMonth": "Mwezi huu",
+    "thisYear": "Mwaka huu"
+  },
+  "filters": {
+    "leaseStatus": "Hali ya Mkataba",
+    "allStatuses": "Hali Zote",
+    "paymentStatus": "Hali ya Malipo",
+    "all": "Zote",
+    "searchPlaceholder": "Tafuta mkataba...",
+    "resetFilters": "Futa Vichujio",
+    "filtersReset": "Vichujio vimefutwa",
+    "activeFilters": "Vichujio Vilivyotumika:",
+    "search": "Tafuta",
+    "dateRange": "Tarehe"
+  },
+  "columns": {
+    "leaseNo": "Namba ya Mkataba",
+    "tenant": "Mpangaji",
+    "property": "Jengo",
+    "unit": "Chumba",
+    "startDate": "Tarehe ya kuanza",
+    "endDate": "Tarehe ya mwisho",
+    "rentExpected": "Kodi Inayotarajiwa",
+    "amountPaid": "Iliyolipwa",
+    "amountDue": "Deni",
+    "overpayment": "Malipo Zaidi",
+    "leaseStatus": "Hali ya Mkataba",
+    "paymentStatus": "Hali ya Malipo",
+    "remainingDays": "Siku Zilizobaki",
+    "selectAll": "Chagua Zote",
+    "deselectAll": "Ondoa Zote",
+    "selectColumns": "Chagua Safu"
+  },
+  "status": {
+    "active": "Inaendelea",
+    "draft": "Rasimu",
+    "expired": "Imeisha",
+    "terminated": "Imekatishwa",
+    "cancelled": "Imeghairiwa"
+  },
+  "paymentStatus": {
+    "paid": "Imelipwa",
+    "partial": "Sehemu",
+    "unpaid": "Haijalipwa",
+    "overpaid": "Imelipwa Zaidi"
+  },
+  "table": {
+    "showing": "Inaonyesha mikataba {{count}} kati ya {{total}}",
+    "selected": "{{count}} zimechaguliwa",
+    "days": "siku {{count}}",
+    "na": "Hakuna"
+  }
+}

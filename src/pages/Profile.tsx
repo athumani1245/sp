@@ -33,6 +33,7 @@ import {
   CloseOutlined,
   KeyOutlined,
 } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 
 const { Title, Text } = Typography;
 
@@ -47,6 +48,7 @@ interface UserInfo {
 }
 
 const Profile: React.FC = () => {
+  const { t } = useTranslation();
   const [form] = Form.useForm();
   const [passwordForm] = Form.useForm();
   const [phoneForm] = Form.useForm();
@@ -204,7 +206,7 @@ const Profile: React.FC = () => {
   const handleVerifyOtp = async () => {
     const otpCode = phoneOtp.join('');
     if (otpCode.length !== 4) {
-      message.error('Please enter the complete 4-digit OTP');
+      message.error(t('profile:changePhoneModal.otpIncomplete'));
       return;
     }
 
@@ -246,15 +248,15 @@ const Profile: React.FC = () => {
     <div style={{ padding: '24px', maxWidth: 1200, margin: '0 auto' }}>
       <div style={{ marginBottom: 24 }}>
         <Title level={2} style={{ marginBottom: 8 }}>
-          My Profile
+          {t('profile:title')}
         </Title>
-        <Text type="secondary">Manage your personal information and account settings</Text>
+        <Text type="secondary">{t('profile:subtitle')}</Text>
       </div>
 
       <Spin spinning={loading}>
         {/* Personal Information Card */}
         <Card
-          title="Personal Information"
+          title={t('profile:personalInfo.title')}
           extra={
             !isEditing ? (
               <Button
@@ -262,7 +264,7 @@ const Profile: React.FC = () => {
                 icon={<EditOutlined />}
                 onClick={() => setIsEditing(true)}
               >
-                Edit Profile
+                {t('profile:personalInfo.editProfile')}
               </Button>
             ) : (
               <Space>
@@ -272,10 +274,10 @@ const Profile: React.FC = () => {
                   onClick={handleSave}
                   loading={updateProfileMutation.isPending}
                 >
-                  Save
+                  {t('profile:personalInfo.save')}
                 </Button>
                 <Button icon={<CloseOutlined />} onClick={handleCancel}>
-                  Cancel
+                  {t('profile:personalInfo.cancel')}
                 </Button>
               </Space>
             )
@@ -286,26 +288,26 @@ const Profile: React.FC = () => {
             <Row gutter={16}>
               <Col xs={24} sm={12}>
                 <Form.Item
-                  label="First Name"
+                  label={t('profile:personalInfo.firstName')}
                   name="firstName"
-                  rules={[{ required: true, message: 'Please enter your first name' }]}
+                  rules={[{ required: true, message: t('profile:personalInfo.firstNameRequired') }]}
                 >
                   <Input
                     prefix={<UserOutlined />}
-                    placeholder="First Name"
+                    placeholder={t('profile:personalInfo.firstNamePlaceholder')}
                     disabled={!isEditing}
                   />
                 </Form.Item>
               </Col>
               <Col xs={24} sm={12}>
                 <Form.Item
-                  label="Last Name"
+                  label={t('profile:personalInfo.lastName')}
                   name="lastName"
-                  rules={[{ required: true, message: 'Please enter your last name' }]}
+                  rules={[{ required: true, message: t('profile:personalInfo.lastNameRequired') }]}
                 >
                   <Input
                     prefix={<UserOutlined />}
-                    placeholder="Last Name"
+                    placeholder={t('profile:personalInfo.lastNamePlaceholder')}
                     disabled={!isEditing}
                   />
                 </Form.Item>
@@ -315,48 +317,48 @@ const Profile: React.FC = () => {
             <Row gutter={16}>
               <Col xs={24} sm={12}>
                 <Form.Item
-                  label="Email Address"
+                  label={t('profile:personalInfo.email')}
                   name="email"
                   rules={[
-                    { required: true, message: 'Please enter your email' },
-                    { type: 'email', message: 'Please enter a valid email' },
+                    { required: true, message: t('profile:personalInfo.emailRequired') },
+                    { type: 'email', message: t('profile:personalInfo.emailInvalid') },
                   ]}
                 >
                   <Input
                     prefix={<MailOutlined />}
-                    placeholder="Email"
+                    placeholder={t('profile:personalInfo.emailPlaceholder')}
                     disabled={!isEditing}
                   />
                 </Form.Item>
               </Col>
               <Col xs={24} sm={12}>
-                <Form.Item label="Phone Number" name="phone">
-                  <Input prefix={<PhoneOutlined />} placeholder="Phone" disabled />
+                <Form.Item label={t('profile:personalInfo.phone')} name="phone">
+                  <Input prefix={<PhoneOutlined />} placeholder={t('profile:personalInfo.phonePlaceholder')} disabled />
                 </Form.Item>
               </Col>
             </Row>
 
             <Form.Item
-              label="Address"
+              label={t('profile:personalInfo.address')}
               name="address"
-              rules={[{ required: true, message: 'Please enter your address' }]}
+              rules={[{ required: true, message: t('profile:personalInfo.addressRequired') }]}
             >
               <Input
                 prefix={<EnvironmentOutlined />}
-                placeholder="Street address"
+                placeholder={t('profile:personalInfo.addressPlaceholder')}
                 disabled={!isEditing}
               />
             </Form.Item>
 
             <Row gutter={16}>
               <Col xs={24} sm={12}>
-                <Form.Item label="Gender" name="gender">
-                  <Input placeholder="Gender" disabled />
+                <Form.Item label={t('profile:personalInfo.gender')} name="gender">
+                  <Input placeholder={t('profile:personalInfo.genderPlaceholder')} disabled />
                 </Form.Item>
               </Col>
               <Col xs={24} sm={12}>
-                <Form.Item label="Date of Birth" name="date_of_birth">
-                  <Input placeholder="Date of Birth" disabled />
+                <Form.Item label={t('profile:personalInfo.dateOfBirth')} name="date_of_birth">
+                  <Input placeholder={t('profile:personalInfo.dateOfBirthPlaceholder')} disabled />
                 </Form.Item>
               </Col>
             </Row>
@@ -364,7 +366,7 @@ const Profile: React.FC = () => {
         </Card>
 
         {/* Account Settings Card */}
-        <Card title="Account Settings">
+        <Card title={t('profile:accountSettings.title')}>
           <Row gutter={16}>
             <Col xs={24} sm={12}>
               <Button
@@ -372,7 +374,7 @@ const Profile: React.FC = () => {
                 block
                 onClick={() => setShowPasswordModal(true)}
               >
-                Change Password
+                {t('profile:accountSettings.changePassword')}
               </Button>
             </Col>
             <Col xs={24} sm={12}>
@@ -381,7 +383,7 @@ const Profile: React.FC = () => {
                 block
                 onClick={() => setShowPhoneModal(true)}
               >
-                Change Phone Number
+                {t('profile:accountSettings.changePhone')}
               </Button>
             </Col>
           </Row>
@@ -393,7 +395,7 @@ const Profile: React.FC = () => {
         title={
           <Space>
             <LockOutlined />
-            <span>Change Password</span>
+            <span>{t('profile:changePasswordModal.title')}</span>
           </Space>
         }
         open={showPasswordModal}
@@ -409,7 +411,7 @@ const Profile: React.FC = () => {
               passwordForm.resetFields();
             }}
           >
-            Cancel
+            {t('profile:changePasswordModal.cancel')}
           </Button>,
           <Button
             key="submit"
@@ -417,47 +419,47 @@ const Profile: React.FC = () => {
             loading={changePasswordMutation.isPending}
             onClick={handlePasswordSubmit}
           >
-            Change Password
+            {t('profile:changePasswordModal.submit')}
           </Button>,
         ]}
       >
         <Form form={passwordForm} layout="vertical">
           <Form.Item
-            label="Current Password"
+            label={t('profile:changePasswordModal.currentPassword')}
             name="currentPassword"
-            rules={[{ required: true, message: 'Please enter your current password' }]}
+            rules={[{ required: true, message: t('profile:changePasswordModal.currentPasswordRequired') }]}
           >
-            <Input.Password prefix={<LockOutlined />} placeholder="Current password" />
+            <Input.Password prefix={<LockOutlined />} placeholder={t('profile:changePasswordModal.currentPasswordPlaceholder')} />
           </Form.Item>
 
           <Form.Item
-            label="New Password"
+            label={t('profile:changePasswordModal.newPassword')}
             name="newPassword"
             rules={[
-              { required: true, message: 'Please enter a new password' },
-              { min: 8, message: 'Password must be at least 8 characters' },
+              { required: true, message: t('profile:changePasswordModal.newPasswordRequired') },
+              { min: 8, message: t('profile:changePasswordModal.newPasswordMinLength') },
             ]}
           >
-            <Input.Password prefix={<LockOutlined />} placeholder="New password" />
+            <Input.Password prefix={<LockOutlined />} placeholder={t('profile:changePasswordModal.newPasswordPlaceholder')} />
           </Form.Item>
 
           <Form.Item
-            label="Confirm New Password"
+            label={t('profile:changePasswordModal.confirmPassword')}
             name="confirmPassword"
             dependencies={['newPassword']}
             rules={[
-              { required: true, message: 'Please confirm your new password' },
+              { required: true, message: t('profile:changePasswordModal.confirmPasswordRequired') },
               ({ getFieldValue }) => ({
                 validator(_, value) {
                   if (!value || getFieldValue('newPassword') === value) {
                     return Promise.resolve();
                   }
-                  return Promise.reject(new Error('Passwords do not match'));
+                  return Promise.reject(new Error(t('profile:changePasswordModal.passwordsDoNotMatch')));
                 },
               }),
             ]}
           >
-            <Input.Password prefix={<LockOutlined />} placeholder="Confirm new password" />
+            <Input.Password prefix={<LockOutlined />} placeholder={t('profile:changePasswordModal.confirmPasswordPlaceholder')} />
           </Form.Item>
         </Form>
       </Modal>
@@ -467,7 +469,7 @@ const Profile: React.FC = () => {
         title={
           <Space>
             <PhoneOutlined />
-            <span>Change Phone Number</span>
+            <span>{t('profile:changePhoneModal.title')}</span>
           </Space>
         }
         open={showPhoneModal}
@@ -482,19 +484,19 @@ const Profile: React.FC = () => {
         {phoneStep === 'input' && (
           <Form form={phoneForm} layout="vertical">
             <Form.Item
-              label="New Phone Number"
+              label={t('profile:changePhoneModal.newPhone')}
               name="newPhone"
               rules={[
-                { required: true, message: 'Please enter your new phone number' },
+                { required: true, message: t('profile:changePhoneModal.newPhoneRequired') },
                 {
                   pattern: /^[0-9]{9}$/,
-                  message: 'Phone number must be exactly 9 digits',
+                  message: t('profile:changePhoneModal.newPhonePattern'),
                 },
               ]}
             >
               <Input
                 prefix={<><PhoneOutlined /> <span style={{ marginLeft: 8, color: '#666' }}>+255</span></>}
-                placeholder="Enter 9 digit phone number"
+                placeholder={t('profile:changePhoneModal.newPhonePlaceholder')}
                 maxLength={9}
                 size="large"
               />
@@ -505,7 +507,7 @@ const Profile: React.FC = () => {
               loading={sendOtpMutation.isPending}
               onClick={handleSendOtp}
             >
-              Send OTP
+              {t('profile:changePhoneModal.sendOtp')}
             </Button>
           </Form>
         )}
@@ -513,7 +515,7 @@ const Profile: React.FC = () => {
         {phoneStep === 'otp' && (
           <div>
             <Text type="secondary" style={{ display: 'block', marginBottom: 16 }}>
-              Enter the 4-digit code sent to your phone number
+              {t('profile:changePhoneModal.otpInstructions')}
             </Text>
 
             <Space size="large" style={{ marginBottom: 24, justifyContent: 'center', width: '100%' }}>
@@ -543,7 +545,7 @@ const Profile: React.FC = () => {
                 loading={verifyOtpMutation.isPending}
                 onClick={handleVerifyOtp}
               >
-                Verify OTP
+                {t('profile:changePhoneModal.verifyOtp')}
               </Button>
 
               <Button
@@ -552,7 +554,7 @@ const Profile: React.FC = () => {
                 loading={resendOtpMutation.isPending}
                 onClick={handleResendOtp}
               >
-                {canResendOtp ? 'Resend OTP' : `Resend OTP in ${countdown}s`}
+                {canResendOtp ? t('profile:changePhoneModal.resendOtp') : t('profile:changePhoneModal.resendOtpIn', { count: countdown })}
               </Button>
             </Space>
           </div>
@@ -562,7 +564,7 @@ const Profile: React.FC = () => {
           <div style={{ textAlign: 'center', padding: '40px 0' }}>
             <Text style={{ fontSize: 48, color: '#52c41a' }}>✓</Text>
             <Title level={4} style={{ marginTop: 16 }}>
-              Phone Number Updated!
+              {t('profile:changePhoneModal.successTitle')}
             </Title>
           </div>
         )}

@@ -7,6 +7,7 @@ import { getDashboardInfo } from '../services/dashboardService';
 import { useAuth } from '../context/AuthContext';
 import { useProfile } from '../hooks/useProfile';
 import { useTour } from '../hooks/useTour';
+import { useTranslation } from 'react-i18next';
 import DashboardStats from '../components/dashboard/DashboardStats';
 import ReportSalesChart from '../components/dashboard/ReportSalesChart';
 import CostBreakdownChart from '../components/dashboard/CostBreakdownChart';
@@ -15,6 +16,7 @@ import SubscriptionBanner from '../components/SubscriptionBanner';
 const { Title, Text } = Typography;
 
 const Dashboard: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { subscription } = useAuth();
   const { data: profileData } = useProfile();
@@ -56,23 +58,23 @@ const Dashboard: React.FC = () => {
 
   const tourSteps: TourProps['steps'] = [
     {
-      title: 'Welcome to Your Dashboard!',
-      description: 'This is your central hub where you can view all important information about your property management at a glance.',
+      title: t('dashboard:tour.welcomeTitle'),
+      description: t('dashboard:tour.welcomeDesc'),
       target: null,
     },
     {
-      title: 'Dashboard Statistics',
-      description: 'Here you can see key metrics like total properties, active leases, total tenants, and monthly revenue. These cards give you a quick overview of your business.',
+      title: t('dashboard:tour.statsTitle'),
+      description: t('dashboard:tour.statsDesc'),
       target: () => statsRef.current,
     },
     {
-      title: 'Sales Report Chart',
-      description: 'This chart shows your monthly revenue trends, helping you track your income over time.',
+      title: t('dashboard:tour.salesChartTitle'),
+      description: t('dashboard:tour.salesChartDesc'),
       target: () => salesChartRef.current,
     },
     {
-      title: 'Cost Breakdown',
-      description: 'View your cost distribution across different categories like rent, utilities, and maintenance.',
+      title: t('dashboard:tour.costChartTitle'),
+      description: t('dashboard:tour.costChartDesc'),
       target: () => costChartRef.current,
     },
   ];
@@ -85,10 +87,10 @@ const Dashboard: React.FC = () => {
       {/* Welcome Header */}
       <div style={{ marginBottom: '24px' }}>
         <Title level={2} style={{ color: '#1a1a1a', marginBottom: '8px', fontSize: window.innerWidth < 768 ? '20px' : '28px' }}>
-          Hello, {getUserName()}!
+          {t('dashboard:welcome', { name: getUserName() })}
         </Title>
         <Text style={{ fontSize: window.innerWidth < 768 ? '12px' : '14px', color: '#6B7280' }}>
-          Explore General information about your properties and leases below.
+          {t('dashboard:subtitle')}
         </Text>
       </div>
 

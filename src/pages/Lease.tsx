@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Card,
   Descriptions,
@@ -86,6 +87,7 @@ const Lease: React.FC = () => {
   const { id: leaseId } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
 
   // Use TanStack Query to fetch lease data
   const { data: lease, isLoading: loading, error, refetch } = useLease(leaseId || null);
@@ -108,41 +110,41 @@ const Lease: React.FC = () => {
   // Show error message if fetch fails
   useEffect(() => {
     if (error) {
-      messageApi.error('Failed to load lease details');
+      messageApi.error(t('leases:leaseDetail.failedToLoad'));
     }
-  }, [error, messageApi]);
+  }, [error, messageApi, t]);
 
   const handleCancelLease = () => {
     Modal.confirm({
-      title: 'Cancel Lease',
+      title: t('leases:leaseDetail.cancelLeaseTitle'),
       icon: <WarningOutlined style={{ color: '#ff4d4f' }} />,
       content: (
         <div>
-          <p>Are you sure you want to cancel this lease?</p>
+          <p>{t('leases:leaseDetail.cancelLeaseConfirm')}</p>
           <p style={{ color: '#8c8c8c' }}>
-            This action will immediately cancel the lease and cannot be undone.
+            {t('leases:leaseDetail.cancelLeaseWarning')}
           </p>
           {lease && (
             <div style={{ marginTop: 16, padding: 12, background: '#f5f5f5', borderRadius: 4 }}>
               <div>
-                <strong>Tenant:</strong> {getTenantName(lease)}
+                <strong>{t('leases:leaseDetail.tenant')}:</strong> {getTenantName(lease)}
               </div>
               <div>
-                <strong>Property:</strong> {lease.property?.property_name || 'N/A'}
+                <strong>{t('leases:leaseDetail.property')}:</strong> {lease.property?.property_name || t('leases:leaseDetail.na')}
               </div>
               <div>
-                <strong>Unit:</strong> {getUnitInfo(lease)}
+                <strong>{t('leases:leaseDetail.unit')}:</strong> {getUnitInfo(lease)}
               </div>
               <div>
-                <strong>Duration:</strong> {lease.number_of_month} months
+                <strong>{t('leases:leaseDetail.duration')}:</strong> {lease.number_of_month} {t('leases:leaseDetail.months')}
               </div>
             </div>
           )}
         </div>
       ),
-      okText: 'Yes, Cancel Lease',
+      okText: t('leases:leaseDetail.yesCancelLease'),
       okType: 'danger',
-      cancelText: 'No, Keep Lease',
+      cancelText: t('leases:leaseDetail.noKeepLease'),
       onOk: async () => {
         if (!leaseId) return;
         
@@ -166,13 +168,13 @@ const Lease: React.FC = () => {
 
   const handleRefresh = async () => {
     try {
-      messageApi.loading('Refreshing lease data...', 0);
+      messageApi.loading(t('leases:leaseDetail.refreshing'), 0);
       await refetch();
       messageApi.destroy();
-      messageApi.success('Lease data refreshed successfully!');
+      messageApi.success(t('leases:leaseDetail.refreshSuccess'));
     } catch (error) {
       messageApi.destroy();
-      messageApi.error('Failed to refresh lease data');
+      messageApi.error(t('leases:leaseDetail.refreshFailed'));
     }
   };
 
@@ -182,7 +184,7 @@ const Lease: React.FC = () => {
   };
 
   const formatDate = (dateString: string) => {
-    if (!dateString) return 'N/A';
+    if (!dateString) return t('leases:leaseDetail.na');
     try {
       if (dateString.includes('-')) {
         const parts = dateString.split('-');
@@ -213,18 +215,18 @@ const Lease: React.FC = () => {
   };
 
   const getUnitInfo = (lease: Lease) => {
-    if (!lease || !lease.unit) return 'Unknown Unit';
+    if (!lease || !lease.unit) return t('leases:leases.unknownUnit');
     if (lease.unit.unit_name) return lease.unit.unit_name;
-    if (lease.unit.unit_number) return `Unit ${lease.unit.unit_number}`;
-    return 'Unknown Unit';
+    if (lease.unit.unit_number) return `${t('leases:leases.unit')} ${lease.unit.unit_number}`;
+    return t('leases:leases.unknownUnit');
   };
 
   const getTenantName = (lease: Lease) => {
-    if (!lease || !lease.tenant) return 'Unknown Tenant';
+    if (!lease || !lease.tenant) return t('leases:leases.unknownTenant');
     if (lease.tenant.first_name && lease.tenant.last_name) {
       return `${lease.tenant.first_name} ${lease.tenant.last_name}`;
     }
-    return 'Unknown Tenant';
+    return t('leases:leases.unknownTenant');
   };
 
   const getPropertyAddress = (lease: Lease) => {
@@ -235,12 +237,12 @@ const Lease: React.FC = () => {
 
   const getStatusTag = (status: string) => {
     const statusConfig: Record<string, { color: string; text: string }> = {
-      active: { color: 'success', text: 'Active' },
-      draft: { color: 'default', text: 'Draft' },
-      expired: { color: 'error', text: 'Expired' },
-      expiring: { color: 'warning', text: 'Expiring Soon' },
-      terminated: { color: 'default', text: 'Terminated' },
-      cancelled: { color: 'error', text: 'Cancelled' },
+      active: { color: 'success', text: t('leases:leaseDetail.active') },
+      draft: { color: 'default', text: t('leases:leaseDetail.draft') },
+      expired: { color: 'error', text: t('leases:leaseDetail.expired') },
+      expiring: { color: 'warning', text: t('leases:leases.expiringSoon') },
+      terminated: { color: 'default', text: t('leases:leaseDetail.terminated') },
+      cancelled: { color: 'error', text: t('leases:leaseDetail.cancelled') },
     };
     const config = statusConfig[status?.toLowerCase()] || statusConfig.draft;
     return <Tag color={config.color}>{config.text}</Tag>;
@@ -258,14 +260,26 @@ const Lease: React.FC = () => {
   };
 
   const getStepsItems = (status: string) => {
-    const baseSteps = [{ title: 'Draft' }, { title: 'Active' }, { title: 'Expired' }];
+    const baseSteps = [
+      { title: t('leases:leaseDetail.draft') },
+      { title: t('leases:leaseDetail.active') },
+      { title: t('leases:leaseDetail.expired') }
+    ];
 
     if (status === 'cancelled') {
-      return [{ title: 'Draft' }, { title: 'Active' }, { title: 'Cancelled' }];
+      return [
+        { title: t('leases:leaseDetail.draft') },
+        { title: t('leases:leaseDetail.active') },
+        { title: t('leases:leaseDetail.cancelled') }
+      ];
     }
 
     if (status === 'terminated') {
-      return [{ title: 'Draft' }, { title: 'Active' }, { title: 'Terminated' }];
+      return [
+        { title: t('leases:leaseDetail.draft') },
+        { title: t('leases:leaseDetail.active') },
+        { title: t('leases:leaseDetail.terminated') }
+      ];
     }
 
     return baseSteps;
@@ -306,13 +320,13 @@ const Lease: React.FC = () => {
     return (
       <div style={{ textAlign: 'center', padding: '100px 0' }}>
         <Alert
-          message="Lease Not Found"
-          description="The lease you're looking for doesn't exist or has been removed."
+          message={t('leases:leaseDetail.leaseNotFoundTitle')}
+          description={t('leases:leaseDetail.leaseNotFoundDesc')}
           type="error"
           showIcon
           action={
             <Button type="primary" onClick={() => navigate('/leases')}>
-              Back to Leases
+              {t('leases:leaseDetail.backToLeases')}
             </Button>
           }
         />
@@ -325,42 +339,42 @@ const Lease: React.FC = () => {
       key: 'details',
       label: (
         <span>
-          <InfoCircleOutlined /> Details
+          <InfoCircleOutlined /> {t('leases:leaseDetail.details')}
         </span>
       ),
       children: (
         <Row gutter={[24, 24]}>
           <Col xs={24} lg={14}>
-            <Card title="Lease Information">
+            <Card title={t('leases:leaseDetail.leaseInformation')}>
               <Descriptions bordered column={1} size="middle">
-                <Descriptions.Item label="Tenant">
+                <Descriptions.Item label={t('leases:leaseDetail.tenant')}>
                   <Space>
                     <UserOutlined />
                     <span>{getTenantName(lease)}</span>
                   </Space>
                 </Descriptions.Item>
-                <Descriptions.Item label="Phone Number">
-                  <span>{lease.tenant?.username || lease.tenant?.phone || 'N/A'}</span>
+                <Descriptions.Item label={t('leases:leaseDetail.phoneNumber')}>
+                  <span>{lease.tenant?.username || lease.tenant?.phone || t('leases:leaseDetail.na')}</span>
                 </Descriptions.Item>
-                <Descriptions.Item label="Property Name">
+                <Descriptions.Item label={t('leases:leaseDetail.propertyName')}>
                   <Space>
                     <HomeOutlined />
-                    <span>{lease.property?.property_name || 'N/A'}</span>
+                    <span>{lease.property?.property_name || t('leases:leaseDetail.na')}</span>
                   </Space>
                 </Descriptions.Item>
-                <Descriptions.Item label="Unit Number">
+                <Descriptions.Item label={t('leases:leaseDetail.unitNumber')}>
                   <span>{getUnitInfo(lease)}</span>
                 </Descriptions.Item>
-                <Descriptions.Item label="Lease Duration">
-                  <span>{lease.number_of_month || 'N/A'} months</span>
+                <Descriptions.Item label={t('leases:leaseDetail.leaseDuration')}>
+                  <span>{lease.number_of_month || t('leases:leaseDetail.na')} {t('leases:leaseDetail.months')}</span>
                 </Descriptions.Item>
-                <Descriptions.Item label="Start Date">
+                <Descriptions.Item label={t('leases:leaseDetail.startDate')}>
                   <Space>
                     <CalendarOutlined />
                     <span>{formatDate(lease.start_date)}</span>
                   </Space>
                 </Descriptions.Item>
-                <Descriptions.Item label="End Date">
+                <Descriptions.Item label={t('leases:leaseDetail.endDate')}>
                   <Space>
                     <CalendarOutlined />
                     <span>{formatDate(lease.end_date)}</span>
@@ -375,14 +389,14 @@ const Lease: React.FC = () => {
               title={
                 <Space>
                   <DollarOutlined />
-                  <span>Payments Summary</span>
+                  <span>{t('leases:leaseDetail.paymentsSummary')}</span>
                 </Space>
               }
             >
               <Space vertical size="large" style={{ width: '100%' }}>
                 <div>
                   <Text type="secondary" style={{ display: 'block', marginBottom: 8 }}>
-                    Total Amount
+                    {t('leases:leaseDetail.totalAmount')}
                   </Text>
                   <Title level={5} style={{ margin: 0, color: '#595959' }}>
                     {formatCurrency(lease.total_amount || 0)}
@@ -391,7 +405,7 @@ const Lease: React.FC = () => {
 
                 <div>
                   <Text type="secondary" style={{ display: 'block', marginBottom: 8 }}>
-                    Paid Amount
+                    {t('leases:leaseDetail.paidAmount')}
                   </Text>
                   <Title level={5} style={{ margin: 0, color: '#595959' }}>
                     {formatCurrency(lease.amount_paid || 0)}
@@ -401,7 +415,7 @@ const Lease: React.FC = () => {
                 {(lease.over_paid_amount || 0) > 0 && (
                   <div>
                     <Text type="secondary" style={{ display: 'block', marginBottom: 8 }}>
-                      Overpaid Amount
+                      {t('leases:leaseDetail.overpaidAmount')}
                     </Text>
                     <Title level={5} style={{ margin: 0, color: '#595959' }}>
                       {formatCurrency(lease.over_paid_amount || 0)}
@@ -411,7 +425,7 @@ const Lease: React.FC = () => {
 
                 <div>
                   <Text type="secondary" style={{ display: 'block', marginBottom: 8 }}>
-                    Discount
+                    {t('leases:leaseDetail.discount')}
                   </Text>
                   <Title level={5} style={{ margin: 0, color: '#595959' }}>
                     {formatCurrency(lease.discount || 0)}
@@ -420,7 +434,7 @@ const Lease: React.FC = () => {
 
                 <div style={{ borderTop: '2px solid #f0f0f0', paddingTop: 16 }}>
                   <Text type="secondary" style={{ display: 'block', marginBottom: 8 }}>
-                    Remaining Amount
+                    {t('leases:leaseDetail.remainingAmount')}
                   </Text>
                   <Title level={5} style={{ margin: 0, color: '#262626' }}>
                     {formatCurrency(lease.remaining_amount || 0)}
@@ -436,7 +450,7 @@ const Lease: React.FC = () => {
       key: 'payments',
       label: (
         <span>
-          <DollarOutlined /> Payments ({lease.payments?.length || 0})
+          <DollarOutlined /> {t('leases:leaseDetail.payments')} ({lease.payments?.length || 0})
         </span>
       ),
       children: (
@@ -448,12 +462,12 @@ const Lease: React.FC = () => {
               onClick={() => setShowPaymentModal(true)}
               style={{ backgroundColor: '#CC5B4B', borderColor: '#CC5B4B' }}
             >
-              Add Payment
+              {t('leases:leaseDetail.addPayment')}
             </Button>
           }
         >
           {!lease.payments || lease.payments.length === 0 ? (
-            <Empty description="No payments recorded for this lease" />
+            <Empty description={t('leases:leaseDetail.noPayments')} />
           ) : (
             <Table
               dataSource={lease.payments || []}
@@ -464,14 +478,14 @@ const Lease: React.FC = () => {
               }
               columns={[
                 {
-                  title: 'Date Paid',
+                  title: t('leases:leaseDetail.datePaid'),
                   dataIndex: 'date_paid',
                   key: 'date_paid',
                   render: (date) => formatDate(date),
                   width: 120,
                 },
                 {
-                  title: 'Amount Paid',
+                  title: t('leases:leaseDetail.amountPaidColumn'),
                   dataIndex: 'amount_paid',
                   key: 'amount_paid',
                   render: (amount) => (
@@ -483,16 +497,16 @@ const Lease: React.FC = () => {
                   width: 150,
                 },
                 {
-                  title: 'Payment Source',
+                  title: t('leases:leaseDetail.paymentSource'),
                   dataIndex: 'payment_source',
                   key: 'payment_source',
                   render: (source) => (
-                    <Tag color="blue">{source || 'N/A'}</Tag>
+                    <Tag color="blue">{source || t('leases:leaseDetail.na')}</Tag>
                   ),
                   width: 130,
                 },
                 {
-                  title: 'Category',
+                  title: t('leases:leaseDetail.category'),
                   dataIndex: 'category',
                   key: 'category',
                   render: (category) => {
@@ -505,14 +519,14 @@ const Lease: React.FC = () => {
                     };
                     return (
                       <Tag color={categoryColors[category] || 'default'}>
-                        {category || 'N/A'}
+                        {category || t('leases:leaseDetail.na')}
                       </Tag>
                     );
                   },
                   width: 120,
                 },
                 {
-                  title: 'Status',
+                  title: t('leases:leaseDetail.status'),
                   dataIndex: 'status',
                   key: 'status',
                   render: (status) => {
@@ -524,14 +538,14 @@ const Lease: React.FC = () => {
                     };
                     return (
                       <Tag color={statusColors[status?.toLowerCase()] || 'success'}>
-                        {status || 'N/A'}
+                        {status || t('leases:leaseDetail.na')}
                       </Tag>
                     );
                   },
                   width: 100,
                 },
                 {
-                  title: 'Actions',
+                  title: t('leases:leaseDetail.actions'),
                   key: 'actions',
                   render: (_: any, record: any) => {
                     const isPaid = record.status?.toLowerCase() === 'paid';
@@ -567,12 +581,12 @@ const Lease: React.FC = () => {
                           if (isDisabled) return;
                           e.stopPropagation();
                           Modal.confirm({
-                            title: 'Cancel Payment',
+                            title: t('leases:leaseDetail.cancelPayment'),
                             icon: <WarningOutlined style={{ color: '#ff4d4f' }} />,
-                            content: `Are you sure you want to cancel this payment of ${formatCurrency(parseFloat(record.amount_paid) || 0)}?`,
-                            okText: 'Yes, Cancel',
+                            content: t('leases:leaseDetail.cancelPaymentConfirm', { amount: formatCurrency(parseFloat(record.amount_paid) || 0) }),
+                            okText: t('leases:leaseDetail.yesCancel'),
                             okType: 'danger',
-                            cancelText: 'No',
+                            cancelText: t('leases:leaseDetail.no'),
                             onOk: async () => {
                               try {
                                 await cancelPaymentMutation.mutateAsync(record.id);
@@ -584,7 +598,7 @@ const Lease: React.FC = () => {
                           });
                         }}
                       >
-                        Cancel
+                        {t('leases:leases.cancel')}
                       </Button>
                     );
                   },
@@ -604,18 +618,18 @@ const Lease: React.FC = () => {
       key: 'history',
       label: (
         <span>
-          <HistoryOutlined /> History
+          <HistoryOutlined /> {t('leases:leaseDetail.history')}
         </span>
       ),
       children: (
-        <Card title="Lease Renewal History">
+        <Card title={t('leases:leaseDetail.leaseRenewalHistory')}>
           {originalLeaseLoading ? (
             <Skeleton active paragraph={{ rows: 6 }} />
           ) : originalLease ? (
             <>
               <Alert
-                message="Renewal Information"
-                description="This lease is a renewal of a previous lease. Below are the details of the original lease."
+                message={t('leases:leaseDetail.renewalInfo')}
+                description={t('leases:leaseDetail.renewalInfoDesc')}
                 type="info"
                 icon={<HistoryOutlined />}
                 showIcon
@@ -626,56 +640,56 @@ const Lease: React.FC = () => {
                 column={{ xs: 1, sm: 1, md: 2 }}
                 size="middle"
               >
-                <Descriptions.Item label="Lease Number">
+                <Descriptions.Item label={t('leases:leaseDetail.leaseNumber')}>
                   <Space>
                     <Text strong>{originalLease.lease_number}</Text>
                   </Space>
                 </Descriptions.Item>
-                <Descriptions.Item label="Status">
+                <Descriptions.Item label={t('leases:leaseDetail.status')}>
                   {getStatusTag(originalLease.status)}
                 </Descriptions.Item>
-                <Descriptions.Item label="Property">
+                <Descriptions.Item label={t('leases:leaseDetail.property')}>
                   <Space>
                     <HomeOutlined />
-                    <span>{originalLease.property?.property_name || 'N/A'}</span>
+                    <span>{originalLease.property?.property_name || t('leases:leaseDetail.na')}</span>
                   </Space>
                 </Descriptions.Item>
-                <Descriptions.Item label="Unit">
+                <Descriptions.Item label={t('leases:leaseDetail.unit')}>
                   {getUnitInfo(originalLease)}
                 </Descriptions.Item>
-                <Descriptions.Item label="Tenant">
+                <Descriptions.Item label={t('leases:leaseDetail.tenant')}>
                   <Space>
                     <UserOutlined />
                     <span>{getTenantName(originalLease)}</span>
                   </Space>
                 </Descriptions.Item>
-                <Descriptions.Item label="Duration">
-                  {originalLease.number_of_month ? `${originalLease.number_of_month} months` : 'N/A'}
+                <Descriptions.Item label={t('leases:leaseDetail.duration')}>
+                  {originalLease.number_of_month ? `${originalLease.number_of_month} ${t('leases:leaseDetail.months')}` : t('leases:leaseDetail.na')}
                 </Descriptions.Item>
-                <Descriptions.Item label="Start Date">
+                <Descriptions.Item label={t('leases:leaseDetail.startDate')}>
                   <Space>
                     <CalendarOutlined />
                     <span>{formatDate(originalLease.start_date)}</span>
                   </Space>
                 </Descriptions.Item>
-                <Descriptions.Item label="End Date">
+                <Descriptions.Item label={t('leases:leaseDetail.endDate')}>
                   <Space>
                     <CalendarOutlined />
                     <span>{formatDate(originalLease.end_date)}</span>
                   </Space>
                 </Descriptions.Item>
-                <Descriptions.Item label="Total Amount">
+                <Descriptions.Item label={t('leases:leaseDetail.totalAmountLabel')}>
                   {formatCurrency(originalLease.total_amount)}
                 </Descriptions.Item>
-                <Descriptions.Item label="Amount Paid">
+                <Descriptions.Item label={t('leases:leaseDetail.amountPaid')}>
                   <Text style={{ color: '#52c41a' }}>
                     {formatCurrency(originalLease.amount_paid)}
                   </Text>
                 </Descriptions.Item>
-                <Descriptions.Item label="Discount">
+                <Descriptions.Item label={t('leases:leaseDetail.discount')}>
                   {formatCurrency(originalLease.discount || 0)}
                 </Descriptions.Item>
-                <Descriptions.Item label="Remaining Balance">
+                <Descriptions.Item label={t('leases:leaseDetail.remainingBalance')}>
                   <Text
                     style={{
                       color:
@@ -691,7 +705,7 @@ const Lease: React.FC = () => {
             </>
           ) : (
             <Empty
-              description="Original lease information not available"
+              description={t('leases:leaseDetail.originalLeaseNotAvailable')}
               image={Empty.PRESENTED_IMAGE_SIMPLE}
             />
           )}
@@ -712,10 +726,10 @@ const Lease: React.FC = () => {
             title: <Link to="/dashboard"><HomeOutlined /></Link>,
           },
           {
-            title: <Link to="/leases">Leases</Link>,
+            title: <Link to="/leases">{t('leases:leaseDetail.leases')}</Link>,
           },
           {
-            title: lease.lease_number || 'Lease Details',
+            title: lease.lease_number || t('leases:leaseDetail.leaseDetails'),
           },
         ]}
       />
@@ -733,7 +747,7 @@ const Lease: React.FC = () => {
                   onClick={handleRefresh}
                   loading={loading}
                 >
-                  Refresh
+                  {t('leases:leases.refresh')}
                 </Button>
                 <Button
                   size="small"
@@ -741,7 +755,7 @@ const Lease: React.FC = () => {
                   onClick={handleDownloadDocument}
                   loading={isGeneratingPDF}
                 >
-                  PDF
+                  {t('leases:leaseDetail.pdf')}
                 </Button>
                 {(lease.status === 'active' || lease.status === 'expiring') && (
                   <Button
@@ -750,7 +764,7 @@ const Lease: React.FC = () => {
                     icon={<ReloadOutlined />}
                     onClick={() => setShowRenewModal(true)}
                   >
-                    Renew
+                    {t('leases:leaseDetail.renew')}
                   </Button>
                 )}
                 {lease.status === 'active' && (
@@ -760,7 +774,7 @@ const Lease: React.FC = () => {
                     icon={<StopOutlined />}
                     onClick={() => setShowTerminateModal(true)}
                   >
-                    Terminate
+                    {t('leases:leaseDetail.terminate')}
                   </Button>
                 )}
                 {lease.status !== 'cancelled' &&
@@ -773,7 +787,7 @@ const Lease: React.FC = () => {
                       onClick={handleCancelLease}
                       loading={isCancelling}
                     >
-                      Cancel
+                      {t('leases:leases.cancel')}
                     </Button>
                   )}
               </Space>
@@ -785,7 +799,7 @@ const Lease: React.FC = () => {
           
           {/* Lease Number */}
           <Title level={4} style={{ margin: 0 }}>
-            <FileTextOutlined /> {lease.lease_number || 'Lease Details'}
+            <FileTextOutlined /> {lease.lease_number || t('leases:leaseDetail.leaseDetails')}
           </Title>
         </Space>
       </Card>

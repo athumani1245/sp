@@ -28,64 +28,66 @@ import {
   FacebookOutlined,
   UserAddOutlined,
 } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import '../assets/styles/Landing.css';
 
 const { Header, Content, Footer } = Layout;
 const { Title, Paragraph, Text } = Typography;
 
 const Landing: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const features = [
     {
       icon: <HomeOutlined />,
-      title: 'Property Management',
-      description: 'Manage multiple properties with ease. Track units, tenants, and maintenance all in one place.',
+      title: t('landing:features.propertyManagement.title'),
+      description: t('landing:features.propertyManagement.description'),
     },
     {
       icon: <TeamOutlined />,
-      title: 'Tenant Management',
-      description: 'Keep detailed tenant records, track lease agreements, and manage communications effortlessly.',
+      title: t('landing:features.tenantManagement.title'),
+      description: t('landing:features.tenantManagement.description'),
     },
     {
       icon: <CalendarOutlined />,
-      title: 'Lease Tracking',
-      description: 'Monitor lease terms, renewal dates, and rental agreements with automated reminders.',
+      title: t('landing:features.leaseTracking.title'),
+      description: t('landing:features.leaseTracking.description'),
     },
     {
       icon: <CreditCardOutlined />,
-      title: 'Payment Tracking',
-      description: 'Track rent payments, late fees, and generate financial reports with our integrated system.',
+      title: t('landing:features.paymentTracking.title'),
+      description: t('landing:features.paymentTracking.description'),
     },
     {
       icon: <ToolOutlined />,
-      title: 'Maintenance Requests',
-      description: 'Handle maintenance requests efficiently with our ticketing system and vendor management.',
+      title: t('landing:features.maintenanceRequests.title'),
+      description: t('landing:features.maintenanceRequests.description'),
     },
     {
       icon: <LineChartOutlined />,
-      title: 'Analytics & Reports',
-      description: 'Get insights into your property performance with detailed analytics and custom reports.',
+      title: t('landing:features.analytics.title'),
+      description: t('landing:features.analytics.description'),
     },
   ];
 
   const testimonials = [
     {
-      name: 'Sarah Johnson',
-      role: 'Property Owner',
-      text: 'Tanaka has revolutionized how I manage my rental properties. Everything is so much easier now!',
+      name: t('landing:testimonials.testimonial1.name'),
+      role: t('landing:testimonials.testimonial1.role'),
+      text: t('landing:testimonials.testimonial1.text'),
       rating: 5,
     },
     {
-      name: 'Michael Chen',
-      role: 'Real Estate Investor',
-      text: 'The best property management platform I\'ve used. Saves me hours every week.',
+      name: t('landing:testimonials.testimonial2.name'),
+      role: t('landing:testimonials.testimonial2.role'),
+      text: t('landing:testimonials.testimonial2.text'),
       rating: 5,
     },
     {
-      name: 'Emily Davis',
-      role: 'Property Manager',
-      text: 'Outstanding features and excellent customer support. Highly recommended!',
+      name: t('landing:testimonials.testimonial3.name'),
+      role: t('landing:testimonials.testimonial3.role'),
+      text: t('landing:testimonials.testimonial3.text'),
       rating: 5,
     },
   ];
@@ -101,15 +103,15 @@ const Landing: React.FC = () => {
               <span className="brand-name">Tanaka</span>
             </div>
             <nav className="nav-links">
-              <a href="#features">Features</a>
-              <a href="#about">About</a>
-              <a href="#testimonials">Testimonials</a>
-              <a href="#contact">Contact</a>
+              <a href="#features">{t('landing:nav.features')}</a>
+              <a href="#about">{t('landing:nav.about')}</a>
+              <a href="#testimonials">{t('landing:nav.testimonials')}</a>
+              <a href="#contact">{t('landing:nav.contact')}</a>
             </nav>
             <Space>
-              <Button onClick={() => navigate('/login')}>Login</Button>
+              <Button onClick={() => navigate('/login')}>{t('landing:nav.login')}</Button>
               <Button type="primary" onClick={() => navigate('/register')}>
-                Get Started
+                {t('landing:nav.getStarted')}
               </Button>
             </Space>
           </div>
@@ -124,11 +126,10 @@ const Landing: React.FC = () => {
               <Col xs={24} lg={12}>
                 <div className="hero-content">
                   <Title level={1} className="hero-title">
-                    Rent & Manage with <span className="text-primary">Ease</span>
+                    {t('landing:hero.title')} <span className="text-primary">{t('landing:hero.titleHighlight')}</span>
                   </Title>
                   <Paragraph className="hero-description">
-                    Streamline your property management with Tanaka's comprehensive platform.
-                    From tenant screening to rent collection, we've got you covered.
+                    {t('landing:hero.description')}
                   </Paragraph>
                   <Space size="large" className="hero-buttons">
                     <Button
@@ -136,49 +137,49 @@ const Landing: React.FC = () => {
                       size="large"
                       onClick={() => navigate('/register')}
                     >
-                      Start Free Trial
+                      {t('landing:hero.startFreeTrial')}
                     </Button>
                     <Button size="large" onClick={() => navigate('/login')}>
-                      Sign In
+                      {t('landing:hero.signIn')}
                     </Button>
                   </Space>
                   <Row gutter={[24, 24]} className="hero-stats">
                     <Col span={8}>
-                      <Statistic title="Properties Managed" value="50+" />
+                      <Statistic title={t('landing:hero.stats.propertiesManaged')} value="50+" />
                     </Col>
                     <Col span={8}>
-                      <Statistic title="Happy Tenants" value="100+" />
+                      <Statistic title={t('landing:hero.stats.happyTenants')} value="100+" />
                     </Col>
                     <Col span={8}>
-                      <Statistic title="Uptime" value="99.9%" />
+                      <Statistic title={t('landing:hero.stats.uptime')} value="99.9%" />
                     </Col>
                   </Row>
                 </div>
               </Col>
               <Col xs={24} lg={12}>
                 <Card className="hero-card">
-                  <Title level={5}>Property Dashboard</Title>
+                  <Title level={5}>{t('landing:hero.dashboard.title')}</Title>
                   <Space vertical style={{ width: '100%' }} size="middle">
                     <div className="metric">
-                      <Text type="secondary">Total Properties</Text>
+                      <Text type="secondary">{t('landing:hero.dashboard.totalProperties')}</Text>
                       <Title level={3} style={{ margin: 0 }}>
                         12
                       </Title>
                     </div>
                     <div className="metric">
-                      <Text type="secondary">Occupied Units</Text>
+                      <Text type="secondary">{t('landing:hero.dashboard.occupiedUnits')}</Text>
                       <Title level={3} style={{ margin: 0, color: '#52c41a' }}>
                         45/48
                       </Title>
                     </div>
                     <div className="metric">
-                      <Text type="secondary">Monthly Revenue</Text>
+                      <Text type="secondary">{t('landing:hero.dashboard.monthlyRevenue')}</Text>
                       <Title level={3} style={{ margin: 0 }}>
                         TZS 2,450,000
                       </Title>
                     </div>
                     <div className="metric">
-                      <Text type="secondary">Outstanding</Text>
+                      <Text type="secondary">{t('landing:hero.dashboard.outstanding')}</Text>
                       <Title level={3} style={{ margin: 0, color: '#faad14' }}>
                         TZS 120,000
                       </Title>
@@ -194,8 +195,8 @@ const Landing: React.FC = () => {
         <section id="features" className="features-section">
           <div className="container">
             <div className="section-header">
-              <Title level={2}>Powerful Features</Title>
-              <Paragraph>Everything you need to manage your properties efficiently</Paragraph>
+              <Title level={2}>{t('landing:features.title')}</Title>
+              <Paragraph>{t('landing:features.subtitle')}</Paragraph>
             </div>
             <Row gutter={[24, 24]}>
               {features.map((feature, index) => (
@@ -216,49 +217,48 @@ const Landing: React.FC = () => {
           <div className="container">
             <Row align="middle" gutter={[48, 48]}>
               <Col xs={24} lg={12}>
-                <Title level={2}>Why Choose Tanaka?</Title>
+                <Title level={2}>{t('landing:about.title')}</Title>
                 <Paragraph>
-                  We understand the challenges of property management in Tanzania. That's why
-                  we've built a platform specifically designed for local needs.
+                  {t('landing:about.description')}
                 </Paragraph>
                 <Space vertical size="middle">
                   <div className="about-feature">
                     <CheckCircleOutlined style={{ color: '#52c41a', fontSize: 20 }} />
-                    <Text>Local currency and payment methods</Text>
+                    <Text>{t('landing:about.features.localCurrency')}</Text>
                   </div>
                   <div className="about-feature">
                     <CheckCircleOutlined style={{ color: '#52c41a', fontSize: 20 }} />
-                    <Text>Swahili and English language support</Text>
+                    <Text>{t('landing:about.features.language')}</Text>
                   </div>
                   <div className="about-feature">
                     <CheckCircleOutlined style={{ color: '#52c41a', fontSize: 20 }} />
-                    <Text>Mobile-first design for accessibility</Text>
+                    <Text>{t('landing:about.features.mobileFirst')}</Text>
                   </div>
                   <div className="about-feature">
                     <CheckCircleOutlined style={{ color: '#52c41a', fontSize: 20 }} />
-                    <Text>24/7 customer support</Text>
+                    <Text>{t('landing:about.features.support')}</Text>
                   </div>
                 </Space>
               </Col>
               <Col xs={24} lg={12}>
                 <Card className="about-card">
-                  <Title level={5}>Recent Activity</Title>
+                  <Title level={5}>{t('landing:about.recentActivity.title')}</Title>
                   <Space vertical style={{ width: '100%' }}>
                     <div className="activity-item">
                       <UserAddOutlined style={{ color: '#1890ff' }} />
-                      <Text>New tenant registered: John Mwamba</Text>
+                      <Text>{t('landing:about.recentActivity.newTenant')}</Text>
                     </div>
                     <div className="activity-item">
                       <CreditCardOutlined style={{ color: '#52c41a' }} />
-                      <Text>Payment received: TZS 450,000</Text>
+                      <Text>{t('landing:about.recentActivity.paymentReceived')}</Text>
                     </div>
                     <div className="activity-item">
                       <ToolOutlined style={{ color: '#faad14' }} />
-                      <Text>Maintenance request submitted</Text>
+                      <Text>{t('landing:about.recentActivity.maintenanceRequest')}</Text>
                     </div>
                     <div className="activity-item">
                       <CalendarOutlined style={{ color: '#1890ff' }} />
-                      <Text>Lease agreement renewed</Text>
+                      <Text>{t('landing:about.recentActivity.leaseRenewed')}</Text>
                     </div>
                   </Space>
                 </Card>
@@ -271,8 +271,8 @@ const Landing: React.FC = () => {
         <section id="testimonials" className="testimonials-section">
           <div className="container">
             <div className="section-header">
-              <Title level={2}>What Our Users Say</Title>
-              <Paragraph>Join thousands of satisfied property managers and owners</Paragraph>
+              <Title level={2}>{t('landing:testimonials.title')}</Title>
+              <Paragraph>{t('landing:testimonials.subtitle')}</Paragraph>
             </div>
             <Row gutter={[24, 24]}>
               {testimonials.map((testimonial, index) => (
@@ -301,17 +301,17 @@ const Landing: React.FC = () => {
         <section className="cta-section">
           <div className="container">
             <Title level={2} style={{ color: 'white' }}>
-              Ready to Get Started?
+              {t('landing:cta.title')}
             </Title>
             <Paragraph style={{ color: 'white', fontSize: 18 }}>
-              Join thousands of property managers who trust Tanaka for their business
+              {t('landing:cta.description')}
             </Paragraph>
             <Space size="large">
               <Button type="primary" size="large" onClick={() => navigate('/register')}>
-                Start Free Trial
+                {t('landing:cta.startFreeTrial')}
               </Button>
               <Button size="large" ghost onClick={() => navigate('/login')}>
-                Sign In
+                {t('landing:cta.signIn')}
               </Button>
             </Space>
           </div>
@@ -327,10 +327,10 @@ const Landing: React.FC = () => {
                 <img src="/Logo.png" alt="Tanaka" width="40" height="40" />
                 <span className="brand-name">Tanaka</span>
               </div>
-              <Paragraph style={{ color: 'white' }}>Streamlining property management across Tanzania.</Paragraph>
+              <Paragraph style={{ color: 'white' }}>{t('landing:footer.tagline')}</Paragraph>
             </Col>
             <Col xs={24} md={8}>
-              <Title level={5}>Contact</Title>
+              <Title level={5}>{t('landing:footer.contact')}</Title>
               <Space vertical>
                 <div>
                   <MailOutlined style={{ marginRight: 8 }} />
@@ -338,29 +338,29 @@ const Landing: React.FC = () => {
                 </div>
                 <div>
                   <PhoneOutlined style={{ marginRight: 8 }} />
-                  <a href="tel:+255762357820">+255 762 357 820</a>
+                  <a href="tel:+255736450475">+255 736 450 475</a>
                 </div>
               </Space>
             </Col>
             <Col xs={24} md={8}>
-              <Title level={5}>Quick Links</Title>
+              <Title level={5}>{t('landing:footer.quickLinks')}</Title>
               <Row gutter={[16, 8]}>
                 <Col span={12}>
                   <Space vertical>
-                    <a href="#features">Features</a>
+                    <a href="#features">{t('landing:footer.features')}</a>
                   </Space>
                 </Col>
                 <Col span={12}>
                   <Space vertical>
-                    <a href="/privacy-policy">Privacy</a>
-                    <a href="#contact">Support</a>
+                    <a href="/privacy-policy">{t('landing:footer.privacy')}</a>
+                    <a href="#contact">{t('landing:footer.support')}</a>
                   </Space>
                 </Col>
               </Row>
             </Col>
           </Row>
           <div className="footer-bottom">
-            <Text style={{ color: 'white' }}  >© {new Date().getFullYear()} Tanaka. All rights reserved.</Text>
+            <Text style={{ color: 'white' }}  >© {new Date().getFullYear()} Tanaka. {t('landing:footer.copyright')}</Text>
             <Space size="large" className="footer-social">
               <a
                 href="https://www.linkedin.com/company/tanakas"

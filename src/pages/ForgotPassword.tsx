@@ -2,12 +2,15 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Form, Input, Button, Card, Typography, Alert, message } from 'antd';
 import { PhoneOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import { sendOtpForReset } from '../services/resetService';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 
 const { Title, Text } = Typography;
 
 const ForgotPassword: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -23,13 +26,13 @@ const ForgotPassword: React.FC = () => {
       const result = await sendOtpForReset(phoneNumber);
 
       if (result.success) {
-        message.success('Verification code sent to your phone!');
+        message.success(t('auth:forgotPassword.codeSentSuccess'));
         navigate('/verify-otp', { state: { username: phoneNumber } });
       } else {
-        setError(result.error || 'Failed to send OTP');
+        setError(result.error || t('auth:forgotPassword.codeSentFailed'));
       }
     } catch (err) {
-      setError('An error occurred. Please try again.');
+      setError(t('auth:forgotPassword.unexpectedError'));
     } finally {
       setLoading(false);
     }
@@ -40,10 +43,13 @@ const ForgotPassword: React.FC = () => {
       {/* Header */}
       <div style={{ padding: '20px 0', background: 'white', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Text strong style={{ fontSize: '24px', color: '#CC5B4B' }}>Tanaka</Text>
-          <Link to="/login" style={{ color: '#CC5B4B', fontWeight: 500 }}>
-            Log In
-          </Link>
+          <Text strong style={{ fontSize: '24px', color: '#CC5B4B' }}>{t('auth:brand')}</Text>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <LanguageSwitcher />
+            <Link to="/login" style={{ color: '#CC5B4B', fontWeight: 500 }}>
+              {t('auth:register.logIn')}
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -57,10 +63,10 @@ const ForgotPassword: React.FC = () => {
               style={{ width: '64px', height: '64px', marginBottom: '16px' }}
             />
             <Title level={3} style={{ marginBottom: '8px', fontWeight: 'normal' }}>
-              Forgot Password?
+              {t('auth:forgotPassword.title')}
             </Title>
             <Text type="secondary">
-              Don't worry, we'll send you a verification code to reset it
+              {t('auth:forgotPassword.subtitle')}
             </Text>
           </div>
 
@@ -82,20 +88,20 @@ const ForgotPassword: React.FC = () => {
             requiredMark={false}
           >
             <Form.Item
-              label="Phone Number"
+              label={t('auth:forgotPassword.phoneLabel')}
               name="phoneNumber"
               rules={[
-                { required: true, message: 'Please input your phone number!' },
+                { required: true, message: t('auth:forgotPassword.phoneRequired') },
                 {
                   pattern: /^[0-9]{9}$/,
-                  message: 'Phone number must be exactly 9 digits',
+                  message: t('auth:forgotPassword.phoneInvalid'),
                 },
               ]}
-              help="We'll send a verification code to this number"
+              help={t('auth:forgotPassword.phoneHelp')}
             >
               <Input
                 prefix={<><PhoneOutlined /> <span style={{ marginLeft: 8, color: '#666' }}>+255</span></>}
-                placeholder="Enter 9 digit phone number"
+                placeholder={t('auth:forgotPassword.phonePlaceholder')}
                 maxLength={9}
                 size="large"
               />
@@ -109,14 +115,14 @@ const ForgotPassword: React.FC = () => {
                 block
                 loading={loading}
               >
-                {loading ? 'Sending...' : 'Send Verification Code'}
+                {loading ? t('auth:forgotPassword.sending') : t('auth:forgotPassword.sendCodeButton')}
               </Button>
             </Form.Item>
           </Form>
 
           <div style={{ textAlign: 'center', marginTop: '24px' }}>
             <Link to="/login" style={{ color: '#8c8c8c', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
-              <ArrowLeftOutlined /> Back to Login
+              <ArrowLeftOutlined /> {t('auth:forgotPassword.backToLogin')}
             </Link>
           </div>
         </Card>
@@ -125,7 +131,7 @@ const ForgotPassword: React.FC = () => {
       {/* Footer */}
       <footer style={{ padding: '24px', textAlign: 'center' }}>
         <Text type="secondary" style={{ fontSize: '12px' }}>
-          © {new Date().getFullYear()} Tanaka. All rights reserved.
+          {t('auth:copyright', { year: new Date().getFullYear() })}
         </Text>
       </footer>
     </div>

@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Card,
   Table,
@@ -63,6 +64,7 @@ interface PaginationState {
 
 const Properties: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [messageApi, contextHolder] = message.useMessage();
   const queryClient = useQueryClient();
   const { open: tourOpen, setOpen: setTourOpen, markTourCompleted } = useTour('properties');
@@ -137,16 +139,16 @@ const Properties: React.FC = () => {
 
   // Property type options matching AddPropertyModal
   const propertyTypeOptions = [
-    { label: 'All Types', value: '' },
-    { label: 'Standalone', value: 'Standalone' },
-    { label: 'Apartment', value: 'Apartment' },
-    { label: 'Commercial building', value: 'Commercial building' },
+    { label: t('properties:properties.allTypes'), value: '' },
+    { label: t('properties:properties.standalone'), value: 'Standalone' },
+    { label: t('properties:properties.apartment'), value: 'Apartment' },
+    { label: t('properties:properties.commercialBuilding'), value: 'Commercial building' },
   ];
 
   // Handle error state
   if (error) {
     console.error('Properties fetch error:', error);
-    messageApi.error('Failed to load properties');
+    messageApi.error(t('properties:properties.loadFailed'));
   }
 
   const handleSearch = (value: string) => {
@@ -175,13 +177,13 @@ const Properties: React.FC = () => {
 
   const handlePropertyAdded = () => {
     setShowModal(false);
-    messageApi.success('Property added successfully!');
+    messageApi.success(t('properties:properties.propertyAdded'));
   };
 
   const handleRefresh = async () => {
-    messageApi.loading('Refreshing properties...', 0.5);
+    messageApi.loading(t('properties:properties.refreshing'), 0.5);
     await refetch();
-    messageApi.success('Properties refreshed!');
+    messageApi.success(t('properties:properties.refreshed'));
   };
   
   const handleDeleteProperty = (propertyId: string) => {
@@ -201,7 +203,7 @@ const Properties: React.FC = () => {
 
   const columns: ColumnsType<Property> = [
     {
-      title: 'Property Name',
+      title: t('properties:properties.propertyName'),
       key: 'name',
       render: (_, record) => (
         <Space>
@@ -212,13 +214,13 @@ const Properties: React.FC = () => {
       sorter: (a, b) => (a.property_name || '').localeCompare(b.property_name || ''),
     },
     {
-      title: 'Type',
+      title: t('properties:properties.type'),
       key: 'type',
       dataIndex: 'property_type',
       render: (type: string) => getPropertyTypeTag(type),
     },
     {
-      title: 'Location',
+      title: t('properties:properties.location'),
       key: 'location',
       render: (_, record) => (
         <Space vertical size={0}>
@@ -229,14 +231,14 @@ const Properties: React.FC = () => {
           <Text type="secondary" style={{ fontSize: '12px' }}>
             {[record.address?.district_name, record.address?.ward_name, record.address?.street]
               .filter(Boolean)
-              .join(', ') || 'No address'}
+              .join(', ') || t('properties:properties.noAddress')}
           </Text>
         </Space>
       ),
       width: 250,
     },
     {
-      title: 'Units',
+      title: t('properties:properties.units'),
       key: 'units',
       dataIndex: 'units_count',
       render: (units: number) => (
@@ -248,11 +250,11 @@ const Properties: React.FC = () => {
       sorter: (a, b) => (a.units_count || 0) - (b.units_count || 0),
     },
     {
-      title: 'Actions',
+      title: t('properties:properties.actions'),
       key: 'actions',
       render: (_, record) => (
         <Space size="small">
-          <Tooltip title="View Details">
+          <Tooltip title={t('properties:properties.viewDetails')}>
             <Button
               type="link"
               icon={<EyeOutlined />}
@@ -277,19 +279,19 @@ const Properties: React.FC = () => {
           <Row justify="space-between" align="middle" gutter={[16, 16]}>
             <Col xs={24} sm={12}>
               <Title level={2} style={{ margin: 0 }}>
-                <BankOutlined /> Properties
+                <BankOutlined /> {t('properties:properties.title')}
               </Title>
             </Col>
             <Col xs={24} sm={12} style={{ textAlign: 'right' }}>
               <Space wrap>
-                <Tooltip title="Refresh properties list">
+                <Tooltip title={t('properties:properties.refreshTooltip')}>
                   <Button
                     icon={<ReloadOutlined />}
                     onClick={handleRefresh}
                     loading={isLoading}
                     size="large"
                   >
-                    Refresh
+                    {t('properties:properties.refresh')}
                   </Button>
                 </Tooltip>
                 <div ref={addButtonRef}>
@@ -299,13 +301,13 @@ const Properties: React.FC = () => {
                     onClick={() => setShowModal(true)}
                     size="large"
                   >
-                    Add New Property
+                    {t('properties:properties.addNewProperty')}
                   </Button>
                 </div>
               </Space>
             </Col>
           </Row>
-          <Text type="secondary">Manage your properties and their details</Text>
+          <Text type="secondary">{t('properties:properties.subtitle')}</Text>
         </Space>
       </div>
 
@@ -315,7 +317,7 @@ const Properties: React.FC = () => {
           <Row gutter={[16, 16]} align="middle">
             <Col xs={24} sm={24} md={12}>
               <Search
-                placeholder="Search by property name, location..."
+                placeholder={t('properties:properties.searchPlaceholder')}
                 allowClear
                 prefix={<SearchOutlined />}
                 size="large"
@@ -327,7 +329,7 @@ const Properties: React.FC = () => {
             </Col>
             <Col xs={24} sm={12} md={6}>
               <Select
-                placeholder="Filter by Type"
+                placeholder={t('properties:properties.filterByType')}
                 allowClear
                 size="large"
                 value={propertyType || undefined}
@@ -344,15 +346,15 @@ const Properties: React.FC = () => {
                 style={{ width: '100%' }}
                 disabled={!search && !propertyType}
               >
-                Clear Filters
+                {t('properties:properties.clearFilters')}
               </Button>
             </Col>
           </Row>
           {(search || propertyType) && (
             <Text type="secondary">
-              Showing {totalCount} result{totalCount !== 1 ? 's' : ''}
-              {search && ` for "${search}"`}
-              {propertyType && ` in ${propertyType.charAt(0).toUpperCase() + propertyType.slice(1)}`}
+              {t('properties:properties.showingResults', { count: totalCount })}
+              {search && ` ${t('properties:properties.for')} "${search}"`}
+              {propertyType && ` ${t('properties:properties.in')} ${propertyType.charAt(0).toUpperCase() + propertyType.slice(1)}`}
             </Text>
           )}
         </Space>

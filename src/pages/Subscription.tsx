@@ -41,6 +41,7 @@ import {
   stopPaymentStatusListener,
   getBillingHistory,
 } from '../services/subscriptionService';
+import { useTranslation } from 'react-i18next';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -79,6 +80,7 @@ interface Package {
 }
 
 const Subscription: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { subscription, hasActiveSubscription } = useAuth();
   const [form] = Form.useForm();
@@ -185,7 +187,7 @@ const Subscription: React.FC = () => {
 
   const handleConfirmSubscription = async () => {
     if (!phoneNumber || phoneNumber.length !== 9) {
-      setSubscriptionError('Please enter a valid 9-digit phone number');
+      setSubscriptionError(t('subscription:confirmModal.phoneNumberError'));
       return;
     }
 
@@ -277,7 +279,7 @@ const Subscription: React.FC = () => {
     form.resetFields();
 
     fetchCurrentSubscription();
-    messageApi.success('Subscription activated successfully!');
+    messageApi.success(t('subscription:messages.successActivated'));
   };
 
   const handleClosePaymentModal = () => {
@@ -339,43 +341,43 @@ const Subscription: React.FC = () => {
 
   const getStatusTag = () => {
     if (hasActiveSubscription) {
-      return <Tag color="success" icon={<CheckCircleOutlined />}>Active</Tag>;
+      return <Tag color="success" icon={<CheckCircleOutlined />}>{t('subscription:status.active')}</Tag>;
     }
-    return <Tag color="error" icon={<CloseCircleOutlined />}>Expired</Tag>;
+    return <Tag color="error" icon={<CloseCircleOutlined />}>{t('subscription:status.expired')}</Tag>;
   };
 
   const billingColumns: ColumnsType<BillingHistory> = [
     {
-      title: 'Date',
+      title: t('subscription:billingHistory.date'),
       dataIndex: 'payment_date',
       key: 'date',
       render: (date: string) => formatDate(date),
     },
     {
-      title: 'Package',
+      title: t('subscription:billingHistory.package'),
       dataIndex: 'package_name',
       key: 'package',
       render: (packageName: string | null) => packageName || 'N/A',
     },
     {
-      title: 'Plan',
+      title: t('subscription:billingHistory.plan'),
       dataIndex: 'plan_name',
       key: 'plan',
       render: (planName: string | null) => planName || 'N/A',
     },
     {
-      title: 'Amount',
+      title: t('subscription:billingHistory.amount'),
       dataIndex: 'amount',
       key: 'amount',
       render: (amount: string) => formatCurrency(parseFloat(amount)),
     },
     {
-      title: 'Status',
+      title: t('subscription:billingHistory.status'),
       dataIndex: 'status',
       key: 'status',
       render: (status: string) => (
         <Tag color={status === 'success' ? 'success' : status === 'pending' ? 'processing' : 'error'}>
-          {status === 'success' ? 'Success' : status === 'pending' ? 'Pending' : 'Failed'}
+          {status === 'success' ? t('subscription:billingHistory.statusSuccess') : status === 'pending' ? t('subscription:billingHistory.statusPending') : t('subscription:billingHistory.statusFailed')}
         </Tag>
       ),
     },
@@ -388,9 +390,9 @@ const Subscription: React.FC = () => {
         {/* Header */}
         <div style={{ marginBottom: '24px' }}>
           <Title level={2}>
-            <CreditCardOutlined /> Subscription
+            <CreditCardOutlined /> {t('subscription:title')}
           </Title>
-          <Text type="secondary">Manage your subscription and billing</Text>
+          <Text type="secondary">{t('subscription:subtitle')}</Text>
         </div>
 
         {/* Current Subscription and Billing History */}
@@ -400,7 +402,7 @@ const Subscription: React.FC = () => {
               title={
                 <Space>
                   <RocketOutlined />
-                  Current Plan
+                  {t('subscription:currentPlan.title')}
                 </Space>
               }
               extra={getStatusTag()}
@@ -418,13 +420,13 @@ const Subscription: React.FC = () => {
                   <Divider style={{ margin: '12px 0' }} />
 
                   <Descriptions column={2} size="small">
-                    <Descriptions.Item label={<><CalendarOutlined /> Start Date</>}>
+                    <Descriptions.Item label={<><CalendarOutlined /> {t('subscription:currentPlan.startDate')}</>}>
                       {formatDate(subscription.start_date)}
                     </Descriptions.Item>
-                    <Descriptions.Item label={<><CalendarOutlined /> End Date</>}>
+                    <Descriptions.Item label={<><CalendarOutlined /> {t('subscription:currentPlan.endDate')}</>}>
                       {formatDate(subscription.end_date)}
                     </Descriptions.Item>
-                    <Descriptions.Item label={<><HomeOutlined /> Maximum Units</>}>
+                    <Descriptions.Item label={<><HomeOutlined /> {t('subscription:currentPlan.maxUnits')}</>}>
                       {subscription.max_units || 'N/A'}
                     </Descriptions.Item>
                   </Descriptions>
@@ -440,7 +442,7 @@ const Subscription: React.FC = () => {
                       <Title level={2} style={{ margin: 0, color: '#CC5B4B' }}>
                         {subscription.days_left || 0}
                       </Title>
-                      <Text type="secondary">days remaining</Text>
+                      <Text type="secondary">{t('subscription:currentPlan.daysRemaining')}</Text>
                     </div>
                   </Card>
                 </Space>
@@ -448,9 +450,9 @@ const Subscription: React.FC = () => {
                 <div style={{ textAlign: 'center', padding: '40px 0' }}>
                   <ClockCircleOutlined style={{ fontSize: '48px', color: '#d9d9d9' }} />
                   <Title level={4} style={{ marginTop: '16px' }}>
-                    No Active Subscription
+                    {t('subscription:currentPlan.noSubscription')}
                   </Title>
-                  <Text type="secondary">Choose a plan below to get started</Text>
+                  <Text type="secondary">{t('subscription:currentPlan.noSubscriptionDesc')}</Text>
                 </div>
               )}
             </Card>
@@ -461,7 +463,7 @@ const Subscription: React.FC = () => {
               title={
                 <Space>
                   <ClockCircleOutlined />
-                  Billing History
+                  {t('subscription:billingHistory.title')}
                 </Space>
               }
               style={{ height: '100%' }}
@@ -473,7 +475,7 @@ const Subscription: React.FC = () => {
                 pagination={{ pageSize: 5, hideOnSinglePage: true }}
                 scroll={{ x: 600 }}
                 size="small"
-                locale={{ emptyText: 'No billing history' }}
+                locale={{ emptyText: t('subscription:billingHistory.noHistory') }}
               />
             </Card>
           </Col>
@@ -483,7 +485,7 @@ const Subscription: React.FC = () => {
         <Card
           title={
             <Title level={4} style={{ margin: 0 }}>
-              <RocketOutlined /> Available Packages
+              <RocketOutlined /> {t('subscription:packages.title')}
             </Title>
           }
           loading={plansLoading}
@@ -527,13 +529,13 @@ const Subscription: React.FC = () => {
                         {pkg.max_units && (
                           <Text>
                             <HomeOutlined style={{ color: '#1890ff', marginRight: '8px' }} />
-                            Up to {pkg.max_units} units
+                            {t('subscription:packages.upTo')} {pkg.max_units} {t('subscription:packages.units')}
                           </Text>
                         )}
                         {pkg.max_property_managers && (
                           <Text>
                             <TeamOutlined style={{ color: '#1890ff', marginRight: '8px' }} />
-                            Up to {pkg.max_property_managers} property managers
+                            {t('subscription:packages.upTo')} {pkg.max_property_managers} {t('subscription:packages.propertyManagers')}
                           </Text>
                         )}
                       </Space>
@@ -543,7 +545,7 @@ const Subscription: React.FC = () => {
                         <Alert
                           message={
                             <Space vertical size={0}>
-                              <Text strong>Selected: {selectedPlan.name}</Text>
+                              <Text strong>{t('subscription:packages.selected')}: {selectedPlan.name}</Text>
                               {selectedPlan.full_price && selectedPlan.discount_amount && selectedPlan.discount_amount > 0 ? (
                                 <>
                                   <div>
@@ -555,12 +557,12 @@ const Subscription: React.FC = () => {
                                     </Text>
                                   </div>
                                   <Text type="secondary" style={{ fontSize: '12px' }}>
-                                    You save {formatCurrency(selectedPlan.discount_amount)} • {selectedPlan.duration_days} days
+                                    {t('subscription:packages.youSave')} {formatCurrency(selectedPlan.discount_amount)} • {selectedPlan.duration_days} {t('subscription:packages.days')}
                                   </Text>
                                 </>
                               ) : (
                                 <Text style={{ color: '#52c41a', fontWeight: 600 }}>
-                                  {formatCurrency(selectedPlan.price)} / {selectedPlan.duration_days} days
+                                  {formatCurrency(selectedPlan.price)} / {selectedPlan.duration_days} {t('subscription:packages.days')}
                                 </Text>
                               )}
                             </Space>
@@ -574,7 +576,7 @@ const Subscription: React.FC = () => {
                       {/* Plans List (Expanded) */}
                       {isExpanded && hasPlans && (
                         <>
-                          <Divider style={{ margin: '8px 0' }}>Available Plans</Divider>
+                          <Divider style={{ margin: '8px 0' }}>{t('subscription:packages.availablePlans')}</Divider>
                           <Space vertical size="small" style={{ width: '100%' }}>
                             {pkg.plans.map((plan) => (
                               <Card
@@ -594,7 +596,7 @@ const Subscription: React.FC = () => {
                                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <Text strong>{plan.name}</Text>
                                     {plan.discount_amount && plan.discount_amount > 0 && (
-                                      <Tag color="success" style={{ margin: 0 }}>Save {formatCurrency(plan.discount_amount)}</Tag>
+                                      <Tag color="success" style={{ margin: 0 }}>{t('subscription:packages.save')} {formatCurrency(plan.discount_amount)}</Tag>
                                     )}
                                   </div>
                                   
@@ -614,7 +616,7 @@ const Subscription: React.FC = () => {
                                   )}
                                   
                                   <Text type="secondary" style={{ fontSize: '12px' }}>
-                                    {plan.duration_days} days
+                                    {plan.duration_days} {t('subscription:packages.days')}
                                   </Text>
                                 </Space>
                               </Card>
@@ -635,7 +637,7 @@ const Subscription: React.FC = () => {
                               handleSelectPackage(pkg.id);
                             }}
                           >
-                            {isExpanded ? 'Close' : `View ${pkg.plans.length} Plan${pkg.plans.length > 1 ? 's' : ''}`}
+                            {isExpanded ? t('subscription:packages.close') : `${pkg.plans.length > 1 ? t('subscription:packages.viewPlans', {count: pkg.plans.length}) : t('subscription:packages.viewPlan', {count: pkg.plans.length})}`}
                           </Button>
                         )}
 
@@ -651,7 +653,7 @@ const Subscription: React.FC = () => {
                                 handleProceedToPayment(pkg.id);
                               }}
                             >
-                              Proceed to Payment
+                              {t('subscription:packages.proceedToPayment')}
                             </Button>
                             <Button
                               block
@@ -661,14 +663,14 @@ const Subscription: React.FC = () => {
                                 handleCancelPlanSelection(pkg.id);
                               }}
                             >
-                              Change Plan
+                              {t('subscription:packages.changePlan')}
                             </Button>
                           </>
                         )}
 
                         {!hasPlans && (
                           <Button block size="large" disabled>
-                            No Plans Available
+                            {t('subscription:packages.noPlansAvailable')}
                           </Button>
                         )}
                       </Space>
@@ -685,7 +687,7 @@ const Subscription: React.FC = () => {
           title={
             <Space>
               <CheckCircleOutlined style={{ color: '#52c41a' }} />
-              Confirm Payment
+              {t('subscription:confirmModal.title')}
             </Space>
           }
           open={showConfirmModal}
@@ -694,7 +696,7 @@ const Subscription: React.FC = () => {
           maskClosable={!subscribing}
           footer={[
             <Button key="back" onClick={handleCancelConfirmation} disabled={subscribing}>
-              Back
+              {t('subscription:confirmModal.back')}
             </Button>,
             <Button
               key="submit"
@@ -703,7 +705,7 @@ const Subscription: React.FC = () => {
               loading={subscribing}
               disabled={!phoneNumber || phoneNumber.length !== 9}
             >
-              Confirm & Pay
+              {t('subscription:confirmModal.confirmAndPay')}
             </Button>,
           ]}
           width={600}
@@ -711,15 +713,15 @@ const Subscription: React.FC = () => {
           {selectedPlan && (
             <div>
               <Title level={5} style={{ marginBottom: '16px' }}>
-                Please confirm your subscription details:
+                {t('subscription:confirmModal.heading')}
               </Title>
 
               <Descriptions bordered column={1} style={{ marginBottom: '16px' }}>
-                <Descriptions.Item label="Selected Plan">
+                <Descriptions.Item label={t('subscription:confirmModal.selectedPlan')}>
                   <Text strong>{selectedPlan.name}</Text>
                 </Descriptions.Item>
-                <Descriptions.Item label="Duration">{selectedPlan.duration_days} days</Descriptions.Item>
-                <Descriptions.Item label="Amount">
+                <Descriptions.Item label={t('subscription:confirmModal.duration')}>{selectedPlan.duration_days} {t('subscription:packages.days')}</Descriptions.Item>
+                <Descriptions.Item label={t('subscription:confirmModal.amount')}>
                   <Text strong style={{ color: '#52c41a', fontSize: '16px' }}>
                     {formatCurrency(selectedPlan.price)}
                   </Text>
@@ -727,18 +729,18 @@ const Subscription: React.FC = () => {
               </Descriptions>
 
               <Alert
-                message="Payment Information"
-                description="A payment prompt will be sent to your phone. Please enter your PIN to complete the payment."
+                message={t('subscription:confirmModal.paymentInfo')}
+                description={t('subscription:confirmModal.paymentInfoDesc')}
                 type="info"
                 showIcon
                 style={{ marginBottom: '16px' }}
               />
 
               <Form.Item
-                label="Phone Number"
+                label={t('subscription:confirmModal.phoneNumber')}
                 required
                 validateStatus={subscriptionError ? 'error' : ''}
-                help={subscriptionError || 'Enter your mobile money number without the country code'}
+                help={subscriptionError || t('subscription:confirmModal.phoneNumberHelp')}
               >
                 <Input
                   size="large"
@@ -770,17 +772,17 @@ const Subscription: React.FC = () => {
             paymentStatus === 'processing' ? (
               <Space>
                 <PhoneOutlined style={{ color: '#1890ff' }} />
-                Complete Payment on Your Phone
+                {t('subscription:paymentModal.titleProcessing')}
               </Space>
             ) : paymentStatus === 'success' ? (
               <Space>
                 <CheckCircleOutlined style={{ color: '#52c41a' }} />
-                Payment Successful
+                {t('subscription:paymentModal.titleSuccess')}
               </Space>
             ) : (
               <Space>
                 <CloseCircleOutlined style={{ color: '#ff4d4f' }} />
-                Payment Failed
+                {t('subscription:paymentModal.titleFailed')}
               </Space>
             )
           }
@@ -792,18 +794,18 @@ const Subscription: React.FC = () => {
             paymentStatus === 'processing'
               ? [
                   <Button key="cancel" onClick={handleCancelPayment}>
-                    Cancel Payment
+                    {t('subscription:paymentModal.cancelPayment')}
                   </Button>,
                 ]
               : paymentStatus === 'success'
               ? [
                   <Button key="continue" type="primary" onClick={handlePaymentSuccess} block>
-                    Continue
+                    {t('subscription:paymentModal.continue')}
                   </Button>,
                 ]
               : [
                   <Button key="close" onClick={handleClosePaymentModal} block>
-                    Close
+                    {t('subscription:paymentModal.close')}
                   </Button>,
                 ]
           }
@@ -813,11 +815,11 @@ const Subscription: React.FC = () => {
             <div style={{ textAlign: 'center', padding: '20px 0' }}>
               <Spin size="large" style={{ marginBottom: '24px' }} />
               <Title level={4} style={{ marginBottom: '16px' }}>
-                Waiting for Payment Confirmation
+                {t('subscription:paymentModal.waitingForPayment')}
               </Title>
 
               <Alert
-                message={apiResponseDescription || 'Please check your phone for a payment prompt'}
+                message={apiResponseDescription || t('subscription:paymentModal.checkPhone')}
                 type="info"
                 showIcon
                 style={{ marginBottom: '16px', textAlign: 'left' }}
@@ -826,7 +828,7 @@ const Subscription: React.FC = () => {
               <Card style={{ marginBottom: '16px', backgroundColor: '#f5f5f5' }}>
                 <Row gutter={16}>
                   <Col span={12}>
-                    <Text type="secondary">Amount:</Text>
+                    <Text type="secondary">{t('subscription:paymentModal.amount')}:</Text>
                     <div>
                       <Text strong style={{ color: '#52c41a', fontSize: '16px' }}>
                         {formatCurrency(selectedPlan?.price)}
@@ -834,7 +836,7 @@ const Subscription: React.FC = () => {
                     </div>
                   </Col>
                   <Col span={12}>
-                    <Text type="secondary">Phone:</Text>
+                    <Text type="secondary">{t('subscription:paymentModal.phone')}:</Text>
                     <div>
                       <Text strong>+255 {phoneNumber}</Text>
                     </div>
@@ -843,25 +845,25 @@ const Subscription: React.FC = () => {
               </Card>
 
               <div style={{ textAlign: 'left', marginBottom: '16px' }}>
-                <Title level={5}>Follow these steps:</Title>
+                <Title level={5}>{t('subscription:paymentModal.followSteps')}:</Title>
                 <Space vertical style={{ width: '100%' }}>
                   <div>
-                    <Text strong>1.</Text> Check your phone for a USSD prompt
+                    <Text strong>1.</Text> {t('subscription:paymentModal.step1')}
                   </div>
                   <div>
-                    <Text strong>2.</Text> Enter your PIN when prompted
+                    <Text strong>2.</Text> {t('subscription:paymentModal.step2')}
                   </div>
                   <div>
-                    <Text strong>3.</Text> Confirm the payment amount and details
+                    <Text strong>3.</Text> {t('subscription:paymentModal.step3')}
                   </div>
                   <div>
-                    <Text strong>4.</Text> Wait for confirmation (this page will update automatically)
+                    <Text strong>4.</Text> {t('subscription:paymentModal.step4')}
                   </div>
                 </Space>
               </div>
 
               <Text type="secondary">
-                <ClockCircleOutlined /> This may take a few moments to process...
+                <ClockCircleOutlined /> {t('subscription:paymentModal.processing')}
               </Text>
             </div>
           )}
@@ -870,25 +872,25 @@ const Subscription: React.FC = () => {
             <div style={{ textAlign: 'center', padding: '40px 0' }}>
               <CheckCircleOutlined style={{ fontSize: '64px', color: '#52c41a', marginBottom: '24px' }} />
               <Title level={3} style={{ color: '#52c41a', marginBottom: '16px' }}>
-                Payment Completed Successfully!
+                {t('subscription:paymentModal.successHeading')}
               </Title>
               <Paragraph type="secondary" style={{ marginBottom: '16px' }}>
-                {apiResponseDescription || 'Your subscription has been activated. You can now enjoy all the features of your selected plan.'}
+                {apiResponseDescription || t('subscription:paymentModal.successDesc')}
               </Paragraph>
 
               {selectedPlan && (
                 <Card style={{ marginBottom: '16px', backgroundColor: '#f6ffed', border: '1px solid #b7eb8f' }}>
                   <Row gutter={16}>
                     <Col span={12}>
-                      <Text type="secondary">Plan:</Text>
+                      <Text type="secondary">{t('subscription:paymentModal.plan')}:</Text>
                       <div>
                         <Text strong>{selectedPlan.name}</Text>
                       </div>
                     </Col>
                     <Col span={12}>
-                      <Text type="secondary">Duration:</Text>
+                      <Text type="secondary">{t('subscription:confirmModal.duration')}:</Text>
                       <div>
-                        <Text strong>{selectedPlan.duration_days} days</Text>
+                        <Text strong>{selectedPlan.duration_days} {t('subscription:packages.days')}</Text>
                       </div>
                     </Col>
                   </Row>
@@ -896,13 +898,13 @@ const Subscription: React.FC = () => {
               )}
 
               <Alert
-                message="Your account has been upgraded successfully!"
+                message={t('subscription:paymentModal.accountUpgraded')}
                 type="success"
                 showIcon
                 style={{ marginBottom: '16px' }}
               />
 
-              <Text type="secondary">This modal will close automatically in a few seconds...</Text>
+              <Text type="secondary">{t('subscription:paymentModal.autoCloseMessage')}</Text>
             </div>
           )}
 
@@ -910,7 +912,7 @@ const Subscription: React.FC = () => {
             <div style={{ textAlign: 'center', padding: '40px 0' }}>
               <CloseCircleOutlined style={{ fontSize: '64px', color: '#ff4d4f', marginBottom: '24px' }} />
               <Title level={3} style={{ color: '#ff4d4f', marginBottom: '16px' }}>
-                Payment Failed
+                {t('subscription:paymentModal.failedHeading')}
               </Title>
 
               {apiResponseDescription && (
@@ -918,17 +920,17 @@ const Subscription: React.FC = () => {
               )}
 
               <div style={{ marginBottom: '16px', textAlign: 'left' }}>
-                <Paragraph type="secondary">Your payment could not be processed. This might be due to:</Paragraph>
+                <Paragraph type="secondary">{t('subscription:paymentModal.failedReasons')}</Paragraph>
                 <ul style={{ textAlign: 'left', color: '#8c8c8c' }}>
-                  <li>Insufficient balance in your mobile money account</li>
-                  <li>Network connectivity issues</li>
-                  <li>Incorrect PIN entered</li>
-                  <li>Payment timeout</li>
+                  <li>{t('subscription:paymentModal.reason1')}</li>
+                  <li>{t('subscription:paymentModal.reason2')}</li>
+                  <li>{t('subscription:paymentModal.reason3')}</li>
+                  <li>{t('subscription:paymentModal.reason4')}</li>
                 </ul>
               </div>
 
               <Alert
-                message="Please check your mobile money balance and try again or contact support if you need assistance."
+                message={t('subscription:paymentModal.checkBalance')}
                 type="info"
                 showIcon
               />

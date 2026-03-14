@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Modal,
   Form,
@@ -45,6 +46,7 @@ const AddTenantModal: React.FC<AddTenantModalProps> = ({
   onClose,
   onTenantAdded,
 }) => {
+  const { t } = useTranslation();
   const [form] = Form.useForm();
   const [error, setError] = useState('');
   const [messageApi, contextHolder] = message.useMessage();
@@ -82,7 +84,7 @@ const AddTenantModal: React.FC<AddTenantModalProps> = ({
       
       onClose();
     } catch (error: any) {
-      setError(error.response?.data?.description || error.response?.data?.message || 'Failed to create tenant. Please try again.');
+      setError(error.response?.data?.description || error.response?.data?.message || t('tenants:addTenantModal.createFailed'));
     }
   };
 
@@ -110,7 +112,7 @@ const AddTenantModal: React.FC<AddTenantModalProps> = ({
         title={
           <Space>
             <UserOutlined style={{ color: '#1890ff' }} />
-            <span>Add New Tenant</span>
+            <span>{t('tenants:addTenantModal.title')}</span>
           </Space>
         }
         open={isOpen}
@@ -122,7 +124,7 @@ const AddTenantModal: React.FC<AddTenantModalProps> = ({
 
         {error && (
           <Alert
-            message="Error"
+            message={t('tenants:addTenantModal.error')}
             description={error}
             type="error"
             showIcon
@@ -134,49 +136,49 @@ const AddTenantModal: React.FC<AddTenantModalProps> = ({
 
         <Form form={form} layout="vertical" onFinish={handleSubmit} autoComplete="off">
           <Title level={5}>
-            <UserOutlined /> Tenant Information
+            <UserOutlined /> {t('tenants:addTenantModal.tenantInformation')}
           </Title>
 
           <Row gutter={16}>
             <Col xs={24} md={12}>
               <Form.Item
-                label="First Name"
+                label={t('tenants:addTenantModal.firstName')}
                 name="first_name"
                 rules={[
-                  { required: true, message: 'Please enter first name' },
-                  { min: 2, message: 'First name must be at least 2 characters' },
+                  { required: true, message: t('tenants:addTenantModal.firstNameRequired') },
+                  { min: 2, message: t('tenants:addTenantModal.firstNameMin') },
                 ]}
-                tooltip="Tenant's legal first name as it appears on official documents"
+                tooltip={t('tenants:addTenantModal.firstNameTooltip')}
               >
-                <Input prefix={<UserOutlined />} placeholder="Enter first name" size="large" />
+                <Input prefix={<UserOutlined />} placeholder={t('tenants:addTenantModal.firstNamePlaceholder')} size="large" />
               </Form.Item>
             </Col>
 
             <Col xs={24} md={12}>
               <Form.Item
-                label="Last Name"
+                label={t('tenants:addTenantModal.lastName')}
                 name="last_name"
                 rules={[
-                  { required: true, message: 'Please enter last name' },
-                  { min: 2, message: 'Last name must be at least 2 characters' },
+                  { required: true, message: t('tenants:addTenantModal.lastNameRequired') },
+                  { min: 2, message: t('tenants:addTenantModal.lastNameMin') },
                 ]}
-                tooltip="Tenant's legal last name (surname/family name)"
+                tooltip={t('tenants:addTenantModal.lastNameTooltip')}
               >
-                <Input prefix={<UserOutlined />} placeholder="Enter last name" size="large" />
+                <Input prefix={<UserOutlined />} placeholder={t('tenants:addTenantModal.lastNamePlaceholder')} size="large" />
               </Form.Item>
             </Col>
           </Row>
 
           <Row gutter={16}>
             <Col xs={24} md={12}>
-              <Form.Item label="Gender" name="gender">
+              <Form.Item label={t('tenants:addTenantModal.gender')} name="gender">
                 <Select
                   size="large"
-                  placeholder="Select gender"
+                  placeholder={t('tenants:addTenantModal.selectGender')}
                   allowClear
                   options={[
-                    { value: 'Male', label: 'Male' },
-                    { value: 'Female', label: 'Female' },
+                    { value: 'Male', label: t('tenants:addTenantModal.male') },
+                    { value: 'Female', label: t('tenants:addTenantModal.female') },
                   ]}
                 />
               </Form.Item>
@@ -184,12 +186,12 @@ const AddTenantModal: React.FC<AddTenantModalProps> = ({
 
             <Col xs={24} md={12}>
               <Form.Item
-                label="Email"
+                label={t('tenants:addTenantModal.email')}
                 name="email"
-                rules={[{ type: 'email', message: 'Please enter a valid email' }]}
-                tooltip="Tenant's email address (optional)"
+                rules={[{ type: 'email', message: t('tenants:addTenantModal.emailInvalid') }]}
+                tooltip={t('tenants:addTenantModal.emailTooltip')}
               >
-                <Input prefix={<MailOutlined />} placeholder="Enter email address" size="large" />
+                <Input prefix={<MailOutlined />} placeholder={t('tenants:addTenantModal.emailPlaceholder')} size="large" />
               </Form.Item>
             </Col>
           </Row>
@@ -197,20 +199,20 @@ const AddTenantModal: React.FC<AddTenantModalProps> = ({
           <Row gutter={16}>
             <Col xs={24} md={12}>
               <Form.Item
-                label="Phone Number"
+                label={t('tenants:addTenantModal.phoneNumber')}
                 name="username"
                 rules={[
-                  { required: true, message: 'Please enter phone number' },
+                  { required: true, message: t('tenants:addTenantModal.phoneNumberRequired') },
                   {
                     pattern: /^[0-9]{9}$/,
-                    message: 'Phone number must be exactly 9 digits',
+                    message: t('tenants:addTenantModal.phoneNumberInvalid'),
                   },
                 ]}
-                tooltip="Primary contact number (9 digits). This will be used as the tenant's username for login."
+                tooltip={t('tenants:addTenantModal.phoneNumberTooltip')}
               >
                 <Input
                   prefix={<><PhoneOutlined /> <span style={{ marginLeft: 8, color: '#666' }}>+255</span></>}
-                  placeholder="Enter 9 digit phone number"
+                  placeholder={t('tenants:addTenantModal.phoneNumberPlaceholder')}
                   maxLength={9}
                   size="large"
                 />
@@ -221,7 +223,7 @@ const AddTenantModal: React.FC<AddTenantModalProps> = ({
           <Divider>
             <Space>
               <TeamOutlined />
-              Emergency Contacts
+              {t('tenants:addTenantModal.emergencyContacts')}
             </Space>
           </Divider>
 
@@ -238,42 +240,42 @@ const AddTenantModal: React.FC<AddTenantModalProps> = ({
                   icon={<DeleteOutlined />}
                   onClick={() => removeEmergencyContact(index)}
                 >
-                  Remove
+                  {t('tenants:addTenantModal.remove')}
                 </Button>
               }
             >
               <Row gutter={16}>
                 <Col xs={24} md={8}>
-                  <Form.Item label="Full Name" style={{ marginBottom: 8 }}>
+                  <Form.Item label={t('tenants:addTenantModal.fullName')} style={{ marginBottom: 8 }}>
                     <Input
                       prefix={<UserOutlined />}
-                      placeholder="Enter full name"
+                      placeholder={t('tenants:addTenantModal.fullNamePlaceholder')}
                       value={contact.full_name}
                       onChange={(e) => updateEmergencyContact(index, 'full_name', e.target.value)}
                     />
                   </Form.Item>
                 </Col>
                 <Col xs={24} md={8}>
-                  <Form.Item label="Relationship" style={{ marginBottom: 8 }}>
+                  <Form.Item label={t('tenants:addTenantModal.relationship')} style={{ marginBottom: 8 }}>
                     <Select
-                      placeholder="Select relationship"
+                      placeholder={t('tenants:addTenantModal.selectRelationship')}
                       value={contact.relationship || undefined}
                       onChange={(value) => updateEmergencyContact(index, 'relationship', value)}
                       style={{ width: '100%' }}
                       options={[
-                        { value: 'Parent', label: 'Parent' },
-                        { value: 'Friend', label: 'Friend' },
-                        { value: 'Spouse', label: 'Spouse' },
-                        { value: 'Relative', label: 'Relative' },
+                        { value: 'Parent', label: t('tenants:addTenantModal.relationshipParent') },
+                        { value: 'Friend', label: t('tenants:addTenantModal.relationshipFriend') },
+                        { value: 'Spouse', label: t('tenants:addTenantModal.relationshipSpouse') },
+                        { value: 'Relative', label: t('tenants:addTenantModal.relationshipRelative') },
                       ]}
                     />
                   </Form.Item>
                 </Col>
                 <Col xs={24} md={8}>
-                  <Form.Item label="Phone Number" style={{ marginBottom: 8 }}>
+                  <Form.Item label={t('tenants:addTenantModal.phoneLabel')} style={{ marginBottom: 8 }}>
                     <Input
                       prefix={<PhoneOutlined />}
-                      placeholder="Enter phone number"
+                      placeholder={t('tenants:addTenantModal.phoneNumberPlaceholder')}
                       value={contact.phone_number}
                       onChange={(e) =>
                         updateEmergencyContact(index, 'phone_number', e.target.value)
@@ -292,7 +294,7 @@ const AddTenantModal: React.FC<AddTenantModalProps> = ({
             block
             style={{ marginBottom: 24 }}
           >
-            Add Emergency Contact
+            {t('tenants:addTenantModal.addEmergencyContact')}
           </Button>
 
           <Divider />
@@ -305,7 +307,7 @@ const AddTenantModal: React.FC<AddTenantModalProps> = ({
                 disabled={createTenantMutation.isPending}
                 size="large"
               >
-                Cancel
+                {t('tenants:addTenantModal.cancel')}
               </Button>
               <Button
                 type="primary"
@@ -314,7 +316,7 @@ const AddTenantModal: React.FC<AddTenantModalProps> = ({
                 loading={createTenantMutation.isPending}
                 size="large"
               >
-                {createTenantMutation.isPending ? 'Creating Tenant...' : 'Create Tenant'}
+                {createTenantMutation.isPending ? t('tenants:addTenantModal.creatingTenant') : t('tenants:addTenantModal.createTenant')}
               </Button>
             </Space>
           </Form.Item>
