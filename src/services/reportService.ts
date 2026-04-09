@@ -1,5 +1,7 @@
 import * as XLSX from 'xlsx-js-style';
+import jsPDF from 'jspdf';
 import dayjs from 'dayjs';
+import { formatLeaseDate } from '../utils/leaseDate';
 
 interface LeaseReportData {
   lease_number: string;
@@ -52,12 +54,12 @@ const LEASE_REPORT_COLUMNS: { [key: string]: ColumnConfig } = {
   start_date: { 
     title: 'Start Date', 
     dataIndex: 'start_date',
-    formatter: (date: string) => date ? dayjs(date).format('DD/MM/YYYY') : 'N/A'
+    formatter: (date: string) => formatLeaseDate(date) || 'N/A'
   },
   end_date: { 
     title: 'End Date', 
     dataIndex: 'end_date',
-    formatter: (date: string) => date ? dayjs(date).format('DD/MM/YYYY') : 'N/A'
+    formatter: (date: string) => formatLeaseDate(date) || 'N/A'
   },
   rent_expected: { 
     title: 'Rent Expected (TSh)', 
@@ -202,11 +204,219 @@ export const exportLeaseReportToExcel = (options: ExportOptions): void => {
 
 /**
  * Export lease report data to PDF
- * @param options Export options
  */
 export const exportLeaseReportToPDF = (options: ExportOptions): void => {
-  // TODO: Implement PDF export functionality
-  throw new Error('PDF export is not yet implemented');
+  const { data, visibleColumns, filename } = options;
+
+  try {
+    const visibleColumnKeys = visibleColumns.filter(key => LEASE_REPORT_COLUMNS[key]);
+
+    const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 30;
+    const usableWidth = pageWidth - margin * 2;
+    const rowHeight = 18;
+    const headerRowHeight = 22;
+    const titleAreaHeight = 48;
+    const footerHeight = 20;
+    const contentMaxY = pageHeight - footerHeight - 5;
+
+    // Proportional column widths
+    const colWidthMap: { [key: string]: number } = {
+      lease_number: 70,
+      tenant: 90,
+      property: 90,
+      unit: 60,
+      start_date: 65,
+      end_date: 65,
+      rent_expected: 75,
+      amount_paid: 75,
+      amount_to_be_paid: 70,
+      overpayment: 70,
+      remaining_days: 55,
+      lease_status: 60,
+      payment_status: 65,
+    };
+
+    const totalDefinedWidth = visibleColumnKeys.reduce((s, k) => s + (colWidthMap[k] || 70), 0);
+    const scale = usableWidth / totalDefinedWidth;
+    const colWidths = visibleColumnKeys.map(k => (colWidthMap[k] || 70) * scale);
+
+    let y = margin;
+    let currentPage = 1;
+
+    // Calculate total pages
+    const firstPageRows = Math.floor((contentMaxY - margin - titleAreaHeight - headerRowHeight) / rowHeight);
+    const otherPageRows = Math.floor((contentMaxY - margin - headerRowHeight) / rowHeight);
+    let totalPages = 1;
+    if (data.length > firstPageRows) {
+      totalPages += Math.ceil((data.length - firstPageRows) / Math.max(otherPageRows, 1));
+    }
+
+    const truncate = (text: string, maxWidth: number): string => {
+      if (doc.getTextWidth(text) <= maxWidth) return text;
+      let t = text;
+      while (t.length > 1 && doc.getTextWidth(t + '…') > maxWidth) {
+        t = t.slice(0, -1);
+      }
+      return t + '…';
+    };
+
+    const drawTitle = () => {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(14);
+      doc.setTextColor(30, 30, 30);
+      doc.text('Lease Report', margin, y + 14);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(110, 110, 110);
+      doc.text(
+        `Generated: ${dayjs().format('DD/MM/YYYY HH:mm')}   |   Total Records: ${data.length}`,
+        margin,
+        y + 32
+      );
+      y += titleAreaHeight;
+    };
+
+    const drawTableHeader = (startY: number) => {
+      doc.setFillColor(59, 130, 246);
+      doc.rect(margin, startY, usableWidth, headerRowHeight, 'F');
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(7.5);
+      doc.setTextColor(255, 255, 255);
+
+      let x = margin;
+      visibleColumnKeys.forEach((key, i) => {
+        const col = LEASE_REPORT_COLUMNS[key];
+        const text = truncate(col.title, colWidths[i] - 6);
+        doc.text(text, x + 3, startY + headerRowHeight - 6);
+        x += colWidths[i];
+      });
+    };
+
+    const drawFooter = (pageNum: number, total: number) => {
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7);
+      doc.setTextColor(150, 150, 150);
+      const fy = pageHeight - 12;
+      doc.text('Tanaka Property Management', margin, fy);
+      doc.text(`Page ${pageNum} of ${total}`, pageWidth / 2, fy, { align: 'center' });
+      doc.text(dayjs().format('DD/MM/YYYY'), pageWidth - margin, fy, { align: 'right' });
+    };
+
+    const drawGridLines = (tableStartY: number, tableEndY: number) => {
+      // Outer border
+      doc.setDrawColor(160, 160, 160);
+      doc.setLineWidth(0.5);
+      doc.rect(margin, tableStartY, usableWidth, tableEndY - tableStartY, 'S');
+
+      // Column dividers
+      doc.setDrawColor(200, 200, 200);
+      doc.setLineWidth(0.3);
+      let x = margin;
+      for (let i = 0; i < colWidths.length - 1; i++) {
+        x += colWidths[i];
+        doc.line(x, tableStartY, x, tableEndY);
+      }
+
+      // Row dividers
+      doc.setDrawColor(225, 225, 225);
+      doc.setLineWidth(0.2);
+      let ry = tableStartY + headerRowHeight + rowHeight;
+      while (ry < tableEndY) {
+        doc.line(margin, ry, margin + usableWidth, ry);
+        ry += rowHeight;
+      }
+      // Line between header and first data row
+      doc.setDrawColor(170, 170, 170);
+      doc.setLineWidth(0.4);
+      doc.line(margin, tableStartY + headerRowHeight, margin + usableWidth, tableStartY + headerRowHeight);
+    };
+
+    // --- Render ---
+    drawTitle();
+
+    let tableStartY = y;
+    drawTableHeader(tableStartY);
+    y += headerRowHeight;
+
+    data.forEach((item, index) => {
+      if (y + rowHeight > contentMaxY) {
+        drawGridLines(tableStartY, y);
+        drawFooter(currentPage, totalPages);
+
+        doc.addPage();
+        currentPage++;
+        y = margin;
+        tableStartY = y;
+        drawTableHeader(tableStartY);
+        y += headerRowHeight;
+      }
+
+      // Alternating row background
+      if (index % 2 === 0) {
+        doc.setFillColor(247, 250, 252);
+        doc.rect(margin, y, usableWidth, rowHeight, 'F');
+      }
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7.5);
+
+      let x = margin;
+      visibleColumnKeys.forEach((key, i) => {
+        const col = LEASE_REPORT_COLUMNS[key];
+        const value = item[col.dataIndex];
+
+        let text: string;
+        if (['rent_expected', 'amount_paid', 'amount_to_be_paid', 'overpayment'].includes(key)) {
+          text = `TSh ${((value as number) || 0).toLocaleString()}`;
+        } else if (col.formatter) {
+          text = String(col.formatter(value));
+        } else {
+          text = String(value || 'N/A');
+        }
+
+        // Color coded status columns
+        if (key === 'lease_status') {
+          const s = (value as string || '').toLowerCase();
+          if (s === 'active') doc.setTextColor(22, 101, 52);
+          else if (s === 'expired' || s === 'terminated') doc.setTextColor(185, 28, 28);
+          else if (s === 'draft') doc.setTextColor(90, 90, 90);
+          else doc.setTextColor(50, 50, 50);
+        } else if (key === 'payment_status') {
+          const s = (value as string || '').toLowerCase();
+          if (s === 'paid') doc.setTextColor(22, 101, 52);
+          else if (s === 'unpaid') doc.setTextColor(185, 28, 28);
+          else if (s === 'partial') doc.setTextColor(161, 85, 0);
+          else if (s === 'overpaid') doc.setTextColor(23, 92, 164);
+          else doc.setTextColor(50, 50, 50);
+        } else if (['rent_expected', 'amount_paid', 'amount_to_be_paid', 'overpayment'].includes(key)) {
+          doc.setTextColor(30, 30, 30);
+        } else {
+          doc.setTextColor(50, 50, 50);
+        }
+
+        const truncated = truncate(text, colWidths[i] - 6);
+        doc.text(truncated, x + 3, y + rowHeight - 5);
+        x += colWidths[i];
+      });
+
+      y += rowHeight;
+    });
+
+    drawGridLines(tableStartY, y);
+    drawFooter(currentPage, totalPages);
+
+    const timestamp = dayjs().format('YYYY-MM-DD_HH-mm-ss');
+    const exportFilename = filename || `Lease_Report_${timestamp}.pdf`;
+    doc.save(exportFilename);
+  } catch (error) {
+    console.error('PDF export error:', error);
+    throw new Error('Failed to export data to PDF');
+  }
 };
 
 /**

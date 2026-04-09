@@ -1,5 +1,4 @@
 import React, { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   Card,
   Table,
@@ -32,6 +31,7 @@ import { useLeaseReport } from '../hooks/useLeases';
 import dayjs, { Dayjs } from 'dayjs';
 import { exportLeaseReportToExcel, exportLeaseReportToPDF } from '../services/reportService';
 import { useTranslation } from 'react-i18next';
+import { formatLeaseDate, parseLeaseDate } from '../utils/leaseDate';
 
 const { Title, Text } = Typography;
 const { RangePicker } = DatePicker;
@@ -54,7 +54,6 @@ interface LeaseData {
 
 const LeaseReport: React.FC = () => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const [filterText, setFilterText] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [paymentStatusFilter, setPaymentStatusFilter] = useState<string>('');
@@ -104,9 +103,12 @@ const LeaseReport: React.FC = () => {
         const endDate = dateRange[1].endOf('day');
         
         if (item.start_date) {
-          const itemStartDate = dayjs(item.start_date);
-          matchesDateRange = itemStartDate.isAfter(startDate) && itemStartDate.isBefore(endDate) || 
-                            itemStartDate.isSame(startDate) || itemStartDate.isSame(endDate);
+          const itemStartDate = parseLeaseDate(item.start_date);
+          matchesDateRange = !!itemStartDate && (
+            (itemStartDate.isAfter(startDate) && itemStartDate.isBefore(endDate)) ||
+            itemStartDate.isSame(startDate) ||
+            itemStartDate.isSame(endDate)
+          );
         }
       }
 
@@ -240,15 +242,15 @@ const LeaseReport: React.FC = () => {
       title: t('leaseReport:columns.startDate'),
       dataIndex: 'start_date',
       key: 'start_date',
-      sorter: (a, b) => dayjs(a.start_date).unix() - dayjs(b.start_date).unix(),
-      render: (date) => date ? dayjs(date).format('DD/MM/YYYY') : t('leaseReport:table.na'),
+      sorter: (a, b) => (parseLeaseDate(a.start_date)?.valueOf() || 0) - (parseLeaseDate(b.start_date)?.valueOf() || 0),
+      render: (date) => formatLeaseDate(date) || t('leaseReport:table.na'),
     },
     {
       title: t('leaseReport:columns.endDate'),
       dataIndex: 'end_date',
       key: 'end_date',
-      sorter: (a, b) => dayjs(a.end_date).unix() - dayjs(b.end_date).unix(),
-      render: (date) => date ? dayjs(date).format('DD/MM/YYYY') : t('leaseReport:table.na'),
+      sorter: (a, b) => (parseLeaseDate(a.end_date)?.valueOf() || 0) - (parseLeaseDate(b.end_date)?.valueOf() || 0),
+      render: (date) => formatLeaseDate(date) || t('leaseReport:table.na'),
     },
     {
       title: t('leaseReport:columns.rentExpected'),
