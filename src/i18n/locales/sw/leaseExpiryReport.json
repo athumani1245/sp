@@ -1,0 +1,69 @@
+{
+  "title": "Ripoti ya Mwisho wa Mikataba",
+  "subtitle": "Angalia na pakua taarifa za mwisho wa mikataba",
+  "statistics": {
+    "totalLeases": "Jumla ya Mikataba",
+    "expiringLeases": "Mikataba Inayokaribia Mwisho",
+    "expiredLeases": "Mikataba Iliyoisha",
+    "activeLeases": "Mikataba Inayoendelea"
+  },
+  "export": {
+    "exportExcel": "Pakua Excel",
+    "exportPdf": "Pakua PDF",
+    "refresh": "Onyesha Tena",
+    "columns": "Safu",
+    "successExcel": "Rekodi {{count}} zimepakuliwa kwenye Excel",
+    "successPdf": "Rekodi {{count}} zimepakuliwa kwenye PDF",
+    "noData": "Hakuna data ya kupakua",
+    "errorExcel": "Imeshindwa kupakua Excel",
+    "errorPdf": "Imeshindwa kupakua PDF"
+  },
+  "quickRange": {
+    "label": "Chagua Haraka:",
+    "today": "Leo",
+    "thisWeek": "Wiki hii",
+    "thisMonth": "Mwezi huu",
+    "thisYear": "Mwaka huu"
+  },
+  "filters": {
+    "leaseStatus": "Hali ya Mkataba",
+    "allStatuses": "Hali Zote",
+    "searchPlaceholder": "Tafuta mkataba...",
+    "resetFilters": "Futa Vichujio",
+    "filtersReset": "Vichujio vimefutwa",
+    "activeFilters": "Vichujio Vilivyotumika:",
+    "search": "Tafuta",
+    "dateRange": "Tarehe"
+  },
+  "columns": {
+    "leaseNo": "Namba ya Mkataba",
+    "tenant": "Mpangaji",
+    "property": "Jengo",
+    "unit": "Chumba",
+    "startDate": "Tarehe ya kuanza",
+    "endDate": "Tarehe ya mwisho",
+    "rentExpected": "Kodi Inayotarajiwa",
+    "amountPaid": "Iliyolipwa",
+    "amountDue": "Deni",
+    "overpayment": "Malipo Zaidi",
+    "leaseStatus": "Hali ya Mkataba",
+    "remainingDays": "Siku Zilizobaki",
+    "selectAll": "Chagua Zote",
+    "deselectAll": "Ondoa Zote",
+    "selectColumns": "Chagua Safu"
+  },
+  "status": {
+    "active": "Inaendelea",
+    "draft": "Rasimu",
+    "expired": "Imeisha",
+    "expiring": "Inakaribia Mwisho",
+    "terminated": "Imekatishwa",
+    "cancelled": "Imeghairiwa"
+  },
+  "table": {
+    "showing": "Inaonyesha mikataba {{count}} kati ya {{total}}",
+    "selected": "{{count}} zimechaguliwa",
+    "days": "siku {{count}}",
+    "na": "Hakuna"
+  }
+}

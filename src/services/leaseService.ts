@@ -186,3 +186,9 @@ export const getLeaseReport = async () => {
   const response = await api.get(`/reports/lease`);
   return response.data.data || [];
 };
+
+// Get lease expiry report
+export const getLeaseExpiryReport = async () => {
+  const response = await api.get(`/reports/lease-expiry-report`);
+  return response.data.data || [];
+};

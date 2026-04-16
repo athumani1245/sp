@@ -8,6 +8,7 @@ import enLeases from './locales/en/leases.json';
 import enDashboard from './locales/en/dashboard.json';
 import enProfile from './locales/en/profile.json';
 import enLeaseReport from './locales/en/leaseReport.json';
+import enLeaseExpiryReport from './locales/en/leaseExpiryReport.json';
 import enSubscription from './locales/en/subscription.json';
 import enLanding from './locales/en/landing.json';
 import swAuth from './locales/sw/auth.json';
@@ -18,6 +19,7 @@ import swLeases from './locales/sw/leases.json';
 import swDashboard from './locales/sw/dashboard.json';
 import swProfile from './locales/sw/profile.json';
 import swLeaseReport from './locales/sw/leaseReport.json';
+import swLeaseExpiryReport from './locales/sw/leaseExpiryReport.json';
 import swSubscription from './locales/sw/subscription.json';
 import swLanding from './locales/sw/landing.json';
 
@@ -35,6 +37,7 @@ i18n
         dashboard: enDashboard,
         profile: enProfile,
         leaseReport: enLeaseReport,
+        leaseExpiryReport: enLeaseExpiryReport,
         subscription: enSubscription,
         landing: enLanding,
       },
@@ -47,6 +50,7 @@ i18n
         dashboard: swDashboard,
         profile: swProfile,
         leaseReport: swLeaseReport,
+        leaseExpiryReport: swLeaseExpiryReport,
         subscription: swSubscription,
         landing: swLanding,
       },
@@ -54,7 +58,7 @@ i18n
     lng: localStorage.getItem('language') || 'en', // Load saved language or default to English
     fallbackLng: 'en',
     defaultNS: 'common',
-    ns: ['common', 'auth', 'properties', 'tenants', 'leases', 'dashboard', 'profile', 'leaseReport', 'subscription', 'landing'],
+    ns: ['common', 'auth', 'properties', 'tenants', 'leases', 'dashboard', 'profile', 'leaseReport', 'leaseExpiryReport', 'subscription', 'landing'],
     interpolation: {
       escapeValue: false, // React already escapes values
     },

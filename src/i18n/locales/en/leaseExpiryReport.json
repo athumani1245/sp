@@ -1,0 +1,69 @@
+{
+  "title": "Lease Expiry Report",
+  "subtitle": "View and export lease expiry data",
+  "statistics": {
+    "totalLeases": "Total Leases",
+    "expiringLeases": "Expiring Leases",
+    "expiredLeases": "Expired Leases",
+    "activeLeases": "Active Leases"
+  },
+  "export": {
+    "exportExcel": "Export Excel",
+    "exportPdf": "Export PDF",
+    "refresh": "Refresh",
+    "columns": "Columns",
+    "successExcel": "Successfully exported {{count}} records to Excel",
+    "successPdf": "Successfully exported {{count}} records to PDF",
+    "noData": "No data available to export",
+    "errorExcel": "Failed to export data to EXCEL",
+    "errorPdf": "Failed to export data to PDF"
+  },
+  "quickRange": {
+    "label": "Quick Range:",
+    "today": "Today",
+    "thisWeek": "This Week",
+    "thisMonth": "This Month",
+    "thisYear": "This Year"
+  },
+  "filters": {
+    "leaseStatus": "Lease Status",
+    "allStatuses": "All Statuses",
+    "searchPlaceholder": "Search leases...",
+    "resetFilters": "Reset Filters",
+    "filtersReset": "Filters reset",
+    "activeFilters": "Active Filters:",
+    "search": "Search",
+    "dateRange": "Date"
+  },
+  "columns": {
+    "leaseNo": "Lease No.",
+    "tenant": "Tenant",
+    "property": "Property",
+    "unit": "Unit",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "rentExpected": "Rent Expected",
+    "amountPaid": "Amount Paid",
+    "amountDue": "Amount Due",
+    "overpayment": "Overpayment",
+    "leaseStatus": "Lease Status",
+    "remainingDays": "Remaining Days",
+    "selectAll": "Select All",
+    "deselectAll": "Deselect All",
+    "selectColumns": "Select Columns"
+  },
+  "status": {
+    "active": "Active",
+    "draft": "Draft",
+    "expired": "Expired",
+    "expiring": "Expiring",
+    "terminated": "Terminated",
+    "cancelled": "Cancelled"
+  },
+  "table": {
+    "showing": "Showing {{count}} of {{total}} leases",
+    "selected": "{{count}} selected",
+    "days": "{{count}} days",
+    "na": "N/A"
+  }
+}

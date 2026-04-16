@@ -17,7 +17,7 @@
     "propertyName": "Jina la Jengo",
     "type": "Aina",
     "location": "Eneo",
-    "units": "Vyumba",
+    "units": "Nyumba/Vyumba",
     "actions": "Vitendo",
     "viewDetails": "Tazama Maelezo",
     "noAddress": "Hakuna anwani",
@@ -137,6 +137,8 @@
     "noLeasesFoundDesc": "Jengo hili halina mikataba bado. Unda mkataba kutoka ukurasa wa Mikataba.",
     "loadingProperty": "Inapakia maelezo ya jengo...",
     "loadingUnits": "Inapakia vyumba vya jengo...",
-    "loadingLeases": "Inapakia mikataba ya jengo..."
+    "loadingLeases": "Inapakia mikataba ya jengo...",
+    "deleteProperty": "Futa Jengo",
+    "deletePropertyConfirm": "Una uhakika unataka kufuta \"{{propertyName}}\"? Kitendo hiki hakiwezi kutenduliwa."
   }
 }

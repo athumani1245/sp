@@ -24,6 +24,7 @@
     "subscription": "Subscription",
     "reports": "Reports",
     "leaseAgreements": "Lease Agreements",
+    "leaseExpiry": "Lease Expiry",
     "subscriptionRequired": "Subscription required"
   }
 }
