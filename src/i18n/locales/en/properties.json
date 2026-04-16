@@ -17,7 +17,7 @@
     "propertyName": "Property Name",
     "type": "Type",
     "location": "Location",
-    "units": "Units",
+    "units": "House/Rooms",
     "actions": "Actions",
     "viewDetails": "View Details",
     "noAddress": "No address",
@@ -69,7 +69,7 @@
     "cancel": "Cancel",
     "details": "Property Details",
     "propertyDetails": "Property Details",
-    "units": "Units",
+    "units": "House/Rooms",
     "leases": "Leases",
     "propertyName": "Property Name",
     "propertyType": "Property Type",
@@ -137,6 +137,8 @@
     "noLeasesFoundDesc": "This property has no leases yet. Create a lease from the Leases page.",
     "loadingProperty": "Loading property details...",
     "loadingUnits": "Loading units...",
-    "loadingLeases": "Loading leases..."
+    "loadingLeases": "Loading leases...",
+    "deleteProperty": "Delete Property",
+    "deletePropertyConfirm": "Are you sure you want to delete \"{{propertyName}}\"? This action cannot be undone."
   }
 }

@@ -101,6 +101,11 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ collapsed, isMobile = false }) 
           label: t('common:nav.leaseAgreements'),
           onClick: () => navigate('/reports/lease'),
         },
+        // {
+        //   key: '/reports/lease-expiry',
+        //   label: t('common:nav.leaseExpiry'),
+        //   onClick: () => navigate('/reports/lease-expiry'),
+        // },
       ],
     },
   ];

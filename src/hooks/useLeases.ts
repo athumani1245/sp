@@ -11,6 +11,7 @@ import {
   getLeasePayments,
   cancelPayment,
   getLeaseReport,
+  getLeaseExpiryReport,
 } from '../services/leaseService';
 import { message } from 'antd';
 
@@ -53,6 +54,13 @@ export const useLeaseReport = () => {
   return useQuery({
     queryKey: ['leaseReport'],
     queryFn: getLeaseReport,
+  });
+};
+
+export const useLeaseExpiryReport = () => {
+  return useQuery({
+    queryKey: ['leaseExpiryReport'],
+    queryFn: getLeaseExpiryReport,
   });
 };
 

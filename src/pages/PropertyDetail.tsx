@@ -37,7 +37,7 @@ import {
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useQueryClient } from '@tanstack/react-query';
-import { useProperty, useUpdateProperty, usePropertyUnits, usePropertyStats, useDeletePropertyUnit, useRegions, useDistricts, useWards } from '../hooks/useProperties';
+import { useProperty, useUpdateProperty, useDeleteProperty, usePropertyUnits, usePropertyStats, useDeletePropertyUnit, useRegions, useDistricts, useWards } from '../hooks/useProperties';
 import { useLeases, leaseKeys } from '../hooks/useLeases';
 import { getLeases } from '../services/leaseService';
 import AddUnitModal from '../components/forms/AddUnitModal';
@@ -79,6 +79,7 @@ const PropertyDetail: React.FC = () => {
   const { data: leasesData, isLoading: leasesLoading, error: leasesError } = useLeases({});
   
   const updatePropertyMutation = useUpdateProperty();
+  const deletePropertyMutation = useDeleteProperty();
   const deleteUnitMutation = useDeletePropertyUnit();
   const { data: regions, isLoading: regionsLoading } = useRegions();
   const { data: districts, isLoading: districtsLoading } = useDistricts(selectedRegion || '');
@@ -152,6 +153,25 @@ const PropertyDetail: React.FC = () => {
 
   const handleBack = () => {
     navigate('/properties');
+  };
+
+  const handleDeleteProperty = () => {
+    Modal.confirm({
+      title: t('properties:propertyDetail.deleteProperty'),
+      content: t('properties:propertyDetail.deletePropertyConfirm', { propertyName: property?.property_name }),
+      okText: t('properties:propertyDetail.delete'),
+      okType: 'danger',
+      cancelText: t('properties:propertyDetail.cancel'),
+      icon: <DeleteOutlined style={{ color: '#ff4d4f' }} />,
+      onOk: async () => {
+        try {
+          await deletePropertyMutation.mutateAsync(id!);
+          navigate('/properties');
+        } catch (error) {
+          // Error already handled by mutation
+        }
+      },
+    });
   };
 
   const handleEdit = () => {
@@ -501,9 +521,19 @@ const PropertyDetail: React.FC = () => {
           </Space>
           <Space>
             {!isEditMode ? (
-              <Button type="primary" icon={<EditOutlined />} onClick={handleEdit}>
-                {t('properties:propertyDetail.edit')}
-              </Button>
+              <>
+                <Button type="primary" icon={<EditOutlined />} onClick={handleEdit}>
+                  {t('properties:propertyDetail.edit')}
+                </Button>
+                <Button
+                  danger
+                  icon={<DeleteOutlined />}
+                  onClick={handleDeleteProperty}
+                  loading={deletePropertyMutation.isPending}
+                >
+                  {t('properties:propertyDetail.deleteProperty')}
+                </Button>
+              </>
             ) : (
               <>
                 <Button icon={<CloseOutlined />} onClick={handleCancel}>

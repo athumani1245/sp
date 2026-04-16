@@ -36,8 +36,9 @@ import {
   FilePdfOutlined,
   EyeOutlined,
   StopOutlined,
+  DeleteOutlined,
 } from '@ant-design/icons';
-import { useLease, useCancelPayment, useCancelLease, useOriginalLease } from '../hooks/useLeases';
+import { useLease, useCancelPayment, useCancelLease, useDeleteLease, useOriginalLease } from '../hooks/useLeases';
 import AddPaymentModal from '../components/forms/AddPaymentModal';
 import RenewLeaseModal from '../components/forms/RenewLeaseModal';
 import TerminateLeaseModal from '../components/forms/TerminateLeaseModal';
@@ -93,12 +94,14 @@ const Lease: React.FC = () => {
   const { data: lease, isLoading: loading, error, refetch } = useLease(leaseId || null);
   const cancelPaymentMutation = useCancelPayment();
   const cancelLeaseMutation = useCancelLease();
+  const deleteLeaseMutation = useDeleteLease();
   
   // Fetch original lease if this is a renewed lease
   const originalLeaseId = lease?.original_lease;
   const { data: originalLease, isLoading: originalLeaseLoading } = useOriginalLease(originalLeaseId);
   
   const [isCancelling, setIsCancelling] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [showRenewModal, setShowRenewModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
@@ -113,6 +116,29 @@ const Lease: React.FC = () => {
       messageApi.error(t('leases:leaseDetail.failedToLoad'));
     }
   }, [error, messageApi, t]);
+
+  const handleDeleteLease = () => {
+    Modal.confirm({
+      title: t('leases:leases.deleteLease'),
+      icon: <WarningOutlined style={{ color: '#ff4d4f' }} />,
+      content: t('leases:leases.deleteLeaseConfirm', { leaseNumber: lease?.lease_number }),
+      okText: t('leases:leases.deleteLease'),
+      okType: 'danger',
+      cancelText: t('leases:leaseDetail.noKeepLease'),
+      onOk: async () => {
+        if (!leaseId) return;
+        try {
+          setIsDeleting(true);
+          await deleteLeaseMutation.mutateAsync(leaseId);
+          navigate('/leases');
+        } catch (error) {
+          console.error('Failed to delete lease:', error);
+        } finally {
+          setIsDeleting(false);
+        }
+      },
+    });
+  };
 
   const handleCancelLease = () => {
     Modal.confirm({
@@ -790,6 +816,17 @@ const Lease: React.FC = () => {
                       {t('leases:leases.cancel')}
                     </Button>
                   )}
+                { (
+                  <Button
+                    danger
+                    size="small"
+                    icon={<DeleteOutlined />}
+                    onClick={handleDeleteLease}
+                    loading={isDeleting}
+                  >
+                    {t('leases:leases.deleteLease')}
+                  </Button>
+                )}
               </Space>
             </Col>
             <Col>
