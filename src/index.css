@@ -21,3 +21,29 @@ code {
 #root {
   min-height: 100vh;
 }
+
+/* Markdown rendered package descriptions */
+.pkg-description-md p {
+  margin: 0 0 8px 0;
+}
+.pkg-description-md p:last-child {
+  margin-bottom: 0;
+}
+.pkg-description-md h2,
+.pkg-description-md h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 10px 0 4px 0;
+  color: rgba(0, 0, 0, 0.85);
+}
+.pkg-description-md ul,
+.pkg-description-md ol {
+  padding-left: 18px;
+  margin: 4px 0 8px 0;
+}
+.pkg-description-md li {
+  margin-bottom: 3px;
+}
+.pkg-description-md strong {
+  font-weight: 600;
+}

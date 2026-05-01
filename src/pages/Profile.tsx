@@ -13,6 +13,10 @@ import {
   Typography,
   Divider,
   Spin,
+  Table,
+  Select,
+  Popconfirm,
+  Tag,
 } from 'antd';
 import {
   useProfile,
@@ -23,6 +27,12 @@ import {
   useResendOtpForPhoneChange,
 } from '../hooks/useProfile';
 import {
+  usePaymentAccounts,
+  useCreatePaymentAccount,
+  useUpdatePaymentAccount,
+  useDeletePaymentAccount,
+} from '../hooks/usePaymentAccounts';
+import {
   UserOutlined,
   MailOutlined,
   PhoneOutlined,
@@ -32,6 +42,9 @@ import {
   SaveOutlined,
   CloseOutlined,
   KeyOutlined,
+  PlusOutlined,
+  DeleteOutlined,
+  BankOutlined,
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 
@@ -46,6 +59,53 @@ interface UserInfo {
   gender?: string;
   date_of_birth?: string;
 }
+
+const PROVIDER_TYPE_OPTIONS = [
+  { value: 'BANK', label: 'Bank Account' },
+  { value: 'LIPA', label: 'Bank/Service Lipa Number' },
+  { value: 'MNO', label: 'Mobile Money Wallet' },
+];
+
+const PROVIDER_OPTIONS: Record<string, { value: string; label: string }[]> = {
+  BANK: [
+    { value: 'CRDB', label: 'CRDB Bank' },
+    { value: 'NMB', label: 'NMB Bank' },
+    { value: 'NBC', label: 'NBC Bank' },
+    { value: 'STANBIC', label: 'Stanbic Bank' },
+    { value: 'ABSA', label: 'Absa Bank' },
+    { value: 'EXIM', label: 'Exim Bank' },
+    { value: 'DTB', label: 'Diamond Trust Bank' },
+    { value: 'KCB', label: 'KCB Bank' },
+    { value: 'EQUITY', label: 'Equity Bank' },
+    { value: 'AZANIA', label: 'Azania Bank' },
+    { value: 'BOA', label: 'Bank of Africa' },
+  ],
+  LIPA: [
+    { value: 'CRDB_LIPA', label: 'CRDB Lipa' },
+    { value: 'NMB_LIPA', label: 'NMB Lipa' },
+    { value: 'NBC_LIPA', label: 'NBC Lipa' },
+    { value: 'STANBIC_LIPA', label: 'Stanbic Lipa' },
+    { value: 'ABSA_LIPA', label: 'Absa Lipa' },
+    { value: 'EXIM_LIPA', label: 'Exim Lipa' },
+    { value: 'DTB_LIPA', label: 'Diamond Trust Lipa' },
+    { value: 'KCB_LIPA', label: 'KCB Lipa' },
+    { value: 'EQUITY_LIPA', label: 'Equity Lipa' },
+    { value: 'AZANIA_LIPA', label: 'Azania Lipa' },
+    { value: 'BOA_LIPA', label: 'Bank of Africa Lipa' },
+    { value: 'SELCOM', label: 'Selcom Lipa' },
+  ],
+  MNO: [
+    { value: 'MPESA', label: 'M-Pesa' },
+    { value: 'AIRTEL', label: 'Airtel Money' },
+    { value: 'TIGOPESA', label: 'Tigo Pesa' },
+    { value: 'HALOPESA', label: 'Halo Pesa' },
+  ],
+};
+
+const ALL_PROVIDERS: Record<string, string> = {};
+Object.values(PROVIDER_OPTIONS).forEach(group => {
+  group.forEach(p => { ALL_PROVIDERS[p.value] = p.label; });
+});
 
 const Profile: React.FC = () => {
   const { t } = useTranslation();
@@ -62,7 +122,17 @@ const Profile: React.FC = () => {
   const verifyOtpMutation = useVerifyOtpAndChangePhone();
   const resendOtpMutation = useResendOtpForPhoneChange();
 
+  // Payment accounts
+  const { data: paymentAccounts, isLoading: accountsLoading } = usePaymentAccounts();
+  const createAccountMutation = useCreatePaymentAccount();
+  const updateAccountMutation = useUpdatePaymentAccount();
+  const deleteAccountMutation = useDeletePaymentAccount();
+
   const [isEditing, setIsEditing] = useState(false);
+  const [editingAccountKey, setEditingAccountKey] = useState<string | null>(null);
+  const [accountForm] = Form.useForm();
+  const [newAccountProviderType, setNewAccountProviderType] = useState<string>('');
+  const [editAccountProviderType, setEditAccountProviderType] = useState<string>('');
 
   // Change password modal
   const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -244,6 +314,190 @@ const Profile: React.FC = () => {
     }
   };
 
+  // Payment account handlers
+  const handleAddAccount = async () => {
+    try {
+      const values = await accountForm.validateFields();
+      await createAccountMutation.mutateAsync(values);
+      accountForm.resetFields();
+      setEditingAccountKey(null);
+      setNewAccountProviderType('');
+    } catch (error) {
+      // validation or mutation error
+    }
+  };
+
+  const handleEditAccount = (record: any) => {
+    setEditingAccountKey(record.id);
+    setEditAccountProviderType(record.provider_type || '');
+    accountForm.setFieldsValue({
+      provider_type: record.provider_type,
+      provider: record.provider,
+      payment_number: record.payment_number,
+      account_name: record.account_name,
+    });
+  };
+
+  const handleSaveAccount = async (id: string) => {
+    try {
+      const values = await accountForm.validateFields();
+      await updateAccountMutation.mutateAsync({ id, accountData: values });
+      setEditingAccountKey(null);
+      accountForm.resetFields();
+      setEditAccountProviderType('');
+    } catch (error) {
+      // validation or mutation error
+    }
+  };
+
+  const handleCancelEditAccount = () => {
+    setEditingAccountKey(null);
+    accountForm.resetFields();
+    setEditAccountProviderType('');
+  };
+
+  const handleDeleteAccount = async (id: string) => {
+    await deleteAccountMutation.mutateAsync(id);
+  };
+
+  const isAddingNew = editingAccountKey === 'new';
+
+  const accountColumns = [
+    {
+      title: t('profile:paymentAccounts.providerType'),
+      dataIndex: 'provider_type',
+      key: 'provider_type',
+      width: 180,
+      render: (_: any, record: any) => {
+        if (record.id === editingAccountKey || (record.id === 'new' && isAddingNew)) {
+          return (
+            <Form.Item name="provider_type" rules={[{ required: true, message: t('profile:paymentAccounts.providerTypeRequired') }]} style={{ margin: 0 }}>
+              <Select
+                placeholder={t('profile:paymentAccounts.providerTypePlaceholder')}
+                options={PROVIDER_TYPE_OPTIONS}
+                onChange={(val) => {
+                  if (record.id === 'new') {
+                    setNewAccountProviderType(val);
+                  } else {
+                    setEditAccountProviderType(val);
+                  }
+                  accountForm.setFieldsValue({ provider: undefined });
+                }}
+                style={{ minWidth: 150 }}
+              />
+            </Form.Item>
+          );
+        }
+        const typeLabel = PROVIDER_TYPE_OPTIONS.find(o => o.value === record.provider_type)?.label || record.provider_type;
+        return <Tag color={record.provider_type === 'BANK' ? 'blue' : record.provider_type === 'MNO' ? 'green' : 'orange'}>{typeLabel}</Tag>;
+      },
+    },
+    {
+      title: t('profile:paymentAccounts.provider'),
+      dataIndex: 'provider',
+      key: 'provider',
+      width: 200,
+      render: (_: any, record: any) => {
+        if (record.id === editingAccountKey || (record.id === 'new' && isAddingNew)) {
+          const activeType = record.id === 'new' ? newAccountProviderType : editAccountProviderType;
+          return (
+            <Form.Item name="provider" rules={[{ required: true, message: t('profile:paymentAccounts.providerRequired') }]} style={{ margin: 0 }}>
+              <Select
+                placeholder={t('profile:paymentAccounts.providerPlaceholder')}
+                options={PROVIDER_OPTIONS[activeType] || []}
+                disabled={!activeType}
+                showSearch
+                filterOption={(input, option) =>
+                  String(option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                }
+                style={{ minWidth: 160 }}
+              />
+            </Form.Item>
+          );
+        }
+        return ALL_PROVIDERS[record.provider] || record.provider;
+      },
+    },
+    {
+      title: t('profile:paymentAccounts.paymentNumber'),
+      dataIndex: 'payment_number',
+      key: 'payment_number',
+      render: (_: any, record: any) => {
+        if (record.id === editingAccountKey || (record.id === 'new' && isAddingNew)) {
+          return (
+            <Form.Item name="payment_number" rules={[{ required: true, message: t('profile:paymentAccounts.paymentNumberRequired') }]} style={{ margin: 0 }}>
+              <Input placeholder={t('profile:paymentAccounts.paymentNumberPlaceholder')} />
+            </Form.Item>
+          );
+        }
+        return record.payment_number;
+      },
+    },
+    {
+      title: t('profile:paymentAccounts.accountName'),
+      dataIndex: 'account_name',
+      key: 'account_name',
+      render: (_: any, record: any) => {
+        if (record.id === editingAccountKey || (record.id === 'new' && isAddingNew)) {
+          return (
+            <Form.Item name="account_name" rules={[{ required: true, message: t('profile:paymentAccounts.accountNameRequired') }]} style={{ margin: 0 }}>
+              <Input placeholder={t('profile:paymentAccounts.accountNamePlaceholder')} />
+            </Form.Item>
+          );
+        }
+        return record.account_name;
+      },
+    },
+    {
+      title: t('profile:paymentAccounts.actions'),
+      key: 'actions',
+      width: 120,
+      render: (_: any, record: any) => {
+        if (record.id === 'new' && isAddingNew) {
+          return (
+            <Space>
+              <Button type="link" size="small" onClick={handleAddAccount} loading={createAccountMutation.isPending}>
+                <SaveOutlined />
+              </Button>
+              <Button type="link" size="small" danger onClick={() => { setEditingAccountKey(null); accountForm.resetFields(); setNewAccountProviderType(''); }}>
+                <CloseOutlined />
+              </Button>
+            </Space>
+          );
+        }
+        if (record.id === editingAccountKey) {
+          return (
+            <Space>
+              <Button type="link" size="small" onClick={() => handleSaveAccount(record.id)} loading={updateAccountMutation.isPending}>
+                <SaveOutlined />
+              </Button>
+              <Button type="link" size="small" danger onClick={handleCancelEditAccount}>
+                <CloseOutlined />
+              </Button>
+            </Space>
+          );
+        }
+        return (
+          <Space>
+            <Button type="link" size="small" onClick={() => handleEditAccount(record)}>
+              <EditOutlined />
+            </Button>
+            <Popconfirm title={t('profile:paymentAccounts.deleteConfirm')} onConfirm={() => handleDeleteAccount(record.id)}>
+              <Button type="link" size="small" danger loading={deleteAccountMutation.isPending}>
+                <DeleteOutlined />
+              </Button>
+            </Popconfirm>
+          </Space>
+        );
+      },
+    },
+  ];
+
+  const accountsDataSource = [
+    ...(paymentAccounts || []),
+    ...(isAddingNew ? [{ id: 'new', provider_type: '', provider: '', payment_number: '', account_name: '' }] : []),
+  ];
+
   return (
     <div style={{ padding: '24px', maxWidth: 1200, margin: '0 auto' }}>
       <div style={{ marginBottom: 24 }}>
@@ -387,6 +641,45 @@ const Profile: React.FC = () => {
               </Button>
             </Col>
           </Row>
+        </Card>
+
+        {/* Payment Accounts Card */}
+        <Card
+          title={
+            <Space>
+              <BankOutlined />
+              <span>{t('profile:paymentAccounts.title')}</span>
+            </Space>
+          }
+          extra={
+            !isAddingNew && (
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={() => {
+                  setEditingAccountKey('new');
+                  accountForm.resetFields();
+                  setNewAccountProviderType('');
+                }}
+              >
+                {t('profile:paymentAccounts.addAccount')}
+              </Button>
+            )
+          }
+          style={{ marginTop: 24 }}
+        >
+          <Form form={accountForm} component={false}>
+            <Table
+              dataSource={accountsDataSource}
+              columns={accountColumns}
+              rowKey="id"
+              loading={accountsLoading}
+              pagination={false}
+              scroll={{ x: 700 }}
+              locale={{ emptyText: t('profile:paymentAccounts.noAccounts') }}
+              size="middle"
+            />
+          </Form>
         </Card>
       </Spin>
 

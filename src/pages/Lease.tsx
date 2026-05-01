@@ -43,6 +43,8 @@ import AddPaymentModal from '../components/forms/AddPaymentModal';
 import RenewLeaseModal from '../components/forms/RenewLeaseModal';
 import TerminateLeaseModal from '../components/forms/TerminateLeaseModal';
 import LeasePDFPreviewModal from '../components/pdf/LeasePDFPreviewModal';
+import Chatter from '../components/chatter/Chatter';
+import ChatterLayout from '../components/layout/ChatterLayout';
 
 const { Title, Text } = Typography;
 
@@ -741,7 +743,8 @@ const Lease: React.FC = () => {
   }
 
   return (
-    <div>
+    <ChatterLayout model="lease" recordId={leaseId || ''}>
+      <div>
       {contextHolder}
 
       {/* Breadcrumb */}
@@ -889,7 +892,10 @@ const Lease: React.FC = () => {
           lease={lease}
         />
       )}
-    </div>
+
+      {/* Chatter - Attachments */}
+      </div>
+    </ChatterLayout>
   );
 };
 

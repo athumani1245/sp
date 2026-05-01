@@ -17,16 +17,16 @@
     "plan": "Mpango",
     "amount": "Kiasi",
     "status": "Hali",
-    "statusSuccess": "Imefaulu",
-    "statusPending": "Inasubiri",
-    "statusFailed": "Imeshindwa",
-    "noHistory": "Hakuna historia ya malipo"
+    "statusSuccess": "success",
+    "statusPending": "pending",
+    "statusFailed": "failed",
+    "noHistory": "Hakuna malipo"
   },
   "packages": {
     "title": "Vifurushi Vinavyopatikana",
     "upTo": "Hadi",
-    "units": "vitengo",
-    "propertyManagers": "wasimamizi wa mali",
+    "units": "nyumba/chumba",
+    "propertyManagers": "wasimamizi",
     "selected": "Umechagua",
     "youSave": "Unaokoa",
     "days": "siku",

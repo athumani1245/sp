@@ -1,5 +1,39 @@
 /* Layout Styles */
 
+/* ── Chatter responsive layout ── */
+.chatter-page-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: stretch;
+}
+
+.chatter-main-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.chatter-sidebar {
+  width: 100%;
+}
+
+/* When the viewport is wide (zoomed-out or large monitor) → sidebar */
+@media (min-width: 1440px) {
+  .chatter-page-layout {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .chatter-sidebar {
+    width: 380px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 80px;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+  }
+}
+
 /* Sider */
 .app-sider {
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);

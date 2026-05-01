@@ -16,7 +16,6 @@ import {
   Select,
   Row,
   Col,
-  Statistic,
   message,
   Modal,
 } from 'antd';
@@ -37,11 +36,14 @@ import {
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useQueryClient } from '@tanstack/react-query';
-import { useProperty, useUpdateProperty, useDeleteProperty, usePropertyUnits, usePropertyStats, useDeletePropertyUnit, useRegions, useDistricts, useWards } from '../hooks/useProperties';
+import { useProperty, useUpdateProperty, useDeleteProperty, usePropertyUnits, useDeletePropertyUnit, useRegions, useDistricts, useWards } from '../hooks/useProperties';
+import { usePropertyManagers } from '../hooks/usePropertyManagers';
 import { useLeases, leaseKeys } from '../hooks/useLeases';
 import { getLeases } from '../services/leaseService';
 import AddUnitModal from '../components/forms/AddUnitModal';
 import EditUnitModal from '../components/forms/EditUnitModal';
+import Chatter from '../components/chatter/Chatter';
+import ChatterLayout from '../components/layout/ChatterLayout';
 import dayjs from 'dayjs';
 
 const { Title, Text } = Typography;
@@ -54,6 +56,46 @@ interface Unit {
   property: string;
   is_occupied: boolean;
 }
+
+// Sub-component for property manager field (view/edit)
+const PropertyManagerField: React.FC<{ isEditMode: boolean; property: any }> = ({ isEditMode, property }) => {
+  const { t } = useTranslation();
+  const { data: managersData, isLoading: managersLoading } = usePropertyManagers({ limit: 100 });
+  const managersList = Array.isArray(managersData?.items) ? managersData!.items : [];
+
+  if (!isEditMode) {
+    const manager = property.managers || property.manager;
+    const managerName = manager
+      ? `${manager.first_name} ${manager.last_name}`
+      : property.manager_name || '-';
+    return (
+      <Form.Item label={t('properties:addPropertyModal.propertyManager')}>
+        <Input value={managerName} disabled prefix={<UserOutlined />} />
+      </Form.Item>
+    );
+  }
+
+  return (
+    <Form.Item
+      label={t('properties:addPropertyModal.propertyManager')}
+      name="manager_id"
+    >
+      <Select
+        placeholder={t('properties:addPropertyModal.propertyManagerPlaceholder')}
+        allowClear
+        showSearch
+        loading={managersLoading}
+        filterOption={(input, option) =>
+          String(option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+        }
+        options={managersList.map((mgr: any) => ({
+          value: mgr.id,
+          label: `${mgr.first_name} ${mgr.last_name} (${mgr.username})`,
+        }))}
+      />
+    </Form.Item>
+  );
+};
 
 const PropertyDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -72,7 +114,6 @@ const PropertyDetail: React.FC = () => {
   // Fetch data using TanStack Query hooks
   const { data: property, isLoading, error } = useProperty(id || '');
   const { data: unitsData, isLoading: unitsLoading, error: unitsError, refetch: refetchUnits } = usePropertyUnits({ property: id || '' });
-  const { data: stats } = usePropertyStats(id || '');
   
   // Fetch all leases without pagination for client-side filtering
   // Don't pass page/limit to get all leases
@@ -132,24 +173,53 @@ const PropertyDetail: React.FC = () => {
       if (propertyType === 'Residential') {
         propertyType = 'Standalone';
       }
-      
+
+      // Resolve region code from name if code is not available
+      const regionCode = property.address?.region_code
+        || (regions && property.address?.region_name
+          ? regions.find((r: any) => r.region_name === property.address.region_name)?.region_code
+          : undefined);
+
       form.setFieldsValue({
         property_name: property.property_name,
         property_type: propertyType,
-        region: property.address?.region_code,
-        district: property.address?.district_code,
-        ward: property.address?.ward_code,
+        region: regionCode,
         street: property.address?.street,
+        manager_id: property.managers?.id || property.manager?.id || property.manager_id || undefined,
       });
-      // Set selected region and district for cascading dropdowns
-      if (property.address?.region_code) {
-        setSelectedRegion(property.address.region_code);
-      }
-      if (property.address?.district_code) {
-        setSelectedDistrict(property.address.district_code);
+      // Set selected region for cascading dropdowns
+      if (regionCode && regionCode !== selectedRegion) {
+        setSelectedRegion(regionCode);
       }
     }
-  }, [property, form]);
+  }, [property, regions, form]);
+
+  // Resolve district once districts are loaded
+  useEffect(() => {
+    if (property && districts && districts.length > 0) {
+      const districtCode = property.address?.district_code
+        || districts.find((d: any) => d.district_name === property.address?.district_name)?.district_code;
+
+      if (districtCode) {
+        form.setFieldsValue({ district: districtCode });
+        if (districtCode !== selectedDistrict) {
+          setSelectedDistrict(districtCode);
+        }
+      }
+    }
+  }, [property, districts, form]);
+
+  // Resolve ward once wards are loaded
+  useEffect(() => {
+    if (property && wards && wards.length > 0) {
+      const wardCode = property.address?.ward_code
+        || wards.find((w: any) => w.ward_name === property.address?.ward_name)?.ward_code;
+
+      if (wardCode) {
+        form.setFieldsValue({ ward: wardCode });
+      }
+    }
+  }, [property, wards, form]);
 
   const handleBack = () => {
     navigate('/properties');
@@ -180,29 +250,37 @@ const PropertyDetail: React.FC = () => {
 
   const handleCancel = () => {
     setIsEditMode(false);
-    // Reset form to original values
+    // Reset form to original values using currently resolved codes
     if (property) {
-      // Map old property types to new valid options
       let propertyType = property.property_type;
       if (propertyType === 'Residential') {
         propertyType = 'Standalone';
       }
-      
+
+      const regionCode = property.address?.region_code
+        || (regions && property.address?.region_name
+          ? regions.find((r: any) => r.region_name === property.address.region_name)?.region_code
+          : undefined);
+      const districtCode = property.address?.district_code
+        || (districts && property.address?.district_name
+          ? districts.find((d: any) => d.district_name === property.address.district_name)?.district_code
+          : undefined);
+      const wardCode = property.address?.ward_code
+        || (wards && property.address?.ward_name
+          ? wards.find((w: any) => w.ward_name === property.address.ward_name)?.ward_code
+          : undefined);
+
       form.setFieldsValue({
         property_name: property.property_name,
         property_type: propertyType,
-        region: property.address?.region_code,
-        district: property.address?.district_code,
-        ward: property.address?.ward_code,
+        region: regionCode,
+        district: districtCode,
+        ward: wardCode,
         street: property.address?.street,
+        manager_id: property.managers?.id || property.manager?.id || property.manager_id || undefined,
       });
-      // Reset cascading states
-      if (property.address?.region_code) {
-        setSelectedRegion(property.address.region_code);
-      }
-      if (property.address?.district_code) {
-        setSelectedDistrict(property.address.district_code);
-      }
+      if (regionCode) setSelectedRegion(regionCode);
+      if (districtCode) setSelectedDistrict(districtCode);
     }
   };
 
@@ -507,7 +585,8 @@ const PropertyDetail: React.FC = () => {
   }
 
   return (
-    <div>
+    <ChatterLayout model="property" recordId={id || ''}>
+      <div>
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
         <Space style={{ justifyContent: 'space-between', width: '100%' }}>
@@ -552,49 +631,6 @@ const PropertyDetail: React.FC = () => {
           </Space>
         </Space>
       </div>
-
-      {/* Statistics Cards */}
-      {stats && (
-        <Row gutter={16} style={{ marginBottom: 24 }}>
-          <Col xs={24} sm={12} md={6}>
-            <Card>
-              <Statistic
-                title={t('properties:propertyDetail.totalUnits')}
-                value={stats.total_units || property.units_count || 0}
-                prefix={<HomeOutlined />}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card>
-              <Statistic
-                title={t('properties:propertyDetail.occupiedUnits')}
-                value={stats.occupied_units || 0}
-                valueStyle={{ color: '#3f8600' }}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card>
-              <Statistic
-                title={t('properties:propertyDetail.availableUnits')}
-                value={stats.available_units || 0}
-                valueStyle={{ color: '#1890ff' }}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card>
-              <Statistic
-                title={t('properties:propertyDetail.totalRevenue')}
-                value={stats.total_revenue || 0}
-                prefix="TZS"
-                precision={0}
-              />
-            </Card>
-          </Col>
-        </Row>
-      )}
 
       {/* Tabs */}
       <Card>
@@ -765,6 +801,9 @@ const PropertyDetail: React.FC = () => {
                         </Space.Compact>
                       </Form.Item>
                     </Col>
+                    <Col xs={24} sm={12}>
+                      <PropertyManagerField isEditMode={isEditMode} property={property} />
+                    </Col>
                   </Row>
                 </Form>
               ),
@@ -882,7 +921,10 @@ const PropertyDetail: React.FC = () => {
         unit={selectedUnit}
         onUnitUpdated={handleUnitUpdated}
       />
-    </div>
+
+      {/* Chatter - Attachments */}
+      </div>
+    </ChatterLayout>
   );
 };
 

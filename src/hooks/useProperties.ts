@@ -11,7 +11,6 @@ import {
   addPropertyUnit,
   updatePropertyUnit,
   deletePropertyUnit,
-  getPropertyStats,
   getRegions,
   getDistricts,
   getWards,
@@ -26,7 +25,6 @@ export const propertyKeys = {
   details: () => [...propertyKeys.all, 'detail'] as const,
   detail: (id: string) => [...propertyKeys.details(), id] as const,
   units: (propertyId: string) => [...propertyKeys.detail(propertyId), 'units'] as const,
-  stats: (propertyId: string) => [...propertyKeys.detail(propertyId), 'stats'] as const,
   availableUnits: (params: any) => ['units', 'available', params] as const,
   regions: ['regions'] as const,
   districts: (regionId: string) => ['districts', regionId] as const,
@@ -82,14 +80,6 @@ export const useProperty = (propertyId: string | null) => {
   return useQuery({
     queryKey: propertyKeys.detail(propertyId || ''),
     queryFn: () => getPropertyById(propertyId!),
-    enabled: !!propertyId,
-  });
-};
-
-export const usePropertyStats = (propertyId: string | null) => {
-  return useQuery({
-    queryKey: propertyKeys.stats(propertyId || ''),
-    queryFn: () => getPropertyStats(propertyId!),
     enabled: !!propertyId,
   });
 };

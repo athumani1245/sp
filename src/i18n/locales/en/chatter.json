@@ -1,0 +1,28 @@
+{
+  "chatter": {
+    "title": "Attachments",
+    "logNote": "Notes/Reminders",
+    "attachments": "Attachments",
+    "uploadFiles": "Click or drag files to upload",
+    "uploading": "Uploading...",
+    "noAttachments": "No attachments yet",
+    "preview": "Preview",
+    "noNotes": "No notes yet",
+    "noteTitle": "Title",
+    "notePlaceholder": "Write a note...",
+    "addNote": "Add",
+    "typeGeneral": "General",
+    "typeReminder": "Reminder",
+    "typeWarning": "Warning",
+    "typeInfo": "Info",
+    "download": "Download",
+    "delete": "Delete",
+    "deleteFile": "Delete File",
+    "deleteFileConfirm": "Are you sure you want to delete \"{{name}}\"?",
+    "deleteNote": "Delete Note",
+    "deleteNoteConfirm": "Are you sure you want to delete this note?",
+    "unknownUser": "Unknown User",
+    "yes": "Yes",
+    "cancel": "Cancel"
+  }
+}
