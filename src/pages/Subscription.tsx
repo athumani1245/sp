@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { useNavigate } from 'react-router-dom';
 import {
   Card,
@@ -86,6 +87,7 @@ const Subscription: React.FC = () => {
   const [form] = Form.useForm();
   const [messageApi, contextHolder] = message.useMessage();
 
+  const hasFetched = useRef(false);
   const [loading, setLoading] = useState(true);
   const [packages, setPackages] = useState<Package[]>([]);
   const [plansLoading, setPlansLoading] = useState(false);
@@ -104,6 +106,9 @@ const Subscription: React.FC = () => {
   const [subscriptionError, setSubscriptionError] = useState('');
 
   useEffect(() => {
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+
     const token = localStorage.getItem('token');
     if (!token) {
       navigate('/');
@@ -511,7 +516,7 @@ const Subscription: React.FC = () => {
                   >
                     <Space vertical size="middle" style={{ width: '100%' }}>
                       <div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                           <Title level={4} style={{ margin: 0 }}>
                             {pkg.name}
                           </Title>
@@ -520,27 +525,21 @@ const Subscription: React.FC = () => {
                           )}
                         </div>
                         {pkg.description && (
-                          <Text type="secondary">{pkg.description}</Text>
+                          <div style={{
+                            fontSize: '14px',
+                            lineHeight: '1.7',
+                            color: 'rgba(0,0,0,0.75)',
+                            background: 'rgba(0,0,0,0.02)',
+                            border: '1px solid rgba(0,0,0,0.06)',
+                            borderRadius: 8,
+                            padding: '12px 16px',
+                          }}
+                            className="pkg-description-md"
+                          >
+                            <ReactMarkdown>{pkg.description}</ReactMarkdown>
+                          </div>
                         )}
                       </div>
-
-                      {/* Package Features */}
-                      <Space vertical size="small" style={{ width: '100%' }}>
-                        {pkg.max_units && (
-                          <Text>
-                            <HomeOutlined style={{ color: '#1890ff', marginRight: '8px' }} />
-                            {t('subscription:packages.upTo')} {pkg.max_units} {t('subscription:packages.units')}
-                          </Text>
-                        )}
-                        {pkg.max_property_managers && (
-                          <Text>
-                            <TeamOutlined style={{ color: '#1890ff', marginRight: '8px' }} />
-                            {t('subscription:packages.upTo')} {pkg.max_property_managers} {t('subscription:packages.propertyManagers')}
-                          </Text>
-                        )}
-                      </Space>
-
-                      {/* Selected Plan Display */}
                       {selectedPlan && (
                         <Alert
                           message={

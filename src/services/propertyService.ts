@@ -183,9 +183,3 @@ export const deletePropertyUnit = async (unitId: string) => {
   await api.delete(`${API_BASE}/units/${unitId}/`);
   return { success: true };
 };
-
-// Property Statistics
-export const getPropertyStats = async (propertyId: string) => {
-  const response = await api.get(`${API_BASE}/properties/${propertyId}/stats/`);
-  return response.data.data;
-};

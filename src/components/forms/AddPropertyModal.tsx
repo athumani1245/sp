@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Form, Input, Select, Row, Col, message, Spin } from 'antd';
-import { BankOutlined, InfoCircleOutlined, EnvironmentOutlined } from '@ant-design/icons';
+import { BankOutlined, InfoCircleOutlined, EnvironmentOutlined, IdcardOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useRegions, useDistricts, useWards, useAddProperty } from '../../hooks/useProperties';
+import { usePropertyManagers } from '../../hooks/usePropertyManagers';
 
 interface Region {
   region_code: string;
@@ -46,7 +47,10 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
   const { data: regions, isLoading: regionsLoading } = useRegions();
   const { data: districts, isLoading: districtsLoading } = useDistricts(selectedRegion || '');
   const { data: wards, isLoading: wardsLoading } = useWards(selectedDistrict || '');
+  const { data: managersData, isLoading: managersLoading } = usePropertyManagers({ limit: 100 });
   const addPropertyMutation = useAddProperty();
+
+  const managersList = Array.isArray(managersData?.items) ? managersData?.items : [];
 
   const locationLoading = regionsLoading || districtsLoading || wardsLoading;
 
@@ -151,6 +155,30 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
                     { value: 'Apartment', label: 'Apartment' },
                     { value: 'Commercial building', label: 'Commercial building' },
                   ]}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col xs={24} sm={12}>
+              <Form.Item
+                label={t('properties:addPropertyModal.propertyManager')}
+                name="manager_id"
+                tooltip={t('properties:addPropertyModal.propertyManagerTooltip')}
+              >
+                <Select
+                  placeholder={t('properties:addPropertyModal.propertyManagerPlaceholder')}
+                  allowClear
+                  showSearch
+                  loading={managersLoading}
+                  filterOption={(input, option) =>
+                    String(option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                  }
+                  options={(managersList || []).map((mgr: any) => ({
+                    value: mgr.id,
+                    label: `${mgr.first_name} ${mgr.last_name} (${mgr.username})`,
+                  }))}
                 />
               </Form.Item>
             </Col>

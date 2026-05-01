@@ -60,7 +60,10 @@
     "streetAddress": "Street Address",
     "streetAddressPlaceholder": "e.g., 123 Beach Road",
     "streetAddressRequired": "Please enter street address",
-    "streetAddressTooltip": "Enter the complete street address including building/plot number (e.g., '123 Beach Road', 'Plot 456 Nyerere St')"
+    "streetAddressTooltip": "Enter the complete street address including building/plot number (e.g., '123 Beach Road', 'Plot 456 Nyerere St')",
+    "propertyManager": "Property Manager",
+    "propertyManagerPlaceholder": "Select a property manager (optional)",
+    "propertyManagerTooltip": "Assign a property manager to oversee this property"
   },
   "propertyDetail": {
     "back": "Back to Properties",

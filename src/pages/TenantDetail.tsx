@@ -31,6 +31,8 @@ import {
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useTenant, useUpdateTenant } from '../hooks/useTenants';
+import Chatter from '../components/chatter/Chatter';
+import ChatterLayout from '../components/layout/ChatterLayout';
 
 const { Title, Text } = Typography;
 
@@ -190,7 +192,8 @@ const TenantDetail: React.FC = () => {
   }
 
   return (
-    <div>
+    <ChatterLayout model="tenant" recordId={id || ''}>
+      <div>
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
         <Space style={{ justifyContent: 'space-between', width: '100%' }}>
@@ -416,7 +419,10 @@ const TenantDetail: React.FC = () => {
           />
         )}
       </Card>
-    </div>
+
+      {/* Chatter - Attachments */}
+      </div>
+    </ChatterLayout>
   );
 };
 

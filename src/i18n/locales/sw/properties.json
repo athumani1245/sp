@@ -60,7 +60,10 @@
     "streetAddress": "Anwani ya Mtaa",
     "streetAddressPlaceholder": "mfano, Mtaa wa Bahari 123",
     "streetAddressRequired": "Tafadhali weka anwani ya mtaa",
-    "streetAddressTooltip": "Weka anwani kamili ya mtaa pamoja na nambari ya jengo/kiwanja (mfano, 'Mtaa wa Bahari 123', 'Kiwanja 456 Barabara ya Nyerere')"
+    "streetAddressTooltip": "Weka anwani kamili ya mtaa pamoja na nambari ya jengo/kiwanja (mfano, 'Mtaa wa Bahari 123', 'Kiwanja 456 Barabara ya Nyerere')",
+    "propertyManager": "Msimamizi wa Mali",
+    "propertyManagerPlaceholder": "Chagua msimamizi wa mali (si lazima)",
+    "propertyManagerTooltip": "Teua msimamizi wa mali kusimamia jengo hili"
   },
   "propertyDetail": {
     "back": "Orodha ya Majengo",

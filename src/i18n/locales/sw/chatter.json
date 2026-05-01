@@ -1,0 +1,28 @@
+{
+  "chatter": {
+    "title": "Viambatisho",
+    "logNote": "Kumbukumbu/Vikumbusho",
+    "attachments": "Viambatisho",
+    "uploadFiles": "Bonyeza au buruta faili kupakia",
+    "uploading": "Inapakia...",
+    "noAttachments": "Hakuna viambatisho bado",
+    "preview": "Hakiki",
+    "noNotes": "Hakuna kumbukumbu bado",
+    "noteTitle": "Kichwa",
+    "notePlaceholder": "Andika kumbukumbu...",
+    "addNote": "Ongeza",
+    "typeGeneral": "Kawaida",
+    "typeReminder": "Kikumbusho",
+    "typeWarning": "Onyo",
+    "typeInfo": "Taarifa",
+    "download": "Pakua",
+    "delete": "Futa",
+    "deleteFile": "Futa Faili",
+    "deleteFileConfirm": "Je, una uhakika unataka kufuta \"{{name}}\"?",
+    "deleteNote": "Futa Kumbukumbu",
+    "deleteNoteConfirm": "Je, una uhakika unataka kufuta kumbukumbu hii?",
+    "unknownUser": "Mtumiaji Asiyejulikana",
+    "yes": "Ndiyo",
+    "cancel": "Ghairi"
+  }
+}

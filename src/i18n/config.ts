@@ -10,7 +10,8 @@ import enProfile from './locales/en/profile.json';
 import enLeaseReport from './locales/en/leaseReport.json';
 import enLeaseExpiryReport from './locales/en/leaseExpiryReport.json';
 import enSubscription from './locales/en/subscription.json';
-import enLanding from './locales/en/landing.json';
+import enPropertyManagers from './locales/en/propertyManagers.json';
+import enChatter from './locales/en/chatter.json';
 import swAuth from './locales/sw/auth.json';
 import swCommon from './locales/sw/common.json';
 import swProperties from './locales/sw/properties.json';
@@ -21,7 +22,8 @@ import swProfile from './locales/sw/profile.json';
 import swLeaseReport from './locales/sw/leaseReport.json';
 import swLeaseExpiryReport from './locales/sw/leaseExpiryReport.json';
 import swSubscription from './locales/sw/subscription.json';
-import swLanding from './locales/sw/landing.json';
+import swPropertyManagers from './locales/sw/propertyManagers.json';
+import swChatter from './locales/sw/chatter.json';
 
 // Initialize i18next
 i18n
@@ -39,7 +41,8 @@ i18n
         leaseReport: enLeaseReport,
         leaseExpiryReport: enLeaseExpiryReport,
         subscription: enSubscription,
-        landing: enLanding,
+        propertyManagers: enPropertyManagers,
+        chatter: enChatter,
       },
       sw: {
         auth: swAuth,
@@ -52,13 +55,14 @@ i18n
         leaseReport: swLeaseReport,
         leaseExpiryReport: swLeaseExpiryReport,
         subscription: swSubscription,
-        landing: swLanding,
+        propertyManagers: swPropertyManagers,
+        chatter: swChatter,
       },
     },
     lng: localStorage.getItem('language') || 'en', // Load saved language or default to English
     fallbackLng: 'en',
     defaultNS: 'common',
-    ns: ['common', 'auth', 'properties', 'tenants', 'leases', 'dashboard', 'profile', 'leaseReport', 'leaseExpiryReport', 'subscription', 'landing'],
+    ns: ['common', 'auth', 'properties', 'tenants', 'leases', 'dashboard', 'profile', 'leaseReport', 'leaseExpiryReport', 'subscription', 'propertyManagers', 'chatter'],
     interpolation: {
       escapeValue: false, // React already escapes values
     },

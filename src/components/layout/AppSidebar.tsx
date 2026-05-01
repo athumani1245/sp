@@ -8,6 +8,7 @@ import {
   CreditCardOutlined,
   FolderOutlined,
   LockOutlined,
+  IdcardOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import type { MenuProps } from 'antd';
@@ -76,6 +77,18 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ collapsed, isMobile = false }) 
         </Tooltip>
       ) : t('common:nav.leases'),
       onClick: () => !isSubscriptionExpired && navigate('/leases'),
+      disabled: isSubscriptionExpired,
+      style: isSubscriptionExpired ? { cursor: 'not-allowed', opacity: 0.5 } : {},
+    },
+    {
+      key: '/property-managers',
+      icon: isSubscriptionExpired ? <LockOutlined /> : <IdcardOutlined />,
+      label: isSubscriptionExpired ? (
+        <Tooltip title={t('common:nav.subscriptionRequired')}>
+          <span>{t('common:nav.propertyManagers')}</span>
+        </Tooltip>
+      ) : t('common:nav.propertyManagers'),
+      onClick: () => !isSubscriptionExpired && navigate('/property-managers'),
       disabled: isSubscriptionExpired,
       style: isSubscriptionExpired ? { cursor: 'not-allowed', opacity: 0.5 } : {},
     },

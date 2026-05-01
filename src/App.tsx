@@ -24,6 +24,7 @@ import LeaseReport from './pages/LeaseReport';
 import LeaseExpiryReport from './pages/LeaseExpiryReport';
 import Profile from './pages/Profile';
 import Subscription from './pages/Subscription';
+import PropertyManagers from './pages/PropertyManagers';
 import './App.css';
 
 // Create a client
@@ -73,6 +74,9 @@ function App() {
             <Route path="/leases" element={<PrivateRoute><MainLayout /></PrivateRoute>}>
               <Route index element={<SubscriptionGate><Leases /></SubscriptionGate>} />
               <Route path=":id" element={<SubscriptionGate><Lease /></SubscriptionGate>} />
+            </Route>
+            <Route path="/property-managers" element={<PrivateRoute><MainLayout /></PrivateRoute>}>
+              <Route index element={<SubscriptionGate><PropertyManagers /></SubscriptionGate>} />
             </Route>
             <Route path="/reports" element={<PrivateRoute><MainLayout /></PrivateRoute>}>
               <Route path="lease" element={<SubscriptionGate><LeaseReport /></SubscriptionGate>} />
