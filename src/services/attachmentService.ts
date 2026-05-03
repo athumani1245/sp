@@ -42,6 +42,7 @@ export const uploadAttachment = async ({ model, record_id, file, attachment_type
   formData.append('model', model);
   formData.append('object_id', record_id);
   formData.append('file', file);
+  if (attachment_type) formData.append('attachment_type', attachment_type);
 
   const response = await api.post(
     `${API_BASE}/attachments/`,

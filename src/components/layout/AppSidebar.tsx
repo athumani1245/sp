@@ -28,14 +28,8 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ collapsed, isMobile = false }) 
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const { hasActiveSubscription, subscription } = useAuth();
+  const { isSubscriptionExpired } = useAuth();
   const [openKeys, setOpenKeys] = useState<string[]>(['reports']);
-
-  // Check if subscription is expired
-  const isSubscriptionExpired = 
-    subscription?.is_active === false || 
-    (subscription?.days_left !== undefined && subscription.days_left <= 0) ||
-    (!subscription?.is_active && !hasActiveSubscription);
 
   const menuItems: MenuItem[] = [
     {

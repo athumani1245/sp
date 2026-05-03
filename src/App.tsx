@@ -61,7 +61,7 @@ function App() {
             
             {/* Protected routes with layout */}
             <Route path="/dashboard" element={<PrivateRoute><MainLayout /></PrivateRoute>}>
-              <Route index element={<Dashboard />} />
+              <Route index element={<SubscriptionGate><Dashboard /></SubscriptionGate>} />
             </Route>
             <Route path="/properties" element={<PrivateRoute><MainLayout /></PrivateRoute>}>
               <Route index element={<SubscriptionGate><Properties /></SubscriptionGate>} />
@@ -83,7 +83,7 @@ function App() {
               <Route path="lease-expiry" element={<SubscriptionGate><LeaseExpiryReport /></SubscriptionGate>} />
             </Route>
             <Route path="/profile" element={<PrivateRoute><MainLayout /></PrivateRoute>}>
-              <Route index element={<SubscriptionGate><Profile /></SubscriptionGate>} />
+              <Route index element={<Profile />} />
             </Route>
             <Route path="/subscription" element={<PrivateRoute><MainLayout /></PrivateRoute>}>
               <Route index element={<Subscription />} />

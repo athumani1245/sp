@@ -16,7 +16,7 @@ import { useAuth } from '../context/AuthContext';
  * Displays subscription status alerts at the top of the dashboard
  */
 const SubscriptionBanner: React.FC = () => {
-  const { subscription, hasActiveSubscription } = useAuth();
+  const { subscription, isSubscriptionExpired } = useAuth();
   const navigate = useNavigate();
   const [dismissed, setDismissed] = useState(false);
 
@@ -28,14 +28,7 @@ const SubscriptionBanner: React.FC = () => {
     navigate('/subscription');
   };
 
-  // Show error if subscription is inactive or expired
-  // Check is_active first, then days_left, and finally hasActiveSubscription as fallback
-  const isExpired = 
-    subscription.is_active === false || 
-    (subscription.days_left !== undefined && subscription.days_left <= 0) ||
-    (!subscription.is_active && !hasActiveSubscription);
-
-  if (isExpired) {
+  if (isSubscriptionExpired) {
     return (
       <Alert
         message="Subscription Expired"

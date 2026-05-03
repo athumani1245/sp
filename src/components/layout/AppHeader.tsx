@@ -44,14 +44,25 @@ const AppHeader: React.FC<AppHeaderProps> = ({ collapsed, setCollapsed }) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
+  // Backend returns dates as DD-MM-YYYY; convert to YYYY-MM-DD for reliable parsing
+  const parseDate = (dateStr: string): Date => {
+    if (!dateStr) return new Date(NaN);
+    const parts = dateStr.split('-');
+    if (parts.length === 3 && parts[0].length === 2) {
+      // DD-MM-YYYY → YYYY-MM-DD
+      return new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
+    }
+    return new Date(dateStr); // already ISO or other parseable format
+  };
+
   const overdueCount = reminderList.filter((r) => {
-    const d = new Date(r.date);
+    const d = parseDate(r.date);
     d.setHours(0, 0, 0, 0);
     return d.getTime() < today.getTime();
   }).length;
 
   const getDueBadgeColor = (dateStr: string) => {
-    const d = new Date(dateStr);
+    const d = parseDate(dateStr);
     d.setHours(0, 0, 0, 0);
     const diffDays = Math.ceil((d.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
     if (diffDays < 0) return 'red';
@@ -61,9 +72,10 @@ const AppHeader: React.FC<AppHeaderProps> = ({ collapsed, setCollapsed }) => {
   };
 
   const getDueLabel = (dateStr: string) => {
-    const d = new Date(dateStr);
+    const d = parseDate(dateStr);
     d.setHours(0, 0, 0, 0);
     const diffDays = Math.ceil((d.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    if (isNaN(diffDays)) return dateStr;
     if (diffDays < 0) return `${Math.abs(diffDays)}d overdue`;
     if (diffDays === 0) return 'Today';
     if (diffDays === 1) return 'Tomorrow';
@@ -264,11 +276,16 @@ const AppHeader: React.FC<AppHeaderProps> = ({ collapsed, setCollapsed }) => {
             arrow={false}
             overlayInnerStyle={{ padding: 0 }}
           >
-            <Badge count={reminderList.length} size="small" offset={[-2, 2]}>
+            <Badge
+              count={reminderList.length}
+              size="small"
+              offset={[-2, 2]}
+              className={reminderList.length > 0 ? 'notification-badge-active' : ''}
+            >
               <Button
                 type="text"
                 icon={<BellOutlined style={{ fontSize: 18 }} />}
-                className="notification-btn"
+                className={`notification-btn${reminderList.length > 0 ? ' notification-btn-active' : ''}`}
                 title="Reminders"
               />
             </Badge>
