@@ -25,6 +25,12 @@
   margin-bottom: 6px;
   user-select: none;
   white-space: nowrap;
+  animation: label-pip 2s ease-in-out infinite;
+}
+
+@keyframes label-pip {
+  0%, 100% { color: #888; text-shadow: none; }
+  50%       { color: #CC5B4B; text-shadow: 0 0 8px rgba(204, 91, 75, 0.6); }
 }
 
 .floating-btn {
