@@ -12,6 +12,21 @@
   gap: 12px;
 }
 
+.floating-social-label {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #888;
+  text-align: center;
+  margin-bottom: 6px;
+  user-select: none;
+  white-space: nowrap;
+}
+
 .floating-btn {
   display: flex;
   align-items: center;

@@ -3,6 +3,7 @@ import { Layout, Drawer } from 'antd';
 import { Outlet, useLocation } from 'react-router-dom';
 import AppHeader from './AppHeader';
 import AppSidebar from './AppSidebar';
+import FloatingSocial from '../FloatingSocial';
 import '../../assets/styles/layout.css';
 
 const { Content } = Layout;
@@ -74,6 +75,7 @@ const MainLayout: React.FC = () => {
           </Content>
         </Layout>
       </Layout>
+      <FloatingSocial />
     </Layout>
   );
 };

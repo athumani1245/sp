@@ -20,6 +20,7 @@ interface AuthContextType {
   loading: boolean;
   subscription: Subscription | null;
   hasActiveSubscription: boolean;
+  isSubscriptionExpired: boolean;
   setIsAuthenticated: (value: boolean) => void;
   setSubscription: (value: Subscription | null) => void;
   checkAuthentication: () => Promise<void>;
@@ -32,6 +33,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [loading, setLoading] = useState(true);
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [hasActiveSubscription, setHasActiveSubscription] = useState(false);
+
+  // Derived: true when end_date is in the past (or no active subscription)
+  const isSubscriptionExpired = (() => {
+    if (!subscription) return false; // no subscription data yet — don't block
+    if (subscription.end_date) {
+      const expired = new Date(subscription.end_date) < new Date();
+      if (expired) return true;
+    }
+    if (subscription.is_active === false) return true;
+    if (subscription.days_left !== undefined && subscription.days_left <= 0) return true;
+    return false;
+  })();
 
   const checkAuthentication = useCallback(async () => {
     const token = localStorage.getItem('token');
@@ -47,8 +60,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           const parsedSubscription = JSON.parse(subscriptionData);
           setSubscription(parsedSubscription);
           
-          // Check if subscription is active based on is_active flag and days_left
-          const isActive = 
+          // hasActiveSubscription: end_date not passed and is_active true
+          const endDateOk = parsedSubscription.end_date
+            ? new Date(parsedSubscription.end_date) >= new Date()
+            : true;
+          const isActive =
+            endDateOk &&
             (parsedSubscription.is_active === true || parsedSubscription.status === 'active') &&
             (parsedSubscription.days_left === undefined || parsedSubscription.days_left > 0);
           
@@ -85,6 +102,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     loading,
     subscription,
     hasActiveSubscription,
+    isSubscriptionExpired,
     setIsAuthenticated,
     setSubscription,
     checkAuthentication,

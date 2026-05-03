@@ -12,15 +12,9 @@ interface SubscriptionGateProps {
  * Redirects to subscription page if subscription is expired
  */
 const SubscriptionGate: React.FC<SubscriptionGateProps> = ({ children }) => {
-  const { hasActiveSubscription, subscription } = useAuth();
+  const { isSubscriptionExpired } = useAuth();
 
-  // Check if subscription is expired
-  const isExpired = 
-    subscription?.is_active === false || 
-    (subscription?.days_left !== undefined && subscription.days_left <= 0) ||
-    (!subscription?.is_active && !hasActiveSubscription);
-
-  if (isExpired) {
+  if (isSubscriptionExpired) {
     return <Navigate to="/subscription" replace />;
   }
 

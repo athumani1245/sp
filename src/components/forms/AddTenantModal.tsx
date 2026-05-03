@@ -24,6 +24,7 @@ import {
   TeamOutlined,
   PlusOutlined,
   DeleteOutlined,
+  IdcardOutlined,
 } from '@ant-design/icons';
 import { useCreateTenant } from '../../hooks/useTenants';
 
@@ -65,7 +66,7 @@ const AddTenantModal: React.FC<AddTenantModalProps> = ({
     setError('');
 
     try {
-      const tenantData = {
+      const tenantData: any = {
         username: '+255' + values.username,
         password: 'StrongPass123',
         first_name: values.first_name,
@@ -75,6 +76,13 @@ const AddTenantModal: React.FC<AddTenantModalProps> = ({
         emergency_contacts: emergencyContacts,
         role: 'Tenant',
       };
+
+      if (values.id_type && values.id_number) {
+        tenantData.identification = {
+          id_type: values.id_type,
+          id_number: values.id_number,
+        };
+      }
 
       await createTenantMutation.mutateAsync(tenantData);
       
@@ -296,6 +304,53 @@ const AddTenantModal: React.FC<AddTenantModalProps> = ({
           >
             {t('tenants:addTenantModal.addEmergencyContact')}
           </Button>
+
+          <Divider>
+            <Space>
+              <IdcardOutlined />
+              Identification
+            </Space>
+          </Divider>
+
+          <Row gutter={16}>
+            <Col xs={24} md={8}>
+              <Form.Item label="ID Type" name="id_type">
+                <Select
+                  size="large"
+                  placeholder="Select ID type"
+                  allowClear
+                  options={[
+                    { value: 'NIDA', label: 'NIDA' },
+                    { value: 'PASSPORT', label: 'Passport' },
+                    { value: 'DRIVING_LICENSE', label: 'Driving License' },
+                    { value: 'VOTER_ID', label: 'Voter ID' },
+                  ]}
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={16}>
+              <Form.Item
+                label="ID Number"
+                name="id_number"
+                rules={[
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      if (!value && getFieldValue('id_type')) {
+                        return Promise.reject(new Error('Please enter the ID number'));
+                      }
+                      return Promise.resolve();
+                    },
+                  }),
+                ]}
+              >
+                <Input
+                  prefix={<IdcardOutlined />}
+                  placeholder="Enter ID number"
+                  size="large"
+                />
+              </Form.Item>
+            </Col>
+          </Row>
 
           <Divider />
 

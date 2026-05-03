@@ -28,6 +28,7 @@ import {
   PlusOutlined,
   DeleteOutlined,
   TeamOutlined,
+  IdcardOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useTenant, useUpdateTenant } from '../hooks/useTenants';
@@ -63,6 +64,8 @@ const TenantDetail: React.FC = () => {
         username: tenant.username,
         email: tenant.email,
         gender: tenant.gender,
+        id_type: tenant.identification?.id_type || null,
+        id_number: tenant.identification?.id_number || '',
       });
       // Initialize emergency contacts
       setEmergencyContacts(tenant.emergency_contacts || []);
@@ -87,6 +90,8 @@ const TenantDetail: React.FC = () => {
         username: tenant.username,
         email: tenant.email,
         gender: tenant.gender,
+        id_type: tenant.identification?.id_type || null,
+        id_number: tenant.identification?.id_number || '',
       });
       // Reset emergency contacts
       setEmergencyContacts(tenant.emergency_contacts || []);
@@ -96,12 +101,17 @@ const TenantDetail: React.FC = () => {
   const handleSave = async () => {
     try {
       const values = await form.validateFields();
+      const { id_type, id_number, ...rest } = values;
+      const tenantData: any = {
+        ...rest,
+        emergency_contacts: emergencyContacts,
+      };
+      if (id_type || id_number) {
+        tenantData.identification = { id_type: id_type || null, id_number: id_number || '' };
+      }
       await updateTenantMutation.mutateAsync({
         tenantId: id!,
-        tenantData: {
-          ...values,
-          emergency_contacts: emergencyContacts,
-        },
+        tenantData,
       });
       setIsEditMode(false);
     } catch (error) {
@@ -302,6 +312,46 @@ const TenantDetail: React.FC = () => {
                     { value: 'Female', label: t('tenants:tenantDetail.female') },
                     { value: 'Other', label: t('tenants:tenantDetail.other') },
                   ]}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+        </Form>
+      </Card>
+
+      {/* Identification */}
+      <Card
+        title={
+          <Space>
+            <IdcardOutlined />
+            <span>Identification</span>
+          </Space>
+        }
+        style={{ marginTop: 16 }}
+      >
+        <Form form={form} layout="vertical">
+          <Row gutter={16}>
+            <Col xs={24} sm={8}>
+              <Form.Item label="ID Type" name="id_type">
+                <Select
+                  placeholder="Select ID type"
+                  disabled={!isEditMode}
+                  allowClear
+                  options={[
+                    { value: 'NIDA', label: 'NIDA' },
+                    { value: 'PASSPORT', label: 'Passport' },
+                    { value: 'DRIVING_LICENSE', label: 'Driving License' },
+                    { value: 'VOTER_ID', label: 'Voter ID' },
+                  ]}
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={16}>
+              <Form.Item label="ID Number" name="id_number">
+                <Input
+                  prefix={<IdcardOutlined />}
+                  placeholder="Enter ID number"
+                  disabled={!isEditMode}
                 />
               </Form.Item>
             </Col>
