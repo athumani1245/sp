@@ -75,18 +75,6 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ collapsed, isMobile = false }) 
       style: isSubscriptionExpired ? { cursor: 'not-allowed', opacity: 0.5 } : {},
     },
     {
-      key: '/property-managers',
-      icon: isSubscriptionExpired ? <LockOutlined /> : <IdcardOutlined />,
-      label: isSubscriptionExpired ? (
-        <Tooltip title={t('common:nav.subscriptionRequired')}>
-          <span>{t('common:nav.propertyManagers')}</span>
-        </Tooltip>
-      ) : t('common:nav.propertyManagers'),
-      onClick: () => !isSubscriptionExpired && navigate('/property-managers'),
-      disabled: isSubscriptionExpired,
-      style: isSubscriptionExpired ? { cursor: 'not-allowed', opacity: 0.5 } : {},
-    },
-    {
       key: '/subscription',
       icon: <CreditCardOutlined />,
       label: t('common:nav.subscription'),
