@@ -59,7 +59,7 @@ export const createNote = async ({
 
 // Delete a note
 export const deleteNote = async ({ model, record_id, noteId }: NoteParams & { noteId: string }) => {
-  await api.delete(`${API_BASE}/notes/${model}/${record_id}/${noteId}/`);
+  await api.delete(`${API_BASE}/notes/${noteId}/`);
   return { success: true };
 };
 
