@@ -310,8 +310,6 @@ const Chatter: React.FC<ChatterProps> = ({ model, recordId }) => {
               options={[
                 { label: t('chatter:chatter.typeGeneral'), value: 'GENERAL' },
                 { label: t('chatter:chatter.typeReminder'), value: 'REMINDER' },
-                { label: t('chatter:chatter.typeWarning'), value: 'WARNING' },
-                { label: t('chatter:chatter.typeInfo'), value: 'INFO' },
               ]}
             />
           </div>
