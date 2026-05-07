@@ -58,6 +58,6 @@ export const uploadAttachment = async ({ model, record_id, file, attachment_type
 
 // Delete an attachment
 export const deleteAttachment = async ({ model, record_id, attachmentId }: AttachmentParams & { attachmentId: string }) => {
-  await api.delete(`${API_BASE}/attachments/${model}/${record_id}/${attachmentId}/`);
+  await api.delete(`${API_BASE}/attachments/${attachmentId}/`);
   return { success: true };
 };
