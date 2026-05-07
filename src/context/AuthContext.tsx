@@ -38,7 +38,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const isSubscriptionExpired = (() => {
     if (!subscription) return false; // no subscription data yet — don't block
     if (subscription.end_date) {
-      const expired = new Date(subscription.end_date) < new Date();
+      // end_date is DD-MM-YYYY from the API; reorder to YYYY-MM-DD for reliable parsing
+      const parts = subscription.end_date.split('-');
+      const normalized = parts.length === 3 ? `${parts[2]}-${parts[1]}-${parts[0]}` : subscription.end_date;
+      const expired = new Date(normalized) < new Date();
       if (expired) return true;
     }
     if (subscription.is_active === false) return true;
@@ -61,8 +64,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           setSubscription(parsedSubscription);
           
           // hasActiveSubscription: end_date not passed and is_active true
+          // end_date is DD-MM-YYYY from the API; reorder to YYYY-MM-DD for reliable parsing
           const endDateOk = parsedSubscription.end_date
-            ? new Date(parsedSubscription.end_date) >= new Date()
+            ? (() => {
+                const p = parsedSubscription.end_date.split('-');
+                const normalized = p.length === 3 ? `${p[2]}-${p[1]}-${p[0]}` : parsedSubscription.end_date;
+                return new Date(normalized) >= new Date();
+              })()
             : true;
           const isActive =
             endDateOk &&
