@@ -25,6 +25,7 @@
     "reports": "Reports",
     "leaseAgreements": "Lease Agreements",
     "leaseExpiry": "Lease Expiry",
+    "pendingPayments": "Pending Payments",
     "propertyManagers": "Property Managers",
     "subscriptionRequired": "Subscription required"
   }

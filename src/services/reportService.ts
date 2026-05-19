@@ -444,6 +444,285 @@ export const getFormattedLeaseReportData = (
 };
 
 // ==========================================
+// Pending Payments Report
+// ==========================================
+
+interface PendingPaymentsReportData {
+  lease_number: string;
+  tenant: string;
+  property: string;
+  unit: string;
+  start_date: string;
+  end_date: string;
+  amount_due: number;
+  amount_paid: number;
+  balance: number;
+  discount: number;
+  lease_status: string;
+  payment_status: string;
+}
+
+interface PendingPaymentsExportOptions {
+  data: PendingPaymentsReportData[];
+  visibleColumns: string[];
+  filename?: string;
+}
+
+const PENDING_PAYMENTS_COLUMNS: { [key: string]: { title: string; dataIndex: keyof PendingPaymentsReportData; formatter?: (value: any) => any } } = {
+  lease_number: { title: 'Lease No.', dataIndex: 'lease_number' },
+  tenant: { title: 'Tenant', dataIndex: 'tenant' },
+  property: { title: 'Property', dataIndex: 'property' },
+  unit: { title: 'Unit', dataIndex: 'unit' },
+  start_date: { title: 'Start Date', dataIndex: 'start_date', formatter: (date: string) => formatLeaseDate(date) || 'N/A' },
+  end_date: { title: 'End Date', dataIndex: 'end_date', formatter: (date: string) => formatLeaseDate(date) || 'N/A' },
+  amount_due: { title: 'Total Rent (TSh)', dataIndex: 'amount_due', formatter: (amount: number) => amount || 0 },
+  amount_paid: { title: 'Amount Paid (TSh)', dataIndex: 'amount_paid', formatter: (amount: number) => amount || 0 },
+  balance: { title: 'Remaining (TSh)', dataIndex: 'balance', formatter: (amount: number) => amount || 0 },
+  discount: { title: 'Discount (TSh)', dataIndex: 'discount', formatter: (amount: number) => amount || 0 },
+  lease_status: { title: 'Lease Status', dataIndex: 'lease_status', formatter: (status: string) => (status || 'N/A').toUpperCase() },
+  payment_status: { title: 'Payment Status', dataIndex: 'payment_status', formatter: (status: string) => (status || 'N/A').toUpperCase() },
+};
+
+export const exportPendingPaymentsReportToExcel = (options: PendingPaymentsExportOptions): void => {
+  const { data, visibleColumns, filename } = options;
+
+  try {
+    const visibleColumnKeys = visibleColumns.filter(key => PENDING_PAYMENTS_COLUMNS[key]);
+
+    const worksheetData = data.map((item: PendingPaymentsReportData) => {
+      const row: any = {};
+      visibleColumnKeys.forEach(key => {
+        const column = PENDING_PAYMENTS_COLUMNS[key];
+        if (column) {
+          const value = item[column.dataIndex];
+          row[column.title] = column.formatter ? column.formatter(value) : (value || 'N/A');
+        }
+      });
+      return row;
+    });
+
+    const worksheet = XLSX.utils.json_to_sheet(worksheetData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Pending Payments');
+
+    const columnWidths = visibleColumnKeys.map(key => {
+      const column = PENDING_PAYMENTS_COLUMNS[key];
+      return { wch: Math.max(column.title.length + 5, 15) };
+    });
+    worksheet['!cols'] = columnWidths;
+
+    const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1');
+    for (let col = range.s.c; col <= range.e.c; col++) {
+      const cellAddress = XLSX.utils.encode_cell({ r: 0, c: col });
+      applyCellStyle(worksheet[cellAddress], true);
+    }
+    for (let row = range.s.r + 1; row <= range.e.r; row++) {
+      for (let col = range.s.c; col <= range.e.c; col++) {
+        const cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
+        const columnKey = visibleColumnKeys[col];
+        const isMonetary = ['amount_due', 'amount_paid', 'balance'].includes(columnKey);
+        applyCellStyle(worksheet[cellAddress], false, isMonetary);
+      }
+    }
+
+    const timestamp = dayjs().format('YYYY-MM-DD_HH-mm-ss');
+    const exportFilename = filename || `Pending_Payments_Report_${timestamp}.xlsx`;
+    XLSX.writeFile(workbook, exportFilename);
+  } catch (error) {
+    console.error('Excel export error:', error);
+    throw new Error('Failed to export data to Excel');
+  }
+};
+
+export const exportPendingPaymentsReportToPDF = (options: PendingPaymentsExportOptions): void => {
+  const { data, visibleColumns, filename } = options;
+
+  try {
+    const visibleColumnKeys = visibleColumns.filter(key => PENDING_PAYMENTS_COLUMNS[key]);
+
+    const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 30;
+    const usableWidth = pageWidth - margin * 2;
+    const rowHeight = 18;
+    const headerRowHeight = 22;
+    const titleAreaHeight = 48;
+    const footerHeight = 20;
+    const contentMaxY = pageHeight - footerHeight - 5;
+
+    const colWidthMap: { [key: string]: number } = {
+      lease_number: 75,
+      tenant: 100,
+      property: 90,
+      unit: 60,
+      start_date: 60,
+      end_date: 60,
+      amount_due: 75,
+      amount_paid: 75,
+      balance: 70,
+      discount: 60,
+      lease_status: 60,
+      payment_status: 75,
+    };
+
+    const totalDefinedWidth = visibleColumnKeys.reduce((s, k) => s + (colWidthMap[k] || 70), 0);
+    const scale = usableWidth / totalDefinedWidth;
+    const colWidths = visibleColumnKeys.map(k => (colWidthMap[k] || 70) * scale);
+
+    let y = margin;
+    let currentPage = 1;
+
+    const firstPageRows = Math.floor((contentMaxY - margin - titleAreaHeight - headerRowHeight) / rowHeight);
+    const otherPageRows = Math.floor((contentMaxY - margin - headerRowHeight) / rowHeight);
+    let totalPages = 1;
+    if (data.length > firstPageRows) {
+      totalPages += Math.ceil((data.length - firstPageRows) / Math.max(otherPageRows, 1));
+    }
+
+    const truncate = (text: string, maxWidth: number): string => {
+      if (doc.getTextWidth(text) <= maxWidth) return text;
+      let t = text;
+      while (t.length > 1 && doc.getTextWidth(t + '…') > maxWidth) t = t.slice(0, -1);
+      return t + '…';
+    };
+
+    const drawTitle = () => {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(14);
+      doc.setTextColor(30, 30, 30);
+      doc.text('Pending Payments Report', margin, y + 14);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(110, 110, 110);
+      doc.text(
+        `Generated: ${dayjs().format('DD/MM/YYYY HH:mm')}   |   Total Records: ${data.length}`,
+        margin, y + 32
+      );
+      y += titleAreaHeight;
+    };
+
+    const drawTableHeader = (startY: number) => {
+      doc.setFillColor(59, 130, 246);
+      doc.rect(margin, startY, usableWidth, headerRowHeight, 'F');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(7.5);
+      doc.setTextColor(255, 255, 255);
+      let x = margin;
+      visibleColumnKeys.forEach((key, i) => {
+        const col = PENDING_PAYMENTS_COLUMNS[key];
+        const text = truncate(col.title, colWidths[i] - 6);
+        doc.text(text, x + 3, startY + headerRowHeight - 6);
+        x += colWidths[i];
+      });
+    };
+
+    const drawFooter = (pageNum: number, total: number) => {
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7);
+      doc.setTextColor(150, 150, 150);
+      const fy = pageHeight - 12;
+      doc.text('Tanaka Property Management', margin, fy);
+      doc.text(`Page ${pageNum} of ${total}`, pageWidth / 2, fy, { align: 'center' });
+      doc.text(dayjs().format('DD/MM/YYYY'), pageWidth - margin, fy, { align: 'right' });
+    };
+
+    const drawGridLines = (tableStartY: number, tableEndY: number) => {
+      doc.setDrawColor(160, 160, 160);
+      doc.setLineWidth(0.5);
+      doc.rect(margin, tableStartY, usableWidth, tableEndY - tableStartY, 'S');
+      doc.setDrawColor(200, 200, 200);
+      doc.setLineWidth(0.3);
+      let x = margin;
+      for (let i = 0; i < colWidths.length - 1; i++) {
+        x += colWidths[i];
+        doc.line(x, tableStartY, x, tableEndY);
+      }
+      doc.setDrawColor(225, 225, 225);
+      doc.setLineWidth(0.2);
+      let ry = tableStartY + headerRowHeight + rowHeight;
+      while (ry < tableEndY) {
+        doc.line(margin, ry, margin + usableWidth, ry);
+        ry += rowHeight;
+      }
+      doc.setDrawColor(170, 170, 170);
+      doc.setLineWidth(0.4);
+      doc.line(margin, tableStartY + headerRowHeight, margin + usableWidth, tableStartY + headerRowHeight);
+    };
+
+    drawTitle();
+    let tableStartY = y;
+    drawTableHeader(tableStartY);
+    y += headerRowHeight;
+
+    data.forEach((item, index) => {
+      if (y + rowHeight > contentMaxY) {
+        drawGridLines(tableStartY, y);
+        drawFooter(currentPage, totalPages);
+        doc.addPage();
+        currentPage++;
+        y = margin;
+        tableStartY = y;
+        drawTableHeader(tableStartY);
+        y += headerRowHeight;
+      }
+
+      if (index % 2 === 0) {
+        doc.setFillColor(247, 250, 252);
+        doc.rect(margin, y, usableWidth, rowHeight, 'F');
+      }
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7.5);
+      let x = margin;
+
+      visibleColumnKeys.forEach((key, i) => {
+        const col = PENDING_PAYMENTS_COLUMNS[key];
+        const value = item[col.dataIndex];
+        let text: string;
+
+        if (['amount_due', 'amount_paid', 'balance', 'discount'].includes(key)) {
+          text = `TSh ${((value as number) || 0).toLocaleString()}`;
+          doc.setTextColor(30, 30, 30);
+        } else if (key === 'payment_status') {
+          const s = (value as string || '').toLowerCase();
+          if (s === 'unpaid' || s.includes('unpaid')) doc.setTextColor(185, 28, 28);
+          else if (s.includes('partial')) doc.setTextColor(161, 85, 0);
+          else doc.setTextColor(50, 50, 50);
+          text = col.formatter ? String(col.formatter(value)) : String(value || 'N/A');
+        } else if (key === 'lease_status') {
+          const s = (value as string || '').toLowerCase();
+          if (s === 'active') doc.setTextColor(22, 101, 52);
+          else if (s === 'expired') doc.setTextColor(185, 28, 28);
+          else doc.setTextColor(50, 50, 50);
+          text = col.formatter ? String(col.formatter(value)) : String(value || 'N/A');
+        } else if (col.formatter) {
+          text = String(col.formatter(value));
+          doc.setTextColor(50, 50, 50);
+        } else {
+          text = String(value || 'N/A');
+          doc.setTextColor(50, 50, 50);
+        }
+
+        doc.text(truncate(text, colWidths[i] - 6), x + 3, y + rowHeight - 5);
+        x += colWidths[i];
+      });
+
+      y += rowHeight;
+    });
+
+    drawGridLines(tableStartY, y);
+    drawFooter(currentPage, totalPages);
+
+    const timestamp = dayjs().format('YYYY-MM-DD_HH-mm-ss');
+    doc.save(filename || `Pending_Payments_Report_${timestamp}.pdf`);
+  } catch (error) {
+    console.error('PDF export error:', error);
+    throw new Error('Failed to export data to PDF');
+  }
+};
+
+// ==========================================
 // Lease Expiry Report
 // ==========================================
 

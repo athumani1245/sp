@@ -22,6 +22,7 @@ import Leases from './pages/Leases';
 import Lease from './pages/Lease';
 import LeaseReport from './pages/LeaseReport';
 import LeaseExpiryReport from './pages/LeaseExpiryReport';
+import PendingPaymentsReport from './pages/PendingPaymentsReport';
 import Profile from './pages/Profile';
 import Subscription from './pages/Subscription';
 import PropertyManagers from './pages/PropertyManagers';
@@ -81,6 +82,7 @@ function App() {
             <Route path="/reports" element={<PrivateRoute><MainLayout /></PrivateRoute>}>
               <Route path="lease" element={<SubscriptionGate><LeaseReport /></SubscriptionGate>} />
               <Route path="lease-expiry" element={<SubscriptionGate><LeaseExpiryReport /></SubscriptionGate>} />
+              <Route path="pending-payments" element={<SubscriptionGate><PendingPaymentsReport /></SubscriptionGate>} />
             </Route>
             <Route path="/profile" element={<PrivateRoute><MainLayout /></PrivateRoute>}>
               <Route index element={<Profile />} />

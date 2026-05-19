@@ -1,0 +1,67 @@
+{
+  "title": "Pending Payments Report",
+  "subtitle": "View and export pending payment data",
+  "statistics": {
+    "totalRecords": "Total Records",
+    "totalAmountDue": "Total Outstanding",
+    "unpaidRecords": "Unpaid Records",
+    "partialPayments": "Partial Payments"
+  },
+  "export": {
+    "exportExcel": "Export Excel",
+    "exportPdf": "Export PDF",
+    "refresh": "Refresh",
+    "columns": "Columns",
+    "successExcel": "Successfully exported {{count}} records to Excel",
+    "successPdf": "Successfully exported {{count}} records to PDF",
+    "noData": "No data available to export",
+    "errorExcel": "Failed to export data to Excel",
+    "errorPdf": "Failed to export data to PDF"
+  },
+  "quickRange": {
+    "label": "Quick Range:",
+    "today": "Today",
+    "thisWeek": "This Week",
+    "thisMonth": "This Month",
+    "thisYear": "This Year"
+  },
+  "filters": {
+    "paymentStatus": "Payment Status",
+    "allStatuses": "All Statuses",
+    "searchPlaceholder": "Search by tenant, property or lease...",
+    "resetFilters": "Reset Filters",
+    "filtersReset": "Filters reset",
+    "activeFilters": "Active Filters:",
+    "search": "Search",
+    "dateRange": "Date",
+    "all": "All"
+  },
+  "columns": {
+    "leaseNo": "Lease No.",
+    "tenant": "Tenant",
+    "property": "Property",
+    "unit": "Unit",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "amountDue": "Total Rent",
+    "amountPaid": "Amount Paid",
+    "balance": "Remaining",
+    "discount": "Discount",
+    "leaseStatus": "Lease Status",
+    "paymentStatus": "Payment Status",
+    "selectAll": "Select All",
+    "deselectAll": "Deselect All",
+    "selectColumns": "Select Columns"
+  },
+  "paymentStatus": {
+    "unpaid": "Unpaid",
+    "partial": "Partial",
+    "overdue": "Overdue"
+  },
+  "table": {
+    "showing": "Showing {{count}} of {{total}} records",
+    "selected": "{{count}} selected",
+    "days": "{{count}} days",
+    "na": "N/A"
+  }
+}

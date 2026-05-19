@@ -187,8 +187,42 @@ export const getLeaseReport = async () => {
   return response.data.data || [];
 };
 
+// Get pending payments report
+export const getPendingPaymentsReport = async () => {
+  const response = await api.get(`/reports/pending-payments`);
+  const data = response.data.data || [];
+  return data.map((item: any) => ({
+    lease_number: item.lease_number,
+    tenant: item.tenant_full_name,
+    property: item.property,
+    unit: item.unit,
+    start_date: item.start_date,
+    end_date: item.end_date,
+    amount_due: item.total_rent ?? 0,
+    amount_paid: item.total_amount_paid ?? 0,
+    balance: item.remaining_amount ?? 0,
+    discount: parseFloat(item.discount) || 0,
+    lease_status: item.lease_status,
+    payment_status: item.payment_status,
+  }));
+};
+
 // Get lease expiry report
 export const getLeaseExpiryReport = async () => {
   const response = await api.get(`/reports/lease-expiry-report`);
-  return response.data.data || [];
+  const data = response.data.data || [];
+  return data.map((item: any) => ({
+    lease_number: item.lease_number,
+    tenant: [item.tenant_name, item.tenant_last_name].filter(Boolean).join(' '),
+    property: item.property_name,
+    unit: item.unit_name,
+    start_date: item.start_date,
+    end_date: item.end_date,
+    rent_expected: item.rent_expected ?? 0,
+    amount_paid: item.amount_paid ?? 0,
+    amount_to_be_paid: item.amount_to_be_paid ?? 0,
+    overpayment: item.overpayment ?? 0,
+    remaining_days: item.days_until_expiry ?? 0,
+    lease_status: item.status,
+  }));
 };

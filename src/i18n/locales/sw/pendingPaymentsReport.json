@@ -1,0 +1,67 @@
+{
+  "title": "Ripoti ya Malipo Yanayosubiri",
+  "subtitle": "Angalia na pakua taarifa za malipo yanayosubiri",
+  "statistics": {
+    "totalRecords": "Jumla ya Rekodi",
+    "totalAmountDue": "Jumla ya Deni Linalobaki",
+    "unpaidRecords": "Rekodi Ambazo Hazijalipwa",
+    "partialPayments": "Malipo ya Sehemu"
+  },
+  "export": {
+    "exportExcel": "Pakua Excel",
+    "exportPdf": "Pakua PDF",
+    "refresh": "Onyesha Tena",
+    "columns": "Safu",
+    "successExcel": "Rekodi {{count}} zimepakuliwa kwenye Excel",
+    "successPdf": "Rekodi {{count}} zimepakuliwa kwenye PDF",
+    "noData": "Hakuna data ya kupakua",
+    "errorExcel": "Imeshindwa kupakua Excel",
+    "errorPdf": "Imeshindwa kupakua PDF"
+  },
+  "quickRange": {
+    "label": "Chagua Haraka:",
+    "today": "Leo",
+    "thisWeek": "Wiki hii",
+    "thisMonth": "Mwezi huu",
+    "thisYear": "Mwaka huu"
+  },
+  "filters": {
+    "paymentStatus": "Hali ya Malipo",
+    "allStatuses": "Hali Zote",
+    "searchPlaceholder": "Tafuta mpangaji, jengo au mkataba...",
+    "resetFilters": "Futa Vichujio",
+    "filtersReset": "Vichujio vimefutwa",
+    "activeFilters": "Vichujio Vilivyotumika:",
+    "search": "Tafuta",
+    "dateRange": "Tarehe",
+    "all": "Zote"
+  },
+  "columns": {
+    "leaseNo": "Namba ya Mkataba",
+    "tenant": "Mpangaji",
+    "property": "Jengo",
+    "unit": "Chumba",
+    "startDate": "Tarehe ya Kuanza",
+    "endDate": "Tarehe ya Mwisho",
+    "amountDue": "Kodi Yote",
+    "amountPaid": "Iliyolipwa",
+    "balance": "Inayobaki",
+    "discount": "Punguzo",
+    "leaseStatus": "Hali ya Mkataba",
+    "paymentStatus": "Hali ya Malipo",
+    "selectAll": "Chagua Zote",
+    "deselectAll": "Ondoa Zote",
+    "selectColumns": "Chagua Safu"
+  },
+  "paymentStatus": {
+    "unpaid": "Haijalipiwa",
+    "partial": "Sehemu",
+    "overdue": "Imechelewa"
+  },
+  "table": {
+    "showing": "Inaonyesha rekodi {{count}} kati ya {{total}}",
+    "selected": "{{count}} zimechaguliwa",
+    "days": "siku {{count}}",
+    "na": "Hakuna"
+  }
+}
