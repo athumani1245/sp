@@ -1,0 +1,26 @@
+{
+  "leaseBuilder": {
+    "title": "Violezo vya Mkataba",
+    "subtitle": "Jenga na simamia violezo vya mkataba vinavyoweza kutumika tena",
+    "newTemplate": "Kiolezo Kipya",
+    "editTemplate": "Hariri Kiolezo",
+    "generateLease": "Tengeneza Kukodisha",
+    "saveTemplate": "Hifadhi Kiolezo",
+    "updateTemplate": "Sasisha",
+    "templateName": "Jina la kiolezo...",
+    "variables": "Vigeuzi",
+    "preview": "Hakiki",
+    "edit": "Hariri",
+    "exportPdf": "Hamisha PDF",
+    "print": "Chapa",
+    "insertVariable": "Weka Kigeuzio",
+    "customVariable": "Kigeuzio maalum",
+    "fillTenantDetails": "Jaza Maelezo ya Mpangaji",
+    "variablesFilled": "{{filled}}/{{total}} vigeuzi vimejazwa",
+    "noTemplates": "Hakuna violezo bado. Unda kiolezo chako cha kwanza!",
+    "deleteConfirm": "Futa kiolezo?",
+    "deleteConfirmDesc": "Kitendo hiki hakiwezi kutenduliwa.",
+    "templateNotFound": "Kiolezo hakikupatikana",
+    "previewNote": "Hali ya hakiki — vigeuzi vinaonyeshwa kama vitetemeko. Tumia Tengeneza Kukodisha kujaza data ya mpangaji."
+  }
+}

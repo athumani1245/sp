@@ -1,0 +1,26 @@
+{
+  "leaseBuilder": {
+    "title": "Contract Templates",
+    "subtitle": "Build and manage reusable contract document templates",
+    "newTemplate": "New Template",
+    "editTemplate": "Edit Template",
+    "generateLease": "Generate Lease",
+    "saveTemplate": "Save Template",
+    "updateTemplate": "Update",
+    "templateName": "Template name...",
+    "variables": "Variables",
+    "preview": "Preview",
+    "edit": "Edit",
+    "exportPdf": "Export PDF",
+    "print": "Print",
+    "insertVariable": "Insert Variable",
+    "customVariable": "Custom variable",
+    "fillTenantDetails": "Fill In Tenant Details",
+    "variablesFilled": "{{filled}}/{{total}} variables filled",
+    "noTemplates": "No templates yet. Create your first template!",
+    "deleteConfirm": "Delete template?",
+    "deleteConfirmDesc": "This action cannot be undone.",
+    "templateNotFound": "Template not found",
+    "previewNote": "Preview mode — variables show as placeholders. Use Generate Lease to fill in tenant data."
+  }
+}

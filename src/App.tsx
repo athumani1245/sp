@@ -7,6 +7,7 @@ import PrivateRoute from './components/PrivateRoute';
 import PublicRoute from './components/PublicRoute';
 import SubscriptionGate from './components/SubscriptionGate';
 import Landing from './pages/Landing';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
@@ -26,6 +27,9 @@ import PendingPaymentsReport from './pages/PendingPaymentsReport';
 import Profile from './pages/Profile';
 import Subscription from './pages/Subscription';
 import PropertyManagers from './pages/PropertyManagers';
+import LeaseTemplatesPage from './features/lease-builder/pages/LeaseTemplatesPage';
+import TemplateBuilderPage from './features/lease-builder/pages/TemplateBuilderPage';
+import LeaseGeneratorPage from './features/lease-builder/pages/LeaseGeneratorPage';
 import './App.css';
 
 // Create a client
@@ -59,6 +63,7 @@ function App() {
             <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
             <Route path="/verify-otp" element={<PublicRoute><VerifyOtp /></PublicRoute>} />
             <Route path="/reset-password" element={<PublicRoute><ResetPassword /></PublicRoute>} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             
             {/* Protected routes with layout */}
             <Route path="/dashboard" element={<PrivateRoute><MainLayout /></PrivateRoute>}>
@@ -75,6 +80,12 @@ function App() {
             <Route path="/leases" element={<PrivateRoute><MainLayout /></PrivateRoute>}>
               <Route index element={<SubscriptionGate><Leases /></SubscriptionGate>} />
               <Route path=":id" element={<SubscriptionGate><Lease /></SubscriptionGate>} />
+            </Route>
+            <Route path="/lease-builder" element={<PrivateRoute><MainLayout /></PrivateRoute>}>
+              <Route index element={<SubscriptionGate><LeaseTemplatesPage /></SubscriptionGate>} />
+              <Route path="new" element={<SubscriptionGate><TemplateBuilderPage /></SubscriptionGate>} />
+              <Route path=":id/edit" element={<SubscriptionGate><TemplateBuilderPage /></SubscriptionGate>} />
+              <Route path=":id/generate" element={<SubscriptionGate><LeaseGeneratorPage /></SubscriptionGate>} />
             </Route>
             <Route path="/property-managers" element={<PrivateRoute><MainLayout /></PrivateRoute>}>
               <Route index element={<SubscriptionGate><PropertyManagers /></SubscriptionGate>} />
