@@ -23,7 +23,6 @@ import {
 import {
   HomeOutlined,
   FileTextOutlined,
-  DownloadOutlined,
   ReloadOutlined,
   CloseCircleOutlined,
   DollarOutlined,
@@ -42,7 +41,7 @@ import { useLease, useCancelPayment, useCancelLease, useDeleteLease, useOriginal
 import AddPaymentModal from '../components/forms/AddPaymentModal';
 import RenewLeaseModal from '../components/forms/RenewLeaseModal';
 import TerminateLeaseModal from '../components/forms/TerminateLeaseModal';
-import LeasePDFPreviewModal from '../components/pdf/LeasePDFPreviewModal';
+import LeaseDocumentModal from '../features/lease-builder/components/LeaseDocumentModal';
 import Chatter from '../components/chatter/Chatter';
 import ChatterLayout from '../components/layout/ChatterLayout';
 
@@ -104,7 +103,6 @@ const Lease: React.FC = () => {
   
   const [isCancelling, setIsCancelling] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [showRenewModal, setShowRenewModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showPDFModal, setShowPDFModal] = useState(false);
@@ -780,9 +778,8 @@ const Lease: React.FC = () => {
                 </Button>
                 <Button
                   size="small"
-                  icon={<DownloadOutlined />}
+                  icon={<FilePdfOutlined />}
                   onClick={handleDownloadDocument}
-                  loading={isGeneratingPDF}
                 >
                   {t('leases:leaseDetail.pdf')}
                 </Button>
@@ -884,9 +881,9 @@ const Lease: React.FC = () => {
         lease={lease}
       />
 
-      {/* PDF Preview Modal */}
+      {/* Lease Document Modal — template selection + preview + export */}
       {showPDFModal && lease && (
-        <LeasePDFPreviewModal
+        <LeaseDocumentModal
           open={showPDFModal}
           onClose={() => setShowPDFModal(false)}
           lease={lease}
