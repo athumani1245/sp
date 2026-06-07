@@ -8,7 +8,6 @@ import {
   Button,
   Row,
   Col,
-  Typography,
   Divider,
   Table,
   Space,
@@ -25,7 +24,6 @@ import {
 import dayjs, { Dayjs } from 'dayjs';
 import { useRenewLease } from '../../hooks/useLeases';
 
-const { Text, Title } = Typography;
 const { Option } = Select;
 
 interface Payment {
@@ -105,7 +103,6 @@ const RenewLeaseModal: React.FC<RenewLeaseModalProps> = ({
 
   useEffect(() => {
     if (visible && lease) {
-      // Calculate suggested renewal dates (after current lease ends)
       const currentEndDate = parseDate(lease.end_date);
       const suggestedStartDate = currentEndDate ? currentEndDate.add(1, 'day') : dayjs();
       const suggestedEndDate = suggestedStartDate.add(6, 'month');
@@ -117,34 +114,36 @@ const RenewLeaseModal: React.FC<RenewLeaseModalProps> = ({
         rent_amount_per_unit: lease.rent_amount_per_unit || 0,
       });
 
-      // Initialize with one RENT payment
-      setPayments([{
-        key: Date.now().toString(),
-        category: 'RENT',
-      }]);
+      setPayments([]);
     }
   }, [visible, lease, form]);
 
   const handleAddPayment = () => {
+    const category = form.getFieldValue('new_payment_category');
+    const amount = form.getFieldValue('new_payment_amount');
+    const source = form.getFieldValue('new_payment_source');
+    const date = form.getFieldValue('new_payment_date');
+
+    if (!category) {
+      antMessage.warning('Please select a payment category');
+      return;
+    }
+
     const newPayment: Payment = {
       key: Date.now().toString(),
-      category: '',
+      category,
+      amount_paid: amount ? String(amount) : undefined,
+      payment_source: source || undefined,
+      payment_date: date ? date.format('YYYY-MM-DD') : undefined,
     };
+
     setPayments([...payments, newPayment]);
+    form.resetFields(['new_payment_category', 'new_payment_amount', 'new_payment_source', 'new_payment_date']);
     setIsAddingPayment(false);
   };
 
   const handleRemovePayment = (key: string) => {
     setPayments(payments.filter(p => p.key !== key));
-  };
-
-  const handlePaymentChange = (key: string, field: keyof Payment, value: any) => {
-    setPayments(payments.map(p => {
-      if (p.key === key) {
-        return { ...p, [field]: value };
-      }
-      return p;
-    }));
   };
 
   const calculateTotalAmount = () => {
@@ -230,67 +229,36 @@ const RenewLeaseModal: React.FC<RenewLeaseModalProps> = ({
       title: 'Category',
       dataIndex: 'category',
       key: 'category',
-      render: (value: string, record: Payment) => (
-        <Select
-          style={{ width: '100%' }}
-          placeholder="Select category"
-          value={value}
-          onChange={(val) => handlePaymentChange(record.key, 'category', val)}
-        >
-          {PAYMENT_CATEGORIES.map(cat => (
-            <Option key={cat.value} value={cat.value}>{cat.label}</Option>
-          ))}
-        </Select>
-      ),
+      render: (value: string) => {
+        const cat = PAYMENT_CATEGORIES.find(c => c.value === value);
+        return cat ? cat.label : value;
+      },
     },
     {
       title: 'Amount',
       dataIndex: 'amount_paid',
       key: 'amount_paid',
-      render: (value: string, record: Payment) => (
-        <Input
-          type="number"
-          placeholder="Amount (optional)"
-          value={value}
-          onChange={(e) => handlePaymentChange(record.key, 'amount_paid', e.target.value)}
-        />
-      ),
+      render: (value: string) => value ? `TSh ${Number(value).toLocaleString()}` : '—',
     },
     {
-      title: 'Payment Source',
+      title: 'Source',
       dataIndex: 'payment_source',
       key: 'payment_source',
-      render: (value: string, record: Payment) => (
-        <Select
-          style={{ width: '100%' }}
-          placeholder="Source (optional)"
-          value={value}
-          allowClear
-          onChange={(val) => handlePaymentChange(record.key, 'payment_source', val)}
-        >
-          {PAYMENT_SOURCES.map(source => (
-            <Option key={source.value} value={source.value}>{source.label}</Option>
-          ))}
-        </Select>
-      ),
+      render: (value: string) => {
+        const src = PAYMENT_SOURCES.find(s => s.value === value);
+        return src ? src.label : (value || '—');
+      },
     },
     {
-      title: 'Payment Date',
+      title: 'Date',
       dataIndex: 'payment_date',
       key: 'payment_date',
-      render: (value: string, record: Payment) => (
-        <DatePicker
-          style={{ width: '100%' }}
-          placeholder="Date (optional)"
-          value={value ? dayjs(value) : null}
-          format="DD-MM-YYYY"
-          onChange={(date) => handlePaymentChange(record.key, 'payment_date', date)}
-        />
-      ),
+      render: (value: string) => value ? dayjs(value).format('DD-MM-YYYY') : '—',
     },
     {
-      title: 'Action',
+      title: '',
       key: 'action',
+      width: 40,
       render: (_: any, record: Payment) => (
         <Button
           type="text"
@@ -443,24 +411,77 @@ const RenewLeaseModal: React.FC<RenewLeaseModalProps> = ({
       </Form>
 
       <Divider>Initial Payments (Optional)</Divider>
-      
-      <Table
-        dataSource={payments}
-        columns={paymentColumns}
-        pagination={false}
-        size="small"
-        scroll={{ x: 800 }}
-        style={{ marginBottom: 16 }}
-      />
 
-      <Button
-        type="dashed"
-        icon={<PlusOutlined />}
-        onClick={handleAddPayment}
-        style={{ width: '100%' }}
-      >
-        Add Payment
-      </Button>
+      {payments.length > 0 && (
+        <Table
+          dataSource={payments}
+          columns={paymentColumns}
+          pagination={false}
+          size="small"
+          style={{ marginBottom: 16 }}
+        />
+      )}
+
+      {isAddingPayment && (
+        <div style={{ background: '#fafafa', border: '1px solid #f0f0f0', borderRadius: 8, padding: 16, marginBottom: 16 }}>
+          <Row gutter={12}>
+            <Col xs={24} sm={6}>
+              <Form.Item name="new_payment_category" label="Category" style={{ marginBottom: 8 }}>
+                <Select placeholder="Select category">
+                  {PAYMENT_CATEGORIES.map(cat => (
+                    <Option key={cat.value} value={cat.value}>{cat.label}</Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={6}>
+              <Form.Item name="new_payment_amount" label="Amount" style={{ marginBottom: 8 }}>
+                <InputNumber
+                  style={{ width: '100%' }}
+                  placeholder="Amount (optional)"
+                  min={0}
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={6}>
+              <Form.Item name="new_payment_source" label="Payment Source" style={{ marginBottom: 8 }}>
+                <Select placeholder="Source (optional)" allowClear>
+                  {PAYMENT_SOURCES.map(src => (
+                    <Option key={src.value} value={src.value}>{src.label}</Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={6}>
+              <Form.Item name="new_payment_date" label="Date" style={{ marginBottom: 8 }}>
+                <DatePicker style={{ width: '100%' }} format="DD-MM-YYYY" placeholder="Date (optional)" />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Space>
+            <Button type="primary" size="small" onClick={handleAddPayment}>
+              Save
+            </Button>
+            <Button size="small" onClick={() => {
+              form.resetFields(['new_payment_category', 'new_payment_amount', 'new_payment_source', 'new_payment_date']);
+              setIsAddingPayment(false);
+            }}>
+              Cancel
+            </Button>
+          </Space>
+        </div>
+      )}
+
+      {!isAddingPayment && (
+        <Button
+          type="dashed"
+          icon={<PlusOutlined />}
+          onClick={() => setIsAddingPayment(true)}
+          style={{ width: '100%' }}
+        >
+          Add Payment
+        </Button>
+      )}
     </Modal>
   );
 };

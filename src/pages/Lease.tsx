@@ -19,6 +19,8 @@ import {
   Alert,
   Empty,
   Table,
+  Spin,
+  Tooltip,
 } from 'antd';
 import {
   HomeOutlined,
@@ -36,8 +38,11 @@ import {
   EyeOutlined,
   StopOutlined,
   DeleteOutlined,
+  DownloadOutlined,
+  ShareAltOutlined,
 } from '@ant-design/icons';
 import { useLease, useCancelPayment, useCancelLease, useDeleteLease, useOriginalLease } from '../hooks/useLeases';
+import api from '../utils/api';
 import AddPaymentModal from '../components/forms/AddPaymentModal';
 import RenewLeaseModal from '../components/forms/RenewLeaseModal';
 import TerminateLeaseModal from '../components/forms/TerminateLeaseModal';
@@ -109,6 +114,55 @@ const Lease: React.FC = () => {
   const [showTerminateModal, setShowTerminateModal] = useState(false);
   const [activeTab, setActiveTab] = useState('details');
   const [messageApi, contextHolder] = message.useMessage();
+
+  const [receipt, setReceipt] = useState<{ open: boolean; loading: boolean; url: string | null; contentType: string; paymentId: string | null }>({
+    open: false, loading: false, url: null, contentType: '', paymentId: null,
+  });
+
+  const handleViewReceipt = async (paymentId: string) => {
+    setReceipt({ open: true, loading: true, url: null, contentType: '', paymentId });
+    try {
+      const res = await api.get(`/payments/receipts/${paymentId}/`, { responseType: 'blob' });
+      const contentType = String(res.headers['content-type'] || 'application/pdf');
+      const url = URL.createObjectURL(new Blob([res.data], { type: contentType }));
+      setReceipt((prev) => ({ ...prev, loading: false, url, contentType }));
+    } catch {
+      setReceipt({ open: false, loading: false, url: null, contentType: '', paymentId: null });
+      message.error('Could not load receipt. Please try again.');
+    }
+  };
+
+  const handleCloseReceipt = () => {
+    if (receipt.url) URL.revokeObjectURL(receipt.url);
+    setReceipt({ open: false, loading: false, url: null, contentType: '', paymentId: null });
+  };
+
+  const handleDownloadReceipt = () => {
+    if (!receipt.url) return;
+    const a = document.createElement('a');
+    a.href = receipt.url;
+    const ext = receipt.contentType.includes('pdf') ? 'pdf' : 'html';
+    a.download = `receipt-${receipt.paymentId}.${ext}`;
+    a.click();
+  };
+
+  const handleShareReceipt = async () => {
+    if (!receipt.url) return;
+    if (navigator.share) {
+      try {
+        const res = await fetch(receipt.url);
+        const blob = await res.blob();
+        const ext = receipt.contentType.includes('pdf') ? 'pdf' : 'html';
+        const file = new File([blob], `receipt-${receipt.paymentId}.${ext}`, { type: receipt.contentType });
+        await navigator.share({ files: [file], title: 'Payment Receipt' });
+      } catch {
+        // User cancelled or share not supported for files — fall back to copy link
+        message.info('Sharing not supported on this device. Use Download instead.');
+      }
+    } else {
+      message.info('Sharing not supported on this browser. Use Download instead.');
+    }
+  };
 
   // Show error message if fetch fails
   useEffect(() => {
@@ -577,8 +631,19 @@ const Lease: React.FC = () => {
                     const isPaid = record.status?.toLowerCase() === 'paid';
                     const isCancelled = record.status?.toLowerCase() === 'cancelled';
                     const isDisabled = !isPaid || isCancelled;
-                    
+
                     return (
+                      <Space size={4}>
+                      <Tooltip title="View Receipt">
+                        <Button
+                          size="small"
+                          icon={<EyeOutlined />}
+                          onClick={(e) => { e.stopPropagation(); handleViewReceipt(record.id); }}
+                          style={{ fontSize: '12px', height: '24px', padding: '0 8px' }}
+                        >
+                          Receipt
+                        </Button>
+                      </Tooltip>
                       <Button
                         type="primary"
                         danger
@@ -626,9 +691,10 @@ const Lease: React.FC = () => {
                       >
                         {t('leases:leases.cancel')}
                       </Button>
+                      </Space>
                     );
                   },
-                  width: 100,
+                  width: 150,
                 },
               ]}
             />
@@ -888,6 +954,40 @@ const Lease: React.FC = () => {
           lease={lease}
         />
       )}
+
+      {/* Receipt Preview Modal */}
+      <Modal
+        open={receipt.open}
+        onCancel={handleCloseReceipt}
+        title="Payment Receipt"
+        width={820}
+        style={{ top: 20 }}
+        styles={{ body: { padding: 0, height: '75vh', display: 'flex', flexDirection: 'column' } }}
+        footer={
+          <Space>
+            <Button onClick={handleCloseReceipt}>Close</Button>
+            <Button icon={<DownloadOutlined />} onClick={handleDownloadReceipt} disabled={!receipt.url}>
+              Download
+            </Button>
+            <Button icon={<ShareAltOutlined />} type="primary" onClick={handleShareReceipt} disabled={!receipt.url}>
+              Share
+            </Button>
+          </Space>
+        }
+        destroyOnHidden
+      >
+        {receipt.loading ? (
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+            <Spin size="large" tip="Loading receipt..." />
+          </div>
+        ) : receipt.url ? (
+          <iframe
+            src={receipt.url}
+            style={{ flex: 1, width: '100%', height: '100%', border: 'none' }}
+            title="Payment Receipt"
+          />
+        ) : null}
+      </Modal>
 
       {/* Chatter - Attachments */}
       </div>
