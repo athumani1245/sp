@@ -32,6 +32,18 @@ function fullName(first: string, last: string): string {
   return [first, last].filter(Boolean).join(' ');
 }
 
+export function mapPaymentAccountsToTemplateData(accounts: any[]): Record<string, string> {
+  const result: Record<string, string> = {};
+  (accounts || []).slice(0, 3).forEach((acc: any, i: number) => {
+    const n = i + 1;
+    result[`payment_account_${n}_provider`] = acc.provider     || '';
+    result[`payment_account_${n}_number`]   = acc.payment_number || '';
+    result[`payment_account_${n}_name`]     = acc.account_name  || '';
+    result[`payment_account_${n}_type`]     = acc.provider_type  || '';
+  });
+  return result;
+}
+
 export function mapLeaseToTemplateData(lease: any): Record<string, string> {
   const tenant    = lease?.tenant    || {};
   const property  = lease?.property  || {};

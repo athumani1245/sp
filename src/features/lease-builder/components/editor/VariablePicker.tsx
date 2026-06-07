@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Input, Divider, Space, Typography, Tooltip, Skeleton, Alert } from 'antd';
+import { Button, Input, Divider, Space, Typography, Skeleton, Alert } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import type { Editor } from '@tiptap/react';
 import { useLeaseVariables } from '../../hooks/useLeaseTemplates';
@@ -17,7 +17,12 @@ const VariablePicker: React.FC<Props> = ({ editor }) => {
   const [search, setSearch] = useState('');
   const { data: apiVariables, isLoading, isError } = useLeaseVariables();
 
-  const allVariables = apiVariables && apiVariables.length > 0 ? apiVariables : LEASE_VARIABLES;
+  // Always show the full local list (proper labels + categories).
+  // Append any extra keys the API returns that aren't already in the local list.
+  const apiExtras = (apiVariables || []).filter(
+    (v: LeaseVariable) => !LEASE_VARIABLES.some((l) => l.id === v.id),
+  );
+  const allVariables: LeaseVariable[] = [...LEASE_VARIABLES, ...apiExtras];
 
   const filtered = search.trim()
     ? allVariables.filter(
@@ -35,47 +40,57 @@ const VariablePicker: React.FC<Props> = ({ editor }) => {
     groups[cat].push(v);
   });
 
-  const insert = (variableId: string) => {
-    if (!editor || !variableId.trim()) return;
-    const id = variableId.trim().toLowerCase().replace(/\s+/g, '_');
+  const insertVariable = (id: string, label: string) => {
+    if (!editor || !id.trim()) return;
+    const normalizedId = id.trim().toLowerCase().replace(/\s+/g, '_');
+    const displayLabel = label.trim() || normalizedId.replace(/_/g, ' ');
+
+    // Collect whatever marks are active at the current cursor position so the
+    // variable node inherits the surrounding text style (font, size, color, etc.)
+    const activeMarks: any[] = [];
+    if (editor.isActive('bold'))      activeMarks.push({ type: 'bold' });
+    if (editor.isActive('italic'))    activeMarks.push({ type: 'italic' });
+    if (editor.isActive('underline')) activeMarks.push({ type: 'underline' });
+    if (editor.isActive('strike'))    activeMarks.push({ type: 'strike' });
+    const ts = editor.getAttributes('textStyle');
+    if (ts.color || ts.fontSize || ts.fontFamily) {
+      activeMarks.push({ type: 'textStyle', attrs: ts });
+    }
+
     editor.chain().focus().insertContent({
       type: 'variableNode',
-      attrs: { id, label: id },
+      attrs: { id: normalizedId, label: displayLabel },
+      ...(activeMarks.length ? { marks: activeMarks } : {}),
     }).run();
   };
 
   const VariableCard = ({ v }: { v: LeaseVariable }) => (
-    <Tooltip key={v.id} title={`Inserts {{ ${v.id} }}`} placement="right" mouseEnterDelay={0.6}>
-      <div
-        onClick={() => insert(v.id)}
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          padding: '5px 8px',
-          borderRadius: 6,
-          border: '1px solid #fcd34d',
-          background: '#fef3c7',
-          cursor: 'pointer',
-          transition: 'background 0.15s, border-color 0.15s',
-          userSelect: 'none',
-        }}
-        onMouseEnter={(e) => {
-          (e.currentTarget as HTMLDivElement).style.background = '#fde68a';
-          (e.currentTarget as HTMLDivElement).style.borderColor = '#f59e0b';
-        }}
-        onMouseLeave={(e) => {
-          (e.currentTarget as HTMLDivElement).style.background = '#fef3c7';
-          (e.currentTarget as HTMLDivElement).style.borderColor = '#fcd34d';
-        }}
-      >
-        <span style={{ fontSize: 12, fontWeight: 500, color: '#78350f', lineHeight: 1.3 }}>
-          {v.label}
-        </span>
-        <span style={{ fontSize: 10, fontFamily: 'monospace', color: '#b45309', lineHeight: 1.3, marginTop: 1 }}>
-          {`{{ ${v.id} }}`}
-        </span>
-      </div>
-    </Tooltip>
+    <div
+      onClick={() => insertVariable(v.id, v.label)}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        padding: '6px 8px',
+        borderRadius: 6,
+        border: '1px solid #fcd34d',
+        background: '#fef3c7',
+        cursor: 'pointer',
+        transition: 'background 0.15s, border-color 0.15s',
+        userSelect: 'none',
+      }}
+      onMouseEnter={(e) => {
+        (e.currentTarget as HTMLDivElement).style.background = '#fde68a';
+        (e.currentTarget as HTMLDivElement).style.borderColor = '#f59e0b';
+      }}
+      onMouseLeave={(e) => {
+        (e.currentTarget as HTMLDivElement).style.background = '#fef3c7';
+        (e.currentTarget as HTMLDivElement).style.borderColor = '#fcd34d';
+      }}
+    >
+      <span style={{ fontSize: 12, fontWeight: 500, color: '#78350f', lineHeight: 1.4 }}>
+        {v.label}
+      </span>
+    </div>
   );
 
   return (
@@ -146,14 +161,14 @@ const VariablePicker: React.FC<Props> = ({ editor }) => {
           placeholder="my_variable"
           value={custom}
           onChange={(e) => setCustom(e.target.value)}
-          onPressEnter={() => { insert(custom); setCustom(''); }}
+          onPressEnter={() => { insertVariable(custom, custom); setCustom(''); }}
           style={{ fontFamily: 'monospace', fontSize: 12 }}
         />
         <Button
           size="small"
           type="primary"
           icon={<PlusOutlined />}
-          onClick={() => { insert(custom); setCustom(''); }}
+          onClick={() => { insertVariable(custom, custom); setCustom(''); }}
           disabled={!custom.trim()}
         />
       </Space.Compact>

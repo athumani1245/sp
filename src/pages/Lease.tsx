@@ -804,8 +804,7 @@ const Lease: React.FC = () => {
                   </Button>
                 )}
                 {lease.status !== 'cancelled' &&
-                  lease.status !== 'terminated' &&
-                  lease.status !== 'expired' && (
+                  lease.status !== 'terminated' && (
                     <Button
                       danger
                       size="small"

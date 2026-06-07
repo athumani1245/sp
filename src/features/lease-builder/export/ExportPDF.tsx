@@ -12,13 +12,13 @@ const BASE_SIZE = 11;
 
 const page = StyleSheet.create({
   root: {
-    paddingTop: 64,
-    paddingBottom: 64,
+    paddingTop: 56,
+    paddingBottom: 56,
     paddingLeft: 72,
     paddingRight: 72,
     fontSize: BASE_SIZE,
     fontFamily: 'Helvetica',
-    lineHeight: 1.7,
+    lineHeight: 1.3,
     color: '#1f2937',
   },
 });
@@ -134,8 +134,8 @@ function BlockNode({
             fontSize: sizes[level] ?? 12,
             fontWeight: 'bold',
             textAlign: align(node),
-            marginBottom: level <= 2 ? 12 : 8,
-            marginTop: level === 1 ? 0 : 6,
+            marginBottom: level <= 2 ? 6 : 4,
+            marginTop: level === 1 ? 0 : 4,
           }}
         >
           <InlineNodes content={node.content ?? []} data={data} />
@@ -148,7 +148,7 @@ function BlockNode({
       return (
         <Text
           key={index}
-          style={{ textAlign: align(node), marginBottom: 8, lineHeight: 1.7 }}
+          style={{ textAlign: align(node), marginBottom: 4 }}
         >
           <InlineNodes content={node.content ?? []} data={data} />
         </Text>
@@ -157,9 +157,9 @@ function BlockNode({
     /* ── Bullet list ── */
     case 'bulletList':
       return (
-        <View key={index} style={{ marginBottom: 8 }}>
+        <View key={index} style={{ marginBottom: 6 }}>
           {(node.content ?? []).map((li: any, i: number) => (
-            <View key={i} style={{ flexDirection: 'row', marginBottom: 3 }}>
+            <View key={i} style={{ flexDirection: 'row', marginBottom: 2 }}>
               <Text style={{ width: 14 }}>{'•'}</Text>
               <Text style={{ flex: 1 }}>
                 <InlineNodes content={li.content?.[0]?.content ?? []} data={data} />
@@ -172,9 +172,9 @@ function BlockNode({
     /* ── Ordered list ── */
     case 'orderedList':
       return (
-        <View key={index} style={{ marginBottom: 8 }}>
+        <View key={index} style={{ marginBottom: 6 }}>
           {(node.content ?? []).map((li: any, i: number) => (
-            <View key={i} style={{ flexDirection: 'row', marginBottom: 3 }}>
+            <View key={i} style={{ flexDirection: 'row', marginBottom: 2 }}>
               <Text style={{ width: 18 }}>{`${i + 1}.`}</Text>
               <Text style={{ flex: 1 }}>
                 <InlineNodes content={li.content?.[0]?.content ?? []} data={data} />
@@ -188,7 +188,7 @@ function BlockNode({
     case 'table': {
       const rows: any[] = node.content ?? [];
       return (
-        <View key={index} style={{ borderWidth: 1, borderColor: '#d9d9d9', marginBottom: 12 }}>
+        <View key={index} style={{ borderWidth: 1, borderColor: '#d9d9d9', marginBottom: 8 }}>
           {rows.map((row: any, ri: number) => {
             const cells: any[] = row.content ?? [];
             return (
@@ -238,7 +238,7 @@ function BlockNode({
             borderLeftWidth: 3,
             borderLeftColor: '#d1d5db',
             paddingLeft: 10,
-            marginBottom: 8,
+            marginBottom: 4,
           }}
         >
           {(node.content ?? []).map((child: any, i: number) => (
