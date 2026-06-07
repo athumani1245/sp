@@ -23,9 +23,10 @@ import { VariableNode } from './editor/extensions/VariableNode';
 import StyleToolbar from './editor/StyleToolbar';
 import VariablePicker from './editor/VariablePicker';
 import { useLeaseTemplates } from '../hooks/useLeaseTemplates';
-import { mapLeaseToTemplateData } from '../utils/mapLeaseToTemplateData';
+import { mapLeaseToTemplateData, mapPaymentAccountsToTemplateData } from '../utils/mapLeaseToTemplateData';
 import { exportToPDF } from '../export/ExportPDF';
 import { VARIABLE_LABEL_MAP } from '../utils/variableDefinitions';
+import { usePaymentAccounts } from '../../../hooks/usePaymentAccounts';
 import type { LeaseTemplate } from '../services/leaseTemplateService';
 
 const { Text } = Typography;
@@ -61,6 +62,7 @@ const LeaseDocumentModal: React.FC<Props> = ({ open, onClose, lease }) => {
   const loadedTemplateIdRef = useRef<string | null>(null);
 
   const { data: templates = [], isLoading } = useLeaseTemplates();
+  const { data: paymentAccounts = [] } = usePaymentAccounts();
 
   const editor = useEditor({
     extensions: EDITOR_EXTENSIONS,
@@ -78,7 +80,11 @@ const LeaseDocumentModal: React.FC<Props> = ({ open, onClose, lease }) => {
   useEffect(() => {
     if (!selectedTemplate || !lease) return;
 
-    const mapped = mapLeaseToTemplateData(lease);
+    const mapped = {
+      ...mapLeaseToTemplateData(lease),
+      // Payment accounts from dedicated endpoint take priority over lease-embedded ones
+      ...mapPaymentAccountsToTemplateData(paymentAccounts),
+    };
     const prefilled: Record<string, string> = {};
     selectedTemplate.variables.forEach((v) => {
       prefilled[v] = mapped[v] || '';
@@ -90,7 +96,7 @@ const LeaseDocumentModal: React.FC<Props> = ({ open, onClose, lease }) => {
       editor.commands.setContent(selectedTemplate.document_json);
       loadedTemplateIdRef.current = selectedTemplate.id;
     }
-  }, [selectedTemplate, lease, editor]); // eslint-disable-line
+  }, [selectedTemplate, lease, editor, paymentAccounts]); // eslint-disable-line
 
   const handleClose = () => {
     setSelectedTemplate(null);
@@ -107,14 +113,16 @@ const LeaseDocumentModal: React.FC<Props> = ({ open, onClose, lease }) => {
       await exportToPDF(
         editor.getJSON(),
         tenantData,
-        `${selectedTemplate.name}_${lease?.lease_number || ''}`,
+        `${lease?.lease_number || 'lease'} - ${tenantData['tenant_name'] || [lease?.tenant?.first_name, lease?.tenant?.last_name].filter(Boolean).join(' ') || 'tenant'}`,
       );
     } finally {
       setExporting(false);
     }
   };
 
-  const leaseMap = lease ? mapLeaseToTemplateData(lease) : {};
+  const leaseMap = lease
+    ? { ...mapLeaseToTemplateData(lease), ...mapPaymentAccountsToTemplateData(paymentAccounts) }
+    : {};
   const filledCount = selectedTemplate
     ? selectedTemplate.variables.filter((v) => !!tenantData[v]?.trim()).length
     : 0;

@@ -5,7 +5,7 @@ import {
 } from 'antd';
 import {
   SaveOutlined, ArrowLeftOutlined, EyeOutlined,
-  EyeInvisibleOutlined, CodeOutlined,
+  EyeInvisibleOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import LeaseEditor from '../components/editor/LeaseEditor';
@@ -23,7 +23,6 @@ const TemplateBuilderPage: React.FC = () => {
 
   const [editorRef, setEditorRef] = useState<any>(null);
   const [variableDrawerOpen, setVariableDrawerOpen] = useState(false);
-  const [jsonDrawerOpen, setJsonDrawerOpen] = useState(false);
 
   const {
     templateName, setTemplateName, setTemplateId,
@@ -134,10 +133,6 @@ const TemplateBuilderPage: React.FC = () => {
             </Button>
           </Tooltip>
 
-          <Tooltip title="View JSON">
-            <Button icon={<CodeOutlined />} onClick={() => setJsonDrawerOpen(true)} />
-          </Tooltip>
-
           <Button
             type="primary"
             icon={<SaveOutlined />}
@@ -212,18 +207,7 @@ const TemplateBuilderPage: React.FC = () => {
         <VariablePicker editor={editorRef} />
       </Drawer>
 
-      {/* JSON viewer drawer */}
-      <Drawer
-        title="Document JSON"
-        placement="right"
-        open={jsonDrawerOpen}
-        onClose={() => setJsonDrawerOpen(false)}
-        width={480}
-      >
-        <pre style={{ fontSize: 11, background: '#f9fafb', padding: 12, borderRadius: 6, overflow: 'auto', maxHeight: '80vh' }}>
-          {JSON.stringify(editorJson, null, 2)}
-        </pre>
-      </Drawer>
+
     </div>
   );
 };

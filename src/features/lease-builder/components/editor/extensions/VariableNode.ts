@@ -7,6 +7,7 @@ export const VariableNode = Node.create({
   group: 'inline',
   inline: true,
   atom: true,
+  marks: '_', // allow all marks so bold/italic/font/color apply to the chip
 
   addAttributes() {
     return {

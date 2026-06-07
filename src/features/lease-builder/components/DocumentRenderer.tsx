@@ -56,7 +56,7 @@ function renderInline(node: any, tenantData: Record<string, string>, key: number
             fontFamily: 'monospace',
           }}
         >
-          {`{{ ${node.attrs?.id} }}`}
+          {`[ ${node.attrs?.label || node.attrs?.id} ]`}
         </span>
       </React.Fragment>
     );

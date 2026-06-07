@@ -10,6 +10,7 @@ import {
   BellOutlined,
   ClockCircleOutlined,
   WarningOutlined,
+  FileTextOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import type { MenuProps } from 'antd';
@@ -241,6 +242,12 @@ const AppHeader: React.FC<AppHeaderProps> = ({ collapsed, setCollapsed }) => {
       label: 'Profile',
       icon: <UserOutlined />,
       onClick: () => navigate('/profile'),
+    },
+    {
+      key: 'contract-templates',
+      label: 'Contract Templates',
+      icon: <FileTextOutlined />,
+      onClick: () => navigate('/lease-builder'),
     },
     {
       type: 'divider',
