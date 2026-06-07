@@ -192,7 +192,8 @@ const LeaseDocumentModal: React.FC<Props> = ({ open, onClose, lease }) => {
           </Text>
         </div>
 
-        <div style={{ flex: 1, overflow: 'auto', paddingBottom: 8 }}>
+        {/* Templates list — capped so variables section always has room */}
+        <div style={{ flex: '0 1 auto', maxHeight: '38%', overflow: 'auto', paddingBottom: 8 }}>
           {isLoading ? (
             <div style={{ display: 'flex', justifyContent: 'center', padding: 24 }}>
               <Spin size="small" />
@@ -282,10 +283,9 @@ const LeaseDocumentModal: React.FC<Props> = ({ open, onClose, lease }) => {
           )}
         </div>
 
-        {/* Variables form section */}
+        {/* Variables form section — takes all remaining sidebar height */}
         {selectedTemplate && (
-          <>
-            <Divider style={{ margin: 0 }} />
+          <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', borderTop: '1px solid #f0f0f0' }}>
             <div style={{ padding: '10px 14px 6px', flexShrink: 0 }}>
               <Space style={{ width: '100%', justifyContent: 'space-between' }}>
                 <Text style={{ fontSize: 11, fontWeight: 600, color: '#6b7280', letterSpacing: '0.05em' }}>
@@ -300,7 +300,7 @@ const LeaseDocumentModal: React.FC<Props> = ({ open, onClose, lease }) => {
             </div>
 
             {emptyCount > 0 && (
-              <div style={{ padding: '0 14px 8px' }}>
+              <div style={{ padding: '0 14px 8px', flexShrink: 0 }}>
                 <Alert
                   type="warning"
                   message={`${emptyCount} field${emptyCount > 1 ? 's' : ''} empty`}
@@ -310,7 +310,7 @@ const LeaseDocumentModal: React.FC<Props> = ({ open, onClose, lease }) => {
               </div>
             )}
 
-            <div style={{ flex: '0 1 auto', overflow: 'auto', padding: '0 14px 14px' }}>
+            <div style={{ flex: 1, overflow: 'auto', padding: '0 14px 14px' }}>
               <Form layout="vertical" size="small">
                 {selectedTemplate.variables.map((varId) => (
                   <Form.Item
@@ -339,7 +339,7 @@ const LeaseDocumentModal: React.FC<Props> = ({ open, onClose, lease }) => {
                 ))}
               </Form>
             </div>
-          </>
+          </div>
         )}
       </div>
 
