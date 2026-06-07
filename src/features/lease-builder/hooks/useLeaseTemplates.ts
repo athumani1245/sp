@@ -67,6 +67,18 @@ export function useDeleteTemplate() {
   });
 }
 
+export function useDuplicateTemplate() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => leaseTemplateService.duplicate(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: templateKeys.lists() });
+      message.success('Template duplicated');
+    },
+    onError: () => message.error('Failed to duplicate template'),
+  });
+}
+
 export function useLeaseVariables() {
   return useQuery({
     queryKey: ['leaseVariables'],
