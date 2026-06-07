@@ -12,6 +12,7 @@ export interface LeaseTemplate {
   name: string;
   document_json: any;
   variables: string[];
+  is_system_template: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -58,6 +59,11 @@ export const leaseTemplateService = {
 
   delete: async (id: string): Promise<void> => {
     await api.delete(`/lease-templates/${id}/`);
+  },
+
+  duplicate: async (id: string): Promise<LeaseTemplate> => {
+    const response = await api.post(`/lease-templates/duplicate/${id}/`);
+    return unwrap(response);
   },
 };
 

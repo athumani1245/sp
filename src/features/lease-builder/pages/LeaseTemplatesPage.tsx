@@ -5,11 +5,11 @@ import {
 } from 'antd';
 import {
   PlusOutlined, EditOutlined, DeleteOutlined, FileTextOutlined,
-  SearchOutlined, EyeOutlined,
+  SearchOutlined, EyeOutlined, CopyOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
-import { useLeaseTemplates, useDeleteTemplate } from '../hooks/useLeaseTemplates';
+import { useLeaseTemplates, useDeleteTemplate, useDuplicateTemplate } from '../hooks/useLeaseTemplates';
 import type { LeaseTemplate } from '../services/leaseTemplateService';
 
 const { Title, Text } = Typography;
@@ -18,7 +18,9 @@ const LeaseTemplatesPage: React.FC = () => {
   const navigate = useNavigate();
   const { data: templates = [], isLoading } = useLeaseTemplates();
   const deleteTemplate = useDeleteTemplate();
+  const duplicateTemplate = useDuplicateTemplate();
   const [search, setSearch] = useState('');
+  const [duplicatingId, setDuplicatingId] = useState<string | null>(null);
 
   const filtered = templates.filter((t) =>
     t.name.toLowerCase().includes(search.toLowerCase())
@@ -67,7 +69,7 @@ const LeaseTemplatesPage: React.FC = () => {
     {
       title: 'Actions',
       key: 'actions',
-      width: 160,
+      width: 180,
       render: (_: any, record: LeaseTemplate) => (
         <Space>
           <Tooltip title="Generate Lease">
@@ -78,11 +80,25 @@ const LeaseTemplatesPage: React.FC = () => {
               onClick={() => navigate(`/lease-builder/${record.id}/generate`)}
             />
           </Tooltip>
-          <Tooltip title="Edit Template">
+          <Tooltip title={record.is_system_template ? 'System templates cannot be edited' : 'Edit Template'}>
             <Button
               size="small"
               icon={<EditOutlined />}
+              disabled={record.is_system_template}
               onClick={() => navigate(`/lease-builder/${record.id}/edit`)}
+            />
+          </Tooltip>
+          <Tooltip title="Duplicate Template">
+            <Button
+              size="small"
+              icon={<CopyOutlined />}
+              loading={duplicatingId === record.id}
+              onClick={() => {
+                setDuplicatingId(record.id);
+                duplicateTemplate.mutate(record.id, {
+                  onSettled: () => setDuplicatingId(null),
+                });
+              }}
             />
           </Tooltip>
           <Popconfirm
@@ -91,13 +107,15 @@ const LeaseTemplatesPage: React.FC = () => {
             onConfirm={() => deleteTemplate.mutate(record.id)}
             okText="Delete"
             okButtonProps={{ danger: true }}
+            disabled={record.is_system_template}
           >
-            <Tooltip title="Delete">
+            <Tooltip title={record.is_system_template ? 'System templates cannot be deleted' : 'Delete'}>
               <Button
                 size="small"
                 danger
                 icon={<DeleteOutlined />}
                 loading={deleteTemplate.isPending}
+                disabled={record.is_system_template}
               />
             </Tooltip>
           </Popconfirm>
