@@ -38,6 +38,7 @@ import AddLeaseModal from '../components/forms/AddLeaseModal';
 import MobileLeasesList from '../components/mobile/MobileLeasesList';
 import { useLeases, useDeleteLease } from '../hooks/useLeases';
 import { useTour } from '../hooks/useTour';
+import { useAuth } from '../context/AuthContext';
 import dayjs from 'dayjs';
 
 const { Search } = Input;
@@ -72,6 +73,7 @@ const Leases: React.FC = () => {
   const screens = useBreakpoint();
   const { t } = useTranslation();
   const { open: tourOpen, setOpen: setTourOpen, markTourCompleted } = useTour('leases');
+  const { hasPermission } = useAuth();
 
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
@@ -292,9 +294,11 @@ const Leases: React.FC = () => {
           </Col>
           <Col xs={24} sm={12} style={{ textAlign: 'right', marginTop: window.innerWidth < 576 ? 16 : 0 }}>
             <div ref={addButtonRef}>
-              <Button type="primary" icon={<PlusOutlined />} onClick={() => setShowAddModal(true)}>
-                {t('leases:leases.addLease')}
-              </Button>
+              {hasPermission('can_create_lease') && (
+                <Button type="primary" icon={<PlusOutlined />} onClick={() => setShowAddModal(true)}>
+                  {t('leases:leases.addLease')}
+                </Button>
+              )}
             </div>
           </Col>
         </Row>

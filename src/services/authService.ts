@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { decodeJWT } from '../utils/jwt';
 
 const API_BASE = process.env.REACT_APP_API_BASE || '';
 const API_KEY = process.env.REACT_APP_API_KEY || '';
@@ -26,20 +27,22 @@ export const login = async (username: string, password: string): Promise<LoginRe
       { headers: { 'Content-Type': 'application/json', 'X-API-KEY': API_KEY } }
     );
 
-    const { access, refresh, subscription } = response.data.data;
+    const { access, refresh } = response.data.data;
     localStorage.setItem('token', access);
     localStorage.setItem('refresh', refresh);
-    localStorage.setItem('subscription', JSON.stringify(subscription));
 
-    if (subscription) {
-      localStorage.setItem('subscription', JSON.stringify(subscription));
+    // Decode the JWT to get permissions and subscription (source of truth)
+    const payload = decodeJWT(access);
+    if (payload) {
+      localStorage.setItem('permissions', JSON.stringify(payload.permissions ?? []));
+      localStorage.setItem('subscription', JSON.stringify(payload.subscription ?? null));
     }
 
     return {
       success: true,
       token: access,
       refresh: refresh,
-      subscription: subscription,
+      subscription: payload?.subscription ?? null,
       user: response.data.user || {},
     };
   } catch (err: any) {
@@ -134,6 +137,7 @@ export const logout = async (): Promise<{ success: boolean; error?: string }> =>
     localStorage.removeItem('token');
     localStorage.removeItem('refresh');
     localStorage.removeItem('subscription');
+    localStorage.removeItem('permissions');
 
     return { success: true };
   } catch (err: any) {
@@ -141,6 +145,7 @@ export const logout = async (): Promise<{ success: boolean; error?: string }> =>
     localStorage.removeItem('token');
     localStorage.removeItem('refresh');
     localStorage.removeItem('subscription');
+    localStorage.removeItem('permissions');
     return { success: false, error: 'Logout completed with errors' };
   }
 };
@@ -155,6 +160,13 @@ export const refreshToken = async (refresh: string): Promise<{ success: boolean;
 
     if (response.data && response.data.access) {
       localStorage.setItem('token', response.data.access);
+
+      // Update permissions and subscription from the new token
+      const payload = decodeJWT(response.data.access);
+      if (payload) {
+        localStorage.setItem('permissions', JSON.stringify(payload.permissions ?? []));
+        localStorage.setItem('subscription', JSON.stringify(payload.subscription ?? null));
+      }
 
       if (response.data.refresh) {
         localStorage.setItem('refresh', response.data.refresh);

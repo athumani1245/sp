@@ -40,6 +40,7 @@ import { useProperty, useUpdateProperty, useDeleteProperty, usePropertyUnits, us
 import { usePropertyManagers } from '../hooks/usePropertyManagers';
 import { useLeases, leaseKeys } from '../hooks/useLeases';
 import { getLeases } from '../services/leaseService';
+import { useAuth } from '../context/AuthContext';
 import AddUnitModal from '../components/forms/AddUnitModal';
 import EditUnitModal from '../components/forms/EditUnitModal';
 import Chatter from '../components/chatter/Chatter';
@@ -103,6 +104,7 @@ const PropertyDetail: React.FC = () => {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [form] = Form.useForm();
+  const { hasPermission } = useAuth();
   const [isEditMode, setIsEditMode] = useState(false);
   const [activeTab, setActiveTab] = useState('details');
   const [showAddUnitModal, setShowAddUnitModal] = useState(false);
@@ -437,23 +439,27 @@ const PropertyDetail: React.FC = () => {
       key: 'actions',
       render: (_, record) => (
         <Space size="small">
-          <Button 
-            type="link" 
-            size="small" 
-            icon={<EditOutlined />}
-            onClick={() => handleEditUnit(record)}
-          >
-            {t('properties:propertyDetail.edit')}
-          </Button>
-          <Button 
-            type="link" 
-            danger 
-            size="small" 
-            icon={<DeleteOutlined />}
-            onClick={() => handleDeleteUnit(record)}
-          >
-            {t('properties:propertyDetail.delete')}
-          </Button>
+          {hasPermission('can_edit_unit') && (
+            <Button 
+              type="link" 
+              size="small" 
+              icon={<EditOutlined />}
+              onClick={() => handleEditUnit(record)}
+            >
+              {t('properties:propertyDetail.editUnit')}
+            </Button>
+          )}
+          {hasPermission('can_delete_unit') && (
+            <Button 
+              type="link" 
+              danger 
+              size="small" 
+              icon={<DeleteOutlined />}
+              onClick={() => handleDeleteUnit(record)}
+            >
+              {t('properties:propertyDetail.delete')}
+            </Button>
+          )}
         </Space>
       ),
     },
@@ -601,17 +607,21 @@ const PropertyDetail: React.FC = () => {
           <Space>
             {!isEditMode ? (
               <>
-                <Button type="primary" icon={<EditOutlined />} onClick={handleEdit}>
-                  {t('properties:propertyDetail.edit')}
-                </Button>
-                <Button
-                  danger
-                  icon={<DeleteOutlined />}
-                  onClick={handleDeleteProperty}
-                  loading={deletePropertyMutation.isPending}
-                >
-                  {t('properties:propertyDetail.deleteProperty')}
-                </Button>
+                {hasPermission('can_edit_property') && (
+                  <Button type="primary" icon={<EditOutlined />} onClick={handleEdit}>
+                    {t('properties:propertyDetail.edit')}
+                  </Button>
+                )}
+                {hasPermission('can_delete_property') && (
+                  <Button
+                    danger
+                    icon={<DeleteOutlined />}
+                    onClick={handleDeleteProperty}
+                    loading={deletePropertyMutation.isPending}
+                  >
+                    {t('properties:propertyDetail.deleteProperty')}
+                  </Button>
+                )}
               </>
             ) : (
               <>
@@ -818,13 +828,15 @@ const PropertyDetail: React.FC = () => {
               children: (
                 <div>
                   <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'flex-end' }}>
-                    <Button 
-                      type="primary" 
-                      icon={<PlusOutlined />}
-                      onClick={() => setShowAddUnitModal(true)}
-                    >
-                      {t('properties:propertyDetail.addUnit')}
-                    </Button>
+                    {hasPermission('can_create_unit') && (
+                      <Button 
+                        type="primary" 
+                        icon={<PlusOutlined />}
+                        onClick={() => setShowAddUnitModal(true)}
+                      >
+                        {t('properties:propertyDetail.addUnit')}
+                      </Button>
+                    )}
                   </div>
                   {unitsLoading ? (
                     <div>

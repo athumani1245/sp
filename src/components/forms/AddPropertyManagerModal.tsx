@@ -13,6 +13,7 @@ import {
   Typography,
   Divider,
   Checkbox,
+  Card,
 } from 'antd';
 import {
   UserOutlined,
@@ -26,19 +27,24 @@ import { useCreatePropertyManager, usePermissions } from '../../hooks/usePropert
 
 const { Title, Text } = Typography;
 
+interface PermissionItem {
+  id: string;
+  name: string;
+  role: string;
+  description: string;
+}
+
+interface PermissionGroup {
+  id: string;
+  name: string;
+  permissions: PermissionItem[];
+}
+
 interface AddPropertyManagerModalProps {
   isOpen: boolean;
   onClose: () => void;
   onManagerAdded?: (data?: any) => void;
 }
-
-const AVAILABLE_PERMISSIONS = [
-  'can_manage_properties',
-  'can_manage_tenants',
-  'can_manage_leases',
-  'can_view_reports',
-  'can_manage_payments',
-];
 
 const AddPropertyManagerModal: React.FC<AddPropertyManagerModalProps> = ({
   isOpen,
@@ -99,7 +105,7 @@ const AddPropertyManagerModal: React.FC<AddPropertyManagerModalProps> = ({
         open={isOpen}
         onCancel={onClose}
         footer={null}
-        width={700}
+        width={800}
       >
         <Divider />
 
@@ -193,14 +199,25 @@ const AddPropertyManagerModal: React.FC<AddPropertyManagerModalProps> = ({
                 <LoadingOutlined style={{ fontSize: 20, marginRight: 8 }} />
                 <Text type="secondary">{t('propertyManagers:addManagerModal.loadingPermissions')}</Text>
               </div>
-            ) : permissions && permissions.length > 0 ? (
+            ) : permissions && Array.isArray(permissions) && permissions.length > 0 ? (
               <Checkbox.Group style={{ width: '100%' }}>
-                <Row gutter={[16, 8]}>
-                  {permissions.map((perm: any) => (
-                    <Col xs={24} md={12} key={perm.id}>
-                      <Checkbox value={perm.id}>
-                        {perm.description}
-                      </Checkbox>
+                <Row gutter={[16, 16]}>
+                  {(permissions as PermissionGroup[]).map((group) => (
+                    <Col xs={24} md={12} key={group.id}>
+                      <Card
+                        size="small"
+                        title={<Text strong>{group.name}</Text>}
+                        style={{ height: '100%' }}
+                        styles={{ body: { paddingTop: 8 } }}
+                      >
+                        <Space direction="vertical" size={6} style={{ width: '100%' }}>
+                          {group.permissions.map((perm) => (
+                            <Checkbox key={perm.id} value={perm.id}>
+                              <Text style={{ fontSize: 13 }}>{perm.description}</Text>
+                            </Checkbox>
+                          ))}
+                        </Space>
+                      </Card>
                     </Col>
                   ))}
                 </Row>

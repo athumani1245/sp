@@ -35,6 +35,7 @@ import PropertyManagerDetailModal from '../components/forms/PropertyManagerDetai
 import MobilePropertyManagersList from '../components/mobile/MobilePropertyManagersList';
 import { usePropertyManagers, useDeletePropertyManager } from '../hooks/usePropertyManagers';
 import { useTour } from '../hooks/useTour';
+import { useAuth } from '../context/AuthContext';
 
 const { Search } = Input;
 const { Title, Text } = Typography;
@@ -55,6 +56,7 @@ const PropertyManagers: React.FC = () => {
   const screens = useBreakpoint();
   const [messageApi, contextHolder] = message.useMessage();
   const { open: tourOpen, setOpen: setTourOpen, markTourCompleted } = useTour('propertyManagers');
+  const { hasPermission } = useAuth();
 
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
@@ -198,15 +200,17 @@ const PropertyManagers: React.FC = () => {
             />
           </Tooltip>
           <Tooltip title={t('propertyManagers:propertyManagers.delete')}>
-            <Button
-              type="link"
-              danger
-              icon={<DeleteOutlined />}
-              onClick={(e) => {
-                e.stopPropagation();
-                handleDelete(record.id, `${record.first_name} ${record.last_name}`);
-              }}
-            />
+            {hasPermission('can_delete_property_manager') && (
+              <Button
+                type="link"
+                danger
+                icon={<DeleteOutlined />}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete(record.id, `${record.first_name} ${record.last_name}`);
+                }}
+              />
+            )}
           </Tooltip>
         </Space>
       ),
@@ -228,14 +232,16 @@ const PropertyManagers: React.FC = () => {
             </Col>
             <Col xs={24} sm={12} style={{ textAlign: 'right' }}>
               <div ref={addButtonRef}>
-                <Button
-                  type="primary"
-                  icon={<PlusOutlined />}
-                  onClick={() => setShowAddModal(true)}
-                  size="large"
-                >
-                  {t('propertyManagers:propertyManagers.addNewManager')}
-                </Button>
+                {hasPermission('can_create_property_manager') && (
+                  <Button
+                    type="primary"
+                    icon={<PlusOutlined />}
+                    onClick={() => setShowAddModal(true)}
+                    size="large"
+                  >
+                    {t('propertyManagers:propertyManagers.addNewManager')}
+                  </Button>
+                )}
               </div>
             </Col>
           </Row>

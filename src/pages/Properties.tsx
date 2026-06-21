@@ -35,6 +35,7 @@ import MobilePropertiesList from '../components/mobile/MobilePropertiesList';
 import { useAllProperties, useDeleteProperty } from '../hooks/useProperties';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTour } from '../hooks/useTour';
+import { useAuth } from '../context/AuthContext';
 
 const { Title, Text } = Typography;
 const { Search } = Input;
@@ -68,6 +69,7 @@ const Properties: React.FC = () => {
   const [messageApi, contextHolder] = message.useMessage();
   const queryClient = useQueryClient();
   const { open: tourOpen, setOpen: setTourOpen, markTourCompleted } = useTour('properties');
+  const { hasPermission } = useAuth();
   const screens = useBreakpoint();
 
   const [search, setSearch] = useState('');
@@ -283,28 +285,18 @@ const Properties: React.FC = () => {
               </Title>
             </Col>
             <Col xs={24} sm={12} style={{ textAlign: 'right' }}>
-              <Space wrap>
-                <Tooltip title={t('properties:properties.refreshTooltip')}>
-                  <Button
-                    icon={<ReloadOutlined />}
-                    onClick={handleRefresh}
-                    loading={isLoading}
-                    size="large"
-                  >
-                    {t('properties:properties.refresh')}
-                  </Button>
-                </Tooltip>
-                <div ref={addButtonRef}>
+              <div ref={addButtonRef}>
+                {hasPermission('can_create_property') && (
                   <Button
                     type="primary"
                     icon={<PlusOutlined />}
                     onClick={() => setShowModal(true)}
                     size="large"
                   >
-                    {t('properties:properties.addNewProperty')}
+                    {t('properties:properties.addProperty')}
                   </Button>
-                </div>
-              </Space>
+                )}
+              </div>
             </Col>
           </Row>
           <Text type="secondary">{t('properties:properties.subtitle')}</Text>

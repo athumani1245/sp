@@ -43,6 +43,7 @@ import {
 } from '@ant-design/icons';
 import { useLease, useCancelPayment, useCancelLease, useDeleteLease, useOriginalLease } from '../hooks/useLeases';
 import api from '../utils/api';
+import { useAuth } from '../context/AuthContext';
 import AddPaymentModal from '../components/forms/AddPaymentModal';
 import RenewLeaseModal from '../components/forms/RenewLeaseModal';
 import TerminateLeaseModal from '../components/forms/TerminateLeaseModal';
@@ -114,6 +115,7 @@ const Lease: React.FC = () => {
   const [showTerminateModal, setShowTerminateModal] = useState(false);
   const [activeTab, setActiveTab] = useState('details');
   const [messageApi, contextHolder] = message.useMessage();
+  const { hasPermission } = useAuth();
 
   const [receipt, setReceipt] = useState<{ open: boolean; loading: boolean; url: string | null; contentType: string; paymentId: string | null }>({
     open: false, loading: false, url: null, contentType: '', paymentId: null,
@@ -526,7 +528,7 @@ const Lease: React.FC = () => {
         </Row>
       ),
     },
-    {
+    ...(hasPermission('can_view_payments') ? [{
       key: 'payments',
       label: (
         <span>
@@ -536,14 +538,16 @@ const Lease: React.FC = () => {
       children: (
         <Card
           extra={
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={() => setShowPaymentModal(true)}
-              style={{ backgroundColor: '#CC5B4B', borderColor: '#CC5B4B' }}
-            >
-              {t('leases:leaseDetail.addPayment')}
-            </Button>
+            hasPermission('can_create_payment') ? (
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={() => setShowPaymentModal(true)}
+                style={{ backgroundColor: '#CC5B4B', borderColor: '#CC5B4B' }}
+              >
+                {t('leases:leaseDetail.addPayment')}
+              </Button>
+            ) : null
           }
         >
           {!lease.payments || lease.payments.length === 0 ? (
@@ -644,6 +648,7 @@ const Lease: React.FC = () => {
                           Receipt
                         </Button>
                       </Tooltip>
+                      {hasPermission('can_cancel_payment') && (
                       <Button
                         type="primary"
                         danger
@@ -691,6 +696,7 @@ const Lease: React.FC = () => {
                       >
                         {t('leases:leases.cancel')}
                       </Button>
+                      )}
                       </Space>
                     );
                   },
@@ -701,7 +707,7 @@ const Lease: React.FC = () => {
           )}
         </Card>
       ),
-    },
+    }] : []),
   ];
 
   // Add History tab if this lease has an original lease
@@ -806,6 +812,12 @@ const Lease: React.FC = () => {
     });
   }
 
+  // Filter out tabs the user lacks permission to see
+  const visibleTabItems = tabItems.filter((tab) => {
+    if (tab.key === 'payments') return hasPermission('can_view_payments');
+    return true;
+  });
+
   return (
     <ChatterLayout model="lease" recordId={leaseId || ''}>
       <div>
@@ -849,7 +861,7 @@ const Lease: React.FC = () => {
                 >
                   {t('leases:leaseDetail.pdf')}
                 </Button>
-                {(lease.status === 'active' || lease.status === 'expiring') && (
+                {(lease.status === 'active' || lease.status === 'expiring') && hasPermission('can_renew_lease') && (
                   <Button
                     type="primary"
                     size="small"
@@ -859,7 +871,7 @@ const Lease: React.FC = () => {
                     {t('leases:leaseDetail.renew')}
                   </Button>
                 )}
-                {lease.status === 'active' && (
+                {lease.status === 'active' && hasPermission('can_terminate_lease') && (
                   <Button
                     danger
                     size="small"
@@ -870,7 +882,7 @@ const Lease: React.FC = () => {
                   </Button>
                 )}
                 {lease.status !== 'cancelled' &&
-                  lease.status !== 'terminated' && (
+                  lease.status !== 'terminated' && hasPermission('can_cancel_lease') && (
                     <Button
                       danger
                       size="small"
@@ -911,7 +923,7 @@ const Lease: React.FC = () => {
         defaultActiveKey="details"
         activeKey={activeTab}
         onChange={setActiveTab}
-        items={tabItems}
+        items={visibleTabItems}
         size="large"
       />
 
