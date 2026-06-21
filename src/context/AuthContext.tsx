@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect, useCallback, ReactNode } from 'react';
 import { refreshToken } from '../services/authService';
+import { decodeJWT } from '../utils/jwt';
 
 interface Subscription {
   plan: string;
@@ -18,6 +19,8 @@ interface Subscription {
 interface AuthContextType {
   isAuthenticated: boolean;
   loading: boolean;
+  permissions: string[];
+  hasPermission: (perm: string) => boolean;
   subscription: Subscription | null;
   hasActiveSubscription: boolean;
   isSubscriptionExpired: boolean;
@@ -31,6 +34,7 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [permissions, setPermissions] = useState<string[]>([]);
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [hasActiveSubscription, setHasActiveSubscription] = useState(false);
 
@@ -53,14 +57,42 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const token = localStorage.getItem('token');
     const refresh = localStorage.getItem('refresh');
     const subscriptionData = localStorage.getItem('subscription');
+    const permissionsData = localStorage.getItem('permissions');
 
     if (token && refresh) {
       setIsAuthenticated(true);
 
-      // Load subscription data
-      if (subscriptionData) {
+      // Load permissions — prefer stored value, fall back to decoding token
+      if (permissionsData) {
         try {
-          const parsedSubscription = JSON.parse(subscriptionData);
+          setPermissions(JSON.parse(permissionsData));
+        } catch {
+          const payload = decodeJWT(token);
+          setPermissions(payload?.permissions ?? []);
+        }
+      } else {
+        const payload = decodeJWT(token);
+        if (payload?.permissions) {
+          setPermissions(payload.permissions);
+          localStorage.setItem('permissions', JSON.stringify(payload.permissions));
+        }
+      }
+
+      // Load subscription — prefer stored value, fall back to decoding token
+      const resolvedSubscriptionData = subscriptionData ?? (() => {
+        const payload = decodeJWT(token);
+        if (payload?.subscription) {
+          const s = JSON.stringify(payload.subscription);
+          localStorage.setItem('subscription', s);
+          return s;
+        }
+        return null;
+      })();
+
+      // Load subscription data
+      if (resolvedSubscriptionData) {
+        try {
+          const parsedSubscription = JSON.parse(resolvedSubscriptionData);
           setSubscription(parsedSubscription);
           
           // hasActiveSubscription: end_date not passed and is_active true
@@ -84,6 +116,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
     } else {
       setIsAuthenticated(false);
+      setPermissions([]);
       setSubscription(null);
       setHasActiveSubscription(false);
     }
@@ -105,9 +138,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setupInterceptor();
   }, []);
 
+  const hasPermission = useCallback((perm: string): boolean => {
+    return permissions.includes(perm);
+  }, [permissions]);
+
   const value: AuthContextType = {
     isAuthenticated,
     loading,
+    permissions,
+    hasPermission,
     subscription,
     hasActiveSubscription,
     isSubscriptionExpired,

@@ -34,6 +34,7 @@ import AddTenantModal from '../components/forms/AddTenantModal';
 import MobileTenantsList from '../components/mobile/MobileTenantsList';
 import { useTenants, useDeleteTenant } from '../hooks/useTenants';
 import { useTour } from '../hooks/useTour';
+import { useAuth } from '../context/AuthContext';
 
 const { Search } = Input;
 const { Title, Text } = Typography;
@@ -56,6 +57,7 @@ const Tenants: React.FC = () => {
   const screens = useBreakpoint();
   const [messageApi, contextHolder] = message.useMessage();
   const { open: tourOpen, setOpen: setTourOpen, markTourCompleted } = useTour('tenants');
+  const { hasPermission } = useAuth();
 
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
@@ -241,14 +243,16 @@ const Tenants: React.FC = () => {
             </Col>
             <Col xs={24} sm={12} style={{ textAlign: 'right' }}>
               <div ref={addButtonRef}>
-                <Button
-                  type="primary"
-                  icon={<PlusOutlined />}
-                  onClick={() => setShowAddModal(true)}
-                  size="large"
-                >
-                  {t('tenants:tenants.addNewTenant')}
-                </Button>
+                {hasPermission('can_add_tenant') && (
+                  <Button
+                    type="primary"
+                    icon={<PlusOutlined />}
+                    onClick={() => setShowAddModal(true)}
+                    size="large"
+                  >
+                    {t('tenants:tenants.addNewTenant')}
+                  </Button>
+                )}
               </div>
             </Col>
           </Row>

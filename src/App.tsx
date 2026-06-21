@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './context/AuthContext';
 import PrivateRoute from './components/PrivateRoute';
 import PublicRoute from './components/PublicRoute';
+import PermissionRoute from './components/PermissionRoute';
 import SubscriptionGate from './components/SubscriptionGate';
 import Landing from './pages/Landing';
 import PrivacyPolicy from './pages/PrivacyPolicy';
@@ -70,8 +71,8 @@ function App() {
               <Route index element={<SubscriptionGate><Dashboard /></SubscriptionGate>} />
             </Route>
             <Route path="/properties" element={<PrivateRoute><MainLayout /></PrivateRoute>}>
-              <Route index element={<SubscriptionGate><Properties /></SubscriptionGate>} />
-              <Route path=":id" element={<SubscriptionGate><PropertyDetail /></SubscriptionGate>} />
+              <Route index element={<PermissionRoute permission="can_view_properties"><SubscriptionGate><Properties /></SubscriptionGate></PermissionRoute>} />
+              <Route path=":id" element={<PermissionRoute permission="can_view_properties"><SubscriptionGate><PropertyDetail /></SubscriptionGate></PermissionRoute>} />
             </Route>
             <Route path="/tenants" element={<PrivateRoute><MainLayout /></PrivateRoute>}>
               <Route index element={<SubscriptionGate><Tenants /></SubscriptionGate>} />
@@ -88,18 +89,18 @@ function App() {
               <Route path=":id/generate" element={<SubscriptionGate><LeaseGeneratorPage /></SubscriptionGate>} />
             </Route>
             <Route path="/property-managers" element={<PrivateRoute><MainLayout /></PrivateRoute>}>
-              <Route index element={<SubscriptionGate><PropertyManagers /></SubscriptionGate>} />
+              <Route index element={<PermissionRoute permission="can_view_property_managers"><SubscriptionGate><PropertyManagers /></SubscriptionGate></PermissionRoute>} />
             </Route>
             <Route path="/reports" element={<PrivateRoute><MainLayout /></PrivateRoute>}>
-              <Route path="lease" element={<SubscriptionGate><LeaseReport /></SubscriptionGate>} />
-              <Route path="lease-expiry" element={<SubscriptionGate><LeaseExpiryReport /></SubscriptionGate>} />
-              <Route path="pending-payments" element={<SubscriptionGate><PendingPaymentsReport /></SubscriptionGate>} />
+              <Route path="lease" element={<PermissionRoute permission="can_view_lease_report"><SubscriptionGate><LeaseReport /></SubscriptionGate></PermissionRoute>} />
+              <Route path="lease-expiry" element={<PermissionRoute permission="can_vew_lease_expiry_report"><SubscriptionGate><LeaseExpiryReport /></SubscriptionGate></PermissionRoute>} />
+              <Route path="pending-payments" element={<PermissionRoute permission="can_view_pending_payments_report"><SubscriptionGate><PendingPaymentsReport /></SubscriptionGate></PermissionRoute>} />
             </Route>
             <Route path="/profile" element={<PrivateRoute><MainLayout /></PrivateRoute>}>
               <Route index element={<Profile />} />
             </Route>
             <Route path="/subscription" element={<PrivateRoute><MainLayout /></PrivateRoute>}>
-              <Route index element={<Subscription />} />
+              <Route index element={<PermissionRoute permission="can_subscribe"><Subscription /></PermissionRoute>} />
             </Route>
             
             {/* Catch all - redirect to landing */}

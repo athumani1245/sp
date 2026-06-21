@@ -14,6 +14,7 @@ import {
   Checkbox,
   Skeleton,
   Tag,
+  Card,
 } from 'antd';
 import {
   UserOutlined,
@@ -116,8 +117,11 @@ const PropertyManagerDetailModal: React.FC<PropertyManagerDetailModalProps> = ({
     return found?.description || found?.name || permId;
   };
 
-  const managerPermissions: string[] =
-    manager?.permissions?.map((p: any) => (typeof p === 'object' ? p.id : p)) || [];
+  // Permissions come from the manager object as [{id, description}] — use directly
+  const managerPermissions: { id: string; description: string }[] =
+    manager?.permissions?.map((p: any) =>
+      typeof p === 'object' ? { id: p.id, description: p.description || p.name || p.id } : { id: p, description: p }
+    ) || [];
 
   // ── View Mode ──
   const renderViewMode = () => {
@@ -221,9 +225,9 @@ const PropertyManagerDetailModal: React.FC<PropertyManagerDetailModalProps> = ({
 
         {managerPermissions.length > 0 ? (
           <Space wrap>
-            {managerPermissions.map((pId) => (
-              <Tag color="blue" key={pId}>
-                {getPermissionLabel(pId)}
+            {managerPermissions.map((perm) => (
+              <Tag color="blue" key={perm.id}>
+                {perm.description}
               </Tag>
             ))}
           </Space>
@@ -317,12 +321,25 @@ const PropertyManagerDetailModal: React.FC<PropertyManagerDetailModalProps> = ({
             <LoadingOutlined style={{ fontSize: 20, marginRight: 8 }} />
             <Text type="secondary">{t('propertyManagers:addManagerModal.loadingPermissions')}</Text>
           </div>
-        ) : permissions && permissions.length > 0 ? (
+        ) : permissions && Array.isArray(permissions) && permissions.length > 0 ? (
           <Checkbox.Group style={{ width: '100%' }}>
-            <Row gutter={[16, 8]}>
-              {permissions.map((perm: any) => (
-                <Col xs={24} md={12} key={perm.id}>
-                  <Checkbox value={perm.id}>{perm.description}</Checkbox>
+            <Row gutter={[16, 16]}>
+              {(permissions as { id: string; name: string; permissions: { id: string; description: string }[] }[]).map((group) => (
+                <Col xs={24} md={12} key={group.id}>
+                  <Card
+                    size="small"
+                    title={<Text strong>{group.name}</Text>}
+                    style={{ height: '100%' }}
+                    styles={{ body: { paddingTop: 8 } }}
+                  >
+                    <Space direction="vertical" size={6} style={{ width: '100%' }}>
+                      {group.permissions.map((perm) => (
+                        <Checkbox key={perm.id} value={perm.id}>
+                          <Text style={{ fontSize: 13 }}>{perm.description}</Text>
+                        </Checkbox>
+                      ))}
+                    </Space>
+                  </Card>
                 </Col>
               ))}
             </Row>
@@ -393,7 +410,7 @@ const PropertyManagerDetailModal: React.FC<PropertyManagerDetailModalProps> = ({
           ? null
           : undefined
       }
-      width={700}
+      width={800}
       destroyOnClose
     >
       {editing ? renderEditMode() : renderViewMode()}
