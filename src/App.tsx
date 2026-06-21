@@ -71,8 +71,8 @@ function App() {
               <Route index element={<SubscriptionGate><Dashboard /></SubscriptionGate>} />
             </Route>
             <Route path="/properties" element={<PrivateRoute><MainLayout /></PrivateRoute>}>
-              <Route index element={<PermissionRoute permission="can_view_properties"><SubscriptionGate><Properties /></SubscriptionGate></PermissionRoute>} />
-              <Route path=":id" element={<PermissionRoute permission="can_view_properties"><SubscriptionGate><PropertyDetail /></SubscriptionGate></PermissionRoute>} />
+              <Route index element={<PermissionRoute permission={['can_view_properties', 'can_view_property']}><SubscriptionGate><Properties /></SubscriptionGate></PermissionRoute>} />
+              <Route path=":id" element={<PermissionRoute permission={['can_view_properties', 'can_view_property']}><SubscriptionGate><PropertyDetail /></SubscriptionGate></PermissionRoute>} />
             </Route>
             <Route path="/tenants" element={<PrivateRoute><MainLayout /></PrivateRoute>}>
               <Route index element={<SubscriptionGate><Tenants /></SubscriptionGate>} />

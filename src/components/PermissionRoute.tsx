@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 
 interface PermissionRouteProps {
   children: React.ReactNode;
-  permission: string;
+  permission: string | string[];
 }
 
 /**

@@ -9,6 +9,7 @@ import {
   FolderOutlined,
   LockOutlined,
   IdcardOutlined,
+  FileProtectOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import type { MenuProps } from 'antd';
@@ -73,8 +74,8 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ collapsed, isMobile = false }) 
       onClick: () => navigate('/dashboard'),
     },
 
-    // Properties — requires can_view_properties
-    hasPermission('can_view_properties')
+    // Properties — requires can_view_properties (owner) or can_view_property (manager)
+    hasPermission(['can_view_properties', 'can_view_property'])
       ? subExpiredProps(<BankOutlined />, t('common:nav.properties'), '/properties')
       : null,
 
@@ -96,6 +97,14 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ collapsed, isMobile = false }) 
       label: t('common:nav.subscription'),
       onClick: () => navigate('/subscription'),
     } as MenuItem : null,
+
+    // Contract Templates — always visible to authenticated users
+    {
+      key: '/lease-builder',
+      icon: <FileProtectOutlined />,
+      label: t('common:nav.contractTemplates'),
+      onClick: () => navigate('/lease-builder'),
+    },
 
     // Reports — show group only if user has at least one report permission
     reportChildren.length > 0 ? {

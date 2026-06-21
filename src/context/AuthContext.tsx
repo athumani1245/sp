@@ -20,7 +20,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   loading: boolean;
   permissions: string[];
-  hasPermission: (perm: string) => boolean;
+  hasPermission: (perm: string | string[]) => boolean;
   subscription: Subscription | null;
   hasActiveSubscription: boolean;
   isSubscriptionExpired: boolean;
@@ -138,7 +138,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setupInterceptor();
   }, []);
 
-  const hasPermission = useCallback((perm: string): boolean => {
+  const hasPermission = useCallback((perm: string | string[]): boolean => {
+    if (Array.isArray(perm)) return perm.some((p) => permissions.includes(p));
     return permissions.includes(perm);
   }, [permissions]);
 

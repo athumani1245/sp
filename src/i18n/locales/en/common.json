@@ -27,6 +27,7 @@
     "leaseExpiry": "Lease Expiry",
     "pendingPayments": "Pending Payments",
     "propertyManagers": "Property Managers",
+    "contractTemplates": "Contract Templates",
     "subscriptionRequired": "Subscription required"
   }
 }
