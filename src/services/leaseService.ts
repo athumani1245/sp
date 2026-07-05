@@ -181,6 +181,22 @@ export const cancelPayment = async (paymentId: string) => {
   return response.data.data || { success: true };
 };
 
+// Refund a payment
+export const refundPayment = async ({
+  paymentId,
+  amount,
+  date,
+  payment_source,
+}: {
+  paymentId: string;
+  amount: number | string;
+  date: string;
+  payment_source: string;
+}) => {
+  const response = await api.post(`/payments/${paymentId}/refund/`, { amount, date, payment_source });
+  return response.data.data || { success: true };
+};
+
 // Get lease report
 export const getLeaseReport = async () => {
   const response = await api.get(`/reports/lease`);

@@ -10,6 +10,7 @@ import {
   renewLease,
   getLeasePayments,
   cancelPayment,
+  refundPayment,
   getLeaseReport,
   getLeaseExpiryReport,
   getPendingPaymentsReport,
@@ -229,6 +230,22 @@ export const useCancelPayment = () => {
     },
     onError: (error: any) => {
       const errorMsg = error.response?.data?.description || error.response?.data?.message || 'Failed to cancel payment';
+      message.error(errorMsg);
+    },
+  });
+};
+
+export const useRefundPayment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: refundPayment,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: leaseKeys.all });
+      message.success('Payment refunded successfully!');
+    },
+    onError: (error: any) => {
+      const errorMsg = error.response?.data?.description || error.response?.data?.message || 'Failed to refund payment';
       message.error(errorMsg);
     },
   });
