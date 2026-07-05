@@ -20,8 +20,9 @@ import {
   Empty,
   Table,
   Spin,
-  Tooltip,
+  Dropdown,
 } from 'antd';
+import type { MenuProps } from 'antd';
 import {
   HomeOutlined,
   FileTextOutlined,
@@ -40,11 +41,14 @@ import {
   DeleteOutlined,
   DownloadOutlined,
   ShareAltOutlined,
+  RollbackOutlined,
+  MoreOutlined,
 } from '@ant-design/icons';
 import { useLease, useCancelPayment, useCancelLease, useDeleteLease, useOriginalLease } from '../hooks/useLeases';
 import api from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import AddPaymentModal from '../components/forms/AddPaymentModal';
+import RefundPaymentModal from '../components/forms/RefundPaymentModal';
 import RenewLeaseModal from '../components/forms/RenewLeaseModal';
 import TerminateLeaseModal from '../components/forms/TerminateLeaseModal';
 import LeaseDocumentModal from '../features/lease-builder/components/LeaseDocumentModal';
@@ -120,6 +124,8 @@ const Lease: React.FC = () => {
   const [receipt, setReceipt] = useState<{ open: boolean; loading: boolean; url: string | null; contentType: string; paymentId: string | null }>({
     open: false, loading: false, url: null, contentType: '', paymentId: null,
   });
+
+  const [refundPayment, setRefundPayment] = useState<{ id: string; amount_paid: string | number } | null>(null);
 
   const handleViewReceipt = async (paymentId: string) => {
     setReceipt({ open: true, loading: true, url: null, contentType: '', paymentId });
@@ -557,15 +563,18 @@ const Lease: React.FC = () => {
               dataSource={lease.payments || []}
               rowKey="id"
               pagination={false}
-              rowClassName={(record) => 
-                record.status?.toLowerCase() !== 'paid' ? 'disabled-row' : ''
-              }
+              size="small"
+              style={{ fontSize: 12 }}
+              rowClassName={(record) => {
+                const status = record.status?.toLowerCase();
+                return status !== 'paid' && status !== 'refund' && status !== 'refunded' ? 'disabled-row' : '';
+              }}
               columns={[
                 {
                   title: t('leases:leaseDetail.datePaid'),
                   dataIndex: 'date_paid',
                   key: 'date_paid',
-                  render: (date) => formatDate(date),
+                  render: (date) => <span style={{ fontSize: 12 }}>{formatDate(date)}</span>,
                   width: 120,
                 },
                 {
@@ -573,9 +582,9 @@ const Lease: React.FC = () => {
                   dataIndex: 'amount_paid',
                   key: 'amount_paid',
                   render: (amount) => (
-                    <Text strong style={{ color: '#52c41a' }}>
+                    <span style={{ fontSize: 12 }}>
                       {formatCurrency(parseFloat(amount) || 0)}
-                    </Text>
+                    </span>
                   ),
                   sorter: (a: any, b: any) => (parseFloat(a.amount_paid) || 0) - (parseFloat(b.amount_paid) || 0),
                   width: 150,
@@ -585,7 +594,7 @@ const Lease: React.FC = () => {
                   dataIndex: 'payment_source',
                   key: 'payment_source',
                   render: (source) => (
-                    <Tag color="blue">{source || t('leases:leaseDetail.na')}</Tag>
+                    <span style={{ fontSize: 12 }}>{source || t('leases:leaseDetail.na')}</span>
                   ),
                   width: 130,
                 },
@@ -593,89 +602,50 @@ const Lease: React.FC = () => {
                   title: t('leases:leaseDetail.category'),
                   dataIndex: 'category',
                   key: 'category',
-                  render: (category) => {
-                    const categoryColors: Record<string, string> = {
-                      RENT: 'purple',
-                      WATER: 'cyan',
-                      ELECTRICITY: 'gold',
-                      MAINTENANCE: 'orange',
-                      DEPOSIT: 'geekblue',
-                    };
-                    return (
-                      <Tag color={categoryColors[category] || 'default'}>
-                        {category || t('leases:leaseDetail.na')}
-                      </Tag>
-                    );
-                  },
+                  render: (category) => (
+                    <span style={{ fontSize: 12 }}>{category || t('leases:leaseDetail.na')}</span>
+                  ),
                   width: 120,
                 },
                 {
                   title: t('leases:leaseDetail.status'),
                   dataIndex: 'status',
                   key: 'status',
-                  render: (status) => {
-                    const statusColors: Record<string, string> = {
-                      paid: 'success',
-                      pending: 'warning',
-                      failed: 'error',
-                      cancelled: 'default',
-                    };
-                    return (
-                      <Tag color={statusColors[status?.toLowerCase()] || 'success'}>
-                        {status || t('leases:leaseDetail.na')}
-                      </Tag>
-                    );
-                  },
+                  render: (status) => (
+                    <span style={{ fontSize: 12 }}>{status || t('leases:leaseDetail.na')}</span>
+                  ),
                   width: 100,
                 },
                 {
                   title: t('leases:leaseDetail.actions'),
                   key: 'actions',
+                  align: 'center' as const,
                   render: (_: any, record: any) => {
-                    const isPaid = record.status?.toLowerCase() === 'paid';
+                    const isPaid = ['paid', 'refund', 'refunded'].includes(record.status?.toLowerCase());
                     const isCancelled = record.status?.toLowerCase() === 'cancelled';
                     const isDisabled = !isPaid || isCancelled;
 
-                    return (
-                      <Space size={4}>
-                      <Tooltip title="View Receipt">
-                        <Button
-                          size="small"
-                          icon={<EyeOutlined />}
-                          onClick={(e) => { e.stopPropagation(); handleViewReceipt(record.id); }}
-                          style={{ fontSize: '12px', height: '24px', padding: '0 8px' }}
-                        >
-                          Receipt
-                        </Button>
-                      </Tooltip>
-                      {hasPermission('can_cancel_payment') && (
-                      <Button
-                        type="primary"
-                        danger
-                        size="small"
-                        icon={<CloseCircleOutlined />}
-                        disabled={isDisabled}
-                        style={{
-                          fontSize: '12px',
-                          height: '24px',
-                          padding: '0 8px',
-                          transition: 'all 0.3s ease',
-                          opacity: isDisabled ? 0.5 : 1,
-                          cursor: isDisabled ? 'not-allowed' : 'pointer',
-                        }}
-                        onMouseEnter={(e) => {
-                          if (!isDisabled) {
-                            e.currentTarget.style.transform = 'scale(1.05)';
-                            e.currentTarget.style.boxShadow = '0 2px 8px rgba(255, 77, 79, 0.3)';
-                          }
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.transform = 'scale(1)';
-                          e.currentTarget.style.boxShadow = 'none';
-                        }}
-                        onClick={(e) => {
-                          if (isDisabled) return;
-                          e.stopPropagation();
+                    const items: MenuProps['items'] = [
+                      {
+                        key: 'receipt',
+                        label: 'Receipt',
+                        icon: <EyeOutlined />,
+                        onClick: () => handleViewReceipt(record.id),
+                      },
+                      {
+                        key: 'refund',
+                        label: t('leases:leases.refund'),
+                        icon: <RollbackOutlined />,
+                        disabled: isDisabled,
+                        onClick: () => setRefundPayment({ id: record.id, amount_paid: record.amount_paid }),
+                      },
+                      ...(hasPermission('can_cancel_payment') ? [{
+                        key: 'cancel',
+                        label: t('leases:leases.cancel'),
+                        icon: <CloseCircleOutlined />,
+                        danger: true,
+                        disabled: isDisabled,
+                        onClick: () => {
                           Modal.confirm({
                             title: t('leases:leaseDetail.cancelPayment'),
                             icon: <WarningOutlined style={{ color: '#ff4d4f' }} />,
@@ -692,15 +662,26 @@ const Lease: React.FC = () => {
                               }
                             },
                           });
-                        }}
+                        },
+                      }] : []),
+                    ];
+
+                    return (
+                      <Dropdown
+                        menu={{ items }}
+                        trigger={['click']}
+                        placement="bottomRight"
                       >
-                        {t('leases:leases.cancel')}
-                      </Button>
-                      )}
-                      </Space>
+                        <Button
+                          type="text"
+                          size="small"
+                          icon={<MoreOutlined />}
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                      </Dropdown>
                     );
                   },
-                  width: 150,
+                  width: 70,
                 },
               ]}
             />
@@ -935,6 +916,13 @@ const Lease: React.FC = () => {
         onPaymentAdded={() => {
           // Payments will auto-refresh via TanStack Query
         }}
+      />
+
+      {/* Refund Payment Modal */}
+      <RefundPaymentModal
+        isOpen={!!refundPayment}
+        onClose={() => setRefundPayment(null)}
+        payment={refundPayment}
       />
 
       {/* Renew Lease Modal */}

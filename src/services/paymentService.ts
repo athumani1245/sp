@@ -98,6 +98,22 @@ export const cancelPayment = async (paymentId: string) => {
   return { success: true };
 };
 
+// Refund a payment
+export const refundPayment = async ({
+  paymentId,
+  amount,
+  date,
+  payment_source,
+}: {
+  paymentId: string;
+  amount: number | string;
+  date: string;
+  payment_source: string;
+}) => {
+  await api.post(`${API_BASE}/payments/${paymentId}/refund/`, { amount, date, payment_source });
+  return { success: true };
+};
+
 // Generate payment receipt
 export const generatePaymentReceipt = async (paymentId: string) => {
   const response = await api.get(`${API_BASE}/payments/${paymentId}/receipt/`, {

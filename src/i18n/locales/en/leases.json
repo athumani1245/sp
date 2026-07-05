@@ -29,6 +29,7 @@
     "deleteLeaseConfirm": "Are you sure you want to delete lease {{leaseNumber}}? This action cannot be undone.",
     "delete": "Delete",
     "cancel": "Cancel",
+    "refund": "Refund",
     "tourWelcomeTitle": "Welcome to Leases Management",
     "tourWelcomeDesc": "Track and manage all your property leases here. Let's walk through the main features!",
     "tourAddTitle": "Add New Lease",
@@ -110,6 +111,7 @@
     "cancelPayment": "Cancel Payment",
     "cancelPaymentConfirm": "Are you sure you want to cancel this payment of {{amount}}?",
     "yesCancel": "Yes, Cancel",
+    "refundPayment": "Refund Payment",
     "no": "No",
     "pdf": "PDF",
     "renew": "Renew",
@@ -201,5 +203,24 @@
     "cash": "Cash",
     "mobileMoney": "Mobile Money",
     "bankTransfer": "Bank Transfer"
+  },
+  "refundPaymentModal": {
+    "title": "Refund Payment",
+    "amount": "Refund Amount (TSh)",
+    "amountRequired": "Please enter the refund amount",
+    "amountMustBePositive": "Refund amount must be greater than 0",
+    "amountInvalid": "Please enter a valid amount",
+    "amountTooManyDecimals": "Refund amount cannot have more than 2 decimal places",
+    "amountExceedsMax": "Refund amount cannot exceed the original payment amount of {{amount}}",
+    "amountTooltip": "Amount to refund to the tenant",
+    "date": "Refund Date",
+    "dateRequired": "Please select refund date",
+    "dateTooltip": "Date when the refund was issued",
+    "paymentSource": "Payment Source",
+    "paymentSourceRequired": "Please select payment source",
+    "paymentSourceTooltip": "Method used to refund the tenant",
+    "paymentSourcePlaceholder": "Select Payment Source",
+    "cancel": "Cancel",
+    "submit": "Refund"
   }
 }

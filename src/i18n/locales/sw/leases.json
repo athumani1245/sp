@@ -29,6 +29,7 @@
     "deleteLeaseConfirm": "Una uhakika unataka kufuta mkataba {{leaseNumber}}? Ukifuta hauwezi kurudishwa.",
     "delete": "Futa",
     "cancel": "Ghairi",
+    "refund": "Rejesha",
     "tourWelcomeTitle": "Karibu Usimamizi wa Mikataba",
     "tourWelcomeDesc": "Hapa unaweza kuona na kusimamia mikataba yote ya majengo yako.",
     "tourAddTitle": "Ongeza Mkataba Mpya",
@@ -110,6 +111,7 @@
     "cancelPayment": "Futa Malipo",
     "cancelPaymentConfirm": "Una uhakika unataka kufuta malipo ya {{amount}}?",
     "yesCancel": "Ndiyo",
+    "refundPayment": "Rejesha Malipo",
     "no": "Hapana",
     "pdf": "PDF",
     "renew": "Ongeza Mkataba",
@@ -201,5 +203,24 @@
     "cash": "Cash",
     "mobileMoney": "Pesa za Simu",
     "bankTransfer": "Benki"
+  },
+  "refundPaymentModal": {
+    "title": "Rejesha Malipo",
+    "amount": "Kiasi cha Kurejeshwa (TSh)",
+    "amountRequired": "Tafadhali weka kiasi cha kurejeshwa",
+    "amountMustBePositive": "Kiasi cha kurejeshwa lazima kiwe zaidi ya 0",
+    "amountInvalid": "Tafadhali weka kiasi sahihi",
+    "amountTooManyDecimals": "Kiasi cha kurejeshwa hakiwezi kuwa na tarakimu zaidi ya 2 baada ya nukta",
+    "amountExceedsMax": "Kiasi cha kurejeshwa hakiwezi kuzidi kiasi cha malipo halisi cha {{amount}}",
+    "amountTooltip": "Kiasi cha kurejeshwa kwa mpangaji",
+    "date": "Tarehe ya Kurejesha",
+    "dateRequired": "Tafadhali chagua tarehe ya kurejesha",
+    "dateTooltip": "Tarehe ambayo malipo yalirejeshwa",
+    "paymentSource": "Njia ya Malipo",
+    "paymentSourceRequired": "Chagua njia ya malipo",
+    "paymentSourceTooltip": "Njia iliyotumika kumrejeshea mpangaji",
+    "paymentSourcePlaceholder": "Chagua Njia",
+    "cancel": "Ghairi",
+    "submit": "Rejesha"
   }
 }
