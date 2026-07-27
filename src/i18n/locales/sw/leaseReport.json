@@ -50,6 +50,8 @@
     "amountPaid": "Iliyolipwa",
     "amountDue": "Deni",
     "overpayment": "Malipo Zaidi",
+    "periodCovered": "Kipindi Kilicholipwa",
+    "paidThrough": "Malipo Mpaka",
     "leaseStatus": "Hali ya Mkataba",
     "paymentStatus": "Hali ya Malipo",
     "remainingDays": "Siku Zilizobaki",
@@ -74,6 +76,7 @@
     "showing": "Inaonyesha mikataba {{count}} kati ya {{total}}",
     "selected": "{{count}} zimechaguliwa",
     "days": "siku {{count}}",
+    "months": "miezi {{count}}",
     "na": "Hakuna"
   }
 }

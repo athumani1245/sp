@@ -50,6 +50,8 @@
     "amountPaid": "Amount Paid",
     "amountDue": "Amount Due",
     "overpayment": "Overpayment",
+    "periodCovered": "Period Covered",
+    "paidThrough": "Paid Through",
     "leaseStatus": "Lease Status",
     "paymentStatus": "Payment Status",
     "remainingDays": "Remaining Days",
@@ -74,6 +76,7 @@
     "showing": "Showing {{count}} of {{total}} lease agreements",
     "selected": "{{count}} selected",
     "days": "{{count}} days",
+    "months": "{{count}} months",
     "na": "N/A"
   }
 }

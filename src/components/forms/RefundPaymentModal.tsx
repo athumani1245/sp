@@ -44,7 +44,7 @@ const RefundPaymentModal: React.FC<RefundPaymentModalProps> = ({
       await refundPaymentMutation.mutateAsync({
         paymentId: payment.id,
         amount: values.amount,
-        date: values.date.format('YYYY-MM-DD'),
+        date: values.date.format('DD-MM-YYYY'),
         payment_source: values.payment_source,
       });
       handleClose();

@@ -90,6 +90,8 @@ interface Lease {
   over_paid_amount?: number;
   discount?: number;
   remaining_amount: number;
+  next_payment_date?: string;
+  months_covered?: number;
   status: string;
   original_lease?: any;
   payments?: any[];
@@ -517,6 +519,24 @@ const Lease: React.FC = () => {
                   </Text>
                   <Title level={5} style={{ margin: 0, color: '#595959' }}>
                     {formatCurrency(lease.discount || 0)}
+                  </Title>
+                </div>
+
+                <div>
+                  <Text type="secondary" style={{ display: 'block', marginBottom: 8 }}>
+                    {t('leases:leaseDetail.monthsCovered')}
+                  </Text>
+                  <Title level={5} style={{ margin: 0, color: '#595959' }}>
+                    {lease.months_covered ?? t('leases:leaseDetail.na')}
+                  </Title>
+                </div>
+
+                <div>
+                  <Text type="secondary" style={{ display: 'block', marginBottom: 8 }}>
+                    {t('leases:leaseDetail.nextPaymentDate')}
+                  </Text>
+                  <Title level={5} style={{ margin: 0, color: '#595959' }}>
+                    {lease.next_payment_date ? formatDate(lease.next_payment_date) : t('leases:leaseDetail.na')}
                   </Title>
                 </div>
 
