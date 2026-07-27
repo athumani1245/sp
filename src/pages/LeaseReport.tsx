@@ -50,6 +50,8 @@ interface LeaseData {
   remaining_days: number;
   lease_status: string;
   payment_status: string;
+  months_covered?: number;
+  next_payment_date?: string;
 }
 
 const LeaseReport: React.FC = () => {
@@ -73,6 +75,8 @@ const LeaseReport: React.FC = () => {
     remaining_days: true,
     lease_status: true,
     payment_status: true,
+    months_covered: true,
+    next_payment_date: true,
   });
 
   const { data: leases = [], isLoading, refetch } = useLeaseReport();
@@ -279,6 +283,20 @@ const LeaseReport: React.FC = () => {
       key: 'overpayment',
       sorter: (a, b) => (a.overpayment || 0) - (b.overpayment || 0),
       render: (amount) => amount > 0 ? <Text style={{ color: '#1890ff' }}>TSh {amount.toLocaleString()}</Text> : '-',
+    },
+    {
+      title: t('leaseReport:columns.periodCovered'),
+      dataIndex: 'months_covered',
+      key: 'months_covered',
+      sorter: (a, b) => (a.months_covered || 0) - (b.months_covered || 0),
+      render: (months) => months || months === 0 ? t('leaseReport:table.months', { count: months }) : t('leaseReport:table.na'),
+    },
+    {
+      title: t('leaseReport:columns.paidThrough'),
+      dataIndex: 'next_payment_date',
+      key: 'next_payment_date',
+      sorter: (a, b) => (parseLeaseDate(a.next_payment_date)?.valueOf() || 0) - (parseLeaseDate(b.next_payment_date)?.valueOf() || 0),
+      render: (date) => formatLeaseDate(date) || t('leaseReport:table.na'),
     },
     {
       title: t('leaseReport:columns.leaseStatus'),

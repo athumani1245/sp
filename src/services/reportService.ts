@@ -17,6 +17,8 @@ interface LeaseReportData {
   remaining_days: number;
   lease_status: string;
   payment_status: string;
+  months_covered?: number;
+  next_payment_date?: string;
 }
 
 interface ColumnConfig {
@@ -76,12 +78,22 @@ const LEASE_REPORT_COLUMNS: { [key: string]: ColumnConfig } = {
     dataIndex: 'amount_to_be_paid',
     formatter: (amount: number) => amount || 0
   },
-  overpayment: { 
-    title: 'Overpayment (TSh)', 
+  overpayment: {
+    title: 'Overpayment (TSh)',
     dataIndex: 'overpayment',
     formatter: (amount: number) => amount || 0
   },
-  remaining_days: { 
+  months_covered: {
+    title: 'Period Covered (Months)',
+    dataIndex: 'months_covered',
+    formatter: (months: number) => months || 0
+  },
+  next_payment_date: {
+    title: 'Paid Through',
+    dataIndex: 'next_payment_date',
+    formatter: (date: string) => formatLeaseDate(date) || 'N/A'
+  },
+  remaining_days: {
     title: 'Remaining Days', 
     dataIndex: 'remaining_days',
     formatter: (days: number) => days || 0
@@ -234,6 +246,8 @@ export const exportLeaseReportToPDF = (options: ExportOptions): void => {
       amount_paid: 75,
       amount_to_be_paid: 70,
       overpayment: 70,
+      months_covered: 65,
+      next_payment_date: 70,
       remaining_days: 55,
       lease_status: 60,
       payment_status: 65,

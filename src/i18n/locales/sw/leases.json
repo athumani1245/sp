@@ -105,6 +105,8 @@
     "paidAmount": "Iliyolipwa",
     "overpaidAmount": "Imezidi",
     "remainingAmount": "Iliyobaki",
+    "monthsCovered": "Kipindi Kilicholipwa",
+    "nextPaymentDate": "Malipo Mpaka",
     "noPayments": "Hakuna malipo yaliyorekodiwa",
     "amountPaidColumn": "Iliyolipwa",
     "actions": "Vitendo",
