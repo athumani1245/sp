@@ -15,6 +15,7 @@ import {
   Space,
   DatePicker,
   message,
+  theme,
 } from 'antd';
 import {
   PlusOutlined,
@@ -94,6 +95,7 @@ const PAYMENT_SOURCES = [
 const AddLeaseModal: React.FC<AddLeaseModalProps> = ({ visible, onCancel, onSuccess }) => {
   const [form] = Form.useForm();
   const { t } = useTranslation();
+  const { token } = theme.useToken();
   const [loading, setLoading] = useState(false);
   const [selectedPropertyId, setSelectedPropertyId] = useState<string>('');
   const [payments, setPayments] = useState<Payment[]>([]);
@@ -549,7 +551,7 @@ const AddLeaseModal: React.FC<AddLeaseModalProps> = ({ visible, onCancel, onSucc
         />
 
         {isAddingPayment && (
-          <div style={{ background: '#fafafa', padding: 12, borderRadius: 4, marginBottom: 12 }}>
+          <div style={{ background: token.colorFillTertiary, padding: 12, borderRadius: 4, marginBottom: 12 }}>
             <Row gutter={8}>
               <Col span={6}>
                 <Form.Item name="payment_date" style={{ marginBottom: 0 }}>

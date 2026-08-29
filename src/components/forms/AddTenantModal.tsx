@@ -13,7 +13,7 @@ import {
   Typography,
   Divider,
   Select,
-  Card,
+  theme,
 } from 'antd';
 import {
   UserOutlined,
@@ -22,19 +22,12 @@ import {
   CloseOutlined,
   MailOutlined,
   TeamOutlined,
-  PlusOutlined,
-  DeleteOutlined,
   IdcardOutlined,
 } from '@ant-design/icons';
 import { useCreateTenant } from '../../hooks/useTenants';
+import EmergencyContactsEditor, { EmergencyContact } from './EmergencyContactsEditor';
 
 const { Text, Title } = Typography;
-
-interface EmergencyContact {
-  full_name: string;
-  relationship: string;
-  phone_number: string;
-}
 
 interface AddTenantModalProps {
   isOpen: boolean;
@@ -48,6 +41,7 @@ const AddTenantModal: React.FC<AddTenantModalProps> = ({
   onTenantAdded,
 }) => {
   const { t } = useTranslation();
+  const { token } = theme.useToken();
   const [form] = Form.useForm();
   const [error, setError] = useState('');
   const [messageApi, contextHolder] = message.useMessage();
@@ -119,7 +113,7 @@ const AddTenantModal: React.FC<AddTenantModalProps> = ({
       <Modal
         title={
           <Space>
-            <UserOutlined style={{ color: '#1890ff' }} />
+            <UserOutlined style={{ color: token.colorPrimary }} />
             <span>{t('tenants:addTenantModal.title')}</span>
           </Space>
         }
@@ -158,7 +152,7 @@ const AddTenantModal: React.FC<AddTenantModalProps> = ({
                 ]}
                 tooltip={t('tenants:addTenantModal.firstNameTooltip')}
               >
-                <Input prefix={<UserOutlined />} placeholder={t('tenants:addTenantModal.firstNamePlaceholder')} size="large" />
+                <Input prefix={<UserOutlined />} placeholder={t('tenants:addTenantModal.firstNamePlaceholder')} />
               </Form.Item>
             </Col>
 
@@ -172,7 +166,7 @@ const AddTenantModal: React.FC<AddTenantModalProps> = ({
                 ]}
                 tooltip={t('tenants:addTenantModal.lastNameTooltip')}
               >
-                <Input prefix={<UserOutlined />} placeholder={t('tenants:addTenantModal.lastNamePlaceholder')} size="large" />
+                <Input prefix={<UserOutlined />} placeholder={t('tenants:addTenantModal.lastNamePlaceholder')} />
               </Form.Item>
             </Col>
           </Row>
@@ -181,7 +175,6 @@ const AddTenantModal: React.FC<AddTenantModalProps> = ({
             <Col xs={24} md={12}>
               <Form.Item label={t('tenants:addTenantModal.gender')} name="gender">
                 <Select
-                  size="large"
                   placeholder={t('tenants:addTenantModal.selectGender')}
                   allowClear
                   options={[
@@ -199,7 +192,7 @@ const AddTenantModal: React.FC<AddTenantModalProps> = ({
                 rules={[{ type: 'email', message: t('tenants:addTenantModal.emailInvalid') }]}
                 tooltip={t('tenants:addTenantModal.emailTooltip')}
               >
-                <Input prefix={<MailOutlined />} placeholder={t('tenants:addTenantModal.emailPlaceholder')} size="large" />
+                <Input prefix={<MailOutlined />} placeholder={t('tenants:addTenantModal.emailPlaceholder')} />
               </Form.Item>
             </Col>
           </Row>
@@ -219,10 +212,9 @@ const AddTenantModal: React.FC<AddTenantModalProps> = ({
                 tooltip={t('tenants:addTenantModal.phoneNumberTooltip')}
               >
                 <Input
-                  prefix={<><PhoneOutlined /> <span style={{ marginLeft: 8, color: '#666' }}>+255</span></>}
+                  prefix={<><PhoneOutlined /> <Text type="secondary" style={{ marginLeft: 8 }}>+255</Text></>}
                   placeholder={t('tenants:addTenantModal.phoneNumberPlaceholder')}
                   maxLength={9}
-                  size="large"
                 />
               </Form.Item>
             </Col>
@@ -235,89 +227,41 @@ const AddTenantModal: React.FC<AddTenantModalProps> = ({
             </Space>
           </Divider>
 
-          {emergencyContacts.map((contact, index) => (
-            <Card
-              key={index}
-              size="small"
-              style={{ marginBottom: 16 }}
-              extra={
-                <Button
-                  type="text"
-                  danger
-                  size="small"
-                  icon={<DeleteOutlined />}
-                  onClick={() => removeEmergencyContact(index)}
-                >
-                  {t('tenants:addTenantModal.remove')}
-                </Button>
-              }
-            >
-              <Row gutter={16}>
-                <Col xs={24} md={8}>
-                  <Form.Item label={t('tenants:addTenantModal.fullName')} style={{ marginBottom: 8 }}>
-                    <Input
-                      prefix={<UserOutlined />}
-                      placeholder={t('tenants:addTenantModal.fullNamePlaceholder')}
-                      value={contact.full_name}
-                      onChange={(e) => updateEmergencyContact(index, 'full_name', e.target.value)}
-                    />
-                  </Form.Item>
-                </Col>
-                <Col xs={24} md={8}>
-                  <Form.Item label={t('tenants:addTenantModal.relationship')} style={{ marginBottom: 8 }}>
-                    <Select
-                      placeholder={t('tenants:addTenantModal.selectRelationship')}
-                      value={contact.relationship || undefined}
-                      onChange={(value) => updateEmergencyContact(index, 'relationship', value)}
-                      style={{ width: '100%' }}
-                      options={[
-                        { value: 'Parent', label: t('tenants:addTenantModal.relationshipParent') },
-                        { value: 'Friend', label: t('tenants:addTenantModal.relationshipFriend') },
-                        { value: 'Spouse', label: t('tenants:addTenantModal.relationshipSpouse') },
-                        { value: 'Relative', label: t('tenants:addTenantModal.relationshipRelative') },
-                      ]}
-                    />
-                  </Form.Item>
-                </Col>
-                <Col xs={24} md={8}>
-                  <Form.Item label={t('tenants:addTenantModal.phoneLabel')} style={{ marginBottom: 8 }}>
-                    <Input
-                      prefix={<PhoneOutlined />}
-                      placeholder={t('tenants:addTenantModal.phoneNumberPlaceholder')}
-                      value={contact.phone_number}
-                      onChange={(e) =>
-                        updateEmergencyContact(index, 'phone_number', e.target.value)
-                      }
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
-            </Card>
-          ))}
+          <EmergencyContactsEditor
+            contacts={emergencyContacts}
+            onAdd={addEmergencyContact}
+            onRemove={removeEmergencyContact}
+            onChange={updateEmergencyContact}
+            relationshipOptions={[
+              { value: 'Parent', label: t('tenants:addTenantModal.relationshipParent') },
+              { value: 'Friend', label: t('tenants:addTenantModal.relationshipFriend') },
+              { value: 'Spouse', label: t('tenants:addTenantModal.relationshipSpouse') },
+              { value: 'Relative', label: t('tenants:addTenantModal.relationshipRelative') },
+            ]}
+            labels={{
+              fullName: t('tenants:addTenantModal.fullName'),
+              fullNamePlaceholder: t('tenants:addTenantModal.fullNamePlaceholder'),
+              relationship: t('tenants:addTenantModal.relationship'),
+              selectRelationship: t('tenants:addTenantModal.selectRelationship'),
+              phoneNumber: t('tenants:addTenantModal.phoneLabel'),
+              phoneNumberPlaceholder: t('tenants:addTenantModal.phoneNumberPlaceholder'),
+              remove: t('tenants:addTenantModal.remove'),
+              addContact: t('tenants:addTenantModal.addEmergencyContact'),
+            }}
+          />
 
-          <Button
-            type="dashed"
-            onClick={addEmergencyContact}
-            icon={<PlusOutlined />}
-            block
-            style={{ marginBottom: 24 }}
-          >
-            {t('tenants:addTenantModal.addEmergencyContact')}
-          </Button>
-
-          <Divider>
+          <Divider style={{ marginTop: 24 }}>
             <Space>
               <IdcardOutlined />
-              Identification
+              {t('tenants:addTenantModal.identification')}
             </Space>
           </Divider>
 
           <Row gutter={16}>
             <Col xs={24} md={8}>
-              <Form.Item label="ID Type" name="id_type">
+              <Form.Item label={t('tenants:addTenantModal.idType')} name="id_type">
                 <Select
-                  size="large"
-                  placeholder="Select ID type"
+                  placeholder={t('tenants:addTenantModal.selectIdType')}
                   allowClear
                   options={[
                     { value: 'NIDA', label: 'NIDA' },
@@ -330,13 +274,13 @@ const AddTenantModal: React.FC<AddTenantModalProps> = ({
             </Col>
             <Col xs={24} md={16}>
               <Form.Item
-                label="ID Number"
+                label={t('tenants:addTenantModal.idNumber')}
                 name="id_number"
                 rules={[
                   ({ getFieldValue }) => ({
                     validator(_, value) {
                       if (!value && getFieldValue('id_type')) {
-                        return Promise.reject(new Error('Please enter the ID number'));
+                        return Promise.reject(new Error(t('tenants:addTenantModal.idNumberRequired')));
                       }
                       return Promise.resolve();
                     },
@@ -345,8 +289,7 @@ const AddTenantModal: React.FC<AddTenantModalProps> = ({
               >
                 <Input
                   prefix={<IdcardOutlined />}
-                  placeholder="Enter ID number"
-                  size="large"
+                  placeholder={t('tenants:addTenantModal.idNumberPlaceholder')}
                 />
               </Form.Item>
             </Col>
@@ -360,7 +303,6 @@ const AddTenantModal: React.FC<AddTenantModalProps> = ({
                 icon={<CloseOutlined />}
                 onClick={onClose}
                 disabled={createTenantMutation.isPending}
-                size="large"
               >
                 {t('tenants:addTenantModal.cancel')}
               </Button>
@@ -369,7 +311,6 @@ const AddTenantModal: React.FC<AddTenantModalProps> = ({
                 htmlType="submit"
                 icon={<SaveOutlined />}
                 loading={createTenantMutation.isPending}
-                size="large"
               >
                 {createTenantMutation.isPending ? t('tenants:addTenantModal.creatingTenant') : t('tenants:addTenantModal.createTenant')}
               </Button>

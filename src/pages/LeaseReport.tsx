@@ -58,6 +58,7 @@ const LeaseReport: React.FC = () => {
   const { t } = useTranslation();
   const [filterText, setFilterText] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('');
+  const [propertyFilter, setPropertyFilter] = useState<string>('');
   const [paymentStatusFilter, setPaymentStatusFilter] = useState<string>('');
   const [dateRange, setDateRange] = useState<[Dayjs | null, Dayjs | null] | null>(null);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
@@ -81,7 +82,15 @@ const LeaseReport: React.FC = () => {
 
   const { data: leases = [], isLoading, refetch } = useLeaseReport();
 
-  // Filter data based on search, status, and date range
+  // Distinct property names present in the report, for the property filter options
+  const propertyOptions = useMemo(() => {
+    const names = Array.from(
+      new Set(leases.map((item: LeaseData) => item.property).filter(Boolean))
+    ) as string[];
+    return names.sort((a, b) => a.localeCompare(b));
+  }, [leases]);
+
+  // Filter data based on search, status, property, and date range
   const filteredData = useMemo(() => {
     return leases.filter((item: LeaseData) => {
       // Search filter
@@ -96,6 +105,9 @@ const LeaseReport: React.FC = () => {
 
       // Status filter
       const matchesStatus = !statusFilter || item.lease_status?.toLowerCase() === statusFilter.toLowerCase();
+
+      // Property filter
+      const matchesProperty = !propertyFilter || item.property === propertyFilter;
 
       // Payment status filter
       const matchesPaymentStatus = !paymentStatusFilter || item.payment_status?.toLowerCase() === paymentStatusFilter.toLowerCase();
@@ -116,9 +128,9 @@ const LeaseReport: React.FC = () => {
         }
       }
 
-      return matchesSearch && matchesStatus && matchesPaymentStatus && matchesDateRange;
+      return matchesSearch && matchesStatus && matchesProperty && matchesPaymentStatus && matchesDateRange;
     });
-  }, [leases, filterText, statusFilter, paymentStatusFilter, dateRange]);
+  }, [leases, filterText, statusFilter, propertyFilter, paymentStatusFilter, dateRange]);
 
   // Calculate statistics
   const statistics = useMemo(() => {
@@ -171,6 +183,7 @@ const LeaseReport: React.FC = () => {
   const resetFilters = () => {
     setFilterText('');
     setStatusFilter('');
+    setPropertyFilter('');
     setPaymentStatusFilter('');
     setDateRange(null);
     message.success(t('leaseReport:filters.filtersReset'));
@@ -585,6 +598,23 @@ const LeaseReport: React.FC = () => {
             <Col xs={24} sm={12} md={4}>
               <Select
                 style={{ width: '100%' }}
+                placeholder={t('leaseReport:filters.property')}
+                value={propertyFilter}
+                onChange={setPropertyFilter}
+                allowClear
+                showSearch
+                filterOption={(input, option) =>
+                  String(option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                }
+                options={[
+                  { label: t('leaseReport:filters.allProperties'), value: '' },
+                  ...propertyOptions.map((name) => ({ label: name, value: name })),
+                ]}
+              />
+            </Col>
+            <Col xs={24} sm={12} md={4}>
+              <Select
+                style={{ width: '100%' }}
                 placeholder={t('leaseReport:filters.paymentStatus')}
                 value={paymentStatusFilter}
                 onChange={setPaymentStatusFilter}
@@ -598,7 +628,7 @@ const LeaseReport: React.FC = () => {
                 ]}
               />
             </Col>
-            <Col xs={24} sm={12} md={7}>
+            <Col xs={24} sm={12} md={4}>
               <Input
                 placeholder={t('leaseReport:filters.searchPlaceholder')}
                 prefix={<SearchOutlined />}
@@ -607,7 +637,7 @@ const LeaseReport: React.FC = () => {
                 allowClear
               />
             </Col>
-            <Col xs={24} sm={12} md={4}>
+            <Col xs={24} sm={12} md={3}>
               <Button
                 icon={<FilterOutlined />}
                 onClick={resetFilters}
@@ -619,11 +649,12 @@ const LeaseReport: React.FC = () => {
           </Row>
 
           {/* Active Filters Display */}
-          {(filterText || statusFilter || paymentStatusFilter || dateRange) && (
+          {(filterText || statusFilter || propertyFilter || paymentStatusFilter || dateRange) && (
             <Space wrap>
               <Text type="secondary">{t('leaseReport:filters.activeFilters')}</Text>
               {filterText && <Tag closable onClose={() => setFilterText('')}>{t('leaseReport:filters.search')}: {filterText}</Tag>}
               {statusFilter && <Tag closable onClose={() => setStatusFilter('')}>{t('leaseReport:filters.leaseStatus')}: {statusFilter}</Tag>}
+              {propertyFilter && <Tag closable onClose={() => setPropertyFilter('')}>{t('leaseReport:filters.property')}: {propertyFilter}</Tag>}
               {paymentStatusFilter && <Tag closable onClose={() => setPaymentStatusFilter('')}>{t('leaseReport:filters.paymentStatus')}: {paymentStatusFilter}</Tag>}
               {dateRange && (
                 <Tag closable onClose={() => setDateRange(null)}>

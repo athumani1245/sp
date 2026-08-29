@@ -5,6 +5,7 @@ import {
   Card,
   Button,
   Space,
+  Flex,
   Typography,
   Skeleton,
   Alert,
@@ -25,23 +26,15 @@ import {
   PhoneOutlined,
   MailOutlined,
   PhoneFilled,
-  PlusOutlined,
-  DeleteOutlined,
   TeamOutlined,
   IdcardOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useTenant, useUpdateTenant } from '../hooks/useTenants';
-import Chatter from '../components/chatter/Chatter';
 import ChatterLayout from '../components/layout/ChatterLayout';
+import EmergencyContactsEditor, { EmergencyContact } from '../components/forms/EmergencyContactsEditor';
 
 const { Title, Text } = Typography;
-
-interface EmergencyContact {
-  full_name: string;
-  relationship: string;
-  phone_number: string;
-}
 
 const TenantDetail: React.FC = () => {
   const { t } = useTranslation();
@@ -206,7 +199,7 @@ const TenantDetail: React.FC = () => {
       <div>
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
-        <Space style={{ justifyContent: 'space-between', width: '100%' }}>
+        <Flex justify="space-between" align="center" wrap="wrap" gap={16}>
           <Space>
             <Button icon={<ArrowLeftOutlined />} onClick={handleBack}>
               {t('tenants:tenantDetail.back')}
@@ -236,7 +229,7 @@ const TenantDetail: React.FC = () => {
               </>
             )}
           </Space>
-        </Space>
+        </Flex>
       </div>
 
       {/* Tenant Details Form */}
@@ -324,7 +317,7 @@ const TenantDetail: React.FC = () => {
         title={
           <Space>
             <IdcardOutlined />
-            <span>Identification</span>
+            <span>{t('tenants:tenantDetail.identification')}</span>
           </Space>
         }
         style={{ marginTop: 16 }}
@@ -332,9 +325,9 @@ const TenantDetail: React.FC = () => {
         <Form form={form} layout="vertical">
           <Row gutter={16}>
             <Col xs={24} sm={8}>
-              <Form.Item label="ID Type" name="id_type">
+              <Form.Item label={t('tenants:tenantDetail.idType')} name="id_type">
                 <Select
-                  placeholder="Select ID type"
+                  placeholder={t('tenants:tenantDetail.selectIdType')}
                   disabled={!isEditMode}
                   allowClear
                   options={[
@@ -347,10 +340,10 @@ const TenantDetail: React.FC = () => {
               </Form.Item>
             </Col>
             <Col xs={24} sm={16}>
-              <Form.Item label="ID Number" name="id_number">
+              <Form.Item label={t('tenants:tenantDetail.idNumber')} name="id_number">
                 <Input
                   prefix={<IdcardOutlined />}
-                  placeholder="Enter ID number"
+                  placeholder={t('tenants:tenantDetail.idNumberPlaceholder')}
                   disabled={!isEditMode}
                 />
               </Form.Item>
@@ -368,17 +361,6 @@ const TenantDetail: React.FC = () => {
           </Space>
         }
         style={{ marginTop: 16 }}
-        extra={
-          isEditMode && (
-            <Button
-              type="dashed"
-              icon={<PlusOutlined />}
-              onClick={addEmergencyContact}
-            >
-              {t('tenants:tenantDetail.addContact')}
-            </Button>
-          )
-        }
       >
         {isEditMode ? (
           <>
@@ -391,71 +373,30 @@ const TenantDetail: React.FC = () => {
                 style={{ marginBottom: 16 }}
               />
             ) : null}
-            {emergencyContacts.map((contact, index) => (
-              <Card
-                key={index}
-                size="small"
-                style={{ marginBottom: 16 }}
-                extra={
-                  <Button
-                    type="text"
-                    danger
-                    size="small"
-                    icon={<DeleteOutlined />}
-                    onClick={() => removeEmergencyContact(index)}
-                  >
-                    {t('tenants:tenantDetail.remove')}
-                  </Button>
-                }
-              >
-                <Row gutter={16}>
-                  <Col xs={24} md={8}>
-                    <Form.Item label={t('tenants:tenantDetail.fullName')} style={{ marginBottom: 8 }}>
-                      <Input
-                        prefix={<UserOutlined />}
-                        placeholder={t('tenants:tenantDetail.fullNamePlaceholder')}
-                        value={contact.full_name || ''}
-                        onChange={(e) =>
-                          updateEmergencyContact(index, 'full_name', e.target.value)
-                        }
-                      />
-                    </Form.Item>
-                  </Col>
-                  <Col xs={24} md={8}>
-                    <Form.Item label={t('tenants:tenantDetail.relationship')} style={{ marginBottom: 8 }}>
-                      <Select
-                        placeholder={t('tenants:tenantDetail.selectRelationship')}
-                        value={contact.relationship || undefined}
-                        onChange={(value) =>
-                          updateEmergencyContact(index, 'relationship', value)
-                        }
-                        style={{ width: '100%' }}
-                        options={[
-                          { value: 'Parent', label: t('tenants:tenantDetail.relationshipParent') },
-                          { value: 'Friend', label: t('tenants:tenantDetail.relationshipFriend') },
-                          { value: 'Spouse', label: t('tenants:tenantDetail.relationshipSpouse') },
-                          { value: 'Sibling', label: t('tenants:tenantDetail.relationshipSibling') },
-                          { value: 'Relative', label: t('tenants:tenantDetail.relationshipRelative') },
-                          { value: 'Other', label: t('tenants:tenantDetail.relationshipOther') },
-                        ]}
-                      />
-                    </Form.Item>
-                  </Col>
-                  <Col xs={24} md={8}>
-                    <Form.Item label={t('tenants:tenantDetail.phoneNumberLabel')} style={{ marginBottom: 8 }}>
-                      <Input
-                        prefix={<PhoneOutlined />}
-                        placeholder={t('tenants:tenantDetail.phoneNumberPlaceholder')}
-                        value={contact.phone_number || ''}
-                        onChange={(e) =>
-                          updateEmergencyContact(index, 'phone_number', e.target.value)
-                        }
-                      />
-                    </Form.Item>
-                  </Col>
-                </Row>
-              </Card>
-            ))}
+            <EmergencyContactsEditor
+              contacts={emergencyContacts}
+              onAdd={addEmergencyContact}
+              onRemove={removeEmergencyContact}
+              onChange={updateEmergencyContact}
+              relationshipOptions={[
+                { value: 'Parent', label: t('tenants:tenantDetail.relationshipParent') },
+                { value: 'Friend', label: t('tenants:tenantDetail.relationshipFriend') },
+                { value: 'Spouse', label: t('tenants:tenantDetail.relationshipSpouse') },
+                { value: 'Sibling', label: t('tenants:tenantDetail.relationshipSibling') },
+                { value: 'Relative', label: t('tenants:tenantDetail.relationshipRelative') },
+                { value: 'Other', label: t('tenants:tenantDetail.relationshipOther') },
+              ]}
+              labels={{
+                fullName: t('tenants:tenantDetail.fullName'),
+                fullNamePlaceholder: t('tenants:tenantDetail.fullNamePlaceholder'),
+                relationship: t('tenants:tenantDetail.relationship'),
+                selectRelationship: t('tenants:tenantDetail.selectRelationship'),
+                phoneNumber: t('tenants:tenantDetail.phoneNumberLabel'),
+                phoneNumberPlaceholder: t('tenants:tenantDetail.phoneNumberPlaceholder'),
+                remove: t('tenants:tenantDetail.remove'),
+                addContact: t('tenants:tenantDetail.addContact'),
+              }}
+            />
           </>
         ) : (
           <Table

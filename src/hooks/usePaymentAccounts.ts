@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   getPaymentAccounts,
+  getPaymentAccountChoices,
   createPaymentAccount,
   updatePaymentAccount,
   deletePaymentAccount,
@@ -10,12 +11,20 @@ import { message } from 'antd';
 export const paymentAccountKeys = {
   all: ['paymentAccounts'] as const,
   list: () => [...paymentAccountKeys.all, 'list'] as const,
+  choices: () => [...paymentAccountKeys.all, 'choices'] as const,
 };
 
 export const usePaymentAccounts = () => {
   return useQuery({
     queryKey: paymentAccountKeys.list(),
     queryFn: getPaymentAccounts,
+  });
+};
+
+export const usePaymentAccountChoices = () => {
+  return useQuery({
+    queryKey: paymentAccountKeys.choices(),
+    queryFn: getPaymentAccountChoices,
   });
 };
 

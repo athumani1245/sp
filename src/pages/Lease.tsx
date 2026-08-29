@@ -7,7 +7,6 @@ import {
   Tag,
   Button,
   Space,
-  Steps,
   Tabs,
   Modal,
   message,
@@ -21,6 +20,7 @@ import {
   Table,
   Spin,
   Dropdown,
+  theme,
 } from 'antd';
 import type { MenuProps } from 'antd';
 import {
@@ -52,7 +52,6 @@ import RefundPaymentModal from '../components/forms/RefundPaymentModal';
 import RenewLeaseModal from '../components/forms/RenewLeaseModal';
 import TerminateLeaseModal from '../components/forms/TerminateLeaseModal';
 import LeaseDocumentModal from '../features/lease-builder/components/LeaseDocumentModal';
-import Chatter from '../components/chatter/Chatter';
 import ChatterLayout from '../components/layout/ChatterLayout';
 
 const { Title, Text } = Typography;
@@ -102,6 +101,7 @@ const Lease: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
+  const { token } = theme.useToken();
 
   // Use TanStack Query to fetch lease data
   const { data: lease, isLoading: loading, error, refetch } = useLease(leaseId || null);
@@ -138,7 +138,7 @@ const Lease: React.FC = () => {
       setReceipt((prev) => ({ ...prev, loading: false, url, contentType }));
     } catch {
       setReceipt({ open: false, loading: false, url: null, contentType: '', paymentId: null });
-      message.error('Could not load receipt. Please try again.');
+      message.error(t('leases:leaseDetail.receiptLoadFailed'));
     }
   };
 
@@ -164,13 +164,13 @@ const Lease: React.FC = () => {
         const blob = await res.blob();
         const ext = receipt.contentType.includes('pdf') ? 'pdf' : 'html';
         const file = new File([blob], `receipt-${receipt.paymentId}.${ext}`, { type: receipt.contentType });
-        await navigator.share({ files: [file], title: 'Payment Receipt' });
+        await navigator.share({ files: [file], title: t('leases:leaseDetail.receiptTitle') });
       } catch {
         // User cancelled or share not supported for files — fall back to copy link
-        message.info('Sharing not supported on this device. Use Download instead.');
+        message.info(t('leases:leaseDetail.sharingNotSupportedDevice'));
       }
     } else {
-      message.info('Sharing not supported on this browser. Use Download instead.');
+      message.info(t('leases:leaseDetail.sharingNotSupportedBrowser'));
     }
   };
 
@@ -211,11 +211,11 @@ const Lease: React.FC = () => {
       content: (
         <div>
           <p>{t('leases:leaseDetail.cancelLeaseConfirm')}</p>
-          <p style={{ color: '#8c8c8c' }}>
+          <p style={{ color: token.colorTextTertiary }}>
             {t('leases:leaseDetail.cancelLeaseWarning')}
           </p>
           {lease && (
-            <div style={{ marginTop: 16, padding: 12, background: '#f5f5f5', borderRadius: 4 }}>
+            <div style={{ marginTop: 16, padding: 12, background: token.colorFillTertiary, borderRadius: 4 }}>
               <div>
                 <strong>{t('leases:leaseDetail.tenant')}:</strong> {getTenantName(lease)}
               </div>
@@ -338,43 +338,6 @@ const Lease: React.FC = () => {
     return <Tag color={config.color}>{config.text}</Tag>;
   };
 
-  const getStatusStep = (status: string) => {
-    const statusMap: Record<string, number> = {
-      draft: 0,
-      active: 1,
-      expired: 2,
-      cancelled: 2,
-      terminated: 2,
-    };
-    return statusMap[status?.toLowerCase()] || 0;
-  };
-
-  const getStepsItems = (status: string) => {
-    const baseSteps = [
-      { title: t('leases:leaseDetail.draft') },
-      { title: t('leases:leaseDetail.active') },
-      { title: t('leases:leaseDetail.expired') }
-    ];
-
-    if (status === 'cancelled') {
-      return [
-        { title: t('leases:leaseDetail.draft') },
-        { title: t('leases:leaseDetail.active') },
-        { title: t('leases:leaseDetail.cancelled') }
-      ];
-    }
-
-    if (status === 'terminated') {
-      return [
-        { title: t('leases:leaseDetail.draft') },
-        { title: t('leases:leaseDetail.active') },
-        { title: t('leases:leaseDetail.terminated') }
-      ];
-    }
-
-    return baseSteps;
-  };
-
   if (loading) {
     return (
       <div style={{ padding: '24px' }}>
@@ -488,7 +451,7 @@ const Lease: React.FC = () => {
                   <Text type="secondary" style={{ display: 'block', marginBottom: 8 }}>
                     {t('leases:leaseDetail.totalAmount')}
                   </Text>
-                  <Title level={5} style={{ margin: 0, color: '#595959' }}>
+                  <Title level={5} style={{ margin: 0, color: token.colorTextSecondary }}>
                     {formatCurrency(lease.total_amount || 0)}
                   </Title>
                 </div>
@@ -497,7 +460,7 @@ const Lease: React.FC = () => {
                   <Text type="secondary" style={{ display: 'block', marginBottom: 8 }}>
                     {t('leases:leaseDetail.paidAmount')}
                   </Text>
-                  <Title level={5} style={{ margin: 0, color: '#595959' }}>
+                  <Title level={5} style={{ margin: 0, color: token.colorTextSecondary }}>
                     {formatCurrency(lease.amount_paid || 0)}
                   </Title>
                 </div>
@@ -507,7 +470,7 @@ const Lease: React.FC = () => {
                     <Text type="secondary" style={{ display: 'block', marginBottom: 8 }}>
                       {t('leases:leaseDetail.overpaidAmount')}
                     </Text>
-                    <Title level={5} style={{ margin: 0, color: '#595959' }}>
+                    <Title level={5} style={{ margin: 0, color: token.colorTextSecondary }}>
                       {formatCurrency(lease.over_paid_amount || 0)}
                     </Title>
                   </div>
@@ -517,7 +480,7 @@ const Lease: React.FC = () => {
                   <Text type="secondary" style={{ display: 'block', marginBottom: 8 }}>
                     {t('leases:leaseDetail.discount')}
                   </Text>
-                  <Title level={5} style={{ margin: 0, color: '#595959' }}>
+                  <Title level={5} style={{ margin: 0, color: token.colorTextSecondary }}>
                     {formatCurrency(lease.discount || 0)}
                   </Title>
                 </div>
@@ -526,7 +489,7 @@ const Lease: React.FC = () => {
                   <Text type="secondary" style={{ display: 'block', marginBottom: 8 }}>
                     {t('leases:leaseDetail.monthsCovered')}
                   </Text>
-                  <Title level={5} style={{ margin: 0, color: '#595959' }}>
+                  <Title level={5} style={{ margin: 0, color: token.colorTextSecondary }}>
                     {lease.months_covered ?? t('leases:leaseDetail.na')}
                   </Title>
                 </div>
@@ -535,16 +498,16 @@ const Lease: React.FC = () => {
                   <Text type="secondary" style={{ display: 'block', marginBottom: 8 }}>
                     {t('leases:leaseDetail.nextPaymentDate')}
                   </Text>
-                  <Title level={5} style={{ margin: 0, color: '#595959' }}>
+                  <Title level={5} style={{ margin: 0, color: token.colorTextSecondary }}>
                     {lease.next_payment_date ? formatDate(lease.next_payment_date) : t('leases:leaseDetail.na')}
                   </Title>
                 </div>
 
-                <div style={{ borderTop: '2px solid #f0f0f0', paddingTop: 16 }}>
+                <div style={{ borderTop: `2px solid ${token.colorBorderSecondary}`, paddingTop: 16 }}>
                   <Text type="secondary" style={{ display: 'block', marginBottom: 8 }}>
                     {t('leases:leaseDetail.remainingAmount')}
                   </Text>
-                  <Title level={5} style={{ margin: 0, color: '#262626' }}>
+                  <Title level={5} style={{ margin: 0, color: token.colorText }}>
                     {formatCurrency(lease.remaining_amount || 0)}
                   </Title>
                 </div>
@@ -569,7 +532,6 @@ const Lease: React.FC = () => {
                 type="primary"
                 icon={<PlusOutlined />}
                 onClick={() => setShowPaymentModal(true)}
-                style={{ backgroundColor: '#CC5B4B', borderColor: '#CC5B4B' }}
               >
                 {t('leases:leaseDetail.addPayment')}
               </Button>
@@ -781,7 +743,7 @@ const Lease: React.FC = () => {
                   {formatCurrency(originalLease.total_amount)}
                 </Descriptions.Item>
                 <Descriptions.Item label={t('leases:leaseDetail.amountPaid')}>
-                  <Text style={{ color: '#52c41a' }}>
+                  <Text type="success">
                     {formatCurrency(originalLease.amount_paid)}
                   </Text>
                 </Descriptions.Item>
@@ -790,12 +752,11 @@ const Lease: React.FC = () => {
                 </Descriptions.Item>
                 <Descriptions.Item label={t('leases:leaseDetail.remainingBalance')}>
                   <Text
-                    style={{
-                      color:
-                        (originalLease.remaining_amount || originalLease.total_amount - originalLease.amount_paid) > 0
-                          ? '#ff4d4f'
-                          : '#52c41a',
-                    }}
+                    type={
+                      (originalLease.remaining_amount || originalLease.total_amount - originalLease.amount_paid) > 0
+                        ? 'danger'
+                        : 'success'
+                    }
                   >
                     {formatCurrency(originalLease.remaining_amount || originalLease.total_amount - originalLease.amount_paid)}
                   </Text>
@@ -894,7 +855,7 @@ const Lease: React.FC = () => {
                       {t('leases:leases.cancel')}
                     </Button>
                   )}
-                { (
+                {hasPermission('can_delete_lease') && (
                   <Button
                     danger
                     size="small"
@@ -925,7 +886,6 @@ const Lease: React.FC = () => {
         activeKey={activeTab}
         onChange={setActiveTab}
         items={visibleTabItems}
-        size="large"
       />
 
       {/* Add Payment Modal */}
@@ -979,18 +939,18 @@ const Lease: React.FC = () => {
       <Modal
         open={receipt.open}
         onCancel={handleCloseReceipt}
-        title="Payment Receipt"
+        title={t('leases:leaseDetail.receiptTitle')}
         width={820}
         style={{ top: 20 }}
         styles={{ body: { padding: 0, height: '75vh', display: 'flex', flexDirection: 'column' } }}
         footer={
           <Space>
-            <Button onClick={handleCloseReceipt}>Close</Button>
+            <Button onClick={handleCloseReceipt}>{t('common:common.close')}</Button>
             <Button icon={<DownloadOutlined />} onClick={handleDownloadReceipt} disabled={!receipt.url}>
-              Download
+              {t('leases:leaseDetail.download')}
             </Button>
             <Button icon={<ShareAltOutlined />} type="primary" onClick={handleShareReceipt} disabled={!receipt.url}>
-              Share
+              {t('leases:leaseDetail.share')}
             </Button>
           </Space>
         }
@@ -998,13 +958,13 @@ const Lease: React.FC = () => {
       >
         {receipt.loading ? (
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-            <Spin size="large" tip="Loading receipt..." />
+            <Spin size="large" tip={t('leases:leaseDetail.loadingReceipt')} />
           </div>
         ) : receipt.url ? (
           <iframe
             src={receipt.url}
             style={{ flex: 1, width: '100%', height: '100%', border: 'none' }}
-            title="Payment Receipt"
+            title={t('leases:leaseDetail.receiptTitle')}
           />
         ) : null}
       </Modal>

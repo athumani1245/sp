@@ -12,12 +12,13 @@ import {
   Col,
   Statistic,
   Typography,
-  Modal,
   Select,
   Tooltip,
   Skeleton,
   Tour,
   Grid,
+  Divider,
+  Empty,
 } from 'antd';
 import type { TourProps } from 'antd';
 import {
@@ -25,18 +26,14 @@ import {
   SearchOutlined,
   ReloadOutlined,
   FileTextOutlined,
-  DollarOutlined,
-  HomeOutlined,
   CalendarOutlined,
-  WarningOutlined,
-  EyeOutlined,
-  DeleteOutlined,
   UserOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import AddLeaseModal from '../components/forms/AddLeaseModal';
+import GuideVideoButton from '../components/GuideVideoButton';
 import MobileLeasesList from '../components/mobile/MobileLeasesList';
-import { useLeases, useDeleteLease } from '../hooks/useLeases';
+import { useLeases } from '../hooks/useLeases';
 import { useTour } from '../hooks/useTour';
 import { useAuth } from '../context/AuthContext';
 import dayjs from 'dayjs';
@@ -80,8 +77,6 @@ const Leases: React.FC = () => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
-  const [selectedLease, setSelectedLease] = useState<Lease | null>(null);
 
   // Tour refs
   const addButtonRef = useRef(null);
@@ -119,9 +114,6 @@ const Leases: React.FC = () => {
     limit: pageSize,
   });
 
-  // Delete mutation
-  const deleteMutation = useDeleteLease();
-
   const handleSearch = (value: string) => {
     setSearch(value);
     setPage(1);
@@ -139,19 +131,6 @@ const Leases: React.FC = () => {
 
   const handleViewLease = (leaseId: string) => {
     navigate(`/leases/${leaseId}`);
-  };
-
-  const handleDeleteClick = (lease: Lease) => {
-    setSelectedLease(lease);
-    setDeleteModalVisible(true);
-  };
-
-  const handleDeleteConfirm = async () => {
-    if (selectedLease) {
-      await deleteMutation.mutateAsync(selectedLease.id);
-      setDeleteModalVisible(false);
-      setSelectedLease(null);
-    }
   };
 
   const handleLeaseAdded = () => {
@@ -293,54 +272,56 @@ const Leases: React.FC = () => {
             </Title>
           </Col>
           <Col xs={24} sm={12} style={{ textAlign: 'right', marginTop: window.innerWidth < 576 ? 16 : 0 }}>
-            <div ref={addButtonRef}>
-              {hasPermission('can_create_lease') && (
-                <Button type="primary" icon={<PlusOutlined />} onClick={() => setShowAddModal(true)}>
-                  {t('leases:leases.addLease')}
-                </Button>
-              )}
-            </div>
+            <Space>
+              <GuideVideoButton url="https://www.youtube.com/watch?v=i5UV8moMk7g" />
+              <div ref={addButtonRef}>
+                {hasPermission('can_create_lease') && (
+                  <Button type="primary" icon={<PlusOutlined />} onClick={() => setShowAddModal(true)}>
+                    {t('leases:leases.addLease')}
+                  </Button>
+                )}
+              </div>
+            </Space>
           </Col>
         </Row>
 
 
-        {/* Filters */}
-        <Card ref={filtersRef}>
-          <Row gutter={[16, 16]} align="middle">
-            <Col xs={24} sm={24} md={12} lg={10}>
-              <Search
-                placeholder={t('leases:leases.searchPlaceholder')}
-                allowClear
-                onSearch={handleSearch}
-                style={{ width: '100%' }}
-                prefix={<SearchOutlined />}
-              />
-            </Col>
-            <Col xs={12} sm={8} md={6} lg={4}>
-              <Select
-                placeholder={t('leases:leases.filterByStatus')}
-                allowClear
-                style={{ width: '100%' }}
-                value={statusFilter || undefined}
-                onChange={handleStatusChange}
-              >
-                <Select.Option value="active">{t('leases:leases.active')}</Select.Option>
-                <Select.Option value="expired">{t('leases:leases.expired')}</Select.Option>
-                <Select.Option value="terminated">{t('leases:leases.terminated')}</Select.Option>
-                <Select.Option value="cancelled">{t('leases:leases.cancelled')}</Select.Option>
-                <Select.Option value="draft">{t('leases:leases.draft')}</Select.Option>
-              </Select>
-            </Col>
-            <Col xs={12} sm={8} md={6} lg={4}>
-              <Button icon={<ReloadOutlined />} onClick={() => refetch()} style={{ width: '100%' }}>
-                {t('leases:leases.refresh')}
-              </Button>
-            </Col>
-          </Row>
-        </Card>
-
-        {/* Leases Table */}
+        {/* Leases */}
         <Card ref={tableRef}>
+          <div ref={filtersRef}>
+            <Row gutter={[16, 16]} align="middle">
+              <Col xs={24} sm={24} md={12} lg={10}>
+                <Search
+                  placeholder={t('leases:leases.searchPlaceholder')}
+                  allowClear
+                  onSearch={handleSearch}
+                  style={{ width: '100%' }}
+                  prefix={<SearchOutlined />}
+                />
+              </Col>
+              <Col xs={12} sm={8} md={6} lg={4}>
+                <Select
+                  placeholder={t('leases:leases.filterByStatus')}
+                  allowClear
+                  style={{ width: '100%' }}
+                  value={statusFilter || undefined}
+                  onChange={handleStatusChange}
+                >
+                  <Select.Option value="active">{t('leases:leases.active')}</Select.Option>
+                  <Select.Option value="expired">{t('leases:leases.expired')}</Select.Option>
+                  <Select.Option value="terminated">{t('leases:leases.terminated')}</Select.Option>
+                  <Select.Option value="cancelled">{t('leases:leases.cancelled')}</Select.Option>
+                  <Select.Option value="draft">{t('leases:leases.draft')}</Select.Option>
+                </Select>
+              </Col>
+              <Col xs={12} sm={8} md={6} lg={4}>
+                <Button icon={<ReloadOutlined />} onClick={() => refetch()} style={{ width: '100%' }}>
+                  {t('leases:leases.refresh')}
+                </Button>
+              </Col>
+            </Row>
+          </div>
+          <Divider style={{ marginBlock: 16 }} />
           {isLoading ? (
             <div>
               <Skeleton active paragraph={{ rows: 2 }} style={{ marginBottom: 16 }} />
@@ -366,6 +347,20 @@ const Leases: React.FC = () => {
                 onClick: () => handleViewLease(record.id),
                 style: { cursor: 'pointer' },
               })}
+              locale={{
+                emptyText: (
+                  <Empty
+                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                    description={
+                      <>
+                        <Text strong>{t('leases:leases.emptyTitle')}</Text>
+                        <br />
+                        <Text type="secondary">{t('leases:leases.emptyDescription')}</Text>
+                      </>
+                    }
+                  />
+                ),
+              }}
             />
           ) : (
             <MobileLeasesList
@@ -383,28 +378,10 @@ const Leases: React.FC = () => {
         onSuccess={handleLeaseAdded}
       />
 
-      {/* Delete Confirmation Modal */}
-      <Modal
-        title={t('leases:leases.deleteLease')}
-        open={deleteModalVisible}
-        onOk={handleDeleteConfirm}
-        onCancel={() => {
-          setDeleteModalVisible(false);
-          setSelectedLease(null);
-        }}
-        okText={t('leases:leases.delete')}
-        cancelText={t('leases:leases.cancel')}
-        okButtonProps={{ danger: true, loading: deleteMutation.isPending }}
-      >
-        <p>
-          {t('leases:leases.deleteLeaseConfirm', { leaseNumber: selectedLease?.lease_number })}
-        </p>
-      </Modal>
-
       {/* Tour */}
       <Tour
         open={tourOpen}
-        onClose={() => setTourOpen(false)}
+        onClose={markTourCompleted}
         onFinish={markTourCompleted}
         steps={tourSteps}
       />

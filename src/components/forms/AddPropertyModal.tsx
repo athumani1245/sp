@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Form, Input, Select, Row, Col, message, Spin } from 'antd';
+import { Modal, Form, Input, Select, Row, Col, message, Spin, theme } from 'antd';
 import { BankOutlined, InfoCircleOutlined, EnvironmentOutlined, IdcardOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useRegions, useDistricts, useWards, useAddProperty } from '../../hooks/useProperties';
 import { usePropertyManagers } from '../../hooks/usePropertyManagers';
+import { usePaymentAccountChoices } from '../../hooks/usePaymentAccounts';
 
 interface Region {
   region_code: string;
@@ -39,6 +40,7 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
   onPropertyAdded,
 }) => {
   const { t } = useTranslation();
+  const { token } = theme.useToken();
   const [form] = Form.useForm();
   const [selectedRegion, setSelectedRegion] = useState<string>();
   const [selectedDistrict, setSelectedDistrict] = useState<string>();
@@ -48,6 +50,7 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
   const { data: districts, isLoading: districtsLoading } = useDistricts(selectedRegion || '');
   const { data: wards, isLoading: wardsLoading } = useWards(selectedDistrict || '');
   const { data: managersData, isLoading: managersLoading } = usePropertyManagers({ limit: 100 });
+  const { data: paymentAccountChoices, isLoading: paymentAccountsLoading } = usePaymentAccountChoices();
   const addPropertyMutation = useAddProperty();
 
   const managersList = Array.isArray(managersData?.items) ? managersData?.items : [];
@@ -91,7 +94,7 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
     <Modal
       title={
         <span>
-          <BankOutlined style={{ color: '#CC5B4B', marginRight: 8 }} />
+          <BankOutlined style={{ color: token.colorPrimary, marginRight: 8 }} />
           {t('properties:addPropertyModal.title')}
         </span>
       }
@@ -102,9 +105,6 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
       okText={t('properties:addPropertyModal.addProperty')}
       cancelText={t('properties:addPropertyModal.cancel')}
       width={800}
-      okButtonProps={{
-        style: { backgroundColor: '#CC5B4B', borderColor: '#CC5B4B' },
-      }}
     >
       <Spin spinning={locationLoading}>
         <Form
@@ -119,10 +119,10 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
           <div
             style={{
               fontSize: '14px',
-              fontWeight: 600,
+              fontWeight: 500,
               marginBottom: '16px',
-              color: '#CC5B4B',
-              borderBottom: '2px solid #f0f0f0',
+              color: token.colorPrimary,
+              borderBottom: `2px solid ${token.colorBorderSecondary}`,
               paddingBottom: '8px',
             }}
           >
@@ -188,11 +188,11 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
           <div
             style={{
               fontSize: '14px',
-              fontWeight: 600,
+              fontWeight: 500,
               marginTop: '24px',
               marginBottom: '16px',
-              color: '#CC5B4B',
-              borderBottom: '2px solid #f0f0f0',
+              color: token.colorPrimary,
+              borderBottom: `2px solid ${token.colorBorderSecondary}`,
               paddingBottom: '8px',
             }}
           >
@@ -288,6 +288,48 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
                 tooltip={t('properties:addPropertyModal.streetAddressTooltip')}
               >
                 <Input placeholder={t('properties:addPropertyModal.streetAddressPlaceholder')} prefix={<EnvironmentOutlined />} />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          {/* Bank Account Information Section */}
+          <div
+            style={{
+              fontSize: '14px',
+              fontWeight: 500,
+              marginTop: '24px',
+              marginBottom: '16px',
+              color: token.colorPrimary,
+              borderBottom: `2px solid ${token.colorBorderSecondary}`,
+              paddingBottom: '8px',
+            }}
+          >
+            <IdcardOutlined style={{ marginRight: 8 }} />
+            {t('properties:addPropertyModal.bankAccountInformation')}
+          </div>
+
+          <Row gutter={16}>
+            <Col xs={24}>
+              <Form.Item
+                label={t('properties:addPropertyModal.bankAccount')}
+                name="payment_accounts"
+                tooltip={t('properties:addPropertyModal.bankAccountTooltip')}
+              >
+                <Select
+                  mode="multiple"
+                  placeholder={t('properties:addPropertyModal.bankAccountPlaceholder')}
+                  allowClear
+                  showSearch
+                  loading={paymentAccountsLoading}
+                  filterOption={(input, option) =>
+                    String(option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                  }
+                  options={(paymentAccountChoices || []).map((acc) => ({
+                    value: acc.id,
+                    label: `${acc.account_name} - ${acc.provider} (${acc.payment_number})`,
+                  }))}
+                  notFoundContent={t('properties:addPropertyModal.noBankAccountsAvailable')}
+                />
               </Form.Item>
             </Col>
           </Row>

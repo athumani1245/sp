@@ -5,6 +5,7 @@ import {
   Card,
   Button,
   Space,
+  Flex,
   Tag,
   Typography,
   Skeleton,
@@ -38,17 +39,20 @@ import type { ColumnsType } from 'antd/es/table';
 import { useQueryClient } from '@tanstack/react-query';
 import { useProperty, useUpdateProperty, useDeleteProperty, usePropertyUnits, useDeletePropertyUnit, useRegions, useDistricts, useWards } from '../hooks/useProperties';
 import { usePropertyManagers } from '../hooks/usePropertyManagers';
+import { usePaymentAccountChoices } from '../hooks/usePaymentAccounts';
 import { useLeases, leaseKeys } from '../hooks/useLeases';
 import { getLeases } from '../services/leaseService';
 import { useAuth } from '../context/AuthContext';
 import AddUnitModal from '../components/forms/AddUnitModal';
 import EditUnitModal from '../components/forms/EditUnitModal';
-import Chatter from '../components/chatter/Chatter';
 import ChatterLayout from '../components/layout/ChatterLayout';
 import dayjs from 'dayjs';
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
+
+const getPaymentAccountIds = (property: any): string[] =>
+  (property?.payment_accounts || []).map((acc: any) => (typeof acc === 'string' ? acc : acc.id));
 
 interface Unit {
   id: string;
@@ -93,6 +97,59 @@ const PropertyManagerField: React.FC<{ isEditMode: boolean; property: any }> = (
           value: mgr.id,
           label: `${mgr.first_name} ${mgr.last_name} (${mgr.username})`,
         }))}
+      />
+    </Form.Item>
+  );
+};
+
+// Sub-component for bank account field (view/edit)
+const BankAccountField: React.FC<{ isEditMode: boolean; property: any }> = ({ isEditMode, property }) => {
+  const { t } = useTranslation();
+  const { data: paymentAccountChoices, isLoading: paymentAccountsLoading } = usePaymentAccountChoices();
+
+  const options = (paymentAccountChoices || []).map((acc) => ({
+    value: acc.id,
+    label: `${acc.account_name} - ${acc.provider} (${acc.payment_number})`,
+  }));
+
+  if (!isEditMode) {
+    const accounts: any[] = property.payment_accounts || [];
+    const labels = accounts.map((acc) =>
+      typeof acc === 'string'
+        ? options.find((o) => o.value === acc)?.label || acc
+        : `${acc.account_name} - ${acc.provider} (${acc.payment_number})`
+    );
+    return (
+      <Form.Item label={t('properties:propertyDetail.bankAccount')}>
+        {labels.length > 0 ? (
+          <Space wrap>
+            {labels.map((label, idx) => (
+              <Tag key={idx} icon={<BankOutlined />}>{label}</Tag>
+            ))}
+          </Space>
+        ) : (
+          <Input value="-" disabled prefix={<BankOutlined />} />
+        )}
+      </Form.Item>
+    );
+  }
+
+  return (
+    <Form.Item
+      label={t('properties:propertyDetail.bankAccount')}
+      name="payment_accounts"
+    >
+      <Select
+        mode="multiple"
+        placeholder={t('properties:propertyDetail.selectBankAccount')}
+        allowClear
+        showSearch
+        loading={paymentAccountsLoading}
+        filterOption={(input, option) =>
+          String(option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+        }
+        options={options}
+        notFoundContent={t('properties:propertyDetail.noBankAccountsAvailable')}
       />
     </Form.Item>
   );
@@ -152,21 +209,6 @@ const PropertyDetail: React.FC = () => {
     }
   }, [id, queryClient]);
 
-  // Debug logging
-  useEffect(() => {
-    if (unitsData) {
-      console.log('Units Data:', unitsData);
-      console.log('Units Items:', units);
-    }
-    if (unitsError) {
-      console.error('Units Error:', unitsError);
-    }
-    if (leasesData) {
-      console.log('All Leases:', leasesData.items?.length || 0);
-      console.log('Filtered Leases for Property:', leases.length);
-    }
-  }, [unitsData, units, unitsError, leasesData, leases]);
-
   // Update form when property data loads
   useEffect(() => {
     if (property) {
@@ -188,6 +230,7 @@ const PropertyDetail: React.FC = () => {
         region: regionCode,
         street: property.address?.street,
         manager_id: property.managers?.id || property.manager?.id || property.manager_id || undefined,
+        payment_accounts: getPaymentAccountIds(property),
       });
       // Set selected region for cascading dropdowns
       if (regionCode && regionCode !== selectedRegion) {
@@ -280,6 +323,7 @@ const PropertyDetail: React.FC = () => {
         ward: wardCode,
         street: property.address?.street,
         manager_id: property.managers?.id || property.manager?.id || property.manager_id || undefined,
+        payment_accounts: getPaymentAccountIds(property),
       });
       if (regionCode) setSelectedRegion(regionCode);
       if (districtCode) setSelectedDistrict(districtCode);
@@ -512,28 +556,28 @@ const PropertyDetail: React.FC = () => {
       width: 150,
     },
     {
-      title: 'Rent Amount',
+      title: t('properties:propertyDetail.rentAmount'),
       dataIndex: 'total_amount',
       key: 'total_amount',
       render: (amount: number) => <Text>{formatCurrency(amount)}</Text>,
       width: 130,
     },
     {
-      title: 'Amount Paid',
+      title: t('properties:propertyDetail.amountPaid'),
       dataIndex: 'amount_paid',
       key: 'amount_paid',
       render: (amount: number) => <Text type="success">{formatCurrency(amount)}</Text>,
       width: 130,
     },
     {
-      title: 'Status',
+      title: t('properties:propertyDetail.status'),
       dataIndex: 'status',
       key: 'status',
       render: (status: string) => getLeaseStatusTag(status),
       width: 100,
     },
     {
-      title: 'Actions',
+      title: t('properties:propertyDetail.actions'),
       key: 'actions',
       render: (_, record) => (
         <Button
@@ -581,7 +625,7 @@ const PropertyDetail: React.FC = () => {
           {t('properties:propertyDetail.back')}
         </Button>
         <Alert
-          title={t('common:common.error')}
+          message={t('common:common.error')}
           description={t('properties:propertyDetail.propertyNotFound')}
           type="error"
           showIcon
@@ -595,7 +639,7 @@ const PropertyDetail: React.FC = () => {
       <div>
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
-        <Space style={{ justifyContent: 'space-between', width: '100%' }}>
+        <Flex justify="space-between" align="center" wrap="wrap" gap={16}>
           <Space>
             <Button icon={<ArrowLeftOutlined />} onClick={handleBack}>
               {t('properties:propertyDetail.back')}
@@ -639,7 +683,7 @@ const PropertyDetail: React.FC = () => {
               </>
             )}
           </Space>
-        </Space>
+        </Flex>
       </div>
 
       {/* Tabs */}
@@ -815,6 +859,12 @@ const PropertyDetail: React.FC = () => {
                       <PropertyManagerField isEditMode={isEditMode} property={property} />
                     </Col>
                   </Row>
+
+                  <Row gutter={16}>
+                    <Col xs={24} sm={12}>
+                      <BankAccountField isEditMode={isEditMode} property={property} />
+                    </Col>
+                  </Row>
                 </Form>
               ),
             },
@@ -845,14 +895,14 @@ const PropertyDetail: React.FC = () => {
                     </div>
                   ) : unitsError ? (
                     <Alert
-                      title={t('properties:propertyDetail.errorLoadingUnits')}
+                      message={t('properties:propertyDetail.errorLoadingUnits')}
                       description={t('properties:propertyDetail.errorLoadingUnitsDesc')}
                       type="error"
                       showIcon
                     />
                   ) : units.length === 0 ? (
                     <Alert
-                      title={t('properties:propertyDetail.noUnitsFound')}
+                      message={t('properties:propertyDetail.noUnitsFound')}
                       description={t('properties:propertyDetail.noUnitsFoundDesc')}
                       type="info"
                       showIcon
@@ -885,14 +935,14 @@ const PropertyDetail: React.FC = () => {
                     </div>
                   ) : leasesError ? (
                     <Alert
-                      title={t('properties:propertyDetail.errorLoadingLeases')}
+                      message={t('properties:propertyDetail.errorLoadingLeases')}
                       description={t('properties:propertyDetail.errorLoadingLeasesDesc')}
                       type="error"
                       showIcon
                     />
                   ) : leases.length === 0 ? (
                     <Alert
-                      title={t('properties:propertyDetail.noLeasesFound')}
+                      message={t('properties:propertyDetail.noLeasesFound')}
                       description={t('properties:propertyDetail.noLeasesFoundDesc')}
                       type="info"
                       showIcon

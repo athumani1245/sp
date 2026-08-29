@@ -43,6 +43,7 @@ import {
   getBillingHistory,
 } from '../services/subscriptionService';
 import { useTranslation } from 'react-i18next';
+import GuideVideoButton from '../components/GuideVideoButton';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -394,9 +395,16 @@ const Subscription: React.FC = () => {
       <div style={{ padding: '24px' }}>
         {/* Header */}
         <div style={{ marginBottom: '24px' }}>
-          <Title level={2}>
-            <CreditCardOutlined /> {t('subscription:title')}
-          </Title>
+          <Row justify="space-between" align="middle" gutter={[16, 16]}>
+            <Col xs={24} sm={12}>
+              <Title level={2} style={{ margin: 0 }}>
+                <CreditCardOutlined /> {t('subscription:title')}
+              </Title>
+            </Col>
+            <Col xs={24} sm={12} style={{ textAlign: 'right' }}>
+              <GuideVideoButton url="https://www.youtube.com/watch?v=6-OCAfqK6Rg" />
+            </Col>
+          </Row>
           <Text type="secondary">{t('subscription:subtitle')}</Text>
         </div>
 

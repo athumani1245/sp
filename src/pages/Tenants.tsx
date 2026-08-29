@@ -16,6 +16,9 @@ import {
   Col,
   Tour,
   Grid,
+  Divider,
+  Empty,
+  theme,
 } from 'antd';
 import type { TourProps } from 'antd';
 import {
@@ -31,6 +34,7 @@ import {
 } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import AddTenantModal from '../components/forms/AddTenantModal';
+import GuideVideoButton from '../components/GuideVideoButton';
 import MobileTenantsList from '../components/mobile/MobileTenantsList';
 import { useTenants, useDeleteTenant } from '../hooks/useTenants';
 import { useTour } from '../hooks/useTour';
@@ -53,6 +57,7 @@ interface Tenant {
 
 const Tenants: React.FC = () => {
   const { t } = useTranslation();
+  const { token } = theme.useToken();
   const navigate = useNavigate();
   const screens = useBreakpoint();
   const [messageApi, contextHolder] = message.useMessage();
@@ -148,7 +153,7 @@ const Tenants: React.FC = () => {
       key: 'name',
       render: (_, record) => (
         <Space>
-          <UserOutlined style={{ color: '#CC5B4B' }} />
+          <UserOutlined style={{ color: token.colorTextTertiary }} />
           <Text strong>
             {record.first_name} {record.last_name}
           </Text>
@@ -193,8 +198,9 @@ const Tenants: React.FC = () => {
       title: t('tenants:tenants.emergencyContacts'),
       dataIndex: 'emergency_contacts',
       key: 'emergency_contacts',
+      align: 'right',
       render: (contacts) => (
-        <Text>{contacts?.length || 0}</Text>
+        <Text style={{ fontVariantNumeric: 'tabular-nums' }}>{contacts?.length || 0}</Text>
       ),
     },
     {
@@ -204,8 +210,8 @@ const Tenants: React.FC = () => {
         <Space size="small">
           <Tooltip title={t('tenants:tenants.viewDetails')}>
             <Button
-              type="link"
-              icon={<EyeOutlined />}
+              type="text"
+              icon={<EyeOutlined style={{ color: token.colorTextSecondary }} />}
               onClick={(e) => {
                 e.stopPropagation();
                 handleViewTenant(record.id);
@@ -214,7 +220,7 @@ const Tenants: React.FC = () => {
           </Tooltip>
           <Tooltip title={t('tenants:tenants.delete')}>
             <Button
-              type="link"
+              type="text"
               danger
               icon={<DeleteOutlined />}
               onClick={(e) => {
@@ -242,38 +248,38 @@ const Tenants: React.FC = () => {
               </Title>
             </Col>
             <Col xs={24} sm={12} style={{ textAlign: 'right' }}>
-              <div ref={addButtonRef}>
-                {hasPermission('can_add_tenant') && (
-                  <Button
-                    type="primary"
-                    icon={<PlusOutlined />}
-                    onClick={() => setShowAddModal(true)}
-                    size="large"
-                  >
-                    {t('tenants:tenants.addNewTenant')}
-                  </Button>
-                )}
-              </div>
+              <Space>
+                <GuideVideoButton url="https://www.youtube.com/watch?v=hjqJ7i2aLg0" />
+                <div ref={addButtonRef}>
+                  {hasPermission('can_add_tenant') && (
+                    <Button
+                      type="primary"
+                      icon={<PlusOutlined />}
+                      onClick={() => setShowAddModal(true)}
+                    >
+                      {t('tenants:tenants.addNewTenant')}
+                    </Button>
+                  )}
+                </div>
+              </Space>
             </Col>
           </Row>
           <Text type="secondary">{t('tenants:tenants.subtitle')}</Text>
         </Space>
       </div>
 
-      {/* Search Section */}
-      <Card style={{ marginBottom: '16px' }} ref={searchRef}>
-        <Search
-          placeholder={t('tenants:tenants.searchPlaceholder')}
-          allowClear
-          prefix={<SearchOutlined />}
-          size="large"
-          onSearch={handleSearch}
-          style={{ width: '100%', maxWidth: 400 }}
-        />
-      </Card>
-
-      {/* Tenants Table */}
+      {/* Tenants */}
       <Card ref={tableRef}>
+        <div ref={searchRef}>
+          <Search
+            placeholder={t('tenants:tenants.searchPlaceholder')}
+            allowClear
+            prefix={<SearchOutlined />}
+            onSearch={handleSearch}
+            style={{ width: '100%', maxWidth: 400 }}
+          />
+        </div>
+        <Divider style={{ marginBlock: 16 }} />
         {isLoading ? (
           <div>
             <Skeleton active paragraph={{ rows: 2 }} style={{ marginBottom: 16 }} />
@@ -297,6 +303,20 @@ const Tenants: React.FC = () => {
               onClick: () => handleViewTenant(record.id),
               style: { cursor: 'pointer' },
             })}
+            locale={{
+              emptyText: (
+                <Empty
+                  image={Empty.PRESENTED_IMAGE_SIMPLE}
+                  description={
+                    <>
+                      <Text strong>{t('tenants:tenants.emptyTitle')}</Text>
+                      <br />
+                      <Text type="secondary">{t('tenants:tenants.emptyDescription')}</Text>
+                    </>
+                  }
+                />
+              ),
+            }}
           />
         ) : (
           <MobileTenantsList
@@ -317,7 +337,7 @@ const Tenants: React.FC = () => {
       {/* Tour */}
       <Tour
         open={tourOpen}
-        onClose={() => setTourOpen(false)}
+        onClose={markTourCompleted}
         onFinish={markTourCompleted}
         steps={tourSteps}
       />

@@ -28,6 +28,7 @@ import PendingPaymentsReport from './pages/PendingPaymentsReport';
 import Profile from './pages/Profile';
 import Subscription from './pages/Subscription';
 import PropertyManagers from './pages/PropertyManagers';
+import Expenses from './pages/Expenses';
 import LeaseTemplatesPage from './features/lease-builder/pages/LeaseTemplatesPage';
 import TemplateBuilderPage from './features/lease-builder/pages/TemplateBuilderPage';
 import LeaseGeneratorPage from './features/lease-builder/pages/LeaseGeneratorPage';
@@ -52,6 +53,37 @@ function App() {
           token: {
             colorPrimary: '#CC5B4B',
             fontFamily: "'Host Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+            // Enterprise density: controls default to 36px, cards/panels to a slightly
+            // larger radius than inputs/buttons.
+            controlHeight: 36,
+            fontSize: 14,
+            borderRadius: 6,
+            borderRadiusLG: 12,
+            fontWeightStrong: 500, // antd defaults this to 600; spec caps weight at 500
+            // Hairline borders (no equivalent existed before — flagged for review)
+            colorBorder: 'rgba(0,0,0,0.18)',
+            colorBorderSecondary: 'rgba(0,0,0,0.10)',
+          },
+          components: {
+            Button: {
+              fontWeight: 500,
+            },
+            Card: {
+              headerFontSize: 15,
+              headerFontSizeSM: 14,
+            },
+            Form: {
+              labelFontSize: 13,
+              itemMarginBottom: 16,
+            },
+            Table: {
+              cellPaddingBlock: 12,
+              cellPaddingInline: 16,
+              borderColor: 'rgba(0,0,0,0.10)',
+              // Reuses the app's existing brand-tint hover convention (see sidebar menu
+              // hover in layout.css) instead of antd's default gray row hover.
+              rowHoverBg: 'rgba(204, 91, 75, 0.05)',
+            },
           },
         }}
       >
@@ -81,6 +113,9 @@ function App() {
             <Route path="/leases" element={<PrivateRoute><MainLayout /></PrivateRoute>}>
               <Route index element={<SubscriptionGate><Leases /></SubscriptionGate>} />
               <Route path=":id" element={<SubscriptionGate><Lease /></SubscriptionGate>} />
+            </Route>
+            <Route path="/expenses" element={<PrivateRoute><MainLayout /></PrivateRoute>}>
+              <Route index element={<SubscriptionGate><Expenses /></SubscriptionGate>} />
             </Route>
             <Route path="/lease-builder" element={<PrivateRoute><MainLayout /></PrivateRoute>}>
               <Route index element={<SubscriptionGate><LeaseTemplatesPage /></SubscriptionGate>} />

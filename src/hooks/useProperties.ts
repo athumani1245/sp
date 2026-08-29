@@ -7,6 +7,7 @@ import {
   updateProperty,
   deleteProperty,
   getAvailableUnits,
+  getUnitChoices,
   getPropertyUnits,
   addPropertyUnit,
   updatePropertyUnit,
@@ -152,6 +153,14 @@ export const useAvailableUnits = (params: any = {}) => {
     queryKey: propertyKeys.availableUnits(params),
     queryFn: () => getAvailableUnits(params),
     enabled: !!params.property,
+  });
+};
+
+// Fetches unit choices across every property (no property filter) - for standalone unit pickers
+export const useUnitChoices = () => {
+  return useQuery({
+    queryKey: ['unitChoices'],
+    queryFn: getUnitChoices,
   });
 };
 
