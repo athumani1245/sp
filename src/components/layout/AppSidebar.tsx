@@ -10,6 +10,7 @@ import {
   LockOutlined,
   IdcardOutlined,
   FileProtectOutlined,
+  WalletOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import type { MenuProps } from 'antd';
@@ -84,6 +85,9 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ collapsed, isMobile = false }) 
 
     // Leases — no explicit view permission; always show
     subExpiredProps(<FileTextOutlined />, t('common:nav.leases'), '/leases'),
+
+    // Expenses — no explicit view permission; always show
+    subExpiredProps(<WalletOutlined />, t('common:nav.expenses'), '/expenses'),
 
     // Property Managers — requires can_view_property_managers
     hasPermission('can_view_property_managers')

@@ -61,7 +61,7 @@ const MobileTenantsList: React.FC<MobileTenantsListProps> = ({
               {/* Tenant Name & Gender */}
               <Space style={{ width: '100%', justifyContent: 'space-between' }}>
                 <Space>
-                  <UserOutlined style={{ color: '#CC5B4B', fontSize: 18 }} />
+                  <UserOutlined style={{ color: '#8c8c8c', fontSize: 18 }} />
                   <Text strong style={{ fontSize: 15 }}>
                     {tenant.first_name} {tenant.last_name}
                   </Text>

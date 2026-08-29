@@ -30,6 +30,8 @@
   "filters": {
     "leaseStatus": "Lease Status",
     "allStatuses": "All Statuses",
+    "property": "Property",
+    "allProperties": "All Properties",
     "paymentStatus": "Payment Status",
     "all": "All",
     "searchPlaceholder": "Search leases...",

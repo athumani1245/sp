@@ -12,6 +12,7 @@ import DashboardStats from '../components/dashboard/DashboardStats';
 import ReportSalesChart from '../components/dashboard/ReportSalesChart';
 import CostBreakdownChart from '../components/dashboard/CostBreakdownChart';
 import SubscriptionBanner from '../components/SubscriptionBanner';
+import GuideVideoButton from '../components/GuideVideoButton';
 
 const { Title, Text } = Typography;
 
@@ -86,12 +87,19 @@ const Dashboard: React.FC = () => {
 
       {/* Welcome Header */}
       <div style={{ marginBottom: '24px' }}>
-        <Title level={2} style={{ color: '#1a1a1a', marginBottom: '8px', fontSize: window.innerWidth < 768 ? '20px' : '28px' }}>
-          {t('dashboard:welcome', { name: getUserName() })}
-        </Title>
-        <Text style={{ fontSize: window.innerWidth < 768 ? '12px' : '14px', color: '#6B7280' }}>
-          {t('dashboard:subtitle')}
-        </Text>
+        <Row justify="space-between" align="middle" gutter={[16, 16]}>
+          <Col xs={24} sm={16}>
+            <Title level={2} style={{ color: '#1a1a1a', marginBottom: '8px', fontSize: window.innerWidth < 768 ? '20px' : '28px' }}>
+              {t('dashboard:welcome', { name: getUserName() })}
+            </Title>
+            <Text style={{ fontSize: window.innerWidth < 768 ? '12px' : '14px', color: '#6B7280' }}>
+              {t('dashboard:subtitle')}
+            </Text>
+          </Col>
+          <Col xs={24} sm={8} style={{ textAlign: 'right' }}>
+            <GuideVideoButton url="https://www.youtube.com/watch?v=LUUOH0F33v4" />
+          </Col>
+        </Row>
       </div>
 
       {/* Stats Cards */}
@@ -116,7 +124,7 @@ const Dashboard: React.FC = () => {
       {/* Tour */}
       <Tour
         open={tourOpen}
-        onClose={() => setTourOpen(false)}
+        onClose={markTourCompleted}
         onFinish={markTourCompleted}
         steps={tourSteps}
       />

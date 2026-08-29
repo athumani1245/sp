@@ -23,6 +23,8 @@
     "noAddress": "No address",
     "propertyAdded": "Property added successfully!",
     "loadFailed": "Failed to load properties",
+    "emptyTitle": "No properties yet",
+    "emptyDescription": "Add your first property to get started.",
     "allTypes": "All Types",
     "standalone": "Standalone",
     "apartment": "Apartment",
@@ -63,7 +65,12 @@
     "streetAddressTooltip": "Enter the complete street address including building/plot number (e.g., '123 Beach Road', 'Plot 456 Nyerere St')",
     "propertyManager": "Property Manager",
     "propertyManagerPlaceholder": "Select a property manager (optional)",
-    "propertyManagerTooltip": "Assign a property manager to oversee this property"
+    "propertyManagerTooltip": "Assign a property manager to oversee this property",
+    "bankAccountInformation": "Bank Account Information",
+    "bankAccount": "Bank Account",
+    "bankAccountPlaceholder": "Select bank account(s) (optional)",
+    "bankAccountTooltip": "Bank account where rent payments for this property should be deposited",
+    "noBankAccountsAvailable": "No bank accounts available. Add one from your Profile page."
   },
   "propertyDetail": {
     "back": "Back to Properties",
@@ -116,6 +123,8 @@
     "tenant": "Tenant",
     "period": "Period",
     "monthlyRent": "Monthly Rent",
+    "rentAmount": "Rent Amount",
+    "amountPaid": "Amount Paid",
     "to": "to",
     "view": "View",
     "unknownTenant": "Unknown Tenant",
@@ -142,6 +151,24 @@
     "loadingUnits": "Loading units...",
     "loadingLeases": "Loading leases...",
     "deleteProperty": "Delete Property",
-    "deletePropertyConfirm": "Are you sure you want to delete \"{{propertyName}}\"? This action cannot be undone."
+    "deletePropertyConfirm": "Are you sure you want to delete \"{{propertyName}}\"? This action cannot be undone.",
+    "bankAccount": "Bank Account",
+    "selectBankAccount": "Select bank account(s) (optional)",
+    "noBankAccountsAvailable": "No bank accounts available. Add one from your Profile page."
+  },
+  "unitModal": {
+    "addTitle": "Add New Unit",
+    "editTitle": "Edit Unit",
+    "addOkText": "Add Unit",
+    "editOkText": "Update Unit",
+    "cancelText": "Cancel",
+    "unitName": "Unit Name",
+    "unitNamePlaceholder": "e.g., Master Bedroom, Apartment 2A, Studio Room",
+    "unitNameRequired": "Please enter unit name",
+    "unitNameMin": "Unit name must be at least 2 characters",
+    "rentPerMonth": "Rent Per Month",
+    "rentPerMonthPlaceholder": "Enter monthly rent amount",
+    "rentPerMonthRequired": "Please enter rent amount",
+    "rentPerMonthInvalid": "Rent must be a positive number"
   }
 }

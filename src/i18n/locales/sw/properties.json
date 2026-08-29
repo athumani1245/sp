@@ -23,6 +23,8 @@
     "noAddress": "Hakuna anwani",
     "propertyAdded": "Jengo limeongezwa!",
     "loadFailed": "Imeshindwa kupakia jengo",
+    "emptyTitle": "Bado hakuna majengo",
+    "emptyDescription": "Ongeza jengo lako la kwanza kuanza.",
     "allTypes": "Aina Zote",
     "standalone": "Ya Pekee",
     "apartment": "Ghorofa",
@@ -63,7 +65,12 @@
     "streetAddressTooltip": "Weka anwani kamili ya mtaa pamoja na nambari ya jengo/kiwanja (mfano, 'Mtaa wa Bahari 123', 'Kiwanja 456 Barabara ya Nyerere')",
     "propertyManager": "Msimamizi wa Mali",
     "propertyManagerPlaceholder": "Chagua msimamizi wa mali (si lazima)",
-    "propertyManagerTooltip": "Teua msimamizi wa mali kusimamia jengo hili"
+    "propertyManagerTooltip": "Teua msimamizi wa mali kusimamia jengo hili",
+    "bankAccountInformation": "Taarifa za Akaunti ya Benki",
+    "bankAccount": "Akaunti ya Benki",
+    "bankAccountPlaceholder": "Chagua akaunti za benki (si lazima)",
+    "bankAccountTooltip": "Akaunti ya benki ambapo malipo ya kodi ya jengo hili yatapokelewa",
+    "noBankAccountsAvailable": "Hakuna akaunti za benki zinazopatikana. Ongeza kutoka ukurasa wa Wasifu."
   },
   "propertyDetail": {
     "back": "Orodha ya Majengo",
@@ -116,6 +123,8 @@
     "tenant": "Mpangaji",
     "period": "Kipindi",
     "monthlyRent": "Kodi ya Kila Mwezi",
+    "rentAmount": "Kiasi cha Kodi",
+    "amountPaid": "Kiasi Kilicholipwa",
     "to": "hadi",
     "view": "Tazama",
     "unknownTenant": "Mpangaji Asiyejulikana",
@@ -142,6 +151,24 @@
     "loadingUnits": "Inapakia vyumba vya jengo...",
     "loadingLeases": "Inapakia mikataba ya jengo...",
     "deleteProperty": "Futa Jengo",
-    "deletePropertyConfirm": "Una uhakika unataka kufuta \"{{propertyName}}\"? Kitendo hiki hakiwezi kutenduliwa."
+    "deletePropertyConfirm": "Una uhakika unataka kufuta \"{{propertyName}}\"? Kitendo hiki hakiwezi kutenduliwa.",
+    "bankAccount": "Akaunti ya Benki",
+    "selectBankAccount": "Chagua akaunti za benki (si lazima)",
+    "noBankAccountsAvailable": "Hakuna akaunti za benki zinazopatikana. Ongeza kutoka ukurasa wa Wasifu."
+  },
+  "unitModal": {
+    "addTitle": "Ongeza Chumba Kipya",
+    "editTitle": "Hariri Chumba",
+    "addOkText": "Ongeza Chumba",
+    "editOkText": "Sasisha Chumba",
+    "cancelText": "Ghairi",
+    "unitName": "Jina la Chumba",
+    "unitNamePlaceholder": "mfano, Chumba cha Wazazi, Ghorofa 2A, Studio",
+    "unitNameRequired": "Tafadhali weka jina la chumba",
+    "unitNameMin": "Jina la chumba lazima liwe na tarakimu 2 au zaidi",
+    "rentPerMonth": "Kodi ya Kila Mwezi",
+    "rentPerMonthPlaceholder": "Weka kiasi cha kodi ya kila mwezi",
+    "rentPerMonthRequired": "Tafadhali weka kiasi cha kodi",
+    "rentPerMonthInvalid": "Kodi lazima iwe nambari chanya"
   }
 }

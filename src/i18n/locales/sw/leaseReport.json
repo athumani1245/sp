@@ -30,6 +30,8 @@
   "filters": {
     "leaseStatus": "Hali ya Mkataba",
     "allStatuses": "Hali Zote",
+    "property": "Jengo",
+    "allProperties": "Majengo Yote",
     "paymentStatus": "Hali ya Malipo",
     "all": "Zote",
     "searchPlaceholder": "Tafuta mkataba...",

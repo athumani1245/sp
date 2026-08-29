@@ -317,7 +317,7 @@ const PropertyManagers: React.FC = () => {
       {/* Tour */}
       <Tour
         open={tourOpen}
-        onClose={() => setTourOpen(false)}
+        onClose={markTourCompleted}
         onFinish={markTourCompleted}
         steps={tourSteps}
       />

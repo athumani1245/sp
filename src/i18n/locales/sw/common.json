@@ -14,12 +14,16 @@
     "close": "Funga",
     "loading": "Inapakia...",
     "error": "Kosa",
-    "success": "Imefanikiwa"  },
+    "success": "Imefanikiwa",
+    "watchGuide": "Tazama Mwongozo",
+    "watchGuideTooltip": "Tazama video fupi ya mwongozo kwa ukurasa huu"
+  },
   "nav": {
     "home": "Nyumbani",
     "properties": "Mali",
     "tenants": "Wapangaji",
     "leases": "Mikataba",
+    "expenses": "Matumizi",
     "subscription": "Usajili",
     "reports": "Ripoti",
     "leaseAgreements": "Mikataba ya Upangaji",

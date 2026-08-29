@@ -42,12 +42,11 @@ const MobilePropertiesList: React.FC<MobilePropertiesListProps> = ({
 
   const getPropertyTypeTag = (type: string) => {
     const typeConfig: Record<string, { color: string; text: string }> = {
-      apartment: { color: 'blue', text: 'Apartment' },
-      house: { color: 'green', text: 'House' },
-      commercial: { color: 'orange', text: 'Commercial' },
-      land: { color: 'purple', text: 'Land' },
+      Standalone: { color: 'green', text: 'Standalone' },
+      Apartment: { color: 'blue', text: 'Apartment' },
+      'Commercial building': { color: 'orange', text: 'Commercial building' },
     };
-    const config = typeConfig[type?.toLowerCase()] || { color: 'default', text: type };
+    const config = typeConfig[type] || { color: 'default', text: type };
     return <Tag color={config.color}>{config.text}</Tag>;
   };
 
@@ -85,7 +84,7 @@ const MobilePropertiesList: React.FC<MobilePropertiesListProps> = ({
               {/* Property Name & Type */}
               <Space style={{ width: '100%', justifyContent: 'space-between' }}>
                 <Space>
-                  <BankOutlined style={{ color: '#1890ff', fontSize: 18 }} />
+                  <BankOutlined style={{ color: '#8c8c8c', fontSize: 18 }} />
                   <Text strong style={{ fontSize: 15 }}>
                     {property.property_name}
                   </Text>

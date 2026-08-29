@@ -1,7 +1,9 @@
 import React, { useEffect } from 'react';
-import { Modal, Form, Input, InputNumber } from 'antd';
+import { Modal, Form } from 'antd';
 import { HomeOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import { useUpdatePropertyUnit } from '../../hooks/useProperties';
+import UnitFormFields from './UnitFormFields';
 
 interface Unit {
   id: string;
@@ -24,6 +26,7 @@ const EditUnitModal: React.FC<EditUnitModalProps> = ({
   unit,
   onUnitUpdated,
 }) => {
+  const { t } = useTranslation();
   const [form] = Form.useForm();
   const updateUnitMutation = useUpdatePropertyUnit();
 
@@ -68,15 +71,15 @@ const EditUnitModal: React.FC<EditUnitModalProps> = ({
     <Modal
       title={
         <span>
-          <HomeOutlined /> Edit Unit
+          <HomeOutlined /> {t('properties:unitModal.editTitle')}
         </span>
       }
       open={isOpen}
       onCancel={handleClose}
       onOk={() => form.submit()}
       confirmLoading={updateUnitMutation.isPending}
-      okText="Update Unit"
-      cancelText="Cancel"
+      okText={t('properties:unitModal.editOkText')}
+      cancelText={t('properties:unitModal.cancelText')}
       width={500}
     >
       <Form
@@ -85,38 +88,7 @@ const EditUnitModal: React.FC<EditUnitModalProps> = ({
         onFinish={handleSubmit}
         style={{ marginTop: 24 }}
       >
-        <Form.Item
-          label="Unit Name"
-          name="unit_name"
-          rules={[
-            { required: true, message: 'Please enter unit name' },
-            { min: 2, message: 'Unit name must be at least 2 characters' },
-          ]}
-        >
-          <Input
-            placeholder="e.g., Master Bedroom, Apartment 2A, Studio Room"
-            prefix={<HomeOutlined />}
-            size="large"
-          />
-        </Form.Item>
-
-        <Form.Item
-          label="Rent Per Month"
-          name="rent_per_month"
-          rules={[
-            { required: true, message: 'Please enter rent amount' },
-            { type: 'number', min: 0, message: 'Rent must be a positive number' },
-          ]}
-        >
-          <InputNumber
-            placeholder="Enter monthly rent amount"
-            style={{ width: '100%' }}
-            size="large"
-            min={0}
-            formatter={(value) => `TSh ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-            parser={(value) => Number(value?.replace(/TSh\s?|(,*)/g, '') || 0) as any}
-          />
-        </Form.Item>
+        <UnitFormFields />
       </Form>
     </Modal>
   );

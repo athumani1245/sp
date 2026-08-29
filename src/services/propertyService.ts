@@ -13,6 +13,7 @@ interface PropertyData {
   ward?: string;
   street?: string;
   manager_id?: string | null;
+  payment_accounts?: string[];
 }
 
 interface PropertyParams {
@@ -51,6 +52,11 @@ const formatPropertyData = (propertyData: PropertyData) => {
   // Include manager_id - send null to remove manager, or the actual ID to assign
   if (propertyData.manager_id !== undefined) {
     formattedData.manager_id = propertyData.manager_id || null;
+  }
+
+  // Include payment_accounts - send the array of linked bank account IDs (empty array to clear)
+  if (propertyData.payment_accounts !== undefined) {
+    formattedData.payment_accounts = propertyData.payment_accounts || [];
   }
 
   return formattedData;
@@ -121,6 +127,19 @@ export const updateProperty = async ({ propertyId, propertyData }: { propertyId:
 export const deleteProperty = async (propertyId: string) => {
   await api.delete(`${API_BASE}/properties/${propertyId}/`);
   return { success: true };
+};
+
+export interface UnitChoice {
+  id: string;
+  unit_name?: string;
+  unit_number?: string;
+  property_name?: string;
+}
+
+export const getUnitChoices = async (): Promise<UnitChoice[]> => {
+  const response = await api.get(`${API_BASE}/unit-choices/`);
+  const data = response.data.data || response.data;
+  return Array.isArray(data) ? data : (data.items || data.results || []);
 };
 
 // Property Units

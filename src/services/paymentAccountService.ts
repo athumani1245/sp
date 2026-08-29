@@ -9,8 +9,21 @@ export interface PaymentAccountData {
   provider_type: string;
 }
 
+export interface PaymentAccountChoice {
+  id: string;
+  account_name: string;
+  provider: string;
+  payment_number: string;
+}
+
 export const getPaymentAccounts = async () => {
   const response = await api.get(`${API_BASE}/payment-accounts/`);
+  const data = response.data.data || response.data;
+  return Array.isArray(data) ? data : (data.items || data.results || []);
+};
+
+export const getPaymentAccountChoices = async (): Promise<PaymentAccountChoice[]> => {
+  const response = await api.get(`${API_BASE}/payment-account-choices/`);
   const data = response.data.data || response.data;
   return Array.isArray(data) ? data : (data.items || data.results || []);
 };

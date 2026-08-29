@@ -17,6 +17,9 @@ import {
   Tour,
   Grid,
   Select,
+  Divider,
+  Empty,
+  theme,
 } from 'antd';
 import type { TourProps } from 'antd';
 import {
@@ -31,6 +34,7 @@ import {
 } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import AddPropertyModal from '../components/forms/AddPropertyModal';
+import GuideVideoButton from '../components/GuideVideoButton';
 import MobilePropertiesList from '../components/mobile/MobilePropertiesList';
 import { useAllProperties, useDeleteProperty } from '../hooks/useProperties';
 import { useQueryClient } from '@tanstack/react-query';
@@ -66,6 +70,7 @@ interface PaginationState {
 const Properties: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { token } = theme.useToken();
   const [messageApi, contextHolder] = message.useMessage();
   const queryClient = useQueryClient();
   const { open: tourOpen, setOpen: setTourOpen, markTourCompleted } = useTour('properties');
@@ -194,12 +199,11 @@ const Properties: React.FC = () => {
 
   const getPropertyTypeTag = (type: string) => {
     const typeConfig: Record<string, { color: string; text: string }> = {
-      apartment: { color: 'blue', text: 'Apartment' },
-      house: { color: 'green', text: 'House' },
-      commercial: { color: 'orange', text: 'Commercial' },
-      land: { color: 'purple', text: 'Land' },
+      Standalone: { color: 'green', text: t('properties:properties.standalone') },
+      Apartment: { color: 'blue', text: t('properties:properties.apartment') },
+      'Commercial building': { color: 'orange', text: t('properties:properties.commercialBuilding') },
     };
-    const config = typeConfig[type?.toLowerCase()] || { color: 'default', text: type };
+    const config = typeConfig[type] || { color: 'default', text: type };
     return <Tag color={config.color}>{config.text}</Tag>;
   };
 
@@ -209,7 +213,7 @@ const Properties: React.FC = () => {
       key: 'name',
       render: (_, record) => (
         <Space>
-          <BankOutlined style={{ color: '#1890ff' }} />
+          <BankOutlined style={{ color: token.colorTextTertiary }} />
           <Text strong>{record.property_name || 'N/A'}</Text>
         </Space>
       ),
@@ -243,10 +247,11 @@ const Properties: React.FC = () => {
       title: t('properties:properties.units'),
       key: 'units',
       dataIndex: 'units_count',
+      align: 'right',
       render: (units: number) => (
         <Space>
           <HomeOutlined />
-          <Text>{units || 0}</Text>
+          <Text style={{ fontVariantNumeric: 'tabular-nums' }}>{units || 0}</Text>
         </Space>
       ),
       sorter: (a, b) => (a.units_count || 0) - (b.units_count || 0),
@@ -258,8 +263,8 @@ const Properties: React.FC = () => {
         <Space size="small">
           <Tooltip title={t('properties:properties.viewDetails')}>
             <Button
-              type="link"
-              icon={<EyeOutlined />}
+              type="text"
+              icon={<EyeOutlined style={{ color: token.colorTextSecondary }} />}
               onClick={(e) => {
                 e.stopPropagation();
                 handleViewProperty(record.id);
@@ -285,75 +290,73 @@ const Properties: React.FC = () => {
               </Title>
             </Col>
             <Col xs={24} sm={12} style={{ textAlign: 'right' }}>
-              <div ref={addButtonRef}>
-                {hasPermission('can_create_property') && (
-                  <Button
-                    type="primary"
-                    icon={<PlusOutlined />}
-                    onClick={() => setShowModal(true)}
-                    size="large"
-                  >
-                    {t('properties:properties.addProperty')}
-                  </Button>
-                )}
-              </div>
+              <Space>
+                <GuideVideoButton url="https://www.youtube.com/watch?v=VlQN4XtEQAA" />
+                <div ref={addButtonRef}>
+                  {hasPermission('can_create_property') && (
+                    <Button
+                      type="primary"
+                      icon={<PlusOutlined />}
+                      onClick={() => setShowModal(true)}
+                    >
+                      {t('properties:properties.addNewProperty')}
+                    </Button>
+                  )}
+                </div>
+              </Space>
             </Col>
           </Row>
           <Text type="secondary">{t('properties:properties.subtitle')}</Text>
         </Space>
       </div>
 
-      {/* Search and Filters Section */}
-      <Card style={{ marginBottom: '16px' }} ref={searchRef}>
-        <Space direction="vertical" style={{ width: '100%' }} size="middle">
-          <Row gutter={[16, 16]} align="middle">
-            <Col xs={24} sm={24} md={12}>
-              <Search
-                placeholder={t('properties:properties.searchPlaceholder')}
-                allowClear
-                prefix={<SearchOutlined />}
-                size="large"
-                onSearch={handleSearch}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                style={{ width: '100%' }}
-              />
-            </Col>
-            <Col xs={24} sm={12} md={6}>
-              <Select
-                placeholder={t('properties:properties.filterByType')}
-                allowClear
-                size="large"
-                value={propertyType || undefined}
-                onChange={handlePropertyTypeChange}
-                style={{ width: '100%' }}
-                options={propertyTypeOptions}
-                disabled={isLoading}
-              />
-            </Col>
-            <Col xs={24} sm={12} md={6}>
-              <Button
-                size="large"
-                onClick={handleClearFilters}
-                style={{ width: '100%' }}
-                disabled={!search && !propertyType}
-              >
-                {t('properties:properties.clearFilters')}
-              </Button>
-            </Col>
-          </Row>
-          {(search || propertyType) && (
-            <Text type="secondary">
-              {t('properties:properties.showingResults', { count: totalCount })}
-              {search && ` ${t('properties:properties.for')} "${search}"`}
-              {propertyType && ` ${t('properties:properties.in')} ${propertyType.charAt(0).toUpperCase() + propertyType.slice(1)}`}
-            </Text>
-          )}
-        </Space>
-      </Card>
-
-      {/* Properties Table */}
+      {/* Properties */}
       <Card ref={tableRef}>
+        <div ref={searchRef}>
+          <Space direction="vertical" style={{ width: '100%' }} size="middle">
+            <Row gutter={[16, 16]} align="middle">
+              <Col xs={24} sm={24} md={12}>
+                <Search
+                  placeholder={t('properties:properties.searchPlaceholder')}
+                  allowClear
+                  prefix={<SearchOutlined />}
+                  onSearch={handleSearch}
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  style={{ width: '100%' }}
+                />
+              </Col>
+              <Col xs={24} sm={12} md={6}>
+                <Select
+                  placeholder={t('properties:properties.filterByType')}
+                  allowClear
+                  value={propertyType || undefined}
+                  onChange={handlePropertyTypeChange}
+                  style={{ width: '100%' }}
+                  options={propertyTypeOptions}
+                  disabled={isLoading}
+                />
+              </Col>
+              <Col xs={24} sm={12} md={6}>
+                <Button
+                  onClick={handleClearFilters}
+                  style={{ width: '100%' }}
+                  disabled={!search && !propertyType}
+                >
+                  {t('properties:properties.clearFilters')}
+                </Button>
+              </Col>
+            </Row>
+            {(search || propertyType) && (
+              <Text type="secondary">
+                {t('properties:properties.showingResults', { count: totalCount })}
+                {search && ` ${t('properties:properties.for')} "${search}"`}
+                {propertyType && ` ${t('properties:properties.in')} ${propertyType.charAt(0).toUpperCase() + propertyType.slice(1)}`}
+              </Text>
+            )}
+          </Space>
+        </div>
+        <Divider style={{ marginBlock: 16 }} />
         {isLoading ? (
           <div>
             <Skeleton active paragraph={{ rows: 2 }} style={{ marginBottom: 16 }} />
@@ -377,6 +380,20 @@ const Properties: React.FC = () => {
               onClick: () => handleViewProperty(record.id),
               style: { cursor: 'pointer' },
             })}
+            locale={{
+              emptyText: (
+                <Empty
+                  image={Empty.PRESENTED_IMAGE_SIMPLE}
+                  description={
+                    <>
+                      <Text strong>{t('properties:properties.emptyTitle')}</Text>
+                      <br />
+                      <Text type="secondary">{t('properties:properties.emptyDescription')}</Text>
+                    </>
+                  }
+                />
+              ),
+            }}
           />
         ) : (
           <MobilePropertiesList
@@ -397,7 +414,7 @@ const Properties: React.FC = () => {
       {/* Tour */}
       <Tour
         open={tourOpen}
-        onClose={() => setTourOpen(false)}
+        onClose={markTourCompleted}
         onFinish={markTourCompleted}
         steps={tourSteps}
       />
