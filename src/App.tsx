@@ -10,6 +10,7 @@ import SubscriptionGate from './components/SubscriptionGate';
 import Landing from './pages/Landing';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Academy from './pages/Academy';
+import AppAcademy from './pages/AppAcademy';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
@@ -78,13 +79,9 @@ function App() {
               itemMarginBottom: 16,
             },
             Table: {
-              // Compact, Odoo-style list density with a light sticky header
-              cellPaddingBlock: 8,
-              cellPaddingInline: 12,
-              headerBg: '#f8f9fa',
-              headerColor: 'rgba(0,0,0,0.88)',
-              headerSplitColor: 'transparent',
-              borderColor: 'rgba(0,0,0,0.08)',
+              cellPaddingBlock: 12,
+              cellPaddingInline: 16,
+              borderColor: 'rgba(0,0,0,0.10)',
               // Reuses the app's existing brand-tint hover convention (see sidebar menu
               // hover in layout.css) instead of antd's default gray row hover.
               rowHoverBg: 'rgba(204, 91, 75, 0.05)',
@@ -136,6 +133,9 @@ function App() {
               <Route path="lease" element={<PermissionRoute permission="can_view_lease_report"><SubscriptionGate><LeaseReport /></SubscriptionGate></PermissionRoute>} />
               <Route path="lease-expiry" element={<PermissionRoute permission="can_vew_lease_expiry_report"><SubscriptionGate><LeaseExpiryReport /></SubscriptionGate></PermissionRoute>} />
               <Route path="pending-payments" element={<PermissionRoute permission="can_view_pending_payments_report"><SubscriptionGate><PendingPaymentsReport /></SubscriptionGate></PermissionRoute>} />
+            </Route>
+            <Route path="/learn" element={<PrivateRoute><MainLayout /></PrivateRoute>}>
+              <Route index element={<AppAcademy />} />
             </Route>
             <Route path="/profile" element={<PrivateRoute><MainLayout /></PrivateRoute>}>
               <Route index element={<Profile />} />

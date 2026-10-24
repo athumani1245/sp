@@ -18,14 +18,19 @@ import {
   Grid,
   Divider,
   Empty,
+  theme,
 } from 'antd';
 import type { TourProps } from 'antd';
 import {
   PlusOutlined,
   SearchOutlined,
   DeleteOutlined,
+  UserOutlined,
+  PhoneOutlined,
+  MailOutlined,
   ExclamationCircleOutlined,
   TeamOutlined,
+  EyeOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import AddTenantModal from '../components/forms/AddTenantModal';
@@ -52,6 +57,7 @@ interface Tenant {
 
 const Tenants: React.FC = () => {
   const { t } = useTranslation();
+  const { token } = theme.useToken();
   const navigate = useNavigate();
   const screens = useBreakpoint();
   const [messageApi, contextHolder] = message.useMessage();
@@ -145,11 +151,13 @@ const Tenants: React.FC = () => {
     {
       title: t('tenants:tenants.name'),
       key: 'name',
-      ellipsis: true,
       render: (_, record) => (
-        <Text strong>
-          {record.first_name} {record.last_name}
-        </Text>
+        <Space>
+          <UserOutlined style={{ color: token.colorTextTertiary }} />
+          <Text strong>
+            {record.first_name} {record.last_name}
+          </Text>
+        </Space>
       ),
       sorter: (a, b) => 
         `${a.first_name} ${a.last_name}`.localeCompare(`${b.first_name} ${b.last_name}`),
@@ -158,14 +166,27 @@ const Tenants: React.FC = () => {
       title: t('tenants:tenants.phone'),
       dataIndex: 'username',
       key: 'username',
-      ellipsis: true,
+      render: (phone) => (
+        <Space>
+          <PhoneOutlined />
+          <Text>{phone}</Text>
+        </Space>
+      ),
     },
     {
       title: t('tenants:tenants.email'),
       dataIndex: 'email',
       key: 'email',
-      ellipsis: true,
-      render: (email) => email || <Text type="secondary">-</Text>,
+      render: (email) => (
+        email ? (
+          <Space>
+            <MailOutlined />
+            <Text>{email}</Text>
+          </Space>
+        ) : (
+          <Text type="secondary">-</Text>
+        )
+      ),
     },
     {
       title: t('tenants:tenants.gender'),
@@ -178,15 +199,25 @@ const Tenants: React.FC = () => {
       dataIndex: 'emergency_contacts',
       key: 'emergency_contacts',
       align: 'right',
-      render: (contacts) => contacts?.length || 0,
+      render: (contacts) => (
+        <Text style={{ fontVariantNumeric: 'tabular-nums' }}>{contacts?.length || 0}</Text>
+      ),
     },
     {
       title: t('tenants:tenants.actions'),
       key: 'actions',
-      align: 'right',
-      width: 80,
       render: (_, record) => (
         <Space size="small">
+          <Tooltip title={t('tenants:tenants.viewDetails')}>
+            <Button
+              type="text"
+              icon={<EyeOutlined style={{ color: token.colorTextSecondary }} />}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleViewTenant(record.id);
+              }}
+            />
+          </Tooltip>
           <Tooltip title={t('tenants:tenants.delete')}>
             <Button
               type="text"
@@ -265,12 +296,9 @@ const Tenants: React.FC = () => {
               current: page,
               pageSize: 10,
               total: totalCount,
-              placement: ['topEnd'],
-              showTotal: (total, range) => `${range[0]}-${range[1]} / ${total}`,
             }}
             onChange={handleTableChange}
             scroll={{ x: 800 }}
-            sticky={{ offsetHeader: 64 }}
             onRow={(record) => ({
               onClick: () => handleViewTenant(record.id),
               style: { cursor: 'pointer' },
