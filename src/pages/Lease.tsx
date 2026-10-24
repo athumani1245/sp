@@ -823,7 +823,7 @@ const Lease: React.FC = () => {
                 >
                   {t('leases:leaseDetail.pdf')}
                 </Button>
-                {(lease.status === 'active' || lease.status === 'expiring') && hasPermission('can_renew_lease') && (
+                {['active', 'expiring', 'expired'].includes(lease.status) && hasPermission('can_renew_lease') && (
                   <Button
                     type="primary"
                     size="small"
