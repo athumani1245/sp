@@ -54,6 +54,14 @@ const PropertyManagerDetailModal: React.FC<PropertyManagerDetailModalProps> = ({
   const { data: permissions, isLoading: permissionsLoading } = usePermissions();
   const updateMutation = useUpdatePropertyManager();
 
+  // API returns permissions grouped as permissionsCategories[].permissions; fall back to flat permissions
+  const rawManagerPermissions: any[] =
+    manager?.permissionsCategories
+      ?.flatMap((c: any) => c.permissions || [])
+      .filter((p: any) => p.selected) ||
+    manager?.permissions ||
+    [];
+
   useEffect(() => {
     if (isOpen) {
       setEditing(false);
@@ -71,7 +79,7 @@ const PropertyManagerDetailModal: React.FC<PropertyManagerDetailModalProps> = ({
         last_name: manager.last_name,
         username: phone,
         email: manager.email || '',
-        permissions: manager.permissions?.map((p: any) => (typeof p === 'object' ? p.id : p)) || [],
+        permissions: rawManagerPermissions.map((p: any) => (typeof p === 'object' ? p.id : p)),
       });
     }
   }, [manager, editing, form]);
@@ -119,9 +127,9 @@ const PropertyManagerDetailModal: React.FC<PropertyManagerDetailModalProps> = ({
 
   // Permissions come from the manager object as [{id, description}] — use directly
   const managerPermissions: { id: string; description: string }[] =
-    manager?.permissions?.map((p: any) =>
+    rawManagerPermissions.map((p: any) =>
       typeof p === 'object' ? { id: p.id, description: p.description || p.name || p.id } : { id: p, description: p }
-    ) || [];
+    );
 
   // ── View Mode ──
   const renderViewMode = () => {
