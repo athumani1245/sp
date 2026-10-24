@@ -61,8 +61,10 @@ export const getTenantById = async (tenantId: string) => {
 };
 
 // Create a new tenant
-export const createTenant = async (tenantData: TenantData) => {
-  const response = await api.post(`${API_BASE}/auth/register-tenant/`, tenantData);
+export const createTenant = async (tenantData: TenantData | FormData) => {
+  // The default JSON header would make axios serialise FormData to JSON.
+  const headers = tenantData instanceof FormData ? { 'Content-Type': 'multipart/form-data' } : undefined;
+  const response = await api.post(`${API_BASE}/auth/register-tenant/`, tenantData, { headers });
   return response.data.data;
 };
 

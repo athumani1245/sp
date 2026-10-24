@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import { Layout, Button, Dropdown, Avatar, Space, message, Badge, List, Typography, Tag, Empty, Popover } from 'antd';
+import React from 'react';
+import { Layout, Button, Dropdown, Avatar, Space, message, Badge, List, Typography, Empty, Popover, Skeleton, Tabs } from 'antd';
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -9,15 +9,17 @@ import {
   CompassOutlined,
   BellOutlined,
   ClockCircleOutlined,
-  WarningOutlined,
   FileTextOutlined,
+  DeleteOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import type { MenuProps } from 'antd';
 import { useAuth } from '../../context/AuthContext';
 import { logout } from '../../services/authService';
-import { useReminders } from '../../hooks/useNotes';
-import type { Note } from '../../services/noteService';
+import { useNotifications } from '../../hooks/useNotifications';
+import { unregisterFromPush, notificationLink } from '../../services/notificationService';
+import type { AppNotification } from '../../services/notificationService';
 import LanguageSwitcher from '../LanguageSwitcher';
 
 const { Header } = Layout;
@@ -32,55 +34,52 @@ interface AppHeaderProps {
 const AppHeader: React.FC<AppHeaderProps> = ({ collapsed, setCollapsed }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { setIsAuthenticated, setSubscription } = useAuth();
-  const { data: reminders } = useReminders();
+  const { t } = useTranslation();
+  const { isAuthenticated, setIsAuthenticated, setSubscription } = useAuth();
+  const {
+    notifications,
+    isLoading: notificationsLoading,
+    unreadCount,
+    isUnread,
+    markAllSeen,
+    remove: removeNotification,
+    enablePush,
+    permission,
+  } = useNotifications(isAuthenticated);
+  const [notificationTab, setNotificationTab] = React.useState('all');
 
-  const reminderList: Note[] = useMemo(() => {
-    const list: Note[] = Array.isArray(reminders) ? reminders : [];
-    return [...list].sort(
-      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+  // One tab per type that actually has notifications; untyped ones only show under "All".
+  const notificationTypes = Array.from(
+    new Set(notifications.map((n) => n.entityType).filter((type): type is string => Boolean(type)))
+  );
+  const activeNotificationTab = notificationTypes.includes(notificationTab) ? notificationTab : 'all';
+  const visibleNotifications =
+    activeNotificationTab === 'all'
+      ? notifications
+      : notifications.filter((n) => n.entityType === activeNotificationTab);
+
+  const formatRelativeTime = (date: Date | null): string => {
+    if (!date) return '';
+    const diffMs = Date.now() - date.getTime();
+    const minutes = Math.round(diffMs / 60000);
+    if (minutes < 1) return t('notifications:notifications.justNow');
+    if (minutes < 60) return t('notifications:notifications.minutesAgo', { count: minutes });
+    const hours = Math.round(minutes / 60);
+    if (hours < 24) return t('notifications:notifications.hoursAgo', { count: hours });
+    const days = Math.round(hours / 24);
+    if (days < 30) return t('notifications:notifications.daysAgo', { count: days });
+    return date.toLocaleDateString();
+  };
+
+  const handleNotificationClick = (notification: AppNotification) => {
+    navigate(notificationLink(notification));
+  };
+
+  const handleEnablePush = async () => {
+    const granted = await enablePush();
+    message[granted ? 'success' : 'info'](
+      t(granted ? 'notifications:notifications.pushEnabled' : 'notifications:notifications.pushDenied')
     );
-  }, [reminders]);
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  // Backend returns dates as DD-MM-YYYY; convert to YYYY-MM-DD for reliable parsing
-  const parseDate = (dateStr: string): Date => {
-    if (!dateStr) return new Date(NaN);
-    const parts = dateStr.split('-');
-    if (parts.length === 3 && parts[0].length === 2) {
-      // DD-MM-YYYY → YYYY-MM-DD
-      return new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
-    }
-    return new Date(dateStr); // already ISO or other parseable format
-  };
-
-  const overdueCount = reminderList.filter((r) => {
-    const d = parseDate(r.date);
-    d.setHours(0, 0, 0, 0);
-    return d.getTime() < today.getTime();
-  }).length;
-
-  const getDueBadgeColor = (dateStr: string) => {
-    const d = parseDate(dateStr);
-    d.setHours(0, 0, 0, 0);
-    const diffDays = Math.ceil((d.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-    if (diffDays < 0) return 'red';
-    if (diffDays === 0) return 'orange';
-    if (diffDays <= 3) return 'gold';
-    return 'blue';
-  };
-
-  const getDueLabel = (dateStr: string) => {
-    const d = parseDate(dateStr);
-    d.setHours(0, 0, 0, 0);
-    const diffDays = Math.ceil((d.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-    if (isNaN(diffDays)) return dateStr;
-    if (diffDays < 0) return `${Math.abs(diffDays)}d overdue`;
-    if (diffDays === 0) return 'Today';
-    if (diffDays === 1) return 'Tomorrow';
-    return `In ${diffDays}d`;
   };
 
   const notificationContent = (
@@ -96,87 +95,93 @@ const AppHeader: React.FC<AppHeaderProps> = ({ collapsed, setCollapsed }) => {
       >
         <Text strong style={{ fontSize: 15 }}>
           <BellOutlined style={{ marginRight: 6 }} />
-          Reminders
+          {t('notifications:notifications.title')}
         </Text>
-        {overdueCount > 0 && (
-          <Tag color="red" icon={<WarningOutlined />}>
-            {overdueCount} overdue
-          </Tag>
+        {permission === 'default' && (
+          <Button type="link" size="small" onClick={handleEnablePush} style={{ padding: 0 }}>
+            {t('notifications:notifications.enablePush')}
+          </Button>
         )}
       </div>
-      {reminderList.length === 0 ? (
+      {notificationsLoading ? (
+        <div style={{ padding: 16 }}>
+          <Skeleton active paragraph={{ rows: 3 }} />
+        </div>
+      ) : notifications.length === 0 ? (
         <Empty
           image={Empty.PRESENTED_IMAGE_SIMPLE}
-          description="No reminders"
+          description={t('notifications:notifications.empty')}
           style={{ padding: '24px 0' }}
         />
       ) : (
+        <>
+        <Tabs
+          size="small"
+          activeKey={activeNotificationTab}
+          onChange={setNotificationTab}
+          tabBarStyle={{ margin: 0, padding: '0 12px' }}
+          items={['all', ...notificationTypes].map((type) => ({
+            key: type,
+            label: `${t(`notifications:notifications.types.${type}`, { defaultValue: type })} (${
+              type === 'all' ? notifications.length : notifications.filter((n) => n.entityType === type).length
+            })`,
+          }))}
+        />
         <List
-          dataSource={reminderList}
+          dataSource={visibleNotifications}
           renderItem={(item) => (
             <List.Item
-              style={{ padding: '10px 12px', cursor: 'default' }}
+              onClick={() => handleNotificationClick(item)}
+              style={{
+                padding: '10px 12px',
+                cursor: 'pointer',
+                backgroundColor: isUnread(item) ? 'rgba(204, 91, 75, 0.06)' : undefined,
+              }}
+              actions={[
+                <Button
+                  key="delete"
+                  type="text"
+                  size="small"
+                  danger
+                  icon={<DeleteOutlined />}
+                  title={t('notifications:notifications.delete')}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removeNotification(item.id);
+                  }}
+                />,
+              ]}
             >
               <List.Item.Meta
                 avatar={
-                  <Avatar
-                    size={32}
-                    style={{
-                      backgroundColor: getDueBadgeColor(item.date) === 'red' ? '#ff4d4f' : '#CC5B4B',
-                    }}
-                    icon={<ClockCircleOutlined />}
-                  />
+                  <Badge dot={isUnread(item)} offset={[-2, 4]}>
+                    <Avatar size={32} style={{ backgroundColor: '#CC5B4B' }} icon={<BellOutlined />} />
+                  </Badge>
                 }
                 title={
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Text
-                      strong
-                      ellipsis
-                      style={{ maxWidth: 200, fontSize: 13 }}
-                    >
-                      {item.title}
-                    </Text>
-                    <Tag
-                      color={getDueBadgeColor(item.date)}
-                      style={{ marginLeft: 8, flexShrink: 0, fontSize: 11 }}
-                    >
-                      {getDueLabel(item.date)}
-                    </Tag>
-                  </div>
+                  <Text style={{ fontSize: 13, whiteSpace: 'normal' }} strong={isUnread(item)}>
+                    {item.title ? `${item.title}: ${item.description}` : item.description}
+                  </Text>
                 }
                 description={
-                  <div>
-                    <Text
-                      type="secondary"
-                      ellipsis
-                      style={{ fontSize: 12, display: 'block' }}
-                    >
-                      {item.content}
-                    </Text>
-                    <Text type="secondary" style={{ fontSize: 11 }}>
-                      <ClockCircleOutlined style={{ marginRight: 4 }} />
-                      {item.date}
-                      {item.model && (
-                        <Tag
-                          style={{ marginLeft: 8, fontSize: 10 }}
-                          bordered={false}
-                        >
-                          {item.model}
-                        </Tag>
-                      )}
-                    </Text>
-                  </div>
+                  <Text type="secondary" style={{ fontSize: 11 }}>
+                    <ClockCircleOutlined style={{ marginRight: 4 }} />
+                    {formatRelativeTime(item.createdAt)}
+                  </Text>
                 }
               />
             </List.Item>
           )}
         />
+        </>
       )}
     </div>
   );
 
   const handleLogout = async () => {
     try {
+      // Detach this browser first, so the next user here does not inherit pushes.
+      await unregisterFromPush();
       await logout();
       setIsAuthenticated(false);
       setSubscription(null);
@@ -282,18 +287,23 @@ const AppHeader: React.FC<AppHeaderProps> = ({ collapsed, setCollapsed }) => {
             placement="bottomRight"
             arrow={false}
             overlayInnerStyle={{ padding: 0 }}
+            onOpenChange={(open) => {
+              // Mark on close so unread highlighting survives while the tray is read.
+              if (!open) markAllSeen();
+            }}
           >
             <Badge
-              count={reminderList.length}
+              count={unreadCount}
               size="small"
               offset={[-2, 2]}
-              className={reminderList.length > 0 ? 'notification-badge-active' : ''}
+              overflowCount={99}
+              className={unreadCount > 0 ? 'notification-badge-active' : ''}
             >
               <Button
                 type="text"
                 icon={<BellOutlined style={{ fontSize: 18 }} />}
-                className={`notification-btn${reminderList.length > 0 ? ' notification-btn-active' : ''}`}
-                title="Reminders"
+                className={`notification-btn${unreadCount > 0 ? ' notification-btn-active' : ''}`}
+                title={t('notifications:notifications.title')}
               />
             </Badge>
           </Popover>

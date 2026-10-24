@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { getExpenses, addExpense, deleteExpense } from '../services/expenseService';
+import { getExpenses, addExpense, updateExpense, deleteExpense } from '../services/expenseService';
 import { message } from 'antd';
 
 export const expenseKeys = {
@@ -25,6 +25,22 @@ export const useAddExpense = () => {
     },
     onError: (error: any) => {
       const errorMsg = error.response?.data?.description || error.response?.data?.message || 'Failed to log expense';
+      message.error(errorMsg);
+    },
+  });
+};
+
+export const useUpdateExpense = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateExpense,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: expenseKeys.all });
+      message.success('Expense updated successfully!');
+    },
+    onError: (error: any) => {
+      const errorMsg = error.response?.data?.description || error.response?.data?.message || 'Failed to update expense';
       message.error(errorMsg);
     },
   });

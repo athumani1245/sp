@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { getNotes, createNote, deleteNote, getReminders, getNotesForRecord } from '../services/noteService';
+import { createNote, deleteNote, getNotesForRecord } from '../services/noteService';
 import type { CreateNotePayload } from '../services/noteService';
 import { message } from 'antd';
 
@@ -7,7 +7,6 @@ import { message } from 'antd';
 export const noteKeys = {
   all: ['notes'] as const,
   list: (model: string, recordId: string) => [...noteKeys.all, model, recordId] as const,
-  reminders: () => [...noteKeys.all, 'reminders'] as const,
 };
 
 // Fetch notes for a record
@@ -51,14 +50,5 @@ export const useDeleteNote = (model: string, recordId: string) => {
       const errorMsg = error.response?.data?.description || error.response?.data?.message || 'Failed to delete note';
       message.error(errorMsg);
     },
-  });
-};
-
-// Fetch all reminders for notification tray
-export const useReminders = () => {
-  return useQuery({
-    queryKey: noteKeys.reminders(),
-    queryFn: getReminders,
-    refetchInterval: 5 * 60 * 1000, // refresh every 5 minutes
   });
 };

@@ -12,6 +12,7 @@
     "category": "Aina",
     "amount": "Kiasi",
     "actions": "Vitendo",
+    "edit": "Hariri",
     "delete": "Futa",
     "deleteExpense": "Futa Matumizi",
     "deleteExpenseConfirm": "Una uhakika unataka kufuta matumizi ya {{amount}}? Kitendo hiki hakiwezi kutenduliwa.",
@@ -35,10 +36,12 @@
     "legal": "Ada za Kisheria na Kitaalamu",
     "other": "Nyingine"
   },
-  "addExpenseModal": {
+  "expenseModal": {
     "title": "Weka Matumizi",
+    "editTitle": "Hariri Matumizi",
     "cancel": "Ghairi",
     "save": "Hifadhi Matumizi",
+    "update": "Sasisha Matumizi",
     "property": "Jengo",
     "selectProperty": "Chagua jengo",
     "propertyRequired": "Chagua jengo",
@@ -57,7 +60,8 @@
     "dateRequired": "Chagua tarehe",
     "description": "Maelezo",
     "descriptionPlaceholder": "mfano, Kujaza mafuta ya jenereta kwa Oktoba",
-    "expenseAdded": "Matumizi yamehifadhiwa"
+    "expenseAdded": "Matumizi yamehifadhiwa",
+    "expenseUpdated": "Matumizi yamesasishwa"
   },
   "manageCategories": {
     "button": "Simamia Aina",
