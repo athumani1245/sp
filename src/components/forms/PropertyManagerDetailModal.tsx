@@ -13,7 +13,6 @@ import {
   Divider,
   Checkbox,
   Skeleton,
-  Tag,
   Card,
 } from 'antd';
 import {
@@ -119,17 +118,17 @@ const PropertyManagerDetailModal: React.FC<PropertyManagerDetailModalProps> = ({
     }
   };
 
-  const getPermissionLabel = (permId: string) => {
-    if (!permissions) return permId;
-    const found = permissions.find((p: any) => p.id === permId);
-    return found?.description || found?.name || permId;
-  };
-
-  // Permissions come from the manager object as [{id, description}] — use directly
-  const managerPermissions: { id: string; description: string }[] =
-    rawManagerPermissions.map((p: any) =>
-      typeof p === 'object' ? { id: p.id, description: p.description || p.name || p.id } : { id: p, description: p }
-    );
+  // Group the manager's selected permissions by category, using the manager's own
+  // categories when present, otherwise the permissions catalog
+  const selectedIds = new Set(rawManagerPermissions.map((p: any) => (typeof p === 'object' ? p.id : p)));
+  const permissionGroups: { id: string; name: string; permissions: { id: string; description: string }[] }[] =
+    ((manager?.permissionsCategories || permissions || []) as any[])
+      .map((group) => ({
+        id: group.id,
+        name: group.name,
+        permissions: (group.permissions || []).filter((p: any) => selectedIds.has(p.id)),
+      }))
+      .filter((group) => group.permissions.length > 0);
 
   // ── View Mode ──
   const renderViewMode = () => {
@@ -231,14 +230,27 @@ const PropertyManagerDetailModal: React.FC<PropertyManagerDetailModalProps> = ({
 
         <Divider>{t('propertyManagers:addManagerModal.permissions')}</Divider>
 
-        {managerPermissions.length > 0 ? (
-          <Space wrap>
-            {managerPermissions.map((perm) => (
-              <Tag color="blue" key={perm.id}>
-                {perm.description}
-              </Tag>
+        {permissionGroups.length > 0 ? (
+          <Row gutter={[16, 16]}>
+            {permissionGroups.map((group) => (
+              <Col xs={24} md={12} key={group.id}>
+                <Card
+                  size="small"
+                  title={<Text strong>{group.name}</Text>}
+                  style={{ height: '100%' }}
+                  styles={{ body: { paddingTop: 8 } }}
+                >
+                  <ul style={{ margin: 0, paddingLeft: 20 }}>
+                    {group.permissions.map((perm) => (
+                      <li key={perm.id} style={{ marginBottom: 6 }}>
+                        <Text style={{ fontSize: 13 }}>{perm.description}</Text>
+                      </li>
+                    ))}
+                  </ul>
+                </Card>
+              </Col>
             ))}
-          </Space>
+          </Row>
         ) : (
           <Text type="secondary">{t('propertyManagers:detailModal.noPermissions')}</Text>
         )}

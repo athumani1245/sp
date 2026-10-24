@@ -8,6 +8,7 @@ import {
   Space,
   Input,
   Tag,
+  Tooltip,
   Typography,
   message,
   Skeleton,
@@ -18,11 +19,15 @@ import {
   Select,
   Divider,
   Empty,
+  theme,
 } from 'antd';
 import type { TourProps } from 'antd';
 import {
   PlusOutlined,
   SearchOutlined,
+  HomeOutlined,
+  EyeOutlined,
+  EnvironmentOutlined,
   BankOutlined,
   TeamOutlined,
   ReloadOutlined,
@@ -65,6 +70,7 @@ interface PaginationState {
 const Properties: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { token } = theme.useToken();
   const [messageApi, contextHolder] = message.useMessage();
   const queryClient = useQueryClient();
   const { open: tourOpen, setOpen: setTourOpen, markTourCompleted } = useTour('properties');
@@ -205,41 +211,68 @@ const Properties: React.FC = () => {
     {
       title: t('properties:properties.propertyName'),
       key: 'name',
-      ellipsis: true,
-      render: (_, record) => <Text strong>{record.property_name || 'N/A'}</Text>,
+      render: (_, record) => (
+        <Space>
+          <BankOutlined style={{ color: token.colorTextTertiary }} />
+          <Text strong>{record.property_name || 'N/A'}</Text>
+        </Space>
+      ),
       sorter: (a, b) => (a.property_name || '').localeCompare(b.property_name || ''),
     },
     {
       title: t('properties:properties.type'),
       key: 'type',
       dataIndex: 'property_type',
-      width: 170,
       render: (type: string) => getPropertyTypeTag(type),
     },
     {
       title: t('properties:properties.location'),
       key: 'location',
-      ellipsis: true,
-      render: (_, record) => {
-        const details = [record.address?.district_name, record.address?.ward_name, record.address?.street]
-          .filter(Boolean)
-          .join(', ');
-        return (
-          <>
-            {record.address?.region_name || 'N/A'}
-            <Text type="secondary"> · {details || t('properties:properties.noAddress')}</Text>
-          </>
-        );
-      },
+      render: (_, record) => (
+        <Space vertical size={0}>
+          <Space>
+            <EnvironmentOutlined />
+            <Text>{record.address?.region_name || 'N/A'}</Text>
+          </Space>
+          <Text type="secondary" style={{ fontSize: '12px' }}>
+            {[record.address?.district_name, record.address?.ward_name, record.address?.street]
+              .filter(Boolean)
+              .join(', ') || t('properties:properties.noAddress')}
+          </Text>
+        </Space>
+      ),
+      width: 250,
     },
     {
       title: t('properties:properties.units'),
       key: 'units',
       dataIndex: 'units_count',
       align: 'right',
-      width: 130,
-      render: (units: number) => units || 0,
+      render: (units: number) => (
+        <Space>
+          <HomeOutlined />
+          <Text style={{ fontVariantNumeric: 'tabular-nums' }}>{units || 0}</Text>
+        </Space>
+      ),
       sorter: (a, b) => (a.units_count || 0) - (b.units_count || 0),
+    },
+    {
+      title: t('properties:properties.actions'),
+      key: 'actions',
+      render: (_, record) => (
+        <Space size="small">
+          <Tooltip title={t('properties:properties.viewDetails')}>
+            <Button
+              type="text"
+              icon={<EyeOutlined style={{ color: token.colorTextSecondary }} />}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleViewProperty(record.id);
+              }}
+            />
+          </Tooltip>
+        </Space>
+      ),
     },
   ];
 
@@ -340,12 +373,9 @@ const Properties: React.FC = () => {
               current: page,
               pageSize: pageSize,
               total: totalCount,
-              placement: ['topEnd'],
-              showTotal: (total, range) => `${range[0]}-${range[1]} / ${total}`,
             }}
             onChange={handleTableChange}
             scroll={{ x: 800 }}
-            sticky={{ offsetHeader: 64 }}
             onRow={(record) => ({
               onClick: () => handleViewProperty(record.id),
               style: { cursor: 'pointer' },

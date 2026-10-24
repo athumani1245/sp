@@ -11,6 +11,7 @@ import {
   IdcardOutlined,
   FileProtectOutlined,
   WalletOutlined,
+  PlayCircleOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import type { MenuProps } from 'antd';
@@ -123,6 +124,14 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ collapsed, isMobile = false }) 
       style: isSubscriptionExpired ? { cursor: 'not-allowed', opacity: 0.5 } : {},
       children: isSubscriptionExpired ? undefined : reportChildren,
     } as MenuItem : null,
+
+    // Academy — video lessons, always visible
+    {
+      key: '/learn',
+      icon: <PlayCircleOutlined />,
+      label: t('common:nav.academy'),
+      onClick: () => navigate('/learn'),
+    },
   ];
 
   const menuItems: MenuItem[] = allMenuItems.filter(Boolean) as MenuItem[];
