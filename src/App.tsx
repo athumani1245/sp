@@ -78,9 +78,13 @@ function App() {
               itemMarginBottom: 16,
             },
             Table: {
-              cellPaddingBlock: 12,
-              cellPaddingInline: 16,
-              borderColor: 'rgba(0,0,0,0.10)',
+              // Compact, Odoo-style list density with a light sticky header
+              cellPaddingBlock: 8,
+              cellPaddingInline: 12,
+              headerBg: '#f8f9fa',
+              headerColor: 'rgba(0,0,0,0.88)',
+              headerSplitColor: 'transparent',
+              borderColor: 'rgba(0,0,0,0.08)',
               // Reuses the app's existing brand-tint hover convention (see sidebar menu
               // hover in layout.css) instead of antd's default gray row hover.
               rowHoverBg: 'rgba(204, 91, 75, 0.05)',

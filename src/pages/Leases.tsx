@@ -26,8 +26,6 @@ import {
   SearchOutlined,
   ReloadOutlined,
   FileTextOutlined,
-  CalendarOutlined,
-  UserOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import AddLeaseModal from '../components/forms/AddLeaseModal';
@@ -188,55 +186,43 @@ const Leases: React.FC = () => {
     {
       title: t('leases:leases.property'),
       key: 'property',
+      ellipsis: true,
       render: (_, record) => (
-        <Space vertical size={0}>
-          <Text>{record.property?.property_name || t('leases:leases.na')}</Text>
-          <Text type="secondary" style={{ fontSize: '12px' }}>
-            {getUnitInfo(record)}
-          </Text>
-        </Space>
+        <>
+          {record.property?.property_name || t('leases:leases.na')}
+          <Text type="secondary"> · {getUnitInfo(record)}</Text>
+        </>
       ),
-      width: 200,
+      width: 220,
     },
     {
       title: t('leases:leases.tenant'),
       key: 'tenant',
-      render: (_, record) => (
-        <Space>
-          <UserOutlined />
-          <Text>{getTenantName(record)}</Text>
-        </Space>
-      ),
+      ellipsis: true,
+      render: (_, record) => getTenantName(record),
       width: 180,
     },
     {
       title: t('leases:leases.period'),
       key: 'period',
-      render: (_, record) => (
-        <Space vertical size={0}>
-          <Text style={{ fontSize: '12px' }}>
-            <CalendarOutlined /> {formatDate(record.start_date)}
-          </Text>
-          <Text type="secondary" style={{ fontSize: '12px' }}>
-            {t('leases:leases.to')} {formatDate(record.end_date)}
-          </Text>
-        </Space>
-      ),
-      width: 150,
+      render: (_, record) => `${formatDate(record.start_date)} → ${formatDate(record.end_date)}`,
+      width: 210,
     },
     {
       title: t('leases:leases.rentAmount'),
       dataIndex: 'total_amount',
       key: 'total_amount',
-      render: (amount: number) => <Text>{formatCurrency(amount)}</Text>,
-      width: 130,
+      align: 'right',
+      render: (amount: number) => formatCurrency(amount),
+      width: 140,
     },
     {
       title: t('leases:leases.amountPaid'),
       dataIndex: 'amount_paid',
       key: 'amount_paid',
+      align: 'right',
       render: (amount: number) => <Text type="success">{formatCurrency(amount)}</Text>,
-      width: 130,
+      width: 140,
     },
     {
       title: t('leases:leases.status'),
@@ -249,6 +235,7 @@ const Leases: React.FC = () => {
       title: t('leases:leases.amountRemaining'),
       key: 'amount_remaining',
       fixed: 'right',
+      align: 'right',
       width: 150,
       render: (_, record) => {
         const remaining = record.remaining_amount || 0;
@@ -339,10 +326,12 @@ const Leases: React.FC = () => {
                 pageSize: pageSize,
                 total: data?.pagination?.total || 0,
                 showSizeChanger: true,
-                showTotal: (total) => t('leases:leases.totalLeases', { count: total }),
+                placement: ['topEnd'],
+                showTotal: (total, range) => `${range[0]}-${range[1]} / ${total}`,
               }}
               onChange={handleTableChange}
               scroll={{ x: 1200 }}
+              sticky={{ offsetHeader: 64 }}
               onRow={(record) => ({
                 onClick: () => handleViewLease(record.id),
                 style: { cursor: 'pointer' },

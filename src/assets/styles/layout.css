@@ -60,6 +60,25 @@
   }
 }
 
+/* List tables: Odoo-style aligned digits, zebra rows, sort icon on hover only */
+.ant-table {
+  font-variant-numeric: tabular-nums;
+}
+
+.ant-table-tbody > tr.ant-table-row:nth-child(even):not(:hover) > td {
+  background: #fafafa;
+}
+
+.ant-table-column-has-sorters .ant-table-column-sorter {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.ant-table-column-has-sorters:hover .ant-table-column-sorter,
+.ant-table-column-sort .ant-table-column-sorter {
+  opacity: 1;
+}
+
 /* Sider */
 .app-sider {
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
