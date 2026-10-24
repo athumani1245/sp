@@ -9,6 +9,7 @@ import PermissionRoute from './components/PermissionRoute';
 import SubscriptionGate from './components/SubscriptionGate';
 import Landing from './pages/Landing';
 import PrivacyPolicy from './pages/PrivacyPolicy';
+import Academy from './pages/Academy';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
@@ -97,6 +98,7 @@ function App() {
             <Route path="/verify-otp" element={<PublicRoute><VerifyOtp /></PublicRoute>} />
             <Route path="/reset-password" element={<PublicRoute><ResetPassword /></PublicRoute>} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/academy" element={<Academy />} />
             
             {/* Protected routes with layout */}
             <Route path="/dashboard" element={<PrivateRoute><MainLayout /></PrivateRoute>}>
