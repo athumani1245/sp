@@ -11,6 +11,16 @@ export interface ExpenseData {
   date: string;
 }
 
+export interface Expense {
+  id: string;
+  properties: string[];
+  units: string[];
+  amount: string | number;
+  category: string | null;
+  description?: string;
+  date: string;
+}
+
 export const getExpenses = async () => {
   const response = await api.get(`${API_BASE}/expenses/`);
   const data = response.data.data || response.data;
@@ -19,6 +29,17 @@ export const getExpenses = async () => {
 
 export const addExpense = async (expenseData: ExpenseData) => {
   const response = await api.post(`${API_BASE}/expenses/`, expenseData);
+  return response.data.data || response.data;
+};
+
+export const updateExpense = async ({
+  expenseId,
+  expenseData,
+}: {
+  expenseId: string;
+  expenseData: Partial<ExpenseData>;
+}) => {
+  const response = await api.patch(`${API_BASE}/expenses/${expenseId}/`, expenseData);
   return response.data.data || response.data;
 };
 

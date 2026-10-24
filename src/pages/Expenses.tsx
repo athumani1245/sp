@@ -21,14 +21,16 @@ import {
   PlusOutlined,
   SearchOutlined,
   WalletOutlined,
+  EditOutlined,
   DeleteOutlined,
   CalendarOutlined,
   TagsOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
-import AddExpenseModal from '../components/forms/AddExpenseModal';
+import ExpenseFormModal from '../components/forms/ExpenseFormModal';
 import ManageCategoriesModal from '../components/forms/ManageCategoriesModal';
 import { useExpenses, useDeleteExpense } from '../hooks/useExpenses';
+import type { Expense } from '../services/expenseService';
 import { useExpenseCategories } from '../hooks/useExpenseCategories';
 import dayjs from 'dayjs';
 
@@ -36,16 +38,6 @@ const { Search } = Input;
 const { Title, Text } = Typography;
 const { useBreakpoint } = Grid;
 const { confirm } = Modal;
-
-interface Expense {
-  id: string;
-  properties: string[];
-  units: string[];
-  amount: string | number;
-  category: string | null;
-  description?: string;
-  date: string;
-}
 
 const Expenses: React.FC = () => {
   const { t } = useTranslation();
@@ -59,7 +51,8 @@ const Expenses: React.FC = () => {
 
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
-  const [showAddModal, setShowAddModal] = useState(false);
+  const [showExpenseModal, setShowExpenseModal] = useState(false);
+  const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [showManageCategoriesModal, setShowManageCategoriesModal] = useState(false);
 
   const formatCurrency = (amount: string | number) => {
@@ -85,8 +78,19 @@ const Expenses: React.FC = () => {
     return matchesCategory && matchesSearch;
   });
 
-  const handleExpenseAdded = () => {
-    setShowAddModal(false);
+  const handleAddExpense = () => {
+    setEditingExpense(null);
+    setShowExpenseModal(true);
+  };
+
+  const handleEdit = (expense: Expense) => {
+    setEditingExpense(expense);
+    setShowExpenseModal(true);
+  };
+
+  const handleCloseExpenseModal = () => {
+    setShowExpenseModal(false);
+    setEditingExpense(null);
   };
 
   const handleDelete = (expense: Expense) => {
@@ -175,17 +179,27 @@ const Expenses: React.FC = () => {
       title: t('expenses:expenses.actions'),
       key: 'actions',
       render: (_, record) => (
-        <Button
-          type="link"
-          danger
-          size="small"
-          icon={<DeleteOutlined />}
-          onClick={() => handleDelete(record)}
-        >
-          {t('expenses:expenses.delete')}
-        </Button>
+        <Space size={0}>
+          <Button
+            type="link"
+            size="small"
+            icon={<EditOutlined />}
+            onClick={() => handleEdit(record)}
+          >
+            {t('expenses:expenses.edit')}
+          </Button>
+          <Button
+            type="link"
+            danger
+            size="small"
+            icon={<DeleteOutlined />}
+            onClick={() => handleDelete(record)}
+          >
+            {t('expenses:expenses.delete')}
+          </Button>
+        </Space>
       ),
-      width: 100,
+      width: 170,
     },
   ];
 
@@ -204,7 +218,7 @@ const Expenses: React.FC = () => {
               <Button icon={<TagsOutlined />} onClick={() => setShowManageCategoriesModal(true)}>
                 {t('expenses:manageCategories.button')}
               </Button>
-              <Button type="primary" icon={<PlusOutlined />} onClick={() => setShowAddModal(true)}>
+              <Button type="primary" icon={<PlusOutlined />} onClick={handleAddExpense}>
                 {t('expenses:expenses.addExpense')}
               </Button>
             </Space>
@@ -281,11 +295,12 @@ const Expenses: React.FC = () => {
         </Card>
       </Space>
 
-      {/* Add Expense Modal */}
-      <AddExpenseModal
-        isOpen={showAddModal}
-        onClose={() => setShowAddModal(false)}
-        onExpenseAdded={handleExpenseAdded}
+      {/* Add / Edit Expense Modal */}
+      <ExpenseFormModal
+        isOpen={showExpenseModal}
+        onClose={handleCloseExpenseModal}
+        onExpenseSaved={handleCloseExpenseModal}
+        expense={editingExpense}
       />
 
       {/* Manage Categories Modal */}

@@ -1,0 +1,23 @@
+{
+  "notifications": {
+    "title": "Arifa",
+    "empty": "Bado hakuna arifa",
+    "enablePush": "Washa arifa",
+    "pushEnabled": "Arifa zimewashwa",
+    "pushDenied": "Arifa hazikuwashwa",
+    "justNow": "Sasa hivi",
+    "minutesAgo": "Dakika {{count}} zilizopita",
+    "hoursAgo": "Saa {{count}} zilizopita",
+    "daysAgo": "Siku {{count}} zilizopita",
+    "delete": "Futa",
+    "types": {
+      "all": "Zote",
+      "expense": "Matumizi",
+      "payment": "Malipo",
+      "lease": "Mikataba",
+      "tenant": "Wapangaji",
+      "property": "Mali",
+      "unit": "Vyumba"
+    }
+  }
+}

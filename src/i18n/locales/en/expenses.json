@@ -12,6 +12,7 @@
     "category": "Category",
     "amount": "Amount",
     "actions": "Actions",
+    "edit": "Edit",
     "delete": "Delete",
     "deleteExpense": "Delete Expense",
     "deleteExpenseConfirm": "Are you sure you want to delete this expense of {{amount}}? This action cannot be undone.",
@@ -35,10 +36,12 @@
     "legal": "Legal & Professional Fees",
     "other": "Other"
   },
-  "addExpenseModal": {
+  "expenseModal": {
     "title": "Log Expense",
+    "editTitle": "Edit Expense",
     "cancel": "Cancel",
     "save": "Save Expense",
+    "update": "Update Expense",
     "property": "Property",
     "selectProperty": "Select property",
     "propertyRequired": "Please select a property",
@@ -57,7 +60,8 @@
     "dateRequired": "Please select a date",
     "description": "Description",
     "descriptionPlaceholder": "e.g., Generator fuel refill for October",
-    "expenseAdded": "Expense logged successfully"
+    "expenseAdded": "Expense logged successfully",
+    "expenseUpdated": "Expense updated successfully"
   },
   "manageCategories": {
     "button": "Manage Categories",

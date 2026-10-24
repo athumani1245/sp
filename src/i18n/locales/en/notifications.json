@@ -1,0 +1,23 @@
+{
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No notifications yet",
+    "enablePush": "Enable push",
+    "pushEnabled": "Push notifications enabled",
+    "pushDenied": "Push notifications were not enabled",
+    "justNow": "Just now",
+    "minutesAgo": "{{count}}m ago",
+    "hoursAgo": "{{count}}h ago",
+    "daysAgo": "{{count}}d ago",
+    "delete": "Delete",
+    "types": {
+      "all": "All",
+      "expense": "Expenses",
+      "payment": "Payments",
+      "lease": "Leases",
+      "tenant": "Tenants",
+      "property": "Properties",
+      "unit": "Units"
+    }
+  }
+}

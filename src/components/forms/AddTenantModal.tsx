@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Modal,
@@ -13,8 +13,12 @@ import {
   Typography,
   Divider,
   Select,
+  Upload,
+  Card,
+  Avatar,
   theme,
 } from 'antd';
+import type { UploadFile } from 'antd';
 import {
   UserOutlined,
   PhoneOutlined,
@@ -23,11 +27,72 @@ import {
   MailOutlined,
   TeamOutlined,
   IdcardOutlined,
+  UploadOutlined,
+  CameraOutlined,
 } from '@ant-design/icons';
 import { useCreateTenant } from '../../hooks/useTenants';
 import EmergencyContactsEditor, { EmergencyContact } from './EmergencyContactsEditor';
 
 const { Text, Title } = Typography;
+
+// Upload keeps files in the form until submit instead of posting them itself.
+const fileListProps = {
+  valuePropName: 'fileList',
+  getValueFromEvent: (e: { fileList: UploadFile[] }) => e.fileList,
+};
+
+// Round photo picker; keeps the single selected file as a one-item UploadFile list.
+const TenantPhotoInput: React.FC<{ value?: UploadFile[]; onChange?: (files: UploadFile[]) => void }> = ({
+  value = [],
+  onChange,
+}) => {
+  const { t } = useTranslation();
+  const { token } = theme.useToken();
+  const file = value[0]?.originFileObj;
+  const preview = useMemo(() => (file ? URL.createObjectURL(file) : undefined), [file]);
+  useEffect(() => () => { if (preview) URL.revokeObjectURL(preview); }, [preview]);
+
+  return (
+    <Space orientation="vertical" align="center" size={4} style={{ width: '100%' }}>
+      <Upload
+        accept="image/*"
+        showUploadList={false}
+        beforeUpload={() => false}
+        onChange={({ fileList }) => onChange?.(fileList.slice(-1))}
+      >
+        <div style={{ position: 'relative', cursor: 'pointer' }}>
+          <Avatar size={80} src={preview} icon={<UserOutlined />} style={{ backgroundColor: token.colorFillSecondary, color: token.colorTextTertiary }} />
+          <span
+            style={{
+              position: 'absolute',
+              right: 0,
+              bottom: 0,
+              width: 28,
+              height: 28,
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: token.colorPrimary,
+              color: token.colorWhite,
+              border: `2px solid ${token.colorBgContainer}`,
+            }}
+          >
+            <CameraOutlined />
+          </span>
+        </div>
+      </Upload>
+      <Text strong style={{ marginTop: 8 }}>{t('tenants:addTenantModal.attachment')}</Text>
+      {file ? (
+        <Button type="link" size="small" danger style={{ padding: 0, height: 'auto' }} onClick={() => onChange?.([])}>
+          {t('tenants:addTenantModal.remove')}
+        </Button>
+      ) : (
+        <Text type="secondary" style={{ fontSize: 12 }}>{t('tenants:addTenantModal.photoHint')}</Text>
+      )}
+    </Space>
+  );
+};
 
 interface AddTenantModalProps {
   isOpen: boolean;
@@ -78,7 +143,22 @@ const AddTenantModal: React.FC<AddTenantModalProps> = ({
         };
       }
 
-      await createTenantMutation.mutateAsync(tenantData);
+      const attachment: UploadFile[] = values.attachment || [];
+      const identificationFiles: UploadFile[] = values.identification_files || [];
+
+      // Files need multipart; nested objects ride along as JSON strings.
+      let payload: any = tenantData;
+      if (attachment.length || identificationFiles.length) {
+        payload = new FormData();
+        Object.entries(tenantData).forEach(([key, value]) => {
+          if (value === null || value === undefined) return;
+          payload.append(key, typeof value === 'object' ? JSON.stringify(value) : String(value));
+        });
+        attachment.forEach((f) => payload.append('attachment', f.originFileObj as File));
+        identificationFiles.forEach((f) => payload.append('identification_files', f.originFileObj as File));
+      }
+
+      await createTenantMutation.mutateAsync(payload);
       
       if (onTenantAdded) {
         onTenantAdded();
@@ -142,58 +222,73 @@ const AddTenantModal: React.FC<AddTenantModalProps> = ({
           </Title>
 
           <Row gutter={16}>
-            <Col xs={24} md={12}>
-              <Form.Item
-                label={t('tenants:addTenantModal.firstName')}
-                name="first_name"
-                rules={[
-                  { required: true, message: t('tenants:addTenantModal.firstNameRequired') },
-                  { min: 2, message: t('tenants:addTenantModal.firstNameMin') },
-                ]}
-                tooltip={t('tenants:addTenantModal.firstNameTooltip')}
+            <Col xs={24} md={6}>
+              <Card
+                size="small"
+                style={{ minHeight: 'calc(100% - 24px)', marginBottom: 24, display: 'flex', flexDirection: 'column' }}
+                styles={{ body: { flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' } }}
               >
-                <Input prefix={<UserOutlined />} placeholder={t('tenants:addTenantModal.firstNamePlaceholder')} />
-              </Form.Item>
+                <Form.Item name="attachment" noStyle>
+                  <TenantPhotoInput />
+                </Form.Item>
+              </Card>
             </Col>
+            <Col xs={24} md={18}>
+              <Row gutter={16}>
+                <Col xs={24} md={12}>
+                  <Form.Item
+                    label={t('tenants:addTenantModal.firstName')}
+                    name="first_name"
+                    rules={[
+                      { required: true, message: t('tenants:addTenantModal.firstNameRequired') },
+                      { min: 2, message: t('tenants:addTenantModal.firstNameMin') },
+                    ]}
+                    tooltip={t('tenants:addTenantModal.firstNameTooltip')}
+                  >
+                    <Input prefix={<UserOutlined />} placeholder={t('tenants:addTenantModal.firstNamePlaceholder')} />
+                  </Form.Item>
+                </Col>
 
-            <Col xs={24} md={12}>
-              <Form.Item
-                label={t('tenants:addTenantModal.lastName')}
-                name="last_name"
-                rules={[
-                  { required: true, message: t('tenants:addTenantModal.lastNameRequired') },
-                  { min: 2, message: t('tenants:addTenantModal.lastNameMin') },
-                ]}
-                tooltip={t('tenants:addTenantModal.lastNameTooltip')}
-              >
-                <Input prefix={<UserOutlined />} placeholder={t('tenants:addTenantModal.lastNamePlaceholder')} />
-              </Form.Item>
-            </Col>
-          </Row>
+                <Col xs={24} md={12}>
+                  <Form.Item
+                    label={t('tenants:addTenantModal.lastName')}
+                    name="last_name"
+                    rules={[
+                      { required: true, message: t('tenants:addTenantModal.lastNameRequired') },
+                      { min: 2, message: t('tenants:addTenantModal.lastNameMin') },
+                    ]}
+                    tooltip={t('tenants:addTenantModal.lastNameTooltip')}
+                  >
+                    <Input prefix={<UserOutlined />} placeholder={t('tenants:addTenantModal.lastNamePlaceholder')} />
+                  </Form.Item>
+                </Col>
+              </Row>
 
-          <Row gutter={16}>
-            <Col xs={24} md={12}>
-              <Form.Item label={t('tenants:addTenantModal.gender')} name="gender">
-                <Select
-                  placeholder={t('tenants:addTenantModal.selectGender')}
-                  allowClear
-                  options={[
-                    { value: 'Male', label: t('tenants:addTenantModal.male') },
-                    { value: 'Female', label: t('tenants:addTenantModal.female') },
-                  ]}
-                />
-              </Form.Item>
-            </Col>
+              <Row gutter={16}>
+                <Col xs={24} md={12}>
+                  <Form.Item label={t('tenants:addTenantModal.gender')} name="gender">
+                    <Select
+                      placeholder={t('tenants:addTenantModal.selectGender')}
+                      allowClear
+                      options={[
+                        { value: 'Male', label: t('tenants:addTenantModal.male') },
+                        { value: 'Female', label: t('tenants:addTenantModal.female') },
+                      ]}
+                    />
+                  </Form.Item>
+                </Col>
 
-            <Col xs={24} md={12}>
-              <Form.Item
-                label={t('tenants:addTenantModal.email')}
-                name="email"
-                rules={[{ type: 'email', message: t('tenants:addTenantModal.emailInvalid') }]}
-                tooltip={t('tenants:addTenantModal.emailTooltip')}
-              >
-                <Input prefix={<MailOutlined />} placeholder={t('tenants:addTenantModal.emailPlaceholder')} />
-              </Form.Item>
+                <Col xs={24} md={12}>
+                  <Form.Item
+                    label={t('tenants:addTenantModal.email')}
+                    name="email"
+                    rules={[{ type: 'email', message: t('tenants:addTenantModal.emailInvalid') }]}
+                    tooltip={t('tenants:addTenantModal.emailTooltip')}
+                  >
+                    <Input prefix={<MailOutlined />} placeholder={t('tenants:addTenantModal.emailPlaceholder')} />
+                  </Form.Item>
+                </Col>
+              </Row>
             </Col>
           </Row>
 
@@ -294,6 +389,16 @@ const AddTenantModal: React.FC<AddTenantModalProps> = ({
               </Form.Item>
             </Col>
           </Row>
+
+          <Form.Item
+            label={t('tenants:addTenantModal.identificationFiles')}
+            name="identification_files"
+            {...fileListProps}
+          >
+            <Upload accept="image/*,.pdf" multiple beforeUpload={() => false}>
+              <Button icon={<UploadOutlined />}>{t('tenants:addTenantModal.attachId')}</Button>
+            </Upload>
+          </Form.Item>
 
           <Divider />
 

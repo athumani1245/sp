@@ -15,6 +15,7 @@ import enPropertyManagers from './locales/en/propertyManagers.json';
 import enChatter from './locales/en/chatter.json';
 import enLeaseBuilder from './locales/en/leaseBuilder.json';
 import enExpenses from './locales/en/expenses.json';
+import enNotifications from './locales/en/notifications.json';
 import swAuth from './locales/sw/auth.json';
 import swCommon from './locales/sw/common.json';
 import swProperties from './locales/sw/properties.json';
@@ -30,6 +31,7 @@ import swPropertyManagers from './locales/sw/propertyManagers.json';
 import swChatter from './locales/sw/chatter.json';
 import swLeaseBuilder from './locales/sw/leaseBuilder.json';
 import swExpenses from './locales/sw/expenses.json';
+import swNotifications from './locales/sw/notifications.json';
 
 // Initialize i18next
 i18n
@@ -52,6 +54,7 @@ i18n
         chatter: enChatter,
         leaseBuilder: enLeaseBuilder,
         expenses: enExpenses,
+        notifications: enNotifications,
       },
       sw: {
         auth: swAuth,
@@ -69,12 +72,13 @@ i18n
         chatter: swChatter,
         leaseBuilder: swLeaseBuilder,
         expenses: swExpenses,
+        notifications: swNotifications,
       },
     },
     lng: localStorage.getItem('language') || 'en', // Load saved language or default to English
     fallbackLng: 'en',
     defaultNS: 'common',
-    ns: ['common', 'auth', 'properties', 'tenants', 'leases', 'dashboard', 'profile', 'leaseReport', 'leaseExpiryReport', 'pendingPaymentsReport', 'subscription', 'propertyManagers', 'chatter', 'leaseBuilder', 'expenses'],
+    ns: ['common', 'auth', 'properties', 'tenants', 'leases', 'dashboard', 'profile', 'leaseReport', 'leaseExpiryReport', 'pendingPaymentsReport', 'subscription', 'propertyManagers', 'chatter', 'leaseBuilder', 'expenses', 'notifications'],
     interpolation: {
       escapeValue: false, // React already escapes values
     },

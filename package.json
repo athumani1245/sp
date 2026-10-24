@@ -32,6 +32,7 @@
     "antd-phone-input": "^0.3.19",
     "axios": "^1.13.3",
     "dayjs": "^1.11.19",
+    "firebase": "^12.19.0",
     "html2canvas": "^1.4.1",
     "i18next": "^25.8.14",
     "jspdf": "^4.1.0",

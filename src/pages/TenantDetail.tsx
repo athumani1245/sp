@@ -16,6 +16,10 @@ import {
   Col,
   Table,
   message,
+  Avatar,
+  Image,
+  Upload,
+  theme,
 } from 'antd';
 import {
   ArrowLeftOutlined,
@@ -40,6 +44,7 @@ const TenantDetail: React.FC = () => {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { token } = theme.useToken();
   const [form] = Form.useForm();
   const [isEditMode, setIsEditMode] = useState(false);
   const [emergencyContacts, setEmergencyContacts] = useState<EmergencyContact[]>([]);
@@ -236,77 +241,101 @@ const TenantDetail: React.FC = () => {
       <Card title={t('tenants:tenantDetail.tenantInformation')}>
         <Form form={form} layout="vertical">
           <Row gutter={16}>
-            <Col xs={24} sm={12}>
-              <Form.Item
-                label={t('tenants:tenantDetail.firstName')}
-                name="first_name"
-                rules={[{ required: true, message: t('tenants:tenantDetail.firstNameRequired') }]}
+            <Col xs={24} md={6}>
+              <Card
+                size="small"
+                style={{ minHeight: 'calc(100% - 24px)', marginBottom: 24, display: 'flex', flexDirection: 'column' }}
+                styles={{ body: { flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12 } }}
               >
-                <Input
-                  placeholder={t('tenants:tenantDetail.firstNamePlaceholder')}
-                  disabled={!isEditMode}
-                  prefix={<UserOutlined />}
-                />
-              </Form.Item>
+                {tenant.attachment?.url ? (
+                  <Image
+                    src={tenant.attachment.url}
+                    alt={tenant.attachment.file_name}
+                    width={96}
+                    height={96}
+                    style={{ borderRadius: '50%', objectFit: 'cover' }}
+                  />
+                ) : (
+                  <Avatar size={96} icon={<UserOutlined />} style={{ backgroundColor: token.colorFillSecondary, color: token.colorTextTertiary }} />
+                )}
+                <Text strong>{t('tenants:addTenantModal.attachment')}</Text>
+              </Card>
             </Col>
-            <Col xs={24} sm={12}>
-              <Form.Item
-                label={t('tenants:tenantDetail.lastName')}
-                name="last_name"
-                rules={[{ required: true, message: t('tenants:tenantDetail.lastNameRequired') }]}
-              >
-                <Input
-                  placeholder={t('tenants:tenantDetail.lastNamePlaceholder')}
-                  disabled={!isEditMode}
-                  prefix={<UserOutlined />}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
+            <Col xs={24} md={18}>
+              <Row gutter={16}>
+                <Col xs={24} sm={12}>
+                  <Form.Item
+                    label={t('tenants:tenantDetail.firstName')}
+                    name="first_name"
+                    rules={[{ required: true, message: t('tenants:tenantDetail.firstNameRequired') }]}
+                  >
+                    <Input
+                      placeholder={t('tenants:tenantDetail.firstNamePlaceholder')}
+                      disabled={!isEditMode}
+                      prefix={<UserOutlined />}
+                    />
+                  </Form.Item>
+                </Col>
+                <Col xs={24} sm={12}>
+                  <Form.Item
+                    label={t('tenants:tenantDetail.lastName')}
+                    name="last_name"
+                    rules={[{ required: true, message: t('tenants:tenantDetail.lastNameRequired') }]}
+                  >
+                    <Input
+                      placeholder={t('tenants:tenantDetail.lastNamePlaceholder')}
+                      disabled={!isEditMode}
+                      prefix={<UserOutlined />}
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
 
-          <Row gutter={16}>
-            <Col xs={24} sm={12}>
-              <Form.Item
-                label={t('tenants:tenantDetail.phoneNumber')}
-                name="username"
-                rules={[{ required: true, message: t('tenants:tenantDetail.phoneNumberRequired') }]}
-              >
-                <Input
-                  placeholder={t('tenants:tenantDetail.phoneNumberPlaceholder')}
-                  disabled={!isEditMode}
-                  prefix={<PhoneOutlined />}
-                />
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={12}>
-              <Form.Item
-                label={t('tenants:tenantDetail.email')}
-                name="email"
-                rules={[{ type: 'email', message: t('tenants:tenantDetail.emailInvalid') }]}
-              >
-                <Input
-                  placeholder={t('tenants:tenantDetail.emailPlaceholder')}
-                  disabled={!isEditMode}
-                  prefix={<MailOutlined />}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
+              <Row gutter={16}>
+                <Col xs={24} sm={12}>
+                  <Form.Item
+                    label={t('tenants:tenantDetail.phoneNumber')}
+                    name="username"
+                    rules={[{ required: true, message: t('tenants:tenantDetail.phoneNumberRequired') }]}
+                  >
+                    <Input
+                      placeholder={t('tenants:tenantDetail.phoneNumberPlaceholder')}
+                      disabled={!isEditMode}
+                      prefix={<PhoneOutlined />}
+                    />
+                  </Form.Item>
+                </Col>
+                <Col xs={24} sm={12}>
+                  <Form.Item
+                    label={t('tenants:tenantDetail.email')}
+                    name="email"
+                    rules={[{ type: 'email', message: t('tenants:tenantDetail.emailInvalid') }]}
+                  >
+                    <Input
+                      placeholder={t('tenants:tenantDetail.emailPlaceholder')}
+                      disabled={!isEditMode}
+                      prefix={<MailOutlined />}
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
 
-          <Row gutter={16}>
-            <Col xs={24} sm={12}>
-              <Form.Item label={t('tenants:tenantDetail.gender')} name="gender">
-                <Select
-                  placeholder={t('tenants:tenantDetail.selectGender')}
-                  disabled={!isEditMode}
-                  allowClear
-                  options={[
-                    { value: 'Male', label: t('tenants:tenantDetail.male') },
-                    { value: 'Female', label: t('tenants:tenantDetail.female') },
-                    { value: 'Other', label: t('tenants:tenantDetail.other') },
-                  ]}
-                />
-              </Form.Item>
+              <Row gutter={16}>
+                <Col xs={24} sm={12}>
+                  <Form.Item label={t('tenants:tenantDetail.gender')} name="gender">
+                    <Select
+                      placeholder={t('tenants:tenantDetail.selectGender')}
+                      disabled={!isEditMode}
+                      allowClear
+                      options={[
+                        { value: 'Male', label: t('tenants:tenantDetail.male') },
+                        { value: 'Female', label: t('tenants:tenantDetail.female') },
+                        { value: 'Other', label: t('tenants:tenantDetail.other') },
+                      ]}
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
             </Col>
           </Row>
         </Form>
@@ -349,6 +378,22 @@ const TenantDetail: React.FC = () => {
               </Form.Item>
             </Col>
           </Row>
+          {tenant.identification?.attachments?.length > 0 && (
+            <Form.Item label={t('tenants:addTenantModal.identificationFiles')} style={{ marginBottom: 0 }}>
+              {/* No children, so Upload only renders the file list (icons, names, links). */}
+              <Upload
+                listType="picture"
+                showUploadList={{ showRemoveIcon: false }}
+                fileList={tenant.identification.attachments.map((file: any) => ({
+                  uid: file.id,
+                  name: file.file_name,
+                  status: 'done',
+                  url: file.url,
+                  type: file.mime_type,
+                }))}
+              />
+            </Form.Item>
+          )}
         </Form>
       </Card>
 

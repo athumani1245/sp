@@ -62,11 +62,3 @@ export const deleteNote = async ({ model, record_id, noteId }: NoteParams & { no
   await api.delete(`${API_BASE}/notes/${noteId}/`);
   return { success: true };
 };
-
-// Get all reminders for current user (for notification tray)
-export const getReminders = async () => {
-  const response = await api.get(`${API_BASE}/notes/`, {
-    params: { note_type: 'REMINDER' },
-  });
-  return response.data.data || response.data;
-};
