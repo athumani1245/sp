@@ -1,0 +1,61 @@
+{
+  "title": "Ripoti ya Malipo",
+  "subtitle": "Angalia na pakua taarifa za malipo",
+  "statistics": {
+    "totalRecords": "Jumla ya Malipo",
+    "totalCollected": "Jumla Iliyokusanywa",
+    "successfulPayments": "Malipo Yaliyofanikiwa",
+    "refundedOrCancelled": "Yaliyorejeshwa / Kughairiwa"
+  },
+  "export": {
+    "exportExcel": "Pakua Excel",
+    "exportPdf": "Pakua PDF",
+    "refresh": "Onyesha Tena",
+    "columns": "Safu",
+    "successExcel": "Rekodi {{count}} zimepakuliwa kwenye Excel",
+    "successPdf": "Rekodi {{count}} zimepakuliwa kwenye PDF",
+    "noData": "Hakuna data ya kupakua",
+    "errorExcel": "Imeshindwa kupakua Excel",
+    "errorPdf": "Imeshindwa kupakua PDF"
+  },
+  "quickRange": {
+    "label": "Chagua Haraka:",
+    "today": "Leo",
+    "thisWeek": "Wiki hii",
+    "thisMonth": "Mwezi huu",
+    "thisYear": "Mwaka huu"
+  },
+  "filters": {
+    "paymentStatus": "Hali ya Malipo",
+    "allStatuses": "Hali Zote",
+    "searchPlaceholder": "Tafuta kwa mpangaji au mkataba...",
+    "resetFilters": "Futa Vichujio",
+    "filtersReset": "Vichujio vimefutwa",
+    "activeFilters": "Vichujio Vilivyotumika:",
+    "search": "Tafuta",
+    "dateRange": "Tarehe ya Malipo",
+    "all": "Zote"
+  },
+  "columns": {
+    "leaseNo": "Namba ya Mkataba",
+    "tenant": "Mpangaji",
+    "amountPaid": "Iliyolipwa",
+    "selectAll": "Chagua Zote",
+    "deselectAll": "Ondoa Zote",
+    "selectColumns": "Chagua Safu",
+    "datePaid": "Tarehe ya Malipo",
+    "paymentSource": "Njia ya Malipo",
+    "category": "Aina",
+    "status": "Hali"
+  },
+  "paymentStatus": {
+    "paid": "Imelipwa",
+    "refunded": "Imerejeshwa",
+    "cancelled": "Imeghairiwa"
+  },
+  "table": {
+    "showing": "Inaonyesha rekodi {{count}} kati ya {{total}}",
+    "selected": "{{count}} zimechaguliwa",
+    "na": "Hakuna"
+  }
+}

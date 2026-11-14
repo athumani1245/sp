@@ -14,6 +14,7 @@ import {
   getLeaseReport,
   getLeaseExpiryReport,
   getPendingPaymentsReport,
+  getPaymentsReport,
 } from '../services/leaseService';
 import { message } from 'antd';
 
@@ -70,6 +71,13 @@ export const usePendingPaymentsReport = () => {
   return useQuery({
     queryKey: ['pendingPaymentsReport'],
     queryFn: getPendingPaymentsReport,
+  });
+};
+
+export const usePaymentsReport = () => {
+  return useQuery({
+    queryKey: ['paymentsReport'],
+    queryFn: getPaymentsReport,
   });
 };
 

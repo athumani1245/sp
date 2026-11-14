@@ -65,6 +65,11 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ collapsed, isMobile = false }) 
       label: t('common:nav.pendingPayments'),
       onClick: () => navigate('/reports/pending-payments'),
     } as MenuItem] : []),
+    {
+      key: '/reports/payments',
+      label: t('common:nav.paymentsReport'),
+      onClick: () => navigate('/reports/payments'),
+    } as MenuItem,
   ];
 
   const allMenuItems: (MenuItem | null)[] = [

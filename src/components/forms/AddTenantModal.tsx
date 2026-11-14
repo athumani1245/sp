@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Modal,
@@ -15,7 +15,6 @@ import {
   Select,
   Upload,
   Card,
-  Avatar,
   theme,
 } from 'antd';
 import type { UploadFile } from 'antd';
@@ -28,10 +27,10 @@ import {
   TeamOutlined,
   IdcardOutlined,
   UploadOutlined,
-  CameraOutlined,
 } from '@ant-design/icons';
 import { useCreateTenant } from '../../hooks/useTenants';
 import EmergencyContactsEditor, { EmergencyContact } from './EmergencyContactsEditor';
+import TenantPhotoInput from './TenantPhotoInput';
 
 const { Text, Title } = Typography;
 
@@ -39,59 +38,6 @@ const { Text, Title } = Typography;
 const fileListProps = {
   valuePropName: 'fileList',
   getValueFromEvent: (e: { fileList: UploadFile[] }) => e.fileList,
-};
-
-// Round photo picker; keeps the single selected file as a one-item UploadFile list.
-const TenantPhotoInput: React.FC<{ value?: UploadFile[]; onChange?: (files: UploadFile[]) => void }> = ({
-  value = [],
-  onChange,
-}) => {
-  const { t } = useTranslation();
-  const { token } = theme.useToken();
-  const file = value[0]?.originFileObj;
-  const preview = useMemo(() => (file ? URL.createObjectURL(file) : undefined), [file]);
-  useEffect(() => () => { if (preview) URL.revokeObjectURL(preview); }, [preview]);
-
-  return (
-    <Space orientation="vertical" align="center" size={4} style={{ width: '100%' }}>
-      <Upload
-        accept="image/*"
-        showUploadList={false}
-        beforeUpload={() => false}
-        onChange={({ fileList }) => onChange?.(fileList.slice(-1))}
-      >
-        <div style={{ position: 'relative', cursor: 'pointer' }}>
-          <Avatar size={80} src={preview} icon={<UserOutlined />} style={{ backgroundColor: token.colorFillSecondary, color: token.colorTextTertiary }} />
-          <span
-            style={{
-              position: 'absolute',
-              right: 0,
-              bottom: 0,
-              width: 28,
-              height: 28,
-              borderRadius: '50%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: token.colorPrimary,
-              color: token.colorWhite,
-              border: `2px solid ${token.colorBgContainer}`,
-            }}
-          >
-            <CameraOutlined />
-          </span>
-        </div>
-      </Upload>
-      <Text strong style={{ marginTop: 8 }}>{t('tenants:addTenantModal.attachment')}</Text>
-      {file ? (
-        <Button type="link" size="small" danger style={{ padding: 0, height: 'auto' }} onClick={() => onChange?.([])}>
-          {t('tenants:addTenantModal.remove')}
-        </Button>
-      ) : (
-        <Text type="secondary" style={{ fontSize: 12 }}>{t('tenants:addTenantModal.photoHint')}</Text>
-      )}
-    </Space>
-  );
 };
 
 interface AddTenantModalProps {
