@@ -1034,6 +1034,8 @@ interface PaymentsReportData {
   date_paid: string;
   lease_number: string;
   tenant: string;
+  property: string;
+  unit: string;
   amount_paid: number;
   payment_source: string;
   category: string;
@@ -1050,6 +1052,8 @@ const PAYMENTS_REPORT_COLUMNS: { [key: string]: { title: string; dataIndex: keyo
   date_paid: { title: 'Date Paid', dataIndex: 'date_paid', formatter: (date: string) => formatLeaseDate(date) || 'N/A' },
   lease_number: { title: 'Lease No.', dataIndex: 'lease_number' },
   tenant: { title: 'Tenant', dataIndex: 'tenant' },
+  property: { title: 'Property', dataIndex: 'property' },
+  unit: { title: 'Unit', dataIndex: 'unit' },
   amount_paid: { title: 'Amount Paid (TSh)', dataIndex: 'amount_paid', formatter: (amount: number) => amount || 0 },
   payment_source: { title: 'Payment Source', dataIndex: 'payment_source', formatter: (v: string) => (v || 'N/A').toUpperCase() },
   category: { title: 'Category', dataIndex: 'category', formatter: (v: string) => (v || 'N/A').toUpperCase() },
@@ -1128,6 +1132,8 @@ export const exportPaymentsReportToPDF = (options: PaymentsExportOptions): void 
       date_paid: 60,
       lease_number: 75,
       tenant: 100,
+      property: 90,
+      unit: 60,
       amount_paid: 80,
       payment_source: 75,
       category: 65,

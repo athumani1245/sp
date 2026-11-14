@@ -28,7 +28,7 @@
   "filters": {
     "paymentStatus": "Payment Status",
     "allStatuses": "All Statuses",
-    "searchPlaceholder": "Search by tenant or lease...",
+    "searchPlaceholder": "Search by tenant, property, unit or lease...",
     "resetFilters": "Reset Filters",
     "filtersReset": "Filters reset",
     "activeFilters": "Active Filters:",
@@ -39,6 +39,8 @@
   "columns": {
     "leaseNo": "Lease No.",
     "tenant": "Tenant",
+    "property": "Property",
+    "unit": "Unit",
     "amountPaid": "Amount Paid",
     "selectAll": "Select All",
     "deselectAll": "Deselect All",

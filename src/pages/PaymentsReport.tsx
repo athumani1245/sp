@@ -41,6 +41,8 @@ interface PaymentReportData {
   date_paid: string;
   lease_number: string;
   tenant: string;
+  property: string;
+  unit: string;
   amount_paid: number;
   payment_source: string;
   category: string;
@@ -66,6 +68,8 @@ const PaymentsReport: React.FC = () => {
     date_paid: true,
     lease_number: true,
     tenant: true,
+    property: true,
+    unit: true,
     amount_paid: true,
     payment_source: true,
     category: true,
@@ -79,6 +83,8 @@ const PaymentsReport: React.FC = () => {
       const searchFields = [
         item.lease_number,
         item.tenant,
+        item.property,
+        item.unit,
         item.payment_source,
         item.category,
       ].join(' ').toLowerCase();
@@ -179,6 +185,20 @@ const PaymentsReport: React.FC = () => {
       dataIndex: 'tenant',
       key: 'tenant',
       sorter: (a, b) => (a.tenant || '').localeCompare(b.tenant || ''),
+      render: (text) => text || t('paymentsReport:table.na'),
+    },
+    {
+      title: t('paymentsReport:columns.property'),
+      dataIndex: 'property',
+      key: 'property',
+      sorter: (a, b) => (a.property || '').localeCompare(b.property || ''),
+      render: (text) => text || t('paymentsReport:table.na'),
+    },
+    {
+      title: t('paymentsReport:columns.unit'),
+      dataIndex: 'unit',
+      key: 'unit',
+      sorter: (a, b) => (a.unit || '').localeCompare(b.unit || ''),
       render: (text) => text || t('paymentsReport:table.na'),
     },
     {
