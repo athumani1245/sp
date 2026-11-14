@@ -78,14 +78,79 @@ export const updateTenant = async ({ tenantId, tenantData }: { tenantId: string;
 export const updateTenantPhoto = async ({ tenantId, photo }: { tenantId: string; photo: File | null }) => {
   if (photo) {
     const formData = new FormData();
-    formData.append('attachment', photo);
-    const response = await api.patch(`${API_BASE}/tenants/${tenantId}/`, formData, {
+    formData.append('file', photo);
+    const response = await api.patch(`${API_BASE}/tenants/${tenantId}/passport-photo/`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     return response.data.data;
   }
-  const response = await api.patch(`${API_BASE}/tenants/${tenantId}/`, { attachment: null });
-  return response.data.data;
+  const response = await api.delete(`${API_BASE}/tenants/${tenantId}/passport-photo/`);
+  return response.data?.data;
+};
+
+// ---------- Identification files ----------
+
+export interface TenantIdentificationFile {
+  id: string;
+  file_name: string;
+  url: string;
+  attachment_type?: string | null;
+  mime_type?: string;
+}
+
+const normalizeIdentificationFile = (item: any): TenantIdentificationFile => {
+  const url = item.url ?? item.file ?? '';
+  return {
+    id: String(item.id),
+    url,
+    file_name: item.file_name || decodeURIComponent(url.split('/').pop()?.split('?')[0] || 'file'),
+    attachment_type: item.attachment_type ?? null,
+    mime_type: item.mime_type ?? item.content_type,
+  };
+};
+
+const multipartHeaders = { headers: { 'Content-Type': 'multipart/form-data' } };
+
+// List all ID files
+export const getTenantIdentificationFiles = async (tenantId: string): Promise<TenantIdentificationFile[]> => {
+  const response = await api.get(`${API_BASE}/tenants/${tenantId}/identification/`);
+  const raw = response.data?.data ?? response.data;
+  const items = Array.isArray(raw) ? raw : (raw?.attachments || raw?.items || raw?.results || []);
+  return items.map(normalizeIdentificationFile);
+};
+
+// Replace all ID files with a new set
+export const replaceTenantIdentificationFiles = async ({ tenantId, files }: { tenantId: string; files: File[] }) => {
+  const formData = new FormData();
+  files.forEach((file) => formData.append('files', file));
+  const response = await api.put(`${API_BASE}/tenants/${tenantId}/identification/`, formData, multipartHeaders);
+  return response.data?.data;
+};
+
+// Replace one ID file
+export const updateTenantIdentificationFile = async ({
+  tenantId,
+  attachmentId,
+  file,
+}: {
+  tenantId: string;
+  attachmentId: string;
+  file: File;
+}) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  const response = await api.patch(
+    `${API_BASE}/tenants/${tenantId}/identification/${attachmentId}/`,
+    formData,
+    multipartHeaders,
+  );
+  return response.data?.data;
+};
+
+// Delete one ID file
+export const deleteTenantIdentificationFile = async ({ tenantId, attachmentId }: { tenantId: string; attachmentId: string }) => {
+  await api.delete(`${API_BASE}/tenants/${tenantId}/identification/${attachmentId}/`);
+  return { success: true };
 };
 
 // Delete a tenant

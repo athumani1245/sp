@@ -11,6 +11,7 @@ import enLeaseReport from './locales/en/leaseReport.json';
 import enLeaseExpiryReport from './locales/en/leaseExpiryReport.json';
 import enPendingPaymentsReport from './locales/en/pendingPaymentsReport.json';
 import enPaymentsReport from './locales/en/paymentsReport.json';
+import enExpenseReport from './locales/en/expenseReport.json';
 import enSubscription from './locales/en/subscription.json';
 import enPropertyManagers from './locales/en/propertyManagers.json';
 import enChatter from './locales/en/chatter.json';
@@ -28,6 +29,7 @@ import swLeaseReport from './locales/sw/leaseReport.json';
 import swLeaseExpiryReport from './locales/sw/leaseExpiryReport.json';
 import swPendingPaymentsReport from './locales/sw/pendingPaymentsReport.json';
 import swPaymentsReport from './locales/sw/paymentsReport.json';
+import swExpenseReport from './locales/sw/expenseReport.json';
 import swSubscription from './locales/sw/subscription.json';
 import swPropertyManagers from './locales/sw/propertyManagers.json';
 import swChatter from './locales/sw/chatter.json';
@@ -52,6 +54,7 @@ i18n
         leaseExpiryReport: enLeaseExpiryReport,
         pendingPaymentsReport: enPendingPaymentsReport,
         paymentsReport: enPaymentsReport,
+        expenseReport: enExpenseReport,
         subscription: enSubscription,
         propertyManagers: enPropertyManagers,
         chatter: enChatter,
@@ -71,6 +74,7 @@ i18n
         leaseExpiryReport: swLeaseExpiryReport,
         pendingPaymentsReport: swPendingPaymentsReport,
         paymentsReport: swPaymentsReport,
+        expenseReport: swExpenseReport,
         subscription: swSubscription,
         propertyManagers: swPropertyManagers,
         chatter: swChatter,
@@ -82,7 +86,7 @@ i18n
     lng: localStorage.getItem('language') || 'en', // Load saved language or default to English
     fallbackLng: 'en',
     defaultNS: 'common',
-    ns: ['common', 'auth', 'properties', 'tenants', 'leases', 'dashboard', 'profile', 'leaseReport', 'leaseExpiryReport', 'pendingPaymentsReport', 'paymentsReport', 'subscription', 'propertyManagers', 'chatter', 'leaseBuilder', 'expenses', 'notifications'],
+    ns: ['common', 'auth', 'properties', 'tenants', 'leases', 'dashboard', 'profile', 'leaseReport', 'leaseExpiryReport', 'pendingPaymentsReport', 'paymentsReport', 'expenseReport', 'subscription', 'propertyManagers', 'chatter', 'leaseBuilder', 'expenses', 'notifications'],
     interpolation: {
       escapeValue: false, // React already escapes values
     },

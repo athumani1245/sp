@@ -16,7 +16,6 @@ import {
   Col,
   Table,
   message,
-  Upload,
 } from 'antd';
 import {
   ArrowLeftOutlined,
@@ -35,6 +34,7 @@ import { useTenant, useUpdateTenant } from '../hooks/useTenants';
 import ChatterLayout from '../components/layout/ChatterLayout';
 import EmergencyContactsEditor, { EmergencyContact } from '../components/forms/EmergencyContactsEditor';
 import TenantPhotoEditor from '../components/forms/TenantPhotoEditor';
+import TenantIdentificationFiles from '../components/forms/TenantIdentificationFiles';
 
 const { Title, Text } = Typography;
 
@@ -368,22 +368,7 @@ const TenantDetail: React.FC = () => {
               </Form.Item>
             </Col>
           </Row>
-          {tenant.identification?.attachments?.length > 0 && (
-            <Form.Item label={t('tenants:addTenantModal.identificationFiles')} style={{ marginBottom: 0 }}>
-              {/* No children, so Upload only renders the file list (icons, names, links). */}
-              <Upload
-                listType="picture"
-                showUploadList={{ showRemoveIcon: false }}
-                fileList={tenant.identification.attachments.map((file: any) => ({
-                  uid: file.id,
-                  name: file.file_name,
-                  status: 'done',
-                  url: file.url,
-                  type: file.mime_type,
-                }))}
-              />
-            </Form.Item>
-          )}
+          <TenantIdentificationFiles tenantId={id!} />
         </Form>
       </Card>
 

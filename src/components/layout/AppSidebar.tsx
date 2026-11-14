@@ -70,6 +70,11 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ collapsed, isMobile = false }) 
       label: t('common:nav.paymentsReport'),
       onClick: () => navigate('/reports/payments'),
     } as MenuItem,
+    {
+      key: '/reports/expense',
+      label: t('common:nav.expenseReport'),
+      onClick: () => navigate('/reports/expense'),
+    } as MenuItem,
   ];
 
   const allMenuItems: (MenuItem | null)[] = [

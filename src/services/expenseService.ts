@@ -47,3 +47,27 @@ export const deleteExpense = async (expenseId: string) => {
   await api.delete(`${API_BASE}/expenses/${expenseId}/`);
   return { success: true };
 };
+
+// Get expense report
+const joinNames = (value: any): string => {
+  if (Array.isArray(value)) {
+    return value.map((v) => (typeof v === 'string' ? v : v?.name ?? v?.property_name ?? v?.unit_name ?? '')).filter(Boolean).join(', ');
+  }
+  if (value && typeof value === 'object') return value.name ?? '';
+  return value ?? '';
+};
+
+export const getExpenseReport = async () => {
+  const response = await api.get(`/reports/expense`);
+  const raw = response.data.data;
+  const data = Array.isArray(raw) ? raw : (raw?.items || raw?.results || []);
+  return data.map((item: any, index: number) => ({
+    id: String(item.id ?? `expense-${index}`),
+    date: item.date ?? item.expense_date ?? item.created_at ?? '',
+    property: joinNames(item.properties ?? item.property ?? item.property_name),
+    unit: joinNames(item.units ?? item.unit ?? item.unit_name),
+    category: (typeof item.category === 'object' ? item.category?.name : item.category) ?? item.category_name ?? '',
+    description: item.description ?? '',
+    amount: parseFloat(item.amount) || 0,
+  }));
+};

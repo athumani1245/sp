@@ -141,6 +141,16 @@
     "attachPhoto": "Attach photo",
     "removePhoto": "Remove photo",
     "savePhoto": "Save photo",
-    "photoHoverHint": "Hover the photo to change or remove it"
+    "photoHoverHint": "Hover the photo to change or remove it",
+    "idFiles": {
+      "replace": "Replace file",
+      "delete": "Delete",
+      "deleteConfirm": "Delete \"{{name}}\"?",
+      "empty": "No ID files uploaded",
+      "add": "Add ID files",
+      "openInNewTab": "Open in new tab",
+      "close": "Close",
+      "previewUnavailable": "Preview is not available for this file type."
+    }
   }
 }
