@@ -136,6 +136,11 @@
     "noContactsAdded": "Hakuna anwani za dharura zilizoongezwa",
     "tenantNotFound": "Imeshindwa kupakia maelezo ya mpangaji. Tafadhali jaribu tena.",
     "tenantUpdated": "Mpangaji ameboreshwa!",
-    "tenantUpdateFailed": "Imeshindwa kuboresha mpangaji"
+    "tenantUpdateFailed": "Imeshindwa kuboresha mpangaji",
+    "changePhoto": "Badilisha picha",
+    "attachPhoto": "Weka picha",
+    "removePhoto": "Ondoa picha",
+    "savePhoto": "Hifadhi picha",
+    "photoHoverHint": "Weka kielekezi juu ya picha kuibadilisha au kuiondoa"
   }
 }

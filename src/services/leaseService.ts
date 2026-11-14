@@ -223,6 +223,25 @@ export const getPendingPaymentsReport = async () => {
   }));
 };
 
+// Get payments report
+export const getPaymentsReport = async () => {
+  const response = await api.get(`/reports/payments`);
+  const raw = response.data.data;
+  const data = Array.isArray(raw) ? raw : (raw?.items || raw?.results || []);
+  return data.map((item: any, index: number) => ({
+    id: String(item.id ?? item.payment_id ?? `${item.lease_number || 'payment'}-${index}`),
+    date_paid: item.date ?? item.date_paid ?? item.payment_date ?? item.created_at ?? '',
+    lease_number: item.lease_number ?? item.lease?.lease_number ?? '',
+    tenant: item.tenant_full_name
+      ?? item.tenant
+      ?? [item.tenant_name, item.tenant_last_name].filter(Boolean).join(' '),
+    amount_paid: parseFloat(item.amount_paid ?? item.amount) || 0,
+    payment_source: item.payment_source ?? item.payment_method ?? '',
+    category: item.category ?? '',
+    status: item.status ?? '',
+  }));
+};
+
 // Get lease expiry report
 export const getLeaseExpiryReport = async () => {
   const response = await api.get(`/reports/lease-expiry-report`);

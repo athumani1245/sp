@@ -5,6 +5,7 @@ import {
   getTenantById,
   createTenant,
   updateTenant,
+  updateTenantPhoto,
   deleteTenant,
   getTenantLeases,
 } from '../services/tenantService';
@@ -82,6 +83,23 @@ export const useUpdateTenant = () => {
     },
     onError: (error: any) => {
       const errorMsg = error.response?.data?.description || error.response?.data?.message || 'Failed to update tenant';
+      message.error(errorMsg);
+    },
+  });
+};
+
+export const useUpdateTenantPhoto = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateTenantPhoto,
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: tenantKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: tenantKeys.detail(variables.tenantId) });
+      message.success(variables.photo ? 'Tenant photo updated successfully!' : 'Tenant photo removed successfully!');
+    },
+    onError: (error: any) => {
+      const errorMsg = error.response?.data?.description || error.response?.data?.message || 'Failed to update tenant photo';
       message.error(errorMsg);
     },
   });

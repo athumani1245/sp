@@ -74,6 +74,20 @@ export const updateTenant = async ({ tenantId, tenantData }: { tenantId: string;
   return response.data.data;
 };
 
+// Replace (file) or remove (null) the tenant's photo, separately from the other details
+export const updateTenantPhoto = async ({ tenantId, photo }: { tenantId: string; photo: File | null }) => {
+  if (photo) {
+    const formData = new FormData();
+    formData.append('attachment', photo);
+    const response = await api.patch(`${API_BASE}/tenants/${tenantId}/`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data.data;
+  }
+  const response = await api.patch(`${API_BASE}/tenants/${tenantId}/`, { attachment: null });
+  return response.data.data;
+};
+
 // Delete a tenant
 export const deleteTenant = async (tenantId: string) => {
   await api.delete(`${API_BASE}/tenants/${tenantId}/`);

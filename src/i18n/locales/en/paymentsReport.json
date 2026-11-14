@@ -1,0 +1,61 @@
+{
+  "title": "Payments Report",
+  "subtitle": "View and export payment records",
+  "statistics": {
+    "totalRecords": "Total Payments",
+    "totalCollected": "Total Collected",
+    "successfulPayments": "Successful Payments",
+    "refundedOrCancelled": "Refunded / Cancelled"
+  },
+  "export": {
+    "exportExcel": "Export Excel",
+    "exportPdf": "Export PDF",
+    "refresh": "Refresh",
+    "columns": "Columns",
+    "successExcel": "Successfully exported {{count}} records to Excel",
+    "successPdf": "Successfully exported {{count}} records to PDF",
+    "noData": "No data available to export",
+    "errorExcel": "Failed to export data to Excel",
+    "errorPdf": "Failed to export data to PDF"
+  },
+  "quickRange": {
+    "label": "Quick Range:",
+    "today": "Today",
+    "thisWeek": "This Week",
+    "thisMonth": "This Month",
+    "thisYear": "This Year"
+  },
+  "filters": {
+    "paymentStatus": "Payment Status",
+    "allStatuses": "All Statuses",
+    "searchPlaceholder": "Search by tenant or lease...",
+    "resetFilters": "Reset Filters",
+    "filtersReset": "Filters reset",
+    "activeFilters": "Active Filters:",
+    "search": "Search",
+    "dateRange": "Date Paid",
+    "all": "All"
+  },
+  "columns": {
+    "leaseNo": "Lease No.",
+    "tenant": "Tenant",
+    "amountPaid": "Amount Paid",
+    "selectAll": "Select All",
+    "deselectAll": "Deselect All",
+    "selectColumns": "Select Columns",
+    "datePaid": "Date Paid",
+    "paymentSource": "Payment Source",
+    "category": "Category",
+    "status": "Status"
+  },
+  "paymentStatus": {
+    "paid": "Paid",
+    "refunded": "Refunded",
+    "cancelled": "Cancelled"
+  },
+  "table": {
+    "showing": "Showing {{count}} of {{total}} records",
+    "selected": "{{count}} selected",
+    "na": "N/A"
+  }
+}

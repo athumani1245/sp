@@ -136,6 +136,11 @@
     "noContactsAdded": "No emergency contacts added",
     "tenantNotFound": "Failed to load tenant details. Please try again.",
     "tenantUpdated": "Tenant updated successfully!",
-    "tenantUpdateFailed": "Failed to update tenant"
+    "tenantUpdateFailed": "Failed to update tenant",
+    "changePhoto": "Change photo",
+    "attachPhoto": "Attach photo",
+    "removePhoto": "Remove photo",
+    "savePhoto": "Save photo",
+    "photoHoverHint": "Hover the photo to change or remove it"
   }
 }

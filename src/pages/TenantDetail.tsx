@@ -16,10 +16,7 @@ import {
   Col,
   Table,
   message,
-  Avatar,
-  Image,
   Upload,
-  theme,
 } from 'antd';
 import {
   ArrowLeftOutlined,
@@ -37,6 +34,7 @@ import type { ColumnsType } from 'antd/es/table';
 import { useTenant, useUpdateTenant } from '../hooks/useTenants';
 import ChatterLayout from '../components/layout/ChatterLayout';
 import EmergencyContactsEditor, { EmergencyContact } from '../components/forms/EmergencyContactsEditor';
+import TenantPhotoEditor from '../components/forms/TenantPhotoEditor';
 
 const { Title, Text } = Typography;
 
@@ -44,7 +42,6 @@ const TenantDetail: React.FC = () => {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { token } = theme.useToken();
   const [form] = Form.useForm();
   const [isEditMode, setIsEditMode] = useState(false);
   const [emergencyContacts, setEmergencyContacts] = useState<EmergencyContact[]>([]);
@@ -247,18 +244,11 @@ const TenantDetail: React.FC = () => {
                 style={{ minHeight: 'calc(100% - 24px)', marginBottom: 24, display: 'flex', flexDirection: 'column' }}
                 styles={{ body: { flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12 } }}
               >
-                {tenant.attachment?.url ? (
-                  <Image
-                    src={tenant.attachment.url}
-                    alt={tenant.attachment.file_name}
-                    width={96}
-                    height={96}
-                    style={{ borderRadius: '50%', objectFit: 'cover' }}
-                  />
-                ) : (
-                  <Avatar size={96} icon={<UserOutlined />} style={{ backgroundColor: token.colorFillSecondary, color: token.colorTextTertiary }} />
-                )}
-                <Text strong>{t('tenants:addTenantModal.attachment')}</Text>
+                <TenantPhotoEditor
+                  tenantId={id!}
+                  currentUrl={tenant.attachment?.url}
+                  currentAlt={tenant.attachment?.file_name}
+                />
               </Card>
             </Col>
             <Col xs={24} md={18}>
