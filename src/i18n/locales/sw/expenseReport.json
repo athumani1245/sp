@@ -1,0 +1,57 @@
+{
+  "title": "Ripoti ya Matumizi",
+  "subtitle": "Angalia na pakua taarifa za matumizi",
+  "statistics": {
+    "totalRecords": "Jumla ya Matumizi",
+    "totalAmount": "Jumla ya Kiasi Kilichotumika",
+    "averageAmount": "Wastani wa Matumizi",
+    "categories": "Aina"
+  },
+  "export": {
+    "exportExcel": "Pakua Excel",
+    "exportPdf": "Pakua PDF",
+    "refresh": "Onyesha Tena",
+    "columns": "Safu",
+    "successExcel": "Rekodi {{count}} zimepakuliwa kwenye Excel",
+    "successPdf": "Rekodi {{count}} zimepakuliwa kwenye PDF",
+    "noData": "Hakuna data ya kupakua",
+    "errorExcel": "Imeshindwa kupakua Excel",
+    "errorPdf": "Imeshindwa kupakua PDF"
+  },
+  "quickRange": {
+    "label": "Chagua Haraka:",
+    "today": "Leo",
+    "thisWeek": "Wiki hii",
+    "thisMonth": "Mwezi huu",
+    "thisYear": "Mwaka huu"
+  },
+  "filters": {
+    "searchPlaceholder": "Tafuta kwa mali, chumba, aina au maelezo...",
+    "resetFilters": "Futa Vichujio",
+    "filtersReset": "Vichujio vimefutwa",
+    "activeFilters": "Vichujio Vilivyotumika:",
+    "search": "Tafuta",
+    "dateRange": "Tarehe",
+    "all": "Zote",
+    "category": "Aina",
+    "allCategories": "Aina Zote"
+  },
+  "columns": {
+    "selectAll": "Chagua Zote",
+    "deselectAll": "Ondoa Zote",
+    "selectColumns": "Chagua Safu",
+    "date": "Tarehe",
+    "property": "Mali",
+    "unit": "Chumba",
+    "category": "Aina",
+    "description": "Maelezo",
+    "amount": "Kiasi"
+  },
+  "table": {
+    "showing": "Inaonyesha rekodi {{count}} kati ya {{total}}",
+    "selected": "{{count}} zimechaguliwa",
+    "na": "Hakuna",
+    "wholeProperty": "Mali Yote",
+    "uncategorized": "Haina Aina"
+  }
+}

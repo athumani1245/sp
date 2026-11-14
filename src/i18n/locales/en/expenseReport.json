@@ -1,0 +1,57 @@
+{
+  "title": "Expense Report",
+  "subtitle": "View and export expense records",
+  "statistics": {
+    "totalRecords": "Total Expenses",
+    "totalAmount": "Total Amount Spent",
+    "averageAmount": "Average Expense",
+    "categories": "Categories"
+  },
+  "export": {
+    "exportExcel": "Export Excel",
+    "exportPdf": "Export PDF",
+    "refresh": "Refresh",
+    "columns": "Columns",
+    "successExcel": "Successfully exported {{count}} records to Excel",
+    "successPdf": "Successfully exported {{count}} records to PDF",
+    "noData": "No data available to export",
+    "errorExcel": "Failed to export data to Excel",
+    "errorPdf": "Failed to export data to PDF"
+  },
+  "quickRange": {
+    "label": "Quick Range:",
+    "today": "Today",
+    "thisWeek": "This Week",
+    "thisMonth": "This Month",
+    "thisYear": "This Year"
+  },
+  "filters": {
+    "searchPlaceholder": "Search by property, unit, category or description...",
+    "resetFilters": "Reset Filters",
+    "filtersReset": "Filters reset",
+    "activeFilters": "Active Filters:",
+    "search": "Search",
+    "dateRange": "Date",
+    "all": "All",
+    "category": "Category",
+    "allCategories": "All Categories"
+  },
+  "columns": {
+    "selectAll": "Select All",
+    "deselectAll": "Deselect All",
+    "selectColumns": "Select Columns",
+    "date": "Date",
+    "property": "Property",
+    "unit": "Unit",
+    "category": "Category",
+    "description": "Description",
+    "amount": "Amount"
+  },
+  "table": {
+    "showing": "Showing {{count}} of {{total}} records",
+    "selected": "{{count}} selected",
+    "na": "N/A",
+    "wholeProperty": "Whole Property",
+    "uncategorized": "Uncategorized"
+  }
+}

@@ -28,6 +28,7 @@ import LeaseReport from './pages/LeaseReport';
 import LeaseExpiryReport from './pages/LeaseExpiryReport';
 import PendingPaymentsReport from './pages/PendingPaymentsReport';
 import PaymentsReport from './pages/PaymentsReport';
+import ExpenseReport from './pages/ExpenseReport';
 import Profile from './pages/Profile';
 import Subscription from './pages/Subscription';
 import PropertyManagers from './pages/PropertyManagers';
@@ -135,6 +136,7 @@ function App() {
               <Route path="lease-expiry" element={<PermissionRoute permission="can_vew_lease_expiry_report"><SubscriptionGate><LeaseExpiryReport /></SubscriptionGate></PermissionRoute>} />
               <Route path="pending-payments" element={<PermissionRoute permission="can_view_pending_payments_report"><SubscriptionGate><PendingPaymentsReport /></SubscriptionGate></PermissionRoute>} />
               <Route path="payments" element={<SubscriptionGate><PaymentsReport /></SubscriptionGate>} />
+              <Route path="expense" element={<SubscriptionGate><ExpenseReport /></SubscriptionGate>} />
             </Route>
             <Route path="/learn" element={<PrivateRoute><MainLayout /></PrivateRoute>}>
               <Route index element={<AppAcademy />} />

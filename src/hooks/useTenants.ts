@@ -6,6 +6,10 @@ import {
   createTenant,
   updateTenant,
   updateTenantPhoto,
+  getTenantIdentificationFiles,
+  replaceTenantIdentificationFiles,
+  updateTenantIdentificationFile,
+  deleteTenantIdentificationFile,
   deleteTenant,
   getTenantLeases,
 } from '../services/tenantService';
@@ -19,6 +23,7 @@ export const tenantKeys = {
   details: () => [...tenantKeys.all, 'detail'] as const,
   detail: (id: string) => [...tenantKeys.details(), id] as const,
   leases: (tenantId: string) => [...tenantKeys.detail(tenantId), 'leases'] as const,
+  identification: (tenantId: string) => [...tenantKeys.detail(tenantId), 'identification'] as const,
 };
 
 // Tenant Hooks
@@ -104,6 +109,44 @@ export const useUpdateTenantPhoto = () => {
     },
   });
 };
+
+// ---------- Identification files ----------
+
+export const useTenantIdentificationFiles = (tenantId: string) => {
+  return useQuery({
+    queryKey: tenantKeys.identification(tenantId),
+    queryFn: () => getTenantIdentificationFiles(tenantId),
+    enabled: !!tenantId,
+  });
+};
+
+// Shared wiring: refresh the tenant (and its ID files) and show a message.
+const useIdentificationMutation = <TVars extends { tenantId: string }>(
+  mutationFn: (vars: TVars) => Promise<unknown>,
+  successMsg: string,
+  errorMsg: string,
+) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn,
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: tenantKeys.detail(variables.tenantId) });
+      message.success(successMsg);
+    },
+    onError: (error: any) => {
+      message.error(error.response?.data?.description || error.response?.data?.message || errorMsg);
+    },
+  });
+};
+
+export const useReplaceTenantIdentificationFiles = () =>
+  useIdentificationMutation(replaceTenantIdentificationFiles, 'ID files uploaded successfully!', 'Failed to upload ID files');
+
+export const useUpdateTenantIdentificationFile = () =>
+  useIdentificationMutation(updateTenantIdentificationFile, 'ID file updated successfully!', 'Failed to update ID file');
+
+export const useDeleteTenantIdentificationFile = () =>
+  useIdentificationMutation(deleteTenantIdentificationFile, 'ID file deleted successfully!', 'Failed to delete ID file');
 
 export const useDeleteTenant = () => {
   const queryClient = useQueryClient();

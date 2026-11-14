@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { getExpenses, addExpense, updateExpense, deleteExpense } from '../services/expenseService';
+import { getExpenses, addExpense, updateExpense, deleteExpense, getExpenseReport } from '../services/expenseService';
 import { message } from 'antd';
 
 export const expenseKeys = {
@@ -59,5 +59,12 @@ export const useDeleteExpense = () => {
       const errorMsg = error.response?.data?.description || error.response?.data?.message || 'Failed to delete expense';
       message.error(errorMsg);
     },
+  });
+};
+
+export const useExpenseReport = () => {
+  return useQuery({
+    queryKey: ['expenseReport'],
+    queryFn: getExpenseReport,
   });
 };
