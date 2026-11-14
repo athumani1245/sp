@@ -232,6 +232,8 @@ export const getPaymentsReport = async () => {
     id: String(item.id ?? item.payment_id ?? `${item.lease_number || 'payment'}-${index}`),
     date_paid: item.date ?? item.date_paid ?? item.payment_date ?? item.created_at ?? '',
     lease_number: item.lease_number ?? item.lease?.lease_number ?? '',
+    property: item.property_name ?? item.lease?.property?.name ?? '',
+    unit: item.unit_name ?? item.lease?.unit?.name ?? '',
     tenant: item.tenant_full_name
       ?? item.tenant
       ?? [item.tenant_name, item.tenant_last_name].filter(Boolean).join(' '),

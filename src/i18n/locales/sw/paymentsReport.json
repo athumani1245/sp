@@ -28,7 +28,7 @@
   "filters": {
     "paymentStatus": "Hali ya Malipo",
     "allStatuses": "Hali Zote",
-    "searchPlaceholder": "Tafuta kwa mpangaji au mkataba...",
+    "searchPlaceholder": "Tafuta kwa mpangaji, mali, chumba au mkataba...",
     "resetFilters": "Futa Vichujio",
     "filtersReset": "Vichujio vimefutwa",
     "activeFilters": "Vichujio Vilivyotumika:",
@@ -39,6 +39,8 @@
   "columns": {
     "leaseNo": "Namba ya Mkataba",
     "tenant": "Mpangaji",
+    "property": "Mali",
+    "unit": "Chumba",
     "amountPaid": "Iliyolipwa",
     "selectAll": "Chagua Zote",
     "deselectAll": "Ondoa Zote",
